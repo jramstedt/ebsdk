@@ -1,0 +1,128 @@
+#! /bin/sh
+
+get_param () {
+    if [ $# -lt 1 ] ; then
+	echo Internal error: parameter required in get_param
+	exit -1
+    fi
+    prompt=$1
+    if [ $# -gt 1 ] ; then
+	default=$2
+    else
+	default=""
+    fi
+
+    echo ""
+    echo "$prompt:"
+    echo -n "    [$default]: "
+    read answer
+    if [ "$answer" = "" ] ; then
+	answer=$default
+    fi
+}
+
+get_yesno () {
+    if [ $# -lt 1 ] ; then
+	echo Internal error: parameter required in get_yesno
+	exit -1
+    fi
+    prompt=$1
+    if [ $# -gt 1 ] ; then
+	default=$2
+	if [ "$default" != "Y" -a "$default" != "y" -a "$default" != "N" -a "$default" != "n" ] ; then
+	    echo Internal error: Defualt must be Y, y, N, or n
+	    exit -1
+	fi
+    else
+	default=""
+    fi
+
+    answer=""
+
+    while [ "$answer" != "Y" -a "$answer" != "y" -a "$answer" != "N" -a "$answer" != "n" ] ; do
+	echo -n "$prompt [Y/N] <$default> "
+	read answer
+	if [ "$answer" = "" ] ; then
+	    answer=$default
+	fi
+    done
+}
+
+
+TARGET_LIST="lx164 sx164 dp264"    
+
+CFDIR=`dirname $0`
+CFDIR=`cd $CFDIR ; pwd`
+
+if [ -x $CFDIR/sdkshell.conf ] ; then
+    echo Using existing configuration in $CFDIR/sdkshell.conf as default
+    . $CFDIR/sdkshell.conf
+fi
+
+
+echo "        ======== EBSDK build configuration ========"
+echo ""
+
+if [ "$EB_BASE" = "" ] ; then
+    EB_BASE=$CFDIR/ebfw
+fi
+get_param "Location of build directory" $EB_BASE
+EB_BASE=$answer
+
+if [ "$EB_TOOLBOX" = "" ] ; then
+    EB_TOOLBOX=$CFDIR/ebtools/unix
+fi
+get_param "Location of build tools directory" $EB_TOOLBOX
+EB_TOOLBOX=$answer
+
+if [ "$EB_BOOTDIR" = "" ] ; then
+    EB_BOOTDIR=$CFDIR/ebboot
+fi
+get_param "Location of bootable image directory" $EB_BOOTDIR
+EB_BOOTDIR=$answer
+
+if [ ! -e $EB_BOOTDIR ] ; then
+    echo $EB_BOOTDIR does not exist
+    get_yesno "Create it? " Y
+    if [ "$answer" = "Y" -o "$answer" = "y" ] ; then
+	mkdir -p $EB_BOOTDIR
+    fi
+else
+    if [ ! -d $EB_BOOTDIR ] ; then
+	echo $EB_BOOTDIR exists but is not a directory.
+	echo Re-check your configuration and try again.
+	exit -1
+    fi
+fi
+
+EB_TARGETS=""
+
+echo ""
+echo Which platforms do you want to build?
+for target in $TARGET_LIST ; do
+    get_yesno $target Y
+    if [ "$answer" = "Y" -o "$answer" = "y" ] ; then
+	if [ "$EB_TARGETS" = "" ] ; then
+	    EB_TARGETS=$target
+	else
+	    EB_TARGETS="$EB_TARGETS $target"
+	fi
+    fi
+done
+
+echo EB_BASE=$EB_BASE > $CFDIR/sdkmake.conf
+echo EB_TOOLBOX=$EB_TOOLBOX >> $CFDIR/sdkmake.conf
+echo EB_BOOTDIR=$EB_BOOTDIR >> $CFDIR/sdkmake.conf
+echo EB_TARGETS=$EB_TARGETS >> $CFDIR/sdkmake.conf
+echo EB_MAKE=$EB_TOOLBOX/gnumake >> $CFDIR/sdkmake.conf
+
+echo EB_BASE=$EB_BASE > $CFDIR/sdkshell.conf
+echo EB_TOOLBOX=$EB_TOOLBOX >> $CFDIR/sdkshell.conf
+echo EB_BOOTDIR=$EB_BOOTDIR >> $CFDIR/sdkshell.conf
+echo EB_TARGETS=\"$EB_TARGETS\" >> $CFDIR/sdkshell.conf
+echo EB_MAKE=$EB_TOOLBOX/gnumake >> $CFDIR/sdkshell.conf
+echo export EB_BASE EB_TOOLBOX EB_BOOTDIR EB_TARGETS EB_MAKE >> $CFDIR/sdkshell.conf
+
+chmod +x $CFDIR/sdkshell.conf
+
+

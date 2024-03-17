@@ -1,0 +1,299 @@
+#
+# Common file for making SROM images.
+#
+# $Id: Makefile.srm,v 1.6 1999/04/15 21:30:49 paradis Exp $
+#
+# $Log: Makefile.srm,v $
+# Revision 1.6  1999/04/15 21:30:49  paradis
+# Scrubbed out RX164 references
+#
+# Revision 1.5  1999/01/29 13:31:56  bissen
+# Made changes to build in the correct mini-debuger image at
+# the end of the srom code.
+#
+# Revision 1.4  1999/01/28 19:36:51  bissen
+# Fixing the sx164 srom padding size.
+#
+# Revision 1.3  1999/01/22 16:02:02  bissen
+# Updating for rx164 target srom builds.
+#
+# Revision 1.2  1999/01/19 19:02:05  bissen
+# Changed build targets for Rx164
+#
+# Revision 1.1.1.1  1998/12/29 21:36:12  paradis
+# Initial CVS checkin
+#
+# Revision 1.29  1997/10/14  20:14:19  pbell
+# Removed inclusion of the minidebugger for sx164 debug build 2
+#
+# Revision 1.28  1997/10/14  19:30:05  pbell
+# Updated SX164 srom size for debug builds 2 and 3
+#
+# Revision 1.27  1997/09/08  18:50:02  pbell
+# *** empty log message ***
+#
+# Revision 1.26  1997/09/08  14:07:39  pbell
+# Enhanced so that there is a default configuration when running
+# from the command line so that SUBTARGET and SUBTARGETEXT can
+# be omitted.
+#
+# Revision 1.25  1997/08/29  16:03:18  pbell
+# *** empty log message ***
+#
+# Revision 1.24  1997/08/26  15:38:24  pbell
+# Updated to generate multiple dependency files for the lx164 and sx164
+# platforms.
+#
+# Revision 1.23  1997/08/26  14:20:37  pbell
+# *** empty log message ***
+#
+# Revision 1.22  1997/07/21  18:44:47  pbell
+# Added support for lx and sx multiple configuration srom builds.
+#
+# Revision 1.21  1997/06/10  19:57:39  fdh
+# Modified sx164_SROMSIZE.
+#
+# Revision 1.20  1997/05/30  03:55:25  fdh
+# Added the .rom target for the SX164.
+#
+# Revision 1.19  1997/05/30  02:02:41  fdh
+# Changed mini-debugger image file name.
+#
+# Revision 1.18  1997/05/27  19:34:59  fdh
+# Corrected the list of mini-debugger images used with
+# the 21066.
+#
+# Revision 1.17  1997/05/23  17:37:40  fdh
+# Added the SX164 target.
+#
+# Revision 1.16  1997/05/08  15:59:10  fdh
+# Modified to build a debug version defining DEBUG_BOARD.
+#
+# Revision 1.15  1997/05/02  18:32:32  pbell
+# Added SX support.
+#
+# Revision 1.14  1997/02/25  21:41:26  fdh
+# Modified the $(BOOTDIR): target.
+#
+# Revision 1.13  1997/02/21  20:11:29  fdh
+# Added LX164.
+#
+# Revision 1.12  1996/04/12  19:31:44  cruz
+# Switched around the order of the listing and the padding rules.
+#
+# Revision 1.11  1996/04/11  17:47:44  cruz
+# Build all SROMs with a special minidebugger that contains
+# a dispatch table in the front to allow calls to be made
+# into the minidebugger.  This version used to be called a
+# debug version but it has now become the de-facto minidebugger.
+#
+# Revision 1.10  1996/02/15  14:52:04  cruz
+# Added new variable for PC164.
+#
+# Revision 1.9  1996/01/12  00:31:31  cruz
+# Moved setting of minidebugger image from rules.osf to here.
+#
+# Revision 1.8  1996/01/05  23:11:38  fdh
+# Adjusted the EB164 srom padding value.  Changed
+# from 0x4000 to 0x4004.
+#
+# Revision 1.7  1996/01/05  20:33:41  cruz
+# Added -x flag to hexpad tool options when the target is EB164.
+# The default padding for all other boards is 0x2004.
+#
+# Revision 1.6  1996/01/04  21:53:44  fdh
+# Added $(BOOTDIR)$(PROGRAM).pad: target.
+#
+# Revision 1.6  1995/12/23  19:31:58  fdh
+# Added the $(BOOTDIR)$(PROGRAM).pad target.
+#
+# Revision 1.5  1995/12/12  02:35:47  fdh
+# Add .hex file to Boot Directory.
+#
+# Revision 1.4  1995/11/18  15:13:00  fdh
+# Changed protection on BOOTDIR file...
+#
+# Revision 1.3  1995/11/16  18:41:58  cruz
+# Added GASSWITCHES to rule.
+#
+# Revision 1.2  1995/11/16  00:12:34  cruz
+# Added local rules.
+#
+#
+
+CONFIG_DIR=../../..
+include $(CONFIG_DIR)/sdkmake.conf
+include ../../rules.gnu
+
+DEFSTEXT_sx164	=rom
+
+
+ifndef SUBTARGET
+SUBTARGET = _sr
+endif
+
+ifndef SUBTARGETEXT
+ifdef DEFSTEXT_$(TARGET)
+SUBTARGETEXT = $(DEFSTEXT_$(TARGET))
+else
+SUBTARGETEXT = pad
+endif
+endif
+
+SOURCE	 	=srom.s
+PROGRAM 	=$(TARGET)$(SUBTARGET)
+
+BUILD_TARGETS = \
+	$(BOOTDIR)$(PROGRAM).img \
+	$(BOOTDIR)$(PROGRAM).hex \
+	$(OBJDIR)$(PROGRAM).lis  \
+	$(BOOTDIR)$(PROGRAM).$(SUBTARGETEXT)
+
+
+# -------------------------------------------------
+# Main targets
+# -------------------------------------------------
+all:	$(BUILD_TARGETS)
+
+# -------------------------------------------------
+# Append local flags here for only this Makefile
+# -------------------------------------------------
+
+# ------------------------------------------------
+# A special minidebugger (mdxxxd.exe is 
+# used for building into the SROMs.  It contains a 
+# dispatch table which allows the SROM to call 
+# routines in the minidebugger
+# ------------------------------------------------
+MDBG_sx164		    = $(TOOLBOX)/md164PCd.exe
+DMDBG_sx164_D0		= $(TOOLBOX)/md164PCd.exe
+DMDBG_sx164_D1		= $(TOOLBOX)/md164PCd.exe
+DMDBG_sx164_D2		=
+DMDBG_sx164_D3		= $(TOOLBOX)/md164PCd.exe
+
+ifdef EB_DEBUG_SROM
+DMDBG_sx164 = $(DMDBG_sx164_D$(EB_DEBUG_SROM))
+else
+DMDBG_sx164 = $(TOOLBOX)/md164PCd.exe
+endif
+
+MDBG_lx164		=
+DMDBG_lx164		= $(TOOLBOX)/md164.exe
+
+ifdef EB_DEBUG_SROM
+MINIDBG 		= $(DMDBG_$(TARGET))
+SROM_CPP		= -DDEBUG_BOARD=$(EB_DEBUG_SROM)
+else
+MINIDBG 		= $(MDBG_$(TARGET))
+SROM_CPP		= 
+endif
+
+GASSWITCHES		= $(GASFLAGS_GLOBAL) -P
+CPPSWITCHES		= $(SROM_INCLUDES) \
+			  $(OPTION_FLAGS_GLOBAL) \
+			  $(SROM_CPP) 
+
+SROM_TOOL_OPTIONS 	= $(SROM_FLAGS_GLOBAL)
+
+lx164_SROMSIZE		= -x0x4004
+
+sx164_SROMSIZE	    = -x0x4004
+
+HEXPAD_TOOL_OPTIONS 	= $(HEXPAD_FLAGS_GLOBAL) $($(TARGET)_SROMSIZE)
+
+#-----------------------------------------------------------
+# Rules for creating main targets.
+#-----------------------------------------------------------
+$(BOOTDIR)$(PROGRAM).img: $(OBJDIR)$(PROGRAM).img $(BOOTDIR)
+	$(COPY) $(OBJDIR)$(PROGRAM).img $(COPY_TO) $(BOOTDIR)$(PROGRAM).img
+	$(CHMOD) 664 $(BOOTDIR)$(PROGRAM).img
+
+$(BOOTDIR)$(PROGRAM).hex: $(OBJDIR)$(PROGRAM).hex $(BOOTDIR)
+	$(COPY) $(OBJDIR)$(PROGRAM).hex $(COPY_TO) $(BOOTDIR)$(PROGRAM).hex
+	$(CHMOD) 664 $(BOOTDIR)$(PROGRAM).hex
+
+$(PROGRAM).hex $(OBJDIR)$(PROGRAM).hex: $(OBJDIR)$(PROGRAM).img
+	$(SROM) $(SROM_TOOL_OPTIONS) \
+		 $(OBJDIR)$(PROGRAM).img $(OBJDIR)$(PROGRAM).hex
+
+$(PROGRAM).lis $(OBJDIR)$(PROGRAM).lis: $(OBJDIR)$(PROGRAM).out
+	$(ALIST) $*.out > $*.lis
+
+$(PROGRAM).pad $(OBJDIR)$(PROGRAM).pad: $(OBJDIR)$(PROGRAM).hex
+	$(HEXPAD) $(HEXPAD_TOOL_OPTIONS) \
+		 $(OBJDIR)$(PROGRAM).hex $(OBJDIR)$(PROGRAM).pad
+
+$(BOOTDIR)$(PROGRAM).pad: $(OBJDIR)$(PROGRAM).pad
+	$(COPY) $(OBJDIR)$(PROGRAM).pad $(COPY_TO) $(BOOTDIR)$(PROGRAM).pad
+	$(CHMOD) 664 $(BOOTDIR)$(PROGRAM).pad
+
+$(BOOTDIR)$(PROGRAM).rom: $(OBJDIR)$(PROGRAM).rom
+	$(COPY) $(OBJDIR)$(PROGRAM).rom $(COPY_TO) $(BOOTDIR)$(PROGRAM).rom
+	$(CHMOD) 644 $(BOOTDIR)$(PROGRAM).rom
+
+#-----------------------------------------------------------
+# Rules for creating files that are needed to build the
+# main targets.
+#-----------------------------------------------------------
+$(PROGRAM).img $(OBJDIR)$(PROGRAM).img: $(OBJDIR)$(PROGRAM).out $(MINIDBG)
+	$(ASTRIP) $(ASTRIP_FLAGS) $(OBJDIR)$(PROGRAM).out $(OBJDIR)$(PROGRAM).nh
+	$(CAT) $(OBJDIR)$(PROGRAM).nh $(MINIDBG) > $(OBJDIR)$(PROGRAM).img
+
+$(OBJDIR)$(PROGRAM).out: $(OBJDIR)$(PROGRAM).cpp
+	$(GAS) $(GASSWITCHES)  $(OBJDIR)$(PROGRAM).cpp -o $(OBJDIR)$(PROGRAM).out
+
+$(OBJDIR)$(PROGRAM).cpp: $(SOURCE) $(OBJDIR)rcsv.h
+	$(DELETE) $(OBJDIR)$(PROGRAM).cpp
+	$(CPP) $(CPPSWITCHES) -I$(OBJDIR) $(SOURCE) $(CPPOUT) $(OBJDIR)$(PROGRAM).cpp
+
+$(OBJDIR)rcsv.h: $(SOURCE)
+	$(TOOLBOX)/rcsv -v $(SOURCE) $(OBJDIR)rcsv.h
+
+$(OBJDIR)$(PROGRAM).rom: $(OBJDIR)$(PROGRAM).img
+	$(MAKEROM) -v -e -iSROM -l0 \
+	$(OBJDIR)$(PROGRAM).img -o $(OBJDIR)$(PROGRAM).rom
+
+$(BOOTDIR):
+	mkdir $(BOOTDIR)
+ifneq "$(EB_BUILD_SYSTEM)" "WINNT"
+	chmod a+r+x $(BOOTDIR)
+endif
+
+#-----------------------------------------------------------
+# For erasing the files created by this makefile.
+#-----------------------------------------------------------
+clean:
+	$(DELETE) *~ \#*\# core depnd$(SUBTARGET).lis.bak \
+		$(OBJDIR)$(PROGRAM).lis \
+		$(OBJDIR)$(PROGRAM).img \
+		$(OBJDIR)$(PROGRAM).nh  \
+		$(OBJDIR)$(PROGRAM).hex \
+		$(OBJDIR)$(PROGRAM).pad \
+		$(OBJDIR)$(PROGRAM).out \
+		$(OBJDIR)$(PROGRAM).cpp \
+		$(OBJDIR)$(PROGRAM).rom \
+		$(OBJDIR)rcsv.h
+
+	$(CLEAN)
+
+#-----------------------------------------------------------
+# For creating the dependency list included below.
+#-----------------------------------------------------------
+
+ifdef EB_DEBUG_SROM
+_MDFLAGS = -a
+else
+_MDFLAGS =
+endif
+
+depend: $(SOURCE)
+	$(MAKEDEPEND) $(_MDFLAGS) -f dependcy.lis  -o.cpp -p'$$(OBJDIR)$(PROGRAM).cpp $$(OBJDIR)' \
+		-- -DMAKEDEPEND $(CPPSWITCHES) -- $(SOURCE)
+
+distclean: clean
+	$(MAKEDEPEND) -f dependcy.lis
+	$(DELETE) dependcy.lis.bak
+
+
+include dependcy.lis
+

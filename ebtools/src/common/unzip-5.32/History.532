@@ -1,0 +1,186 @@
+UnZip, version 5.32, 3 November 1997
+
+New or removed features, you betcha:
+
+5.32a (19 Jul 97):
+ - FlexOS:  new port! [Derek Fawcus]
+ - WinDLL:  updates and reorg for use with Visual Basic [Mike White]
+ - added CRC multi-byte read optimizations to x86 assembler code [Rodney Brown,
+    Christian Spieler]
+ - VMS:  updated vmsdefs.h for gcc 2.x support [Onno van der Linden, Christian]
+5.32b (8 Sep 97):
+ - updated Where file [GRR]
+ - updated proginfo/3rdparty.bug with PKWARE -ex bug [GRR, "Tom"]
+ - monster patch [Christian]
+    - screen width for DOS [Jason "Adoxa" Hood, Christian]
+    - VMS makefile improvements
+    - extra-field testing/printing improvements
+ - Amiga:  incorporated time.lib code for timestamp handling [Walter Haidinger,
+    Norbert Pueschel, Christian]
+ - updated COPYING file with time.lib copyright, relaxed restrictions on
+    commercial use [GRR]
+ - monster DLL patch [Mike W]
+    - finished modifications to allow use with Visual BASIC
+    - added new entry points:  UzpVersion2() (for VB), UzpValidate(), UzpGrep(),
+       UzpNoPrinting()
+    - added support for static libraries
+    - various other fixes and stuff (no beeping, etc.)
+ - Tandem:  new port! [Dave D. Smith, GRR]
+ - updated README, including info about unshrink() and mailing large binaries
+    [GRR]
+ - VM/CMS, MVS:  enabled ZipInfo help screen; added argv/argc pre-processing
+    for stand-alone operation; don't use BLKSIZE for CMS [Greg Hartwig]
+ - BeOS:  added work-arounds for old-style (beta) BeOS extra fields [Chris H]
+ - enhanced "EF block length" error message [GRR]
+5.32c (28 Sep 97):
+ - removed the witty "so there" comments from zipfile-not-found error messages;
+    removed (all?) contractions [GRR, Paul Tabour, Steve Salisbury]
+ - added extra 17 days to 2038 saturation test [GRR, Christian]
+ - BeOS:  updated GNU C support [Chris]
+ - MSDOS:  updated djgpp 2.x makefile for make 3.75 [Frank Donahoe,
+    Eli Zaretskii]
+ - changed exit status from 1 to 81 for failed testing/extraction due to
+    unsupported compression/encryption; updated unzip.{1,doc} [GRR, Jean-loup]
+5.32d (5 Oct 97):
+ - Tandem:  added support for text conversion (-a) [Dave Smith]
+ - MSDOS, Win32:  updated Watcom makefiles for version 11.0 [Paul]
+ - BeOS:  integrated with Unix symlink code [Chris]
+ - updated INSTALL [Christian, GRR]
+ - generalized TIMESTAMP support (-T) and enabled it for most OSes:  RISC OS,
+    Amiga, Atari, BeOS, MS-DOS, QDOS, VMS and Win32 (already existed for Unix)
+    [Christian]
+ - OS/2:  enabled TIMESTAMP support (-T) [GRR]
+ - renamed Where to WHERE for consistency; updated all references [GRR]
+5.32e (11 Oct 97):
+ - Unix:  added assembler CRC support to Linux shared-library targets [GRR]
+ - updated README, CONTRIBS, WHERE, Contents, various other docs [GRR]
+ - cleaned up and improved TIMESTAMP support (including adding it to Human68k
+    port) [Christian]
+5.32f (18 Oct 97):
+ - updated WHERE some more [Christian, GRR]
+ - updated Intel-assembler CRC code [Christian, Rodney Brown]
+ - updated README.CR with "how-to" instructions and newer PGP info [GRR,
+    Christian]
+ - WinDLL:  made extraction directory thread-safe [Mike W]
+ - Mac:  added Metrowerks port; updated Mac code [Antoine Verheijen]
+ - made minor grammatical fixes to source comments [Christian]
+ - SMS/QDOS:  updated README file [Christian, GRR]
+5.32g (21 Oct 97):
+ - updated INSTALL [Frank Donahoe, GRR]
+ - updated WHERE [Christian, GRR]
+5.32h (31 Oct 97):
+ - Amiga:  updated time_lib.c and stat.c with latest Zip fixes [Paul, Christian]
+ - VMS:  added info about *.bck distributions to 00binary.vms, cosmetic cleanups
+    to vms.c [Christian]
+5.32i (2 Nov 97):
+ - updated dates/version numbers for public release [GRR]
+
+Bugs fixed:
+
+5.32a (19 Jul 97):
+ - Unix:  added -DNO_UID_GID to 7300 and 7300_gcc targets; added -DCBREAK=2 to
+    3Bx and 7300* targets [Peter Mauzey, GRR]
+ - Unix:  fixed typo in ZipInfo man page [Guy Harris]
+ - NT:  fixed incorrect NTSD extra-block offsets in zipinfo.c and win32.c [Jim
+    Delahanty]
+ - NT:  changed NTSD testing to flag failed security check differently from CRC
+    failure [Jim Delahanty]
+ - moved test_NT (NTSD extra blocks) to extract.c for multi-OS testing [GRR]
+ - OS/2:  fixed potential double-free bug in checkdir() [Aaron Gaalswyk]
+ - DOS:  fixed buffer-overrun bug in msdos.c [Peter Eckel]
+ - Amiga:  fixed Unix -> Amiga DST error with new mkgmtime() [Paul Kienitz]
+5.32b (8 Sep 97):
+ - changed redirect-related DLL ifdefs to OS2DLL [GRR, Geoff McLane]
+ - WinDLL:  fixed FINISH_REDIRECT macro so in-memory extraction works for non-
+    OS/2 DLLs [Mike W, GRR]
+ - monster patch [Christian]
+    - time_t overrun fixes ("2096 bug")
+    - VMS:  CLI interface bugfix
+ - DOS, OS/2, Win32:  fixed mismatched ifdef/elif pairs in msdos.c [Michael
+    "Mike" D. O'Connor, GRR]
+ - DOS:  fixed makefile.tc (unzipsfx command line too long) [GRR, Michael
+    "Mike" D. O'Connor]
+ - fixed file-attributes code for various OSes [Chris H]
+ - OS/2, DOS, Win32:  fixed bug allowing spaces before dots in extracted
+    filenames [Kai Uwe, Christian]
+ - fixed some ef_scan_for_izux() debug messages, "central e.f. vs. local e.f."
+    inconsistencies [Christian]
+ - relaxed some restrictions on time_t overrun values ("2096 bug") [Christian]
+5.32c (28 Sep 97):
+ - Win32:  fixed eb_ucptr oversight (NTSD code) [Mike W, Jim Delahanty]
+ - VMS:  fixed missing-comma typo in make_unz.com, missing-dollar typo in
+    descrip.mms, various other typos [Mike Freeman, GRR, Christian]
+ - Unix:  fixed symlink info message (printed even when -q given) [GRR, Robert
+    Anderson]
+ - various minor fixes to Amiga timezone code, extract.c message, globals.h
+    [Christian]
+ - MSDOS:  made STRIP command non-echoing in makefile.tc [Mike O'Connor]
+ - Unix:  added new symlink code to avoid problem wherein existing symlink
+    with no pointee is not detected at extraction time, resulting in a fresh-
+    but-bogus pointee file containing its own filename [GRR]
+5.32d (5 Oct 97):
+ - MSDOS:  one final fix to djgpp 2.x makefile [Frank Donahoe]
+ - fixed symlink info message (printed even when -q given) in non-Unix ports:
+    AOS/VS, Atari, BeOS, Tandem and QDOS cross-compile [GRR]
+ - Tandem:  added to list of auto-case-conversion systems [GRR]
+ - Amiga:  minor time_lib fix via Zip sources [Paul, Christian]
+ - miscellaneous other fixes from Christian's monster TIMESTAMP patch:
+    - shortened extra-field warning (extract.c)
+    - added -Zsmall-conv to DOS and Win32 emx+gcc makefiles
+    - enhanced _dos_setftime() to return an error code
+    - switched to relaxed ANSI mode for Alpha VMS compiles
+    - fixed a "strings not in Far memory" fault (zipinfo.c)
+    - simplified/fixed old "local-only UX" extra-field code (zipinfo.c)
+    - various cosmetic fixes
+ - OS/2:  fixed problem with broken REXX API [Kai Uwe]
+5.32e (11 Oct 97):
+ - Win32:  fixed bogus G.filename reference in stamp_file() [Mike W]
+ - really replaced "Where" with "WHERE" (oops) [GRR, Eric Baatz]
+ - QDOS:  changed sys/time.h -> time.h in unzpriv.h [Jonathan Hudson]
+ - OS/2:  fixed typo, overlooked ifdef in timestamp code [Kai Uwe]
+ - Unix:  tweaked ISC makefile targets [Larry Jones]
+ - DLL:  fixed a bunch of OS2DLL / DLL ifdefs; added missing redirect_outfile();
+    fixed typo in windll/unziplib.def [Mike W]
+ - VMS:  removed bogus leap variable [Mike F]
+ - Tandem:  removed bogus `release' script; ifdef'd tzset() call; modified
+    stat() for creation time [Dave Smith]
+ - BeOS:  disabled restoration of file attribs on symlinks (currently no way
+    to do so from C) [Chris]
+ - WinDLL:  cleaned up comments and DESCRIPTION text in *.def [Mike W]
+ - Amiga:  fixed some non-portable header inclusions; added typecast [Paul]
+ - removed some unused variables and made Headers static again in list.c
+    [Christian]
+5.32f (18 Oct 97):
+ - DOS, Win32:  bugfix for checkdir() problem where memory freed twice [Mike W]
+ - fixed array-size allocation bug in unshrink code [Antoine]
+ - OS/2:  improved bounds-checking on truncated extra fields to avoid segfaults
+    on bad zipfiles [Christian]
+ - VMS:  fixed failure to extract some indexed files that were stored with
+    IM-style extra field!!! (zip "-V" for Zip 2.0 through 2.1) [Christian]
+5.32g (21 Oct 97):
+ - Mac:  removed bogus blank lines from new *.hqx files [Christian, GRR]
+ - more spelling corrections [Christian]
+ - Amiga:  fixed "last timezone bug" (mkgmtime() 16-bit overflow); added missing
+    makefile stuff to activate time_lib code [Paul]
+ - removed remaining ports' possibilities for double free()s; added check for
+    out-of-bounds NTSD extra fields; added remaining checks against redefining
+    DATE_FORMAT; removed unused code in unshrink.c; fixed bogus RETURN macro;
+    prototyped MAIN unconditionally; cleaned up/fixed VMS QIO fix [Christian]
+5.32h (31 Oct 97):
+ - OS/2:  fixed bogus Info() causing segmentation violations; simplified blank-
+    before-dot fix; initialized G.{,x}filespecs in UzpFileTree() [Christian]
+ - WinDLL:  fixed ISO-OEM character conversion; extended calling interface for
+    excluded files; initialized more variables; updated VB and C examples
+    [Christian, Mike W]
+ - DOS:  fixed version() code for Turbo C++ versions (3.0 == last) [E-Yen Tan]
+5.32i (2 Nov 97):
+ - WinDLL:  fixed "ush" ifdef in structs.h [Mike W]
+ - fixed some UnZip-vs-ZipInfo T_flag mixups [GRR]
+
+==================
+
+These changes occurred in beta versions 5.32a to 5.32i.  This list may have 
+left out some bugfixes and even some features...void where prohibited, your
+mileage may vary, etc., etc.
+
+Greg Roelofs

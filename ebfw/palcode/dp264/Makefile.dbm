@@ -1,0 +1,23 @@
+CONFIG_DIR=../../..
+include $(CONFIG_DIR)/sdkmake.conf
+
+OSFPAL_ASM_FILES= ev6_defs.mar ev6_redefine_defs.mar ev6_osf_dbm.mar \
+    ev6_pal_temps.mar ev6_alpha_defs.mar ev6_osf_pal_defs.mar \
+    ev6_dbm_pal_defs.mar ev6_system_pal_impure.mar ev6_pal_macros.mar \
+    ev6_osf_pal.mar sromcsrv.mar sromio.mar ev6_osf_system_pal.mar
+
+
+osfpal_dbm:
+	$(HAL) -o osfpal_dbm.exe -l osfpal_dbm.lis -h EV6 -e ".SHOW MEB" $(OSFPAL_ASM_FILES)
+	$(EB_TOOLBOX)/mapcvt -pvc osfpal_dbm.lis osfpal_dbm.map
+
+dnr:
+	defnr -i ev6_pal_temps.dnr -m -o ev6_pal_temps.mar
+	defnr -i ev6_system_pal_impure.dnr -m -o ev6_system_pal_impure.mar
+	defnr -i ev6_system_pal_defs.dnr -m -o ev6_system_pal_defs.mar
+
+clean:
+	rm -f core
+	rm -f osfpal.exe osfpal_dbm.exe
+	rm -f osfpal.lis osfpal_dbm.lis
+	rm -f *.map

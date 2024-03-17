@@ -1,0 +1,16 @@
+!IF "$(CPU)" == "ALPHA"
+EXEDIR          = ..\..\..\ntalpha
+!ELSE
+EXEDIR          = ..\..\..\ntx86
+!ENDIF
+
+all: $(PROGRAMS) $(PROGRAM)
+
+clean:
+	-del /f /q $(PROGRAMS) $(OBJECTS) *~
+
+install:	$(PROGRAM)
+	copy $(PROGRAM) $(EXEDIR)
+
+$(PROGRAM) $(EXEDIR)\$(PROGRAM).exe:	$(OBJECTS)
+	$(link) $(linkdebug) $(conflags) /out:$(EXEDIR)\$(PROGRAM).exe $(OBJECTS) $(conlibs)

@@ -1,0 +1,31 @@
+CC		= cc
+CFLAGS		= -g -DCROSS_COMPILE_32_TO_64_BITS=1 -I. -I../include
+LFLAGS		= -lc
+COMMON		= ../common
+INCLUDE		= ../include
+COMMONLIB	= $(COMMON)/commlib.a
+
+TOUCH = /usr/bin/touch
+#
+tools:		alist
+
+alist:		alist.o\
+    	    	$(COMMONLIB)
+		$(CC) $(CFLAGS) -o alist alist.o $(COMMONLIB) $(LFLAGS)
+
+alist.o:	alist.c\
+		$(INCLUDE)/aout.h\
+		$(INCLUDE)/cross_32_to_64.h
+		$(CC) $(CFLAGS) -c alist.c
+
+disassembler.o: disassembler.o
+		$(CC) $(CFLAGS) -c disassembler.c
+
+install:	alist\
+		cp alist $(TOOLBOX)/.
+    	    	
+clean:
+		rm -f *.o *~ core alist
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+

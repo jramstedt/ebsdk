@@ -1,0 +1,25 @@
+#
+# Make file to build LIST on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:	$(EXEDIR)\ccheck.exe $(EXEDIR)\newstrip.exe 
+
+$(OBJDIR)\ccheck.obj:	$(INCDIR)\a_out.h $(SRCDIR)\ccheck.c
+
+$(EXEDIR)\ccheck.exe:	$(OBJDIR)\ccheck.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+	$(OBJDIR)\ccheck.obj $(COMMONLIB) $(conlibs)
+
+$(OBJDIR)\newstrip.obj:	$(INCDIR)\coff.h $(SRCDIR)\newstrip.c
+
+$(EXEDIR)\newstrip.exe:	$(OBJDIR)\newstrip.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+	$(OBJDIR)\newstrip.obj $(COMMONLIB) $(conlibs)
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\ccheck.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\ccheck.exe
+	-del $(CLEANFLAGS) $(OBJDIR)\newstrip.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\newstrip.exe

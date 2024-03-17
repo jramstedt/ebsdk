@@ -1,0 +1,580 @@
+Loading up Write Once Chain from CBOX
+write_once_a[0] = tlaser_stio_mode_a(0) = 0
+tlaser_stio_mode_a                                 = 0x0
+
+write_once_a[1] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[2] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[3] = dcvic_threshold_a(0) = 0
+write_once_a[4] = dcvic_threshold_a(1) = 0
+write_once_a[5] = dcvic_threshold_a(2) = 1
+write_once_a[6] = dcvic_threshold_a(3) = 0
+write_once_a[7] = dcvic_threshold_a(4) = 0
+write_once_a[8] = dcvic_threshold_a(5) = 0
+write_once_a[9] = dcvic_threshold_a(6) = 0
+write_once_a[10] = dcvic_threshold_a(7) = 0
+dcvic_threshold_a                                  = 0x4
+
+write_once_a[11] = bc_clean_victim_a(0) = 0
+bc_clean_victim_a                                  = 0x0
+
+write_once_a[12] = sys_bus_size_a(0) = 1
+write_once_a[13] = sys_bus_size_a(1) = 1
+sys_bus_size_a                                     = 0x3
+
+write_once_a[14] = sysbus_format_a(0) = 1
+sysbus_format_a                                    = 0x1
+
+write_once_a[15] = sys_clk_ratio_a(1) = 1
+write_once_a[16] = sys_clk_ratio_a(2) = 0
+write_once_a[17] = sys_clk_ratio_a(3) = 0
+write_once_a[18] = sys_clk_ratio_a(4) = 0
+sys_clk_ratio_a                                    = 0x2
+
+write_once_a[19] = dup_tag_enable_a(0) = 0
+dup_tag_enable_a                                   = 0x0
+
+write_once_a[20] = prb_tag_only_a(0) = 1
+prb_tag_only_a                                     = 0x1
+
+write_once_a[21] = fast_mode_disable_a(0) = 1
+fast_mode_disable_a                                = 0x1
+
+write_once_a[22] = bc_rdvictim_a(0) = 0
+bc_rdvictim_a                                      = 0x0
+
+write_once_a[23] = bc_clean_victim_a(0) = 0
+bc_clean_victim_a                                  = 0x0
+
+write_once_a[24] = rdvic_ack_inhibit_a(0) = 0
+rdvic_ack_inhibit_a                                = 0x0
+
+write_once_a[25] = sysbus_mb_enable_a(0) = 0
+sysbus_mb_enable_a                                 = 0x0
+
+write_once_a[26] = sysbus_ack_limit_a(4) = 0
+write_once_a[27] = sysbus_ack_limit_a(3) = 0
+write_once_a[28] = sysbus_ack_limit_a(2) = 1
+write_once_a[29] = sysbus_ack_limit_a(1) = 0
+write_once_a[30] = sysbus_ack_limit_a(0) = 0
+sysbus_ack_limit_a                                 = 0x4
+
+write_once_a[31] = sysbus_vic_limit_a(2) = 0
+write_once_a[32] = sysbus_vic_limit_a(1) = 0
+write_once_a[33] = sysbus_vic_limit_a(0) = 0
+sysbus_vic_limit_a                                 = 0x0
+
+write_once_a[34] = bc_clean_victim_a(0) = 0
+bc_clean_victim_a                                  = 0x0
+
+write_once_a[35] = bc_wr_wr_bubble_a(0) = 0
+bc_wr_wr_bubble_a                                  = 0x0
+
+write_once_a[36] = bc_rd_wr_bubbles_a(5) = 0
+write_once_a[37] = bc_rd_wr_bubbles_a(4) = 0
+write_once_a[38] = bc_rd_wr_bubbles_a(3) = 1
+write_once_a[39] = bc_rd_wr_bubbles_a(2) = 0
+write_once_a[40] = bc_rd_wr_bubbles_a(1) = 0
+write_once_a[41] = bc_rd_wr_bubbles_a(0) = 1
+bc_rd_wr_bubbles_a                                 = 0x9
+
+write_once_a[42] = bc_rd_rd_bubble_a(0) = 0
+bc_rd_rd_bubble_a                                  = 0x0
+
+write_once_a[43] = bc_sj_bank_enable_a(0) = 0
+bc_sj_bank_enable_a                                = 0x0
+
+write_once_a[44] = bc_wr_rd_bubbles_a(3) = 0
+write_once_a[45] = bc_wr_rd_bubbles_a(2) = 0
+write_once_a[46] = bc_wr_rd_bubbles_a(1) = 1
+write_once_a[47] = bc_wr_rd_bubbles_a(0) = 1
+bc_wr_rd_bubbles_a                                 = 0x3
+
+write_once_a[48] = dup_tag_enable_a(0) = 0
+dup_tag_enable_a                                   = 0x0
+
+write_once_a[49] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[50] = bc_rdvictim_a(0) = 0
+bc_rdvictim_a                                      = 0x0
+
+write_once_a[51] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[52] = bc_rdvictim_a(0) = 0
+bc_rdvictim_a                                      = 0x0
+
+write_once_a[53] = bc_clean_victim_a(0) = 0
+bc_clean_victim_a                                  = 0x0
+
+write_once_a[54] = dup_tag_enable_a(0) = 0
+dup_tag_enable_a                                   = 0x0
+
+write_once_a[55] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[56] = enable_probe_chk_a(0) = 0
+enable_probe_chk_a                                 = 0x0
+
+write_once_a[57] = spec_read_enable_a(0) = 1
+spec_read_enable_a                                 = 0x1
+
+write_once_a[58] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[59] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[60] = mbox_bc_prb_stall_a(0) = 0
+mbox_bc_prb_stall_a                                = 0x0
+
+write_once_a[61] = bc_lat_data_pattern_a(31) = 0
+write_once_a[62] = bc_lat_data_pattern_a(30) = 0
+write_once_a[63] = bc_lat_data_pattern_a(29) = 0
+write_once_a[64] = bc_lat_data_pattern_a(28) = 0
+write_once_a[65] = bc_lat_data_pattern_a(27) = 0
+write_once_a[66] = bc_lat_data_pattern_a(26) = 0
+write_once_a[67] = bc_lat_data_pattern_a(25) = 0
+write_once_a[68] = bc_lat_data_pattern_a(24) = 0
+write_once_a[69] = bc_lat_data_pattern_a(23) = 0
+write_once_a[70] = bc_lat_data_pattern_a(22) = 0
+write_once_a[71] = bc_lat_data_pattern_a(21) = 0
+write_once_a[72] = bc_lat_data_pattern_a(20) = 0
+write_once_a[73] = bc_lat_data_pattern_a(19) = 0
+write_once_a[74] = bc_lat_data_pattern_a(18) = 0
+write_once_a[75] = bc_lat_data_pattern_a(17) = 0
+write_once_a[76] = bc_lat_data_pattern_a(16) = 0
+write_once_a[77] = bc_lat_data_pattern_a(15) = 0
+write_once_a[78] = bc_lat_data_pattern_a(14) = 0
+write_once_a[79] = bc_lat_data_pattern_a(13) = 0
+write_once_a[80] = bc_lat_data_pattern_a(12) = 1
+write_once_a[81] = bc_lat_data_pattern_a(11) = 0
+write_once_a[82] = bc_lat_data_pattern_a(10) = 0
+write_once_a[83] = bc_lat_data_pattern_a(9) = 1
+write_once_a[84] = bc_lat_data_pattern_a(8) = 0
+write_once_a[85] = bc_lat_data_pattern_a(7) = 1
+write_once_a[86] = bc_lat_data_pattern_a(6) = 0
+write_once_a[87] = bc_lat_data_pattern_a(5) = 0
+write_once_a[88] = bc_lat_data_pattern_a(4) = 1
+write_once_a[89] = bc_lat_data_pattern_a(3) = 0
+write_once_a[90] = bc_lat_data_pattern_a(2) = 0
+write_once_a[91] = bc_lat_data_pattern_a(1) = 0
+write_once_a[92] = bc_lat_data_pattern_a(0) = 0
+bc_lat_data_pattern_a                              = 0x1290
+
+write_once_a[93] = bc_lat_tag_pattern_a(23) = 0
+write_once_a[94] = bc_lat_tag_pattern_a(22) = 0
+write_once_a[95] = bc_lat_tag_pattern_a(21) = 0
+write_once_a[96] = bc_lat_tag_pattern_a(20) = 0
+write_once_a[97] = bc_lat_tag_pattern_a(19) = 0
+write_once_a[98] = bc_lat_tag_pattern_a(18) = 0
+write_once_a[99] = bc_lat_tag_pattern_a(17) = 0
+write_once_a[100] = bc_lat_tag_pattern_a(16) = 0
+write_once_a[101] = bc_lat_tag_pattern_a(15) = 0
+write_once_a[102] = bc_lat_tag_pattern_a(14) = 0
+write_once_a[103] = bc_lat_tag_pattern_a(13) = 0
+write_once_a[104] = bc_lat_tag_pattern_a(12) = 0
+write_once_a[105] = bc_lat_tag_pattern_a(11) = 0
+write_once_a[106] = bc_lat_tag_pattern_a(10) = 0
+write_once_a[107] = bc_lat_tag_pattern_a(9) = 0
+write_once_a[108] = bc_lat_tag_pattern_a(8) = 0
+write_once_a[109] = bc_lat_tag_pattern_a(7) = 0
+write_once_a[110] = bc_lat_tag_pattern_a(6) = 0
+write_once_a[111] = bc_lat_tag_pattern_a(5) = 0
+write_once_a[112] = bc_lat_tag_pattern_a(4) = 1
+write_once_a[113] = bc_lat_tag_pattern_a(3) = 0
+write_once_a[114] = bc_lat_tag_pattern_a(2) = 0
+write_once_a[115] = bc_lat_tag_pattern_a(1) = 0
+write_once_a[116] = bc_lat_tag_pattern_a(0) = 0
+bc_lat_tag_pattern_a                               = 0x10
+
+write_once_a[117] = bc_rdvictim_a(0) = 0
+bc_rdvictim_a                                      = 0x0
+
+write_once_a[118] = enable_stc_command_a(0) = 0
+enable_stc_command_a                               = 0x0
+
+write_once_a[119] = bc_late_write_num_a(2) = 0
+write_once_a[120] = bc_late_write_num_a(1) = 0
+write_once_a[121] = bc_late_write_num_a(0) = 1
+bc_late_write_num_a                                = 0x1
+
+write_once_a[122] = bc_cpu_late_write_num_a(1) = 0
+write_once_a[123] = bc_cpu_late_write_num_a(0) = 1
+bc_cpu_late_write_num_a                            = 0x1
+
+write_once_a[124] = bc_burst_mode_enable_a(0) = 0
+bc_burst_mode_enable_a                             = 0x0
+
+write_once_a[125] = bc_pentium_mode_a(0) = 0
+bc_pentium_mode_a                                  = 0x0
+
+write_once_a[126] = bc_clk_ratio_a(1) = 0
+bc_clk_ratio_a                                     = 0x8
+
+write_once_a[127] = bc_frm_clk_a(0) = 1
+bc_frm_clk_a                                       = 0x1
+
+write_once_a[128] = bc_clk_delay_a(1) = 1
+write_once_a[129] = bc_clk_delay_a(0) = 0
+bc_clk_delay_a                                     = 0x2
+
+write_once_a[130] = bc_ddmr_enable_a(0) = 1
+bc_ddmr_enable_a                                   = 0x1
+
+write_once_a[131] = bc_ddmf_enable_a(0) = 1
+bc_ddmf_enable_a                                   = 0x1
+
+write_once_a[132] = bc_late_write_upper_a(0) = 0
+bc_late_write_upper_a                              = 0x0
+
+write_once_a[133] = bc_tag_ddm_fall_en_a(0) = 0
+bc_tag_ddm_fall_en_a                               = 0x0
+
+write_once_a[134] = bc_tag_ddm_rise_en_a(0) = 1
+bc_tag_ddm_rise_en_a                               = 0x1
+
+write_once_a[135] = bc_clkfwd_enable_a(0) = 1
+bc_clkfwd_enable_a                                 = 0x1
+
+write_once_a[136] = bc_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[137] = bc_rcv_mux_cnt_preset_a(0) = 0
+bc_rcv_mux_cnt_preset_a                            = 0x0
+
+write_once_a[138] = bc_late_write_upper_a(0) = 0
+bc_late_write_upper_a                              = 0x0
+
+write_once_a[139] = sys_ddm_fall_en_a(0) = 1
+sys_ddm_fall_en_a                                  = 0x1
+
+write_once_a[140] = sys_ddm_rise_en_a(0) = 1
+sys_ddm_rise_en_a                                  = 0x1
+
+write_once_a[141] = sys_clkfwd_enable_a(0) = 1
+sys_clkfwd_enable_a                                = 0x1
+
+write_once_a[142] = sys_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[143] = sys_rcv_mux_cnt_preset_a(0) = 0
+sys_rcv_mux_cnt_preset_a                           = 0x0
+
+write_once_a[144] = sys_clk_delay_a(1) = 0
+write_once_a[145] = sys_clk_delay_a(0) = 1
+sys_clk_delay_a                                    = 0x1
+
+write_once_a[146] = sys_ddmr_enable_a(0) = 1
+sys_ddmr_enable_a                                  = 0x1
+
+write_once_a[147] = sys_ddmf_enable_a(0) = 1
+sys_ddmf_enable_a                                  = 0x1
+
+write_once_a[148] = bc_ddm_fall_en_a(0) = 0
+bc_ddm_fall_en_a                                   = 0x0
+
+write_once_a[149] = bc_ddm_rise_en_a(0) = 1
+bc_ddm_rise_en_a                                   = 0x1
+
+write_once_a[150] = bc_clkfwd_enable_a(0) = 1
+bc_clkfwd_enable_a                                 = 0x1
+
+write_once_a[151] = bc_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[152] = bc_rcv_mux_cnt_preset_a(0) = 0
+bc_rcv_mux_cnt_preset_a                            = 0x0
+
+write_once_a[153] = bc_clk_delay_a(1) = 1
+write_once_a[154] = bc_clk_delay_a(0) = 0
+bc_clk_delay_a                                     = 0x2
+
+write_once_a[155] = bc_ddmr_enable_a(0) = 1
+bc_ddmr_enable_a                                   = 0x1
+
+write_once_a[156] = bc_ddmf_enable_a(0) = 1
+bc_ddmf_enable_a                                   = 0x1
+
+write_once_a[157] = sys_ddm_fall_en_a(0) = 1
+sys_ddm_fall_en_a                                  = 0x1
+
+write_once_a[158] = sys_ddm_rise_en_a(0) = 1
+sys_ddm_rise_en_a                                  = 0x1
+
+write_once_a[159] = sys_clkfwd_enable_a(0) = 1
+sys_clkfwd_enable_a                                = 0x1
+
+write_once_a[160] = sys_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[161] = sys_rcv_mux_cnt_preset_a(0) = 0
+sys_rcv_mux_cnt_preset_a                           = 0x0
+
+write_once_a[162] = sys_clk_delay_a(1) = 0
+write_once_a[163] = sys_clk_delay_a(0) = 1
+sys_clk_delay_a                                    = 0x1
+
+write_once_a[164] = sys_ddmr_enable_a(0) = 1
+sys_ddmr_enable_a                                  = 0x1
+
+write_once_a[165] = sys_ddmf_enable_a(0) = 1
+sys_ddmf_enable_a                                  = 0x1
+
+write_once_a[166] = bc_ddm_fall_en_a(0) = 0
+bc_ddm_fall_en_a                                   = 0x0
+
+write_once_a[167] = bc_ddm_rise_en_a(0) = 1
+bc_ddm_rise_en_a                                   = 0x1
+
+write_once_a[168] = bc_clkfwd_enable_a(0) = 1
+bc_clkfwd_enable_a                                 = 0x1
+
+write_once_a[169] = bc_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[170] = bc_rcv_mux_cnt_preset_a(0) = 0
+bc_rcv_mux_cnt_preset_a                            = 0x0
+
+write_once_a[171] = sys_ddm_fall_en_a(0) = 1
+sys_ddm_fall_en_a                                  = 0x1
+
+write_once_a[172] = sys_ddm_rise_en_a(0) = 1
+sys_ddm_rise_en_a                                  = 0x1
+
+write_once_a[173] = sys_clkfwd_enable_a(0) = 1
+sys_clkfwd_enable_a                                = 0x1
+
+write_once_a[174] = sys_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[175] = sys_rcv_mux_cnt_preset_a(0) = 0
+sys_rcv_mux_cnt_preset_a                           = 0x0
+
+write_once_a[176] = sys_clk_delay_a(1) = 0
+write_once_a[177] = sys_clk_delay_a(0) = 1
+sys_clk_delay_a                                    = 0x1
+
+write_once_a[178] = sys_ddmr_enable_a(0) = 1
+sys_ddmr_enable_a                                  = 0x1
+
+write_once_a[179] = sys_ddmf_enable_a(0) = 1
+sys_ddmf_enable_a                                  = 0x1
+
+write_once_a[180] = bc_ddm_fall_en_a(0) = 0
+bc_ddm_fall_en_a                                   = 0x0
+
+write_once_a[181] = bc_ddm_rise_en_a(0) = 1
+bc_ddm_rise_en_a                                   = 0x1
+
+write_once_a[182] = bc_clkfwd_enable_a(0) = 1
+bc_clkfwd_enable_a                                 = 0x1
+
+write_once_a[183] = bc_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[184] = bc_rcv_mux_cnt_preset_a(0) = 0
+bc_rcv_mux_cnt_preset_a                            = 0x0
+
+write_once_a[185] = bc_clk_delay_a(1) = 1
+write_once_a[186] = bc_clk_delay_a(0) = 0
+bc_clk_delay_a                                     = 0x2
+
+write_once_a[187] = bc_ddmr_enable_a(0) = 1
+bc_ddmr_enable_a                                   = 0x1
+
+write_once_a[188] = bc_ddmf_enable_a(0) = 1
+bc_ddmf_enable_a                                   = 0x1
+
+write_once_a[189] = sys_ddm_fall_en_a(0) = 1
+sys_ddm_fall_en_a                                  = 0x1
+
+write_once_a[190] = sys_ddm_rise_en_a(0) = 1
+sys_ddm_rise_en_a                                  = 0x1
+
+write_once_a[191] = sys_clkfwd_enable_a(0) = 1
+sys_clkfwd_enable_a                                = 0x1
+
+write_once_a[192] = sys_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[193] = sys_rcv_mux_cnt_preset_a(0) = 0
+sys_rcv_mux_cnt_preset_a                           = 0x0
+
+write_once_a[194] = sys_clk_delay_a(1) = 0
+write_once_a[195] = sys_clk_delay_a(0) = 1
+sys_clk_delay_a                                    = 0x1
+
+write_once_a[196] = sys_ddmr_enable_a(0) = 1
+sys_ddmr_enable_a                                  = 0x1
+
+write_once_a[197] = sys_ddmf_enable_a(0) = 1
+sys_ddmf_enable_a                                  = 0x1
+
+write_once_a[198] = bc_ddm_fall_en_a(0) = 0
+bc_ddm_fall_en_a                                   = 0x0
+
+write_once_a[199] = bc_ddm_rise_en_a(0) = 1
+bc_ddm_rise_en_a                                   = 0x1
+
+write_once_a[200] = bc_clkfwd_enable_a(0) = 1
+bc_clkfwd_enable_a                                 = 0x1
+
+write_once_a[201] = bc_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[202] = bc_rcv_mux_cnt_preset_a(0) = 0
+bc_rcv_mux_cnt_preset_a                            = 0x0
+
+write_once_a[203] = sys_clk_delay_a(1) = 0
+write_once_a[204] = sys_clk_delay_a(0) = 1
+sys_clk_delay_a                                    = 0x1
+
+write_once_a[205] = sys_ddmr_enable_a(0) = 1
+sys_ddmr_enable_a                                  = 0x1
+
+write_once_a[206] = sys_ddmf_enable_a(0) = 1
+sys_ddmf_enable_a                                  = 0x1
+
+write_once_a[207] = sys_ddm_fall_en_a(0) = 1
+sys_ddm_fall_en_a                                  = 0x1
+
+write_once_a[208] = sys_ddm_rise_en_a(0) = 1
+sys_ddm_rise_en_a                                  = 0x1
+
+write_once_a[209] = sys_clkfwd_enable_a(0) = 1
+sys_clkfwd_enable_a                                = 0x1
+
+write_once_a[210] = sys_rcv_mux_cnt_preset_a(1) = 0
+write_once_a[211] = sys_rcv_mux_cnt_preset_a(0) = 0
+sys_rcv_mux_cnt_preset_a                           = 0x0
+
+write_once_a[212] = cfr_gclk_delay_a(3) = 0
+write_once_a[213] = cfr_gclk_delay_a(2) = 0
+write_once_a[214] = cfr_gclk_delay_a(1) = 0
+write_once_a[215] = cfr_gclk_delay_a(0) = 0
+cfr_gclk_delay_a                                   = 0x0
+
+write_once_a[216] = cfr_ev6clk_delay_a(2) = 0
+write_once_a[217] = cfr_ev6clk_delay_a(1) = 0
+write_once_a[218] = cfr_ev6clk_delay_a(0) = 0
+cfr_ev6clk_delay_a                                 = 0x0
+
+write_once_a[219] = cfr_frmclk_delay_a(1) = 0
+write_once_a[220] = cfr_frmclk_delay_a(0) = 1
+cfr_frmclk_delay_a                                 = 0x1
+
+write_once_a[221] = bc_late_write_num_a(2) = 0
+write_once_a[222] = bc_late_write_num_a(1) = 0
+write_once_a[223] = bc_late_write_num_a(0) = 1
+bc_late_write_num_a                                = 0x1
+
+write_once_a[224] = bc_cpu_late_write_num_a(0) = 1
+write_once_a[225] = bc_cpu_late_write_num_a(1) = 0
+bc_cpu_late_write_num_a                            = 0x1
+
+write_once_a[226] = jitter_cmd_a(0) = 0
+jitter_cmd_a                                       = 0x0
+
+write_once_a[227] = fast_mode_disable_a(0) = 1
+fast_mode_disable_a                                = 0x1
+
+write_once_a[228] = sysdc_delay_a(0) = 1
+write_once_a[229] = sysdc_delay_a(1) = 0
+write_once_a[230] = sysdc_delay_a(2) = 1
+write_once_a[231] = sysdc_delay_a(3) = 0
+sysdc_delay_a                                      = 0x5
+
+write_once_a[232] = data_valid_dly_a(0) = 1
+write_once_a[233] = data_valid_dly_a(1) = 1
+data_valid_dly_a                                   = 0x3
+
+write_once_a[234] = bc_ddm_fall_en_a(0) = 0
+bc_ddm_fall_en_a                                   = 0x0
+
+write_once_a[235] = bc_ddm_rise_en_a(0) = 1
+bc_ddm_rise_en_a                                   = 0x1
+
+write_once_a[236] = bc_cpu_clk_delay_a(1) = 0
+write_once_a[237] = bc_cpu_clk_delay_a(0) = 1
+bc_cpu_clk_delay_a                                 = 0x1
+
+write_once_a[238] = bc_fdbk_en_a(7) = 0
+write_once_a[239] = bc_fdbk_en_a(6) = 0
+write_once_a[240] = bc_fdbk_en_a(5) = 0
+write_once_a[241] = bc_fdbk_en_a(4) = 0
+write_once_a[242] = bc_fdbk_en_a(3) = 0
+write_once_a[243] = bc_fdbk_en_a(2) = 0
+write_once_a[244] = bc_fdbk_en_a(1) = 1
+write_once_a[245] = bc_fdbk_en_a(0) = 0
+bc_fdbk_en_a                                       = 0x2
+
+write_once_a[246] = bc_clk_ld_vector_a(15) = 1
+write_once_a[247] = bc_clk_ld_vector_a(14) = 0
+write_once_a[248] = bc_clk_ld_vector_a(13) = 0
+write_once_a[249] = bc_clk_ld_vector_a(12) = 1
+write_once_a[250] = bc_clk_ld_vector_a(11) = 0
+write_once_a[251] = bc_clk_ld_vector_a(10) = 1
+write_once_a[252] = bc_clk_ld_vector_a(9) = 0
+write_once_a[253] = bc_clk_ld_vector_a(8) = 0
+write_once_a[254] = bc_clk_ld_vector_a(7) = 1
+write_once_a[255] = bc_clk_ld_vector_a(6) = 0
+write_once_a[256] = bc_clk_ld_vector_a(5) = 1
+write_once_a[257] = bc_clk_ld_vector_a(4) = 0
+write_once_a[258] = bc_clk_ld_vector_a(3) = 0
+write_once_a[259] = bc_clk_ld_vector_a(2) = 1
+write_once_a[260] = bc_clk_ld_vector_a(1) = 0
+write_once_a[261] = bc_clk_ld_vector_a(0) = 1
+bc_clk_ld_vector_a                                 = 0x94a5
+
+write_once_a[262] = bc_bphase_ld_vector_a(3) = 0
+write_once_a[263] = bc_bphase_ld_vector_a(2) = 0
+write_once_a[264] = bc_bphase_ld_vector_a(1) = 1
+write_once_a[265] = bc_bphase_ld_vector_a(0) = 1
+bc_bphase_ld_vector_a                              = 0x3
+
+write_once_a[266] = sys_ddm_fall_en_a(0) = 1
+sys_ddm_fall_en_a                                  = 0x1
+
+write_once_a[267] = sys_ddm_rise_en_a(0) = 1
+sys_ddm_rise_en_a                                  = 0x1
+
+write_once_a[268] = sys_cpu_clk_delay_a(1) = 0
+write_once_a[269] = sys_cpu_clk_delay_a(0) = 0
+sys_cpu_clk_delay_a                                = 0x0
+
+write_once_a[270] = sys_fdbk_en_a(7) = 0
+write_once_a[271] = sys_fdbk_en_a(6) = 0
+write_once_a[272] = sys_fdbk_en_a(5) = 0
+write_once_a[273] = sys_fdbk_en_a(4) = 0
+write_once_a[274] = sys_fdbk_en_a(3) = 0
+write_once_a[275] = sys_fdbk_en_a(2) = 0
+write_once_a[276] = sys_fdbk_en_a(1) = 1
+write_once_a[277] = sys_fdbk_en_a(0) = 0
+sys_fdbk_en_a                                      = 0x2
+
+write_once_a[278] = sys_clk_ld_vector_a(15) = 0
+write_once_a[279] = sys_clk_ld_vector_a(14) = 1
+write_once_a[280] = sys_clk_ld_vector_a(13) = 1
+write_once_a[281] = sys_clk_ld_vector_a(12) = 0
+write_once_a[282] = sys_clk_ld_vector_a(11) = 1
+write_once_a[283] = sys_clk_ld_vector_a(10) = 1
+write_once_a[284] = sys_clk_ld_vector_a(9) = 0
+write_once_a[285] = sys_clk_ld_vector_a(8) = 1
+write_once_a[286] = sys_clk_ld_vector_a(7) = 1
+write_once_a[287] = sys_clk_ld_vector_a(6) = 0
+write_once_a[288] = sys_clk_ld_vector_a(5) = 1
+write_once_a[289] = sys_clk_ld_vector_a(4) = 1
+write_once_a[290] = sys_clk_ld_vector_a(3) = 0
+write_once_a[291] = sys_clk_ld_vector_a(2) = 1
+write_once_a[292] = sys_clk_ld_vector_a(1) = 1
+write_once_a[293] = sys_clk_ld_vector_a(0) = 0
+sys_clk_ld_vector_a                                = 0x6db6
+
+write_once_a[294] = sys_bphase_ld_vector_a(3) = 0
+write_once_a[295] = sys_bphase_ld_vector_a(2) = 1
+write_once_a[296] = sys_bphase_ld_vector_a(1) = 0
+write_once_a[297] = sys_bphase_ld_vector_a(0) = 1
+sys_bphase_ld_vector_a                             = 0x5
+
+write_once_a[298] = sys_frame_ld_vector_a(4) = 1
+write_once_a[299] = sys_frame_ld_vector_a(3) = 0
+write_once_a[300] = sys_frame_ld_vector_a(2) = 1
+write_once_a[301] = sys_frame_ld_vector_a(1) = 0
+write_once_a[302] = sys_frame_ld_vector_a(0) = 1
+sys_frame_ld_vector_a                              = 0x15
+
+write_once_a[303] = sysdc_delay_a(4) = 0
+sysdc_delay_a                                      = 0x5
+
+
+Write Once Chain size 351Moving Write Once data into temporary chain buffer
+Printing out Write Once chain
+CBOX_SHIFT_DATA(350,0) = 0x00000000000000000000569B6D900F294A502B599003F1B8FA6E39B8FA6E38CD8A010000012900000200C2401030F020
+

@@ -1,0 +1,108 @@
+/*
+ * $Id: dp264.cbx,v 1.1.1.1 1998/12/29 21:36:25 paradis Exp $
+ * $Log: dp264.cbx,v $
+ * Revision 1.1.1.1  1998/12/29 21:36:25  paradis
+ * Initial CVS checkin
+ *
+# Revision 1.1  1997/11/20  16:47:59  pbell
+# Initial revision
+#
+# Revision 1.2  1997/08/03  21:31:53  razdan
+# setup for 4X bcache (300 Mhz machine)
+#
+# Revision 1.1  1997/07/22  19:44:46  fdh
+# Initial revision
+#
+    cbox setup file for srom generated from tsunami_uni.config .. for debug
+    initial GCLK in bypass mode is:  266 Mhz
+    initial Fwded clock	          :   66 Mhz
+    initial Frame clock           :   33 Mhz  
+
+    therefore:  2X  bitrate
+		4X  frmclk/bitclk ratio
+		Y-div : 4 (though it's bypass mode)
+		Assuming frame clock shift of 0.
+
+		4X  bcache...real slow..
+ */ 
+
+
+
+
+
+cfr_frmclk_delay_a                  = 0x1   	/* <1:0>, number of frame clock cycles to delay clk_fwd reset (0-3) */
+cfr_ev6clk_delay_a                  = 0x0   	/*  <2:0>, number of ev6_clk cycles to delay clk_fwd reset (0-7) */
+cfr_gclk_delay_a                    = 0x2   	/*  <2:0>, number of gclk cycles to delay clk_fwd reset (0-7) */
+sys_rcv_mux_cnt_preset_a            = 0x1   	/* <1,0>, the cnt value in the clock forwarding reciever system */
+
+sys_clk_ratio_a                     = 0x4   	/* <15:0>, 2X      	*/
+sys_clk_ld_vector_a                 = 0xCCCC   	/*  <15,0>,2X	         */
+sys_fdbk_en_a                       = 0x1   	/*  <7,0>, Feedback tap to use for circular shift register generating sys clock */
+sys_bphase_ld_vector_a              = 0x0   	/* <3,0>, Initial pattern for b-phase extension logic for the sys clock (see c_pads.mdl for patterns) */
+sys_frame_ld_vector_a               = 0x14   	/*  <4,0>, Initial pattern for generating framing clock for system transfers (see c_pads.mdl for patterns */
+sysdc_delay_a                       = 0x2   	/*  <3,0>, delay before looking at sysdc		*/
+jitter_cmd_a                        = 0x0   	/* delay write Sysdc to make the write predictable */
+
+data_valid_dly_a                    = 0x1   	/* <1,0>, use delayed version of sys_data_in_valid based on sysdc delay */
+
+frame_select_a                      = 0x2   	/* <1:0>,   0   -  1X ,1   -  2X, 2   -  4X */
+sys_clk_delay_a                     = 0x2   	/*  <1,0>, system clk delay(in phases)				*/
+bc_clk_delay_a                      = 0x3   	/*  one cycle of delay between data and clk			*/
+
+sys_cpu_clk_delay_a                 = 0x0   	/*  <1,0>, enable delay of address by 0-3 CPU cycles...always set to 0	*/
+dup_tag_enable_a                    = 0x0   	/*  <0,0>, External System has a Duplicate Tag -->  Steve Mode for Probes */
+prb_tag_only_a                      = 0x1   	/*  favor  tag reads over tag/data reads        */
+spec_read_enable_a                  = 0x1   	/*  enable speculative reads			*/
+mbox_bc_prb_stall_a                 = 0x0   	/*  set for bcache 5X,6X,7X,8X clock rates      */
+sysbus_format_a                     = 0x1   	/*  four choices for pa bus assignment.	0 =Bank Interleave	1 =Page Mode	*/
+sysbus_mb_enable_a                  = 0x0   	/*  <0,0>, send MBs to pins				*/
+sysbus_ack_limit_a                  = 0x4   	/*  <4,0>, zero is inf, otherwize its the count        */
+sysbus_vic_limit_a                  = 0x0   	/*  <2,0>, zero is inf, otherwize its the count of victims   */
+tlaser_stio_mode_a                  = 0x0   	/*  32-byte limit for stores to io space */
+
+fast_mode_disable_a                 = 0x1   	/*  tells EV6 to disable FAST mode */
+bc_clean_victim_a                   = 0x0   	/*  <0,0>, clean victim is being overwritten -cray	*/
+bc_rdvictim_a                       = 0x0   	/*  <0,0>, clean victim is being overwritten -cray	*/
+sys_bus_size_a                      = 0x2   	/*  <1,0>, usage of bits 1,0 :  1 1  -> ignore 1,0   1 0  -> illegal  0 1  -> ignore 0  0 0  -> use both*/
+rdvic_ack_inhibit_a                 = 0x0   	/*  inhibit ack update on rdvic commands       */
+enable_stc_command_a                = 0x0   	/*  tell System about store conditionals       */
+bc_frm_clk_a                        = 0x0   	/*  probe tags can probe under bc-hits under every slot  */
+dcvic_threshold_a                   = 0x10   	/*  <7,0>, VAF threshold for bcvictims		    	*/
+bc_rd_rd_bubbles_a                  = 0x0   	/*  <1,0>, If bank conflict, the rd to rd bubble  	*/
+
+bc_clk_ratio_a                      = 0x40   	/*  <15,0>, sysclock ratio from 1X-8X in 0.5 incs    	*/
+bc_clk_ld_vector_a                  = 0x3333   	/*  <15,0>, Initial bcache read clock waveform (see c_pads.mdl for patterns) */
+bc_fdbk_en_a                        = 0x1   	/*  <7,0>, Feedback tap to use for circular shift register  generating bcache clock*/
+bc_bphase_ld_vector_a               = 0x0   	/*  <3,0>, Initial pattern for b-phase extension logic for the bcache clock (see c_pads.mdl for patterns)*/
+
+bc_rd_wr_bubbles_a                  = 0x1C   	/*  <5,0>, number of bcache cycles between rd and wr. 0-63    */
+bc_late_write_num_a                 = 0x1   	/*  <2,0>, enable write data to be delayed for 0-7 BcWrite cycles       */
+bc_wr_rd_bubbles_a                  = 0x0   	/* <3,0>, number of bcache cycles between wr and rd. */
+bc_cpu_late_write_num_a             = 0x0   	/* <1,0>, enable delay of data wrt address by	0-3 CPU cycles		   	        */
+bc_cpu_clk_delay_a                  = 0x0   	/* <1,0>, enable delay of data wrt address by 0-3 CPU cycles		   	        */
+bc_burst_mode_enable_a              = 0x0   	/* is the Bcache burst mode 			*/
+bc_lat_data_pattern_a               = 0x11110  	/* <31,0>, data return pattern				*/
+bc_lat_tag_pattern_a                = 0x10  	/* <23,0>, data return pattern				*/
+bc_cf_double_clk_a                  = 0x0   	/* bcache clocks are run double rate		  */
+bc_clkfwd_enable_a                  = 0x1   	/* enable clk-forwarding interface on bcache side */
+bc_ddm_fall_en_a                    = 0x0   	/* write bcache data on the falling edge of the clock    */
+bc_ddm_rise_en_a                    = 0x1   	/* write bcache data on the rising edge of the clock     */
+bc_ddmf_enable_a                    = 0x1   	/* enable falling edge of bcache clock (always set to 1) */
+bc_ddmr_enable_a                    = 0x1   	/* enable rising edge of bcache clock (always set to 1)  */
+bc_ddm_rd_fall_en_a                 = 0x1   	/* read bcache data on the falling edge of the clock     */
+bc_ddm_rd_rise_en_a                 = 0x1   	/* read bcache data on the rising edge of the clock      */
+bc_tag_ddm_fall_en_a                = 0x0   	/* write bcache tag on the falling edge of the clock    */
+bc_tag_ddm_rise_en_a                = 0x1   	/* write bcache tag on the rising edge of the clock     */
+bc_tag_ddm_rd_fall_en_a             = 0x1   	/* read bcache tag on the falling edge of the clock     */
+bc_tag_ddm_rd_rise_en_a             = 0x1   	/* read bcache tag on the rising edge of the clock      */
+bc_pentium_mode_a                   = 0x0   	/* pentium mode */
+sys_cf_double_clk_a                 = 0x1   	/* system clocks are run double rate		  */
+sys_clkfwd_enable_a                 = 0x1   	/* enable clk-forwarding interface on system side */
+sys_ddm_fall_en_a                   = 0x1   	/* write system data on the falling edge of the clock    */
+sys_ddm_rise_en_a                   = 0x1   	/* write system data on the rising edge of the clock     */
+sys_ddmf_enable_a                   = 0x1   	/* enable falling edge of system clock (always set to 1) */
+sys_ddmr_enable_a                   = 0x1   	/* enable rising edge of system clock (always set to 1)  */
+sys_ddm_rd_fall_en_a                = 0x1   	/* read system data on the falling edge of the clock     */
+sys_ddm_rd_rise_en_a                = 0x1   	/* read system data on the rising edge of the clock      */
+bc_rcv_mux_cnt_preset_a             = 0x2   	/* <1,0>, the cnt value in the clock forwarding reciever bcache */
+bc_late_write_upper_a               = 0x0   	/* bc_late_write_num range select (0 = 0-3, 1 = 4-7) */

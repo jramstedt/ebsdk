@@ -1,0 +1,21 @@
+#
+# Make file to build bit on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:	$(EXEDIR)\bit.exe 
+
+$(OBJDIR)\bit.obj:	$(SRCDIR)\bit.c
+$(OBJDIR)\getopt.obj:	$(SRCDIR)\getopt.c
+
+$(EXEDIR)\bit.exe:	$(OBJDIR)\bit.obj $(OBJDIR)\getopt.obj 
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\bit.obj $(OBJDIR)\getopt.obj \
+		$(conlibs) /map:$(OBJDIR)\bit.map
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\getopt.obj
+	-del $(CLEANFLAGS) $(OBJDIR)\bit.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\bit.exe
+	-del $(CLEANFLAGS) $(OBJDIR)\bit.map

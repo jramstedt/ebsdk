@@ -1,0 +1,35 @@
+	Calculate default value for the -m option.
+
+	Warn about image_size + base exceeding the
+	max ic address and increment errors.
+
+	Pad image to appropriate boundary and print
+	informational message.
+
+	Warn about uninitialized CSRs.
+
+	Add aliases for CSRs.
+
+	Write user documentation for ic4mat.
+
+done	Interface to load_icache stuff
+
+done	Find alias for skewed_fill_mode_a_h.
+
+done	Remove from cbox.in example... skewed_fill_mode_a_h           = 0x0       
+
+done	Unix Makefile
+
+	NT Makefile  (port to NT)
+
+done	VMS mms file (port to VMS)
+
+done	Write usage() function.
+
+done	Fix -l option to accept filename for list file.
+
+done	Create chain2cbox utility.
+
+done	#ifndef H_INCLUDED for include files.
+
+

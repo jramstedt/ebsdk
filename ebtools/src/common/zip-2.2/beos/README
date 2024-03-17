@@ -1,0 +1,24 @@
+zip 2.2 for BeOS
+
+KNOWN BUGS
+
+- zip will archive attributes associated with symbolic links... this would 
+  work if get_attr_dir() could return the _link's_ attributes instead of 
+  the link's _target's_ attributes dir... this will be fixed in a future
+  version of BeOS
+
+FEATURES
+
+- stores BeOS Preview Release's new file attributes, compressing them if 
+  possible
+
+- zip files are created with the correct file type (application/zip)
+
+- supports both Metrowerks CodeWarrior and GNU C
+
+Please report any bugs to the Zip-Bugs mailing list; our email address is
+zip-bugs@lists.wku.edu.  If it's something BeOS-specific, you could email
+me directly.
+
+- Chris Herborth (chrish@qnx.com)
+  September 20/1997

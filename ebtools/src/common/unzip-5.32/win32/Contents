@@ -1,0 +1,19 @@
+Contents of the "win32" sub-archive for UnZip 5.32 and later:
+
+  Contents      this file
+  Makefile      makefile for UnZip using MS Visual C++
+  Makefile.emx  makefile for UnZip using emx+gcc 0.9c with RSXNT 1.3
+  Makefile.wat  makefile for UnZip using Watcom C/C++
+  crc_i386.asm  32-bit Intel-assembler version of CRC routine
+  crc_i386.c    ditto, for MS[V]C with no MASM only
+  w32cfg.h      Win32-specific configuration, included by unzpriv.h
+  win32.c       Win32-specific support routines
+  nt.c          WinNT-specific support routines (ACLs/security descriptors)
+  nt.h          WinNT-specific support header
+  rsxntwin.h    supplement header for RSXNT, fills holes in their <windows.h>
+
+crc_i386.c has been tested with MSVC but not integrated into any makefile
+yet.  It is provided for those who may have MSVC but no assembler.  Note
+that some C compilers on Pentium-class machines have been reported to emit
+faster code from the plain C sources (crc32.c) than the assembler routines
+provide.  This has not been tested lately, however.

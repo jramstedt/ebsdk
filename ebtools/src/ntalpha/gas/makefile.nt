@@ -1,0 +1,93 @@
+######################################################################
+# HISTORY
+# $Log: makefile.nt,v $
+# Revision 1.1.1.1  1998/12/29 21:36:30  paradis
+# Initial CVS checkin
+#
+# Revision 1.2  1996/08/20  14:41:44  fdh
+# Set the CPU variable
+#
+# Revision 1.1  1995/05/04  20:51:16  fdh
+# Initial revision
+#
+# Revision 1.3  90/11/08  15:05:05  bww
+# 	Changed "a.out.h" to "a_out.h".
+# 	[90/11/08  15:00:50  bww]
+# 
+# Revision 1.2  90/08/31  09:38:44  bww
+# 	Created for new and improved SSP format.
+# 	[90/08/31  09:35:08  bww]
+# 
+######################################################################
+
+# The include file <NTWIN32.MAK> requires the CPU environment
+# variable to be set.  However, on systems that have never had
+# the win32 SDK installed, this variable will unlikely be defined.
+!IFNDEF CPU
+CPU	= $(PROCESSOR_ARCHITECTURE)
+!ENDIF
+
+default:	gas
+
+!INCLUDE <ntwin32.mak>
+
+IDIR			= /usr/local/gnu/bin/
+
+#include $(MAKETOP)Makefile-common
+
+!INCLUDE makedep.nt
+
+PROGRAM			= gas
+OBJECTS			= as.obj xrealloc.obj xmalloc.obj hash.obj hexvalue.obj \
+			  atofgen.obj append.obj messages.obj expr.obj \
+			  app.obj frags.obj infile.obj inscrub.obj \
+			  outfile.obj subsegs.obj symbols.obj version.obj \
+			  floconst.obj flocopy.obj flomult.obj \
+			  strstr.obj bigcopy.obj obstack.obj write.obj \
+			  read.obj list.obj $(Alpha_OFILES)
+
+DEF_CFLAGS		= -g
+
+#xrealloc.obj_CFLAGS	= $(CFLAGS) -Derror=as_fatal
+#xmalloc.obj_CFLAGS	= $(xrealloc.obj_CFLAGS)
+#hash.obj_CFLAGS		= $(xrealloc.obj_CFLAGS)
+
+
+LIBRARIES		= $(Alpha_LIBS)
+
+GARBAGE			= $(Alpha_GARBAGE)
+
+!INCLUDE makent.bin
+
+#include $(MAKETOP)Makefile-bin
+#include $(MAKETOP)XSMakefile-man
+
+as.obj:		as.h struc_sy.h a_out.h write.h
+atofgen.obj:	flonum.h bignum.h
+bigcopy.obj:	bignum.h
+expr.obj:		as.h flonum.h bignum.h read.h struc_sy.h a_out.h \
+		expr.h obstack.h symbols.h
+floconst.obj:	flonum.h bignum.h
+flocopy.obj:	flonum.h bignum.h
+flomult.obj:	flonum.h bignum.h
+frags.obj:	as.h subsegs.h obstack.h frags.h struc_sy.h a_out.h
+hash.obj:		hash.h
+infile.obj:	infile.h
+inscrub.obj:	as.h read.h infile.h
+list.obj:		list.c as.h expr.h flonum.h frags.h hash.h md.h read.h \
+		struc_sy.h write.h
+messages.obj:	as.h
+obstack.obj:	obstack.h
+read.obj:		as.h read.h md.h hash.h obstack.h frags.h flonum.h \
+		bignum.h struc_sy.h a_out.h expr.h symbols.h
+subsegs.obj:	as.h subsegs.h obstack.h frags.h struc_sy.h \
+		a_out.h write.h
+symbols.obj:	as.h hash.h obstack.h struc_sy.h a_out.h \
+		symbols.h frags.h
+write.obj:	as.h md.h subsegs.h obstack.h struc_sy.h a_out.h \
+		write.h symbols.h
+
+
+
+
+

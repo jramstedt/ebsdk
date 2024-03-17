@@ -1,0 +1,19 @@
+Support the following pseudo-ops:
+loads:
+	ldb	$1,0($1)
+	ldbu	$1,0($1)
+	ldw	$1,0($1)
+	ldwu	$1,0($1)
+	uldw	$1,0($1)
+	uldwu	$1,0($1)
+	uldl	$1,0($1)
+	uldq	$1,0($1)
+stores:
+	stb	$1,0($1)
+	stw	$1,0($1)
+	ustw	$1,0($1)
+	ustl	$1,0($1)
+	ustq	$1,0($1)
+arith:
+	absl	$1,$1
+	absq	$1,$1

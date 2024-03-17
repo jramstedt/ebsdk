@@ -1,0 +1,11 @@
+EXEDIR = ..\..\..\ntalpha
+
+SRCS = strip.c
+
+$(EXEDIR)\strip.exe:	$(SRCS)
+	CL /Fe$@ $(SRCS)
+
+clean:
+	-del /q /f strip.obj
+
+depend:

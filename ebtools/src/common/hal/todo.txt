@@ -1,0 +1,27 @@
+1. make \n inside macro argument angles terminate the argument and the macro expansion.
+2. If missing ">", have parse error msg give better line number.
+3. show full address in listing?
+4. .deassign symbol
+5. able to concate strings to make symbol names i.e. sym_'numsym'
+6. macro and symbol exists checkers
+7. say .quad x, then later x = . + ~~~ produces "x is sym and label error"
+8. ".if b" and ".if nb" require <> for macro arg names
+9. support delim style ^_~~~~~~_
+10. ".endx" checking stack
+11. Add more location info to absolute expression checker.
+12. .pragma support for macro 'arg' use checking
+13. eliminate requirement that a .mar file must end with \n
+14. support \n,\t,.. in ASCII strings
+15. .byte, .word support
+16. .local symbol (note: still have the ?sym idea half implemented)
+17. put error/warning messages in listing also
+18. redirect .do_cmd info to listing?
+19. HAL pixie idea (keeps track of how much time in each macro, # of calls, etc.)
+20. HAL debugger idea (Allows breakpoints around macro calls, shown stack, symbol table, etc.)
+21. Increase performance by doing multiple "skipargck" lines instead of just one
+22. Delay if body preprocessing until executing it. (%extract uses symbol set in body)
+23. nesting macro definitions and still using "'" in nested def arg's
+24. %locate(<sub_text>, arg_name, start_pos)  -> arg_name wrong -> no error msg
+25. %locate(<sub_text>, arg_name, start_pos)  -> no checking arg3 is a symbol
+26. Floating point data types
+27. Logical operators (use for complicated if conditions)

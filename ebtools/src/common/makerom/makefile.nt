@@ -1,0 +1,22 @@
+#
+# Make file to build makerom on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:	$(EXEDIR)\makerom.exe
+
+$(OBJDIR)\makerom.obj:	$(SRCDIR)\makerom.c
+
+$(OBJDIR)\compress.obj:	$(SRCDIR)\compress.c
+
+$(EXEDIR)\makerom.exe:	$(OBJDIR)\makerom.obj $(OBJDIR)\compress.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\makerom.obj $(OBJDIR)\compress.obj \
+		$(COMMONLIB) $(conlibs) 
+
+CLEAN:
+ 	-del $(CLEANFLAGS) $(OBJDIR)\makerom.obj
+ 	-del $(CLEANFLAGS) $(OBJDIR)\compress.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\makerom.exe
+ 

@@ -1,0 +1,38 @@
+######################################################################
+# HISTORY
+#  7-Dec-91  Alessandro Forin (af) at Carnegie-Mellon University
+#	Created.
+#
+# $Log: makedep.nt,v $
+# Revision 1.1.1.1  1998/12/29 21:36:30  paradis
+# Initial CVS checkin
+#
+# Revision 1.1  1995/05/04  20:51:16  fdh
+# Initial revision
+#
+# 
+######################################################################
+
+# CMU env
+ALPHA_CFLAGS	= -DEXPR_TAKES_BIGNUMS -DFIRST_32BIT_QUADRANT=1
+ALPHA_OFILES	= alpha.o atofieee.o atof-vax.o alloca.o
+ALPHA_LDLIBS	= -lcs -lc -ldivide
+
+# OSf env
+alpha_CFLAGS	= -g3 -Dalpha -DEXPR_TAKES_BIGNUMS
+alpha_OFILES	= alpha.o atofieee.o atof-vax.o alloca.o
+
+# NT env
+EXTRA_CFLAGS	= -nologo -DEXPR_TAKES_BIGNUMS -DCROSS_COMPILE_32_TO_64_BITS=1 -DNT=1 -Dalpha=1 -Iinclude -c 
+
+Alpha_OFILES	= alpha.obj atofieee.obj atof-vax.obj alloca.obj c_32_64.obj
+
+alpha.o:	as.h read.h flonum.h bignum.h md.h \
+		obstack.h frags.h struc_sy.h a_out.h expr.h \
+		symbols.h a_out.h alpha_op.h
+atofieee.o:	flonum.h bignum.h
+atof-vax.o:	as.h read.h flonum.h bignum.h
+
+.c.obj:
+  $(cc) $(cdebug) $(cflags) $(EXTRA_CFLAGS) $(cvars) $*.c
+

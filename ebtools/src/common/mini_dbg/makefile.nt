@@ -1,0 +1,183 @@
+#
+# Make file to build hfcomp on NT
+#
+!INCLUDE ..\nt.inc
+
+SREC		= $(EB_TOOLBOX)\srec
+IC4MAT		= $(EB_TOOLBOX)\ic4mat
+PVC		= $(EB_TOOLBOX)\pvc
+STRIP		= $(EB_TOOLBOX)\strip
+GAS		= $(EB_TOOLBOX)\gas
+ASTRIP		= $(EB_TOOLBOX)\astrip
+ALIST		= $(EB_TOOLBOX)\alist
+SYSGEN		= $(EB_TOOLBOX)\sysgen
+RCSV		= $(EB_TOOLBOX)\rcsv
+SROM		= $(EB_TOOLBOX)\srom
+HEX		= $(EB_TOOLBOX)\hex32
+
+STRIPFLAGS	= -m
+CPPFLAGS	= -nologo -I. -I..\include -DPVCCHECK $(CPPFLAGS) 
+
+SROM_TOOL_OPTIONS = -v
+
+BIN_TYPE	= exe
+MAKEHEX		= $(SROM) $(SROM_TOOL_OPTIONS) -$(CPU) 
+
+!IF "$(TYPE)" == "064"
+CPU		= 21064
+CPP_EXTRA	= -DFULL_MDBG	# Enables "PR" command.
+!ENDIF
+
+!IF "$(TYPE)" == "066"
+CPU		= 21066
+CPP_EXTRA	=
+!ENDIF
+
+!IF "$(TYPE)" == "164"
+CPU		= 21164
+CPP_EXTRA	= -DFULL_MDBG	# Enables "PR" command.
+!ENDIF
+
+!IF "$(TYPE)" == "164PC"
+CPU		= 21164PC
+CPP_EXTRA	= -DFULL_MDBG	# Enables "PR" command.
+!ENDIF
+
+!IF "$(TYPE)" == "264"
+CPU		= 21264
+CPP_EXTRA	= -DFULL_MDBG	# Enables "PR" command.
+BIN_TYPE	= ic
+MAKEHEX		= $(HEX) 
+!ENDIF
+
+!IF "$(VERSION)" == "d"
+CPP_EXTRA	= $(CPP_EXTRA) -DDEBUG
+!ENDIF
+
+INCLUDES 	= -I. -I..\include -I..\obj
+
+
+# -------------------------------------------------
+# Append local flags here for only this Makefile
+# -------------------------------------------------
+MAKE		= nmake -nologo
+MAKEFILE	= makefile.nt
+
+#
+#
+CPPSWITCHES	= -DDC$(CPU) $(INCLUDES) $(CPP_EXTRA) $(CPPFLAGS)
+GASSWITCHES	= -v -$(CPU)
+
+
+PROGRAM		= md$(TYPE)$(VERSION)
+
+all:	mdbg064 mdbg066 mdbg164 mdbg164pc mdbg264
+
+mdbg064:
+	$(MAKE) -f $(MAKEFILE) TYPE=064 tools
+	$(MAKE) -f $(MAKEFILE) TYPE=064 VERSION=d dtools
+
+mdbg066:
+	$(MAKE) -f $(MAKEFILE) TYPE=066 tools
+	$(MAKE) -f $(MAKEFILE) TYPE=066 VERSION=d dtools
+
+mdbg164:
+	$(MAKE) -f $(MAKEFILE) TYPE=164 tools
+	$(MAKE) -f $(MAKEFILE) TYPE=164 VERSION=d dtools
+
+mdbg164pc:
+	$(MAKE) -f $(MAKEFILE) TYPE=164PC tools
+	$(MAKE) -f $(MAKEFILE) TYPE=164PC VERSION=d dtools
+
+mdbg264:
+	$(MAKE) -f $(MAKEFILE) TYPE=264 tools
+	$(MAKE) -f $(MAKEFILE) TYPE=264 VERSION=d dtools
+
+tools:	$(EXEDIR)\$(PROGRAM).exe $(EXEDIR)\$(PROGRAM).hex $(EXEDIR)\$(PROGRAM).sr
+tools:  $(OBJDIR)\$(PROGRAM).lis $(OBJDIR)\$(PROGRAM).pvc
+dtools:	$(EXEDIR)\$(PROGRAM).exe $(OBJDIR)\$(PROGRAM).lis $(OBJDIR)\$(PROGRAM).pvc
+
+$(OBJDIR)\$(PROGRAM).lis: $(OBJDIR)\$(PROGRAM).obj
+	$(ALIST) $(OBJDIR)\$(PROGRAM).obj > $@
+
+$(OBJDIR)\$(PROGRAM).pvc: dbg$(TYPE).ent $(OBJDIR)\$(PROGRAM).map 
+	echo set code_file $(EXEDIR)\$(PROGRAM).exe > $@
+	echo set map_file $(OBJDIR)\$(PROGRAM).map >> $@
+	echo set entry_file dbg$(TYPE).ent >> $@
+	echo set cpu $(CPU) >> $@
+#	echo set flag all >> $@
+	echo go >> $@
+	echo quit >> $@
+
+$(EXEDIR)\$(PROGRAM).exe: $(OBJDIR)\$(PROGRAM).obj $(OBJDIR)\$(PROGRAM).pvc
+	$(ASTRIP) $(ASTRIP_FLAGS) $(OBJDIR)\$(PROGRAM).obj $(EXEDIR)\$(PROGRAM).exe
+#	$(PVC) < $(OBJDIR)\$(PROGRAM).pvc
+
+CBOX_FILE	= dp264.cbx
+
+$(EXEDIR)\$(PROGRAM).ic: $(EXEDIR)\$(PROGRAM).exe $(CBOX_FILE)
+	echo "$(IC4MAT) -21264 -v -l $(OBJDIR)\cbox.lis -m -4 $(CBOX_FILE) \
+	$(PROGRAM).exe $(PROGRAM).ic" > $(OBJDIR)\ic4mat.log
+
+	$(IC4MAT) -21264 -v -l $(OBJDIR)\cbox.lis -m -4 $(CBOX_FILE) \
+	$*.exe $@ >> $(OBJDIR)\ic4mat.log
+
+$(EXEDIR)\$(PROGRAM).rom: $(EXEDIR)\$(PROGRAM).exe
+	$(MAKEROM) -v -s"MINIDBGR" -i"4" -l200000 $(EXEDIR)\$(PROGRAM).exe -o $(EXEDIR)\$(PROGRAM).rom
+
+$(EXEDIR)\$(PROGRAM).sr: $(EXEDIR)\$(PROGRAM).$(BIN_TYPE)
+	$(SREC) -v -i $(EXEDIR)\$(PROGRAM).$(BIN_TYPE) $@
+
+$(EXEDIR)\$(PROGRAM).hex: $(EXEDIR)\$(PROGRAM).$(BIN_TYPE)
+	$(MAKEHEX) $(EXEDIR)\$(PROGRAM).$(BIN_TYPE) $@
+
+$(OBJDIR)\$(PROGRAM).map: $(OBJDIR)\$(PROGRAM).obj
+	$(ALIST) -m $(OBJDIR)\$(PROGRAM).obj > $@
+
+$(OBJDIR)\$(PROGRAM).obj: $(OBJDIR)\$(PROGRAM).cpp
+	$(GAS) $(GASSWITCHES) $(OBJDIR)\$(PROGRAM).cpp -o $(OBJDIR)\$(PROGRAM).obj 
+
+$(OBJDIR)\$(PROGRAM).cpp: mini_dbg.s $(OBJDIR)\mini_rcs.h mini_dbg.h serialio.s ascitab.h \
+	..\include\dc21064.h ..\include\dc21164.h
+	$(CC) /E $(CPPSWITCHES) mini_dbg.s > $@
+
+$(OBJDIR)\mini_rcs.h: mini_dbg.s
+	$(RCSV) -v mini_dbg.s $@
+
+#-----------------------------------------------------------
+# CLEAN
+#-----------------------------------------------------------
+
+clean: clean264 clean164PC clean164 clean064 clean066
+
+clean264:
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=264 clean2
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=264 VERSION=d clean2
+
+clean164PC:
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=164PC clean2
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=164PC VERSION=d clean2
+
+clean164:
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=164 clean2
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=164 VERSION=d clean2
+
+clean064:
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=064 clean2
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=064 VERSION=d clean2
+
+clean066:
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=066 clean2
+	$(MAKE) $(MFLAGS) -f $(MAKEFILE) TYPE=066 VERSION=d clean2
+
+clean2:
+	-del $(CLEANFLAGS) $(OBJDIR)\$(PROGRAM).lis 
+	-del $(CLEANFLAGS) $(EXEDIR)\$(PROGRAM).exe 
+	-del $(CLEANFLAGS) $(EXEDIR)\$(PROGRAM).hex
+	-del $(CLEANFLAGS) $(EXEDIR)\$(PROGRAM).sr
+	-del $(CLEANFLAGS) $(OBJDIR)\$(PROGRAM).obj 
+	-del $(CLEANFLAGS) $(OBJDIR)\$(PROGRAM).cpp 
+	-del $(CLEANFLAGS) $(OBJDIR)\$(PROGRAM).pvc 
+	-del $(CLEANFLAGS) $(OBJDIR)\$(PROGRAM).map 
+	-del $(CLEANFLAGS) $(OBJDIR)\mini_rcs.h
+

@@ -1,0 +1,17 @@
+#
+# Make file to build rcsv on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:	$(EXEDIR)\rcsv.exe
+
+$(OBJDIR)\rcsv.obj:	$(SRCDIR)\rcsv.c
+
+$(EXEDIR)\rcsv.exe:	$(OBJDIR)\rcsv.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\rcsv.obj $(conlibs)
+
+CLEAN:	    	
+	-del $(CLEANFLAGS) $(OBJDIR)\rcsv.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\rcsv.exe

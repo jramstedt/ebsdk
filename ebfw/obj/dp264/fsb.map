@@ -1,0 +1,109 @@
+		LINK EDITOR MEMORY MAP
+
+
+output		input		virtual
+section		section		address		    size
+
+.text   			   10000	    aaa0
+		.text   	   10000	     2a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/crt0.o
+		.text   	   102a0	     160 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/fsbmain.o
+		.text   	   10400	     5f0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/file.o
+		.text   	   109f0	     4a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/malloc.o
+		.text   	   10e90	     640 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/rtc.o
+		.text   	   114d0	     dd0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(dp264_io.o)
+		.text   	   122a0	     350 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(initdata.o)
+		.text   	   125f0	     330 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(asmstuff.o)
+		.text   	   12920	     400 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fsboot.o)
+		.text   	   12d20	     800 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fileio.o)
+		.text   	   13520	     230 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(time.o)
+		.text   	   13750	      d0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(string.o)
+		.text   	   13820	     550 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(smcc669.o)
+		.text   	   13d70	     7b0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(acersio.o)
+		.text   	   14520	     2b0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(beep.o)
+		.text   	   147d0	     2a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(ulcd.o)
+		.text   	   14a70	     a20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(romhead.o)
+		.text   	   15490	     2e0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(ctype.o)
+		.text   	   15770	    29b0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fatdrv.o)
+		.text   	   18120	     cc0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(floppy.o)
+		.text   	   18de0	     2a0 /usr/ccs/lib/libc.a(memmove.o)
+		.text   	   19080	     900 /usr/ccs/lib/libc.a(ots_div_alpha.o)
+		.text   	   19980	     1a0 /usr/ccs/lib/libc.a(strcpy.o)
+		.text   	   19b20	     1f0 /usr/ccs/lib/libc.a(strcat.o)
+		.text   	   19d10	     110 /usr/ccs/lib/libc.a(strncpy.o)
+		.text   	   19e20	     180 /usr/ccs/lib/libc.a(strcmp.o)
+		.text   	   19fa0	      f0 /usr/ccs/lib/libc.a(strncmp.o)
+		.text   	   1a090	     180 /usr/ccs/lib/libc.a(strncat.o)
+		.text   	   1a210	      f0 /usr/ccs/lib/libc.a(strchr.o)
+		.text   	   1a300	     100 /usr/ccs/lib/libc.a(strrchr.o)
+		.text   	   1a400	     1c0 /usr/ccs/lib/libc.a(memcpy.o)
+		.text   	   1a5c0	     4e0 /usr/ccs/lib/libc.a(ots_move_alpha.o)
+
+.rdata  			   1cd40	      00
+
+.rconst 			   1aaa0	    22a0
+		.rconst 	   1aaa0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(dp264_io.o)
+		.rconst 	   1aab0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(time.o)
+		.rconst 	   1aaf0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(beep.o)
+		.rconst 	   1ab00	     100 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(ctype.o)
+		.rconst 	   1ac00	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fatdrv.o)
+		.rconst 	   1ac10	      60 /usr/ccs/lib/libc.a(strncpy.o)
+		.rconst 	   1ac70	      60 /usr/ccs/lib/libc.a(strncmp.o)
+		.rconst 	   1acd0	      60 /usr/ccs/lib/libc.a(strncat.o)
+		.rconst 	   1ad30	    2010 /usr/ccs/lib/libc.a(ots_div_data_alpha.o)
+
+.data   			   1cd40	    1810
+		.data   	   1cd40	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/crt0.o
+		.data   	   1cd80	      50 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/fsbmain.o
+		.data   	   1cdd0	     2f0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/file.o
+		.data   	   1d0c0	     130 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/malloc.o
+		.data   	   1d1f0	      a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/rtc.o
+		.data   	   1d290	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/fsbver.o
+		.data   	   1d2f0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(dp264_io.o)
+		.data   	   1d330	     120 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(initdata.o)
+		.data   	   1d450	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(asmstuff.o)
+		.data   	   1d490	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fsboot.o)
+		.data   	   1d4f0	     140 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fileio.o)
+		.data   	   1d630	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(time.o)
+		.data   	   1d670	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(string.o)
+		.data   	   1d6b0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(smcc669.o)
+		.data   	   1d6f0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(acersio.o)
+		.data   	   1d730	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(beep.o)
+		.data   	   1d770	     740 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(romhead.o)
+		.data   	   1deb0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(ctype.o)
+		.data   	   1def0	     4a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fatdrv.o)
+		.data   	   1e390	     1c0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(floppy.o)
+
+.sdata  			   1ec50	     520
+		.sdata  	   1ec50	      20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/fsbmain.o
+		.sdata  	   1ec70	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/file.o
+		.sdata  	   1ecb0	      20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/malloc.o
+		.sdata  	   1ecd0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/rtc.o
+		.sdata  	   1ed10	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/fsbver.o
+		.sdata  	   1ed20	      20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(dp264_io.o)
+		.sdata  	   1ed40	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(initdata.o)
+		.sdata  	   1ed70	     1a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fsboot.o)
+		.sdata  	   1ef10	      50 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fileio.o)
+		.sdata  	   1ef60	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(time.o)
+		.sdata  	   1ef70	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(string.o)
+		.sdata  	   1ef80	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(smcc669.o)
+		.sdata  	   1ef90	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(acersio.o)
+		.sdata  	   1efa0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(beep.o)
+		.sdata  	   1efb0	     140 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(romhead.o)
+		.sdata  	   1f0f0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(ctype.o)
+		.sdata  	   1f100	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fatdrv.o)
+		.sdata  	   1f160	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(floppy.o)
+
+.sbss   			   1f170	      d0
+		.sbss   	   1f170	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/malloc.o
+		.sbss   	   1f180	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fileio.o)
+		.sbss   	   1f190	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(smcc669.o)
+		.sbss   	   1f1a0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(acersio.o)
+		.sbss   	   1f1b0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fatdrv.o)
+		.sbss   	   1f1c0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(floppy.o)
+		.sbss   	   1f1d0	      60 (scommon)
+
+.bss    			   1f240	     5e0
+		.bss    	   1f240	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/malloc.o
+		.bss    	   1f250	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(time.o)
+		.bss    	   1f280	     380 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/dp264/lib.a(fatdrv.o)
+		.bss    	   1f600	     20c (common)

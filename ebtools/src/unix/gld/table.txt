@@ -1,0 +1,43 @@
+Translation table for COFF<->A.OUT
+
+coff->a.out (relocation entries)
+
+coff					a.out	
+field					field	
+
+r_vaddr - s_vaddr			r_address	
++ scn_base
+(from optional header)
+
+0					r_addend
+r_extern				r_extern
+
+if r_extern == FALSE
+  r_type = R_LITUSE
+    r_symndx = R_LU_JSR			r_index = N_TEXT
+					r_type = RELOC_WDISP14
+  r_type = R_LITUSE
+    r_symndx != R_LU_JSR		r_index = N_ABS
+					r_type = NO_RELOC
+
+  r_type = R_GPDISP
+	<complicated>
+
+  r_type = something else
+    r_symndx = R_SN_TEXT, R_SN_INIT,	r_index = N_TEXT
+	R_SN_FINI, R_SN_RDATA
+    r_symndx = R_SN_DATA, R_SN_SDATA,
+	R_SN_LIT8, R_SN_LIT4		r_index = N_DATA
+    r_symndx = R_SN_SBSS, R_SN_BSS	r_index = N_BSS
+    r_symndx = R_SN_PDATA, R_SN_XDATA,
+	R_SN_NULL			ERROR
+    					r_type = coff_map_rtype(r_type, FALSE)
+
+else (r_extern == TRUE)
+					
+			
+
+
+
+
+fi

@@ -1,0 +1,16 @@
+#
+# Make file to build srec on NT
+#
+!INCLUDE ..\nt.inc
+#
+ALL:	$(EXEDIR)\srec.exe
+
+$(OBJDIR)\srec.obj:	$(SRCDIR)\srec.c
+
+$(EXEDIR)\srec.exe:	$(OBJDIR)\srec.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\srec.OBJ $(conlibs)
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\srec.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\srec.exe

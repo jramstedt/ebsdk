@@ -1,0 +1,11 @@
+EXEDIR = ..\..\..\ntalpha
+
+SRCS = wincc.c
+
+$(EXEDIR)\wincc.exe:	$(SRCS)
+	CL /Fe$@ $(SRCS)
+
+clean:
+	-del /q /f wincc.obj
+
+depend:

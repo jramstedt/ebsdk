@@ -1,0 +1,39 @@
+Contents of the "windll" subdirectory for UnZip 5.32 and later:
+
+  Contents       this file
+  windll16.def   definition file for 16-bit UnZip DLL
+  windll32.def   definition file for 32-bit UnZip DLL
+  unziplib.def   definition file for 32-bit UnZip library
+  windll.c       contains the entry point for the DLL, "fake" printing,
+                 sound, rename, replace and password functions
+  windll.h       header file for both 16- and 32-bit DLLs
+  zipver.h       versioning information for resource file, and also
+                 used by WiZ application itself
+  decs.h         Exported function declarations.
+  windll.rc      resource file for both 16- and 32-bit DLLs
+  windll.doc     simplistic explaination of how to use DLL
+  structs.h      header file, used by both the DLL and by WiZ, that defines
+                 several structures passed to the DLL
+  example.c      a very simplistic example of how to load the DLL and make
+                 a call into it
+  example.h      header file for example.c
+
+  borland\dll\   directory with DLL makefiles for Borland C++
+  borland\lib\   directory with LIB makefiles for Borland C++
+
+  visualc\dll\   directory with DLL project and makefile for Visual C++ 5.0
+  visualc\lib\   directory with LIB project and makefile for Visual C++ 5.0
+
+  vb\            example files for using the Visual C++ DLL with Visual Basic
+
+
+Note that Borland C++ 5.0 is full of bugs; version 4.5 or 5.01 is recommended
+instead.  If you must use Borland C++ 5.0, using the Intel optimizing compiler
+is required to avoid crashes (possibly due to a bug in the stat() function in
+the normal Borland compiler).  This does have the advantage of giving you a
+smaller code size than the 4.52 compiler.  Borland C++ 5.01 has resolved many
+of the problems seen with 5.0 and can be used reliably.
+
+The Microsoft C port has not been tested as completely as the Borland port.
+I have been singularly unsuccessful in getting this to compile and run under
+MSVC 1.52c.

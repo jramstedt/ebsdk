@@ -1,0 +1,52 @@
+
+OBJS = parser.tab.o$(alpha) lex.yy.o$(alpha) avl_mod.o$(alpha) main.o$(alpha) hal.o$(alpha) sym.o$(alpha) utl.o$(alpha) dir.o$(alpha) memmgt.o$(alpha) operator.o$(alpha) lib.o$(alpha) dll.o$(alpha) osf.o$(alpha) NN_Div.o$(alpha) NN_Util.o$(alpha) NN_DigitDiv.o$(alpha) NN_SubDigitMult.o$(alpha) NN_Sub.o$(alpha) NN_DigitMult.o$(alpha) yywrap.o$(alpha)
+
+
+CC = cc
+FLEX = flex
+DEBUG=
+
+LINKFLAGS=$(DEBUG)
+GENERIC_CFLAGS = $(DEBUG)
+
+
+CFLAGS = $(GENERIC_CFLAGS) $(EXTRA_CFLAGS)
+
+
+# DO NOT REMOVE THE "-I" from FLEXFLAGS
+#
+# 1. It is required for the macro preprocessing function to work correctly.
+# 2. It is required for the error processing to have the correct line numbers.
+#
+FLEXFLAGS = -iId
+
+BISONFLAGS = --verbose --define --debug
+
+hal$(alpha).exe : $(OBJS)
+	cc $(LINKFLAGS) -o hal $+
+
+lex.yy.c : lexer.l
+	$(FLEX) $(FLEXFLAGS) $<
+
+parser.tab.c : parser.y
+	bison $(BISONFLAGS) $<
+
+parser.tab.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h
+lex.yy.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h ev5.h operator.h
+avl_mod.o$(alpha) : avl.h
+main.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h version.h
+hal.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h
+sym.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h
+utl.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h operator.h
+dir.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h operator.h
+memmgt.o$(alpha) : hal.h avl.h lexyy.h parser.tab.h
+operator.o$(alpha) : alpha_opcode.h hal.h avl.h lexyy.h parser.tab.h operator.h defoper.h
+lib.o$(alpha) : hal.h lib.h operator.h
+dll.o$(alpha) : dll.h
+osf.o$(alpha) : hal.h version.h
+NN_div.o$(alpha) : NN.h
+NN_util.o$(alpha) : NN.h
+NN_digitdiv.o$(alpha) : NN.h
+NN_subdigitmult.o$(alpha) : NN.h
+NN_sub.o$(alpha) : NN.h
+NN_digitmult.o$(alpha) : NN.h

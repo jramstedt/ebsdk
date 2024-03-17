@@ -1,0 +1,11 @@
+EXEDIR = ..\..\..\ntalpha
+
+SRCS = rm.c
+
+$(EXEDIR)\rm.exe:	$(SRCS)
+	CL /Fe$@ $(SRCS)
+
+clean:
+	-del /q /f rm.obj
+
+depend:

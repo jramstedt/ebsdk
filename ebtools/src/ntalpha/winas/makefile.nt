@@ -1,0 +1,11 @@
+EXEDIR = ..\..\..\ntalpha
+
+SRCS = winas.c
+
+$(EXEDIR)\winas.exe:	$(SRCS)
+	CL /Fe$@ $(SRCS)
+
+clean:
+	-del /q /f winas.obj
+
+depend:

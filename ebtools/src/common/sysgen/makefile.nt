@@ -1,0 +1,19 @@
+#
+# Make file to build sysgen on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:	$(EXEDIR)\sysgen.exe 
+
+$(OBJDIR)\sysgen.obj:	$(INCDIR)\c_32_64.h $(SRCDIR)\sysgen.c
+
+$(EXEDIR)\sysgen.exe:	$(OBJDIR)\sysgen.obj 
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\sysgen.obj $(COMMONLIB) $(conlibs) \
+		/map:$(OBJDIR)\sysgen.map
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\sysgen.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\sysgen.exe
+	-del $(CLEANFLAGS) $(OBJDIR)\sysgen.map

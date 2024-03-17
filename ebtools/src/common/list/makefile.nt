@@ -1,0 +1,22 @@
+#
+# Make file to build LIST tools on NT
+#
+!INCLUDE ..\nt.inc
+#
+ALL:	$(EXEDIR)\Alist.exe
+
+$(OBJDIR)\alist.obj:	$(INCDIR)\a_out.h $(SRCDIR)\alist.c
+
+$(EXEDIR)\alist.exe:	$(OBJDIR)\alist.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ $** $(COMMONLIB) $(conlibs) 
+
+$(OBJDIR)\clist.obj:	$(INCDIR)\coff.h $(SRCDIR)\clist.c
+
+$(EXEDIR)\clist.exe:	$(OBJDIR)\clist.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ $** $(COMMONLIB) $(conlibs)
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\alist.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\alist.exe
+	-del $(CLEANFLAGS) $(OBJDIR)\clist.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\clist.exe

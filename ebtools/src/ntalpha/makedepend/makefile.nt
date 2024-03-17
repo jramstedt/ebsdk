@@ -1,0 +1,9 @@
+EXEDIR = ..\..\..\ntalpha
+
+OBJFILES=cppsetup.obj ifparser.obj include.obj parse.obj pr.obj main.obj
+
+$(EXEDIR)\makedepend.exe: $(OBJFILES)
+	link /out:$@ $(OBJFILES)
+
+clean:
+	-del *.obj

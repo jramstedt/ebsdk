@@ -1,0 +1,20 @@
+OBJDIR=.
+EXEDIR=..\..\..\ntalpha
+
+CC=CL
+CFLAGS=/nologo /c
+
+SRCFILES= lexer.lex.c parser.tab.c avl_mod.c dll.c main.c hal.c  \
+    sym.c utl.c dir.c memmgt.c operator.c osf.c lib.c NN_Div.c NN_Util.c  \
+    NN_DigitDiv.c NN_SubDigitMult.c NN_Sub.c NN_DigitMult.c yywrap.c
+
+
+OBJFILES= lexer.lex.obj parser.tab.obj avl_mod.obj dll.obj main.obj  \
+    hal.obj sym.obj utl.obj dir.obj memmgt.obj operator.obj osf.obj  \
+    lib.obj NN_Div.obj NN_Util.obj NN_DigitDiv.obj NN_SubDigitMult.obj  \
+    NN_Sub.obj NN_DigitMult.obj yywrap.obj
+
+
+$(EXEDIR)hal.exe: $(OBJFILES)
+	link /out:$(EXEDIR)\hal.exe $(OBJFILES)
+

@@ -1,0 +1,339 @@
+%
+% ev6_system_pal_impure_p1.dnr
+%
+
+%
+% Last Edit:	18-May-98
+%
+% Edit History
+% Who	When		What
+% ---	----		----
+% ES	17-Sep-96	Moved around impure locations to match previous
+%				implementations
+% ES	17-Oct-96	Renamed to ev6_system_pal_impure.dnr
+% ES	21-Nov-96	Changed cbox error registers, deleted them
+%				from CNS
+% ES	05-Mar-97	Added FP_PC, FPE_STATE, emulation reg file.
+%			IF THESE LOCATIONS CHANGE, you must rebuild the
+%				emulator with the new .h file!
+% ES	08-Apr-97	Eliminate CPU_BASE and SYSTEM_BASE and SIZE as
+%				as locations.
+%				NOW NEED TO UPDATE THESE MANUALLY!
+% ES	10-Apr-97	Change cbox read chain names.
+%			Added PAL_BASE, I_CTL, PROCESS_CONTEXT to mchk.
+% ES	09-Jun-97	New logout frame arrangement.
+% ES	24-Jun-97	Eliminate VA and VA_CTL. Also have revision number.
+%				Add/move around reserved spots.
+% ES	15-Aug-97	Added some names for DP264.
+% ES	30-Oct-97	Move mm_stat from long to short frame for
+%				corrected dc_tag_perr.
+% ES	06-Nov-97	Put srom parameters at the end.
+% ES	20-Nov-97	Put srom parameters back at placeholders. Only debug
+%				monitor cares. SRM puts it where it wants
+%				anyway
+% ES	18-May-98	Add CNS__WRITE_MANY
+
+
+%
+% Define CNS__SIZE
+% THIS IS MANUALLY SET!
+%
+
+DEF	CNS__SIZE		0x5c0
+
+%
+% Define prefix as CNS
+%
+
+PREFIX CNS
+
+%
+% Define offsets
+%
+
+DEFLIST 0x0 8 ! start = 0x0, increment = 8
+	FLAG			% Dump flag
+	HALT			% Halt code
+
+	R0			% Integer registers
+	R1
+	R2
+	R3
+	R4
+	R5
+	R6
+	R7
+	R8
+	R9
+	R10
+	R11
+	R12
+	R13
+	R14
+	R15
+	R16
+	R17
+	R18
+	R19
+	R20
+	R21
+	R22
+	R23
+	R24
+	R25
+	R26
+	R27
+	R28
+	R29
+	R30
+	R31
+
+	F0			% Floating point registers
+	F1
+	F2
+	F3
+	F4
+	F5
+	F6
+	F7
+	F8
+	F9
+	F10
+	F11
+	F12
+	F13
+	F14
+	F15
+	F16
+	F17
+	F18
+	F19
+	F20
+	F21
+	F22
+	F23
+	F24
+	F25
+	F26
+	F27
+	F28
+	F29
+	F30
+	F31
+
+	MCHKFLAG		% Does anyone use this?????
+
+	IMPURE			% Important PALtemps
+	WHAMI
+	SCC
+	PRBR
+	PTBR
+	TRAP
+	HALT_CODE
+	KSP
+	SCBB
+	PCBB
+	VPTB
+	SROM_REV		% DP264 debug monitor
+	PROC_ID			% DP264
+	MEM_SIZE		% DP264
+	CYCLE_CNT		% DP264
+	SIGNATURE		% DP264
+	PROC_MASK		% DP264
+	SYSCTX			% DP264
+	PLACE_HOLDER18
+	PLACE_HOLDER19
+	PLACE_HOLDER20
+	PLACE_HOLDER21
+	PLACE_HOLDER22
+	PLACE_HOLDER23
+	P4			% Shadow Registers
+	P5
+	P6
+	P7
+	P20
+	P_TEMP
+	P_MISC
+	P23
+
+	FPCR			% IPRs
+	VA
+	VA_CTL
+	EXC_ADDR
+	IER_CM
+	SIRR
+	ISUM
+	EXC_SUM
+	PAL_BASE
+	I_CTL
+	PCTR_CTL
+	PROCESS_CONTEXT
+	I_STAT
+	DTB_ALT_MODE
+	MM_STAT
+	M_CTL
+	DC_CTL
+	DC_STAT
+
+	FPE_STATE		% For emulator
+	FP_PC			% For emulator
+
+	R0_EMUL			% Integer registers for emulator
+	R1_EMUL
+	R2_EMUL
+	R3_EMUL
+	R4_EMUL
+	R5_EMUL
+	R6_EMUL
+	R7_EMUL
+	R8_EMUL
+	R9_EMUL
+	R10_EMUL
+	R11_EMUL
+	R12_EMUL
+	R13_EMUL
+	R14_EMUL
+	R15_EMUL
+	R16_EMUL
+	R17_EMUL
+	R18_EMUL
+	R19_EMUL
+	R20_EMUL
+	R21_EMUL
+	R22_EMUL
+	R23_EMUL
+	R24_EMUL
+	R25_EMUL
+	R26_EMUL
+	R27_EMUL
+	R28_EMUL
+	R29_EMUL
+	R30_EMUL
+	R31_EMUL
+
+	F0_EMUL			% Floating point registers
+	F1_EMUL
+	F2_EMUL
+	F3_EMUL
+	F4_EMUL
+	F5_EMUL
+	F6_EMUL
+	F7_EMUL
+	F8_EMUL
+	F9_EMUL
+	F10_EMUL
+	F11_EMUL
+	F12_EMUL
+	F13_EMUL
+	F14_EMUL
+	F15_EMUL
+	F16_EMUL
+	F17_EMUL
+	F18_EMUL
+	F19_EMUL
+	F20_EMUL
+	F21_EMUL
+	F22_EMUL
+	F23_EMUL
+	F24_EMUL
+	F25_EMUL
+	F26_EMUL
+	F27_EMUL
+	F28_EMUL
+	F29_EMUL
+	F30_EMUL
+	F31_EMUL
+
+	WRITE_MANY
+
+
+ENDPREFIX
+
+%
+% Define MCHK_CRD__BASE, MCHK_CRD_CPU_BASE,
+% 		MCHK_CRD__SYSTEM_BASE, and MCHK_CRD__SIZE
+% THESE ARE MANUALLY SET!
+% Also have revision number.
+%
+
+DEF	MCHK_CRD__REV		0x1
+DEF	MCHK_CRD__BASE		0x0
+DEF	MCHK_CRD__CPU_BASE	0x18
+DEF	MCHK_CRD__SYSTEM_BASE	0x58
+DEF	MCHK_CRD__SIZE		0x58
+
+%
+% Define prefix as MCHK_CRD
+%
+
+PREFIX MCHK_CRD
+
+%
+% Define mchk_crd offsets
+%
+
+DEFLIST 0x0 8 ! Start = 0x0, increment 8
+	FLAG_FRAME
+	OFFSETS
+
+	MCHK_CODE		% start of pal specific
+
+	I_STAT			% start of cpu specific
+	DC_STAT
+	C_ADDR
+	DC1_SYNDROME
+	DC0_SYNDROME
+	C_STAT
+	C_STS
+	MM_STAT
+
+ENDPREFIX
+
+%
+% Define MCHK__BASE, MCHK__CPU_BASE, MCHK__SYSTEM_BASE, MCHK__SIZE
+% THESE ARE MANUALLY SET!
+% Also have revision number.
+%
+
+DEF	MCHK__REV		0x1
+DEF	MCHK__BASE		0x100
+DEF	MCHK__CPU_BASE		0x18
+DEF	MCHK__SYSTEM_BASE	0xA0
+DEF	MCHK__SIZE		0xA0
+
+%
+% Define prefix as MCHK
+%
+
+PREFIX MCHK
+
+%
+% Define mchk offsets
+%
+
+DEFLIST 0x0 8 ! Start = 0x0, increment 8
+	FLAG_FRAME
+	OFFSETS
+
+	MCHK_CODE		% start of pal specific
+
+	I_STAT			% start of cpu specific common
+	DC_STAT
+	C_ADDR
+	DC1_SYNDROME
+	DC0_SYNDROME
+	C_STAT
+	C_STS
+	MM_STAT
+
+	EXC_ADDR		% start of cpu specific, mchk only
+	IER_CM
+	ISUM
+	RESERVED_0
+	PAL_BASE
+	I_CTL
+	PROCESS_CONTEXT
+	RESERVED_1
+	RESERVED_2
+
+ENDPREFIX

@@ -1,0 +1,87 @@
+%
+% ev6_pal_temps.dnr
+%
+
+%
+% Last Edit:	13-Oct-98
+%
+% Edit History
+% Who	When		What
+% ---	----		----
+% ES	19-Sep-96	Just have M_CTL and DC_CTL in impure only.
+% ES	18-Jun-97	Add P_MISC.
+% ES	01-Aug-97	Put M_CTL back into pal_temps and impure.
+% ES	24-Sep-97	Add a reserve location for debugging, etc.
+% ES	29-Jun-98	Added PT__SYS_EVENT
+% ES	06-Oct-98	For spinlock hack, added
+%				PT__PCTR_SAVE
+%				PT__PCTR_FLAG
+%				PT__PCTR_R4
+%				PT__PCTR_PEND
+%				PT__PCTR_VMS
+%
+
+%
+% Define prefix as PT
+%
+PREFIX PT
+
+%
+% Define offsets
+%
+DEFLIST 0x0 8 ! Start = 0x0, increment 8
+	VPTB
+	PTBR
+	PCBB
+	KSP
+	USP		% osf only
+	KGP		% osf only
+	ENT_ARITH	% osf only
+	ENT_IF		% osf only
+	ENT_INT		% osf only
+	ENT_MM		% osf only
+	ENT_SYS		% osf only
+	ENT_UNA		% osf only
+	STACK_PC	% osf only
+	NEW_A0		% osf only
+	NEW_A1		% osf only
+	NEW_A2		% osf only
+	SYSVAL		% osf only
+	IMPURE
+	P_MISC
+	WHAMI
+	SCC
+	PRBR
+	TRAP
+	VA_CTL
+	M_CTL
+	HALT_CODE
+	VPTE_PC
+	REG
+	OPCODE
+	R0
+	R1
+	R2
+	R3
+	R8
+	R9
+	R25
+	R26
+	NEW_PS		% PS for post interrupt
+	CH_MODE
+	CH_SP
+	CALL_PAL_PC
+	DTB_ALT_MODE
+	FAULT_PC
+	FAULT_SCB
+	FAULT_R4	% VA/Mask
+	FAULT_R5	% MMF/Exc_Sum
+	SCBB
+	RSV_FOR_PAL	% Reserved for PALcode
+	SYS_EVENT
+	PCTR_SAVE
+	PCTR_FLAG
+	PCTR_R4
+	PCTR_PEND
+	PCTR_VMS
+

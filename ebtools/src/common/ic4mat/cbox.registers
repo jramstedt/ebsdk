@@ -1,0 +1,233 @@
+// CBOX CSR registers.
+
+Container c_reg_csr
+{
+
+- Signal   cbox_dbg_port_a(2,0);			/* debug port mux selects
+							000 	-->  	c_sys_arb->sys_rdy_in_4_cycles_6a
+									c_sys_arb->arb_prb_hit_a
+									c_sys_arb->arb_spec_fill_a
+									c_sys_arb->arb_maf_mem_a
+									c_sys_arb->arb_for_wmb_a
+									c_sys_arb->arb_for_mb_a
+
+							001	--> 	c_sys_arb->sys_ack_ctr_almost_full_a
+									c_sys_arb->mbox_empty_a
+									c_sys_arb->active_wrio_6a
+									c_sys_arb->inhibit_write_a
+									c_sys_arb->inhibit_wrvictim_a
+									c_sys_arb->is_rdvic_read_a
+
+							010	-->	c_bcc_arb->dup_tag_arb_a
+									c_bcc_arb->arb_bc_rddata_6a
+									c_bcc_arb->arb_bc_rdtag_6a
+									c_bcc_arb->dc_victim_6a
+									c_bcc_arb->arb_dc_affinity_6a
+									c_bcc_arb->active_bc_6a
+	
+							011	-->	c_bcc_arb->cannot_do_maf_flow_6a
+									c_bcc_arb->cannot_do_prb_flow_6a
+									c_bcc_arb->bc_tag_read_busy_6a
+									c_bcc_arb->bc_read_busy_6a
+									c_bcc_arb->rdvic_coming_6a
+									c_bcc_arb->bc_write_busy_6a
+
+							100	-->	c_isb_arb->dc_ext_0a
+									c_isb_arb->dc_upd_0a
+									c_isb_arb->arb_maf_cam_0a
+									c_isb_arb->arb_maf_retire_0a
+									c_isb_arb->any_trans_0a
+									c_isb_arb->address_trans_0a
+
+							111	-->
+									c->sysdc_fill_cmd_n2a_h
+									c_osb_ctl->load_cmd_a
+									c_osb_ctl->load_fast_mode_a
+
+*/
+							
+//	
+- Signal   istream_enable_a;			// keep around for huggins
+
+
+
++ Signal sys_clk_ratio_a(15,0);			/* sysclock ratio from 1X-8X in 0.5 incs    	*/
+- Signal frame_select_dec_a(3,0);		/* decoded frame select */
++ Signal frame_select_a(1,0);			/*  0   -  1X
+						    1   -  2X
+						    2   -  4X
+						*/
++ Signal cfr_frmclk_delay_a(1,0);		/*  number of frame clock cycles to delay clk_fwd reset (0-3) */
++ Signal cfr_ev6clk_delay_a(2,0);		/*  number of ev6_clk cycles to delay clk_fwd reset (0-7) */
++ Signal cfr_gclk_delay_a(2,0);			/*  number of gclk cycles to delay clk_fwd reset (0-7) */
+
++ Signal sys_clk_delay_a(1,0);			/*  system clk delay(in phases)				*/
++ Signal bc_clk_delay_a(1,0);			/*  bcache clk delay(in phases)				*/
+
+
++ Signal sys_clk_ld_vector_a(15,0);		/*  Initial system clock waveform (see c_pads.mdl for patterns) */
++ Signal sys_fdbk_en_a(7,0);			/*  Feedback tap to use for circular shift register generating sys clock */
++ Signal sys_bphase_ld_vector_a(3,0);		/*  Initial pattern for b-phase extension logic for the sys clock (see c_pads.mdl for patterns) */
++ Signal sys_frame_ld_vector_a(4,0);		/*  Initial pattern for generating framing clock for system transfers (see c_pads.mdl for
+							patterns */
++ Signal sys_cpu_clk_delay_a(1,0);  		/*  enable delay of address by 0-3 CPU cycles...always set to 0	*/
+
++ Signal dup_tag_enable_a(0,0);	  		/*  External System has a Duplicate Tag -->  Steve Mode for Probes */
+
+- Signal enable_evict_a;				/*  enable evicts to be sent off-chip  		*/
++ Signal prb_tag_only_a;				/*  favor  tag reads over tag/data reads        */
+
+- Signal set_dirty_enable_a(2,0);		/*  enable sending set dirtys to system		
+						       SD SC  C
+							0  0  0  |  don't send anything off chip    (workstations)
+							0  0  1  |  send only clean->dirty off chip (makes no sense)
+							0  1  0  |  send only shared->dirty off chip(cray mode)
+						 	0  1  1  |  send clean,shared off chip      (usefull ??)
+							1  0  0  |  send only sd->dirty off chip    (usefull ??)
+							1  0  1  |  send only sd,c-> off chip       (usefull ??)
+							1  1  0  |  send all shared blocks off chip (tsunami)
+							1  1  1  |  send every-thing off chip       (wildfire)
+						*/
+				
+- Signal zeroblk_enable_a(1,0);	  		/*  enable sending zeroblks to system   	
+							X 0      |  don't use zeroblks -->   (wildfire ??)
+							0 1      |  use Zeroblks..do not send off chip (workstations)
+							1 1      |  Zeroblk ...   send off chip (Tsunami)
+						*/
++ Signal spec_read_enable_a;			/*  enable speculative reads			*/
++ Signal mbox_bc_prb_stall_a;			/*  set for bcache 5X,6X,7X,8X clock rates      */
+
++ Signal sysbus_format_a;	  		/*  four choices for pa bus assignment.		
+							0        |  Bank Interleave
+							1        |  Page Mode
+						*/
++ Signal sysbus_mb_enable_a(0,0);  		/*  send MBs to pins				*/
++ Signal sysbus_ack_limit_a(4,0);		/*  zero is inf, otherwize its the count        */
++ Signal sysbus_vic_limit_a(2,0);		/*  zero is inf, otherwize its the count of victims   */
+
++ Signal tlaser_stio_mode_a;			/*  32-byte limit for stores to io space */
+
+
+
++ Signal sysdc_delay_a(3,0);			/*  delay before looking at sysdc		*/
++ Signal fast_mode_disable_a;			/* tells EV6 to disable FAST mode 	 	
+						          1.5  2.0  2.5  3.0  3.5  4.0  5.0 6.0 7.0 8.0
+						     1    ill   3    2    2    2    2    1   1   1   1
+						     2     2    2    1    1    1    1    1   1   1   1
+						     4     1    1    1    1    1    1    1   1   1   1
+
+						     This chart shows the number of framing clocks
+						     between address and data for fast mode--
+						*/
+
+- Signal bc_clean_victim_b(0,0);			/*  clean victim is being overwritten -cray	*/
++ Signal bc_clean_victim_a(0,0);			/*  clean victim is being overwritten -cray	*/
++ Signal bc_rdvictim_a(0,0);			/*  clean victim is being overwritten -cray	*/
++ Signal sys_bus_size_a(1,0);			/*  usage of bits 1,0
+							 1 1  -> ignore 1,0
+							 1 0  -> illegal
+							 0 1  -> ignore 0
+							 0 0  -> use both
+						*/
+
++ Signal rdvic_ack_inhibit_a;			/*  inhibit ack update on rdvic commands       */
++ Signal enable_stc_command_a;			/*  tell System about store conditionals       */
+// Bcache PORT CSRs
+
++ Signal bc_frm_clk_a;				/*  probe tags can probe under bc-hits under every slot  */
++ Signal dcvic_threshold_a(7,0);	    		/* VAF threshold for bcvictims		    	*/
++ Signal bc_rd_rd_bubbles_a(1,0);  		/*  If bank conflict, the rd to rd bubble  	*/
++ Signal bc_clk_ratio_a(15,0);			/* sysclock ratio from 1X-8X in 0.5 incs    	*/
+
+
++ Signal bc_clk_ld_vector_a(15,0);		/*  Initial bcache read clock waveform (see c_pads.mdl for patterns) */
++ Signal bc_fdbk_en_a(7,0);			/*  Feedback tap to use for circular shift register generating bcache clock */
++ Signal bc_bphase_ld_vector_a(3,0);		/*  Initial pattern for b-phase extension logic for the bcache clock (see c_pads.mdl for patterns) */
+
++ Signal bc_rd_wr_bubbles_a(5,0);  		/* number of bcache cycles between rd and wr. 0-63    */
++ Signal bc_late_write_num_a(2,0);  		/* enable write data to be delayed for 
+							0-7 BcWrite cycles		        */
++ Signal bc_wr_rd_bubbles_a(3,0);  		/* number of bcache cycles between wr and rd.
+									     0-16                */
+
++ Signal bc_cpu_late_write_num_a(1,0);  		/* enable delay of data wrt address by
+							0-3 CPU cycles		   	        */
++ Signal bc_cpu_clk_delay_a(1,0);  		/* enable delay of data wrt address by
+							0-3 CPU cycles		   	        */
+
++ Signal bc_burst_mode_enable_a;			/* is the Bcache burst mode 			*/
++ Signal bc_lat_data_pattern_a(31,0);		/* data return pattern				*/
++ Signal bc_lat_tag_pattern_a(23,0);		/* data return pattern				*/
+
++ Signal bc_cf_double_clk_a;			/* bcache clocks are run double rate		  */
++ Signal bc_clkfwd_enable_a;			/* enable clk-forwarding interface on bcache side */
+
++ Signal bc_ddm_fall_en_a;			/* write bcache data on the falling edge of the clock    */
++ Signal bc_ddm_rise_en_a;			/* write bcache data on the rising edge of the clock     */
++ Signal bc_ddmf_enable_a;			/* enable falling edge of bcache clock (always set to 1) */
++ Signal bc_ddmr_enable_a;			/* enable rising edge of bcache clock (always set to 1)  */
++ Signal bc_ddm_rd_fall_en_a;			/* read bcache data on the falling edge of the clock     */
++ Signal bc_ddm_rd_rise_en_a;			/* read bcache data on the rising edge of the clock      */
+
++ Signal bc_tag_ddm_fall_en_a;			/* write bcache tag on the falling edge of the clock    */
++ Signal bc_tag_ddm_rise_en_a;			/* write bcache tag on the rising edge of the clock     */
++ Signal bc_tag_ddm_rd_fall_en_a;	 	/* read bcache tag on the falling edge of the clock     */
++ Signal bc_tag_ddm_rd_rise_en_a;		/* read bcache tag on the rising edge of the clock      */
+
++ Signal bc_pentium_mode_a;			/* pentium mode */
+
++ Signal sys_cf_double_clk_a;			/* system clocks are run double rate		  */
++ Signal sys_clkfwd_enable_a;			/* enable clk-forwarding interface on system side */
+
++ Signal sys_ddm_fall_en_a;			/* write system data on the falling edge of the clock    */
++ Signal sys_ddm_rise_en_a;			/* write system data on the rising edge of the clock     */
++ Signal sys_ddmf_enable_a;			/* enable falling edge of system clock (always set to 1) */
++ Signal sys_ddmr_enable_a;			/* enable rising edge of system clock (always set to 1)  */
++ Signal sys_ddm_rd_fall_en_a;			/* read system data on the falling edge of the clock     */
++ Signal sys_ddm_rd_rise_en_a;			/* read system data on the rising edge of the clock      */
+
++ Signal sys_rcv_mux_cnt_preset_a(1,0);		/* the cnt value in the clock forwarding reciever system*/
++ Signal bc_rcv_mux_cnt_preset_a(1,0);		/* the cnt value in the clock forwarding reciever bcache*/
+- Signal frame_clock_offset_a(1,0);		/* number of bit times the framing clock is ahead of ref*/
++ Signal data_valid_dly_a(1,0);			/* use delayed version of sys_data_in_valid based on sysdc delay */
++ Signal jitter_cmd_a;				/* delay write Sysdc to make the write predictable */
+
++ Signal bc_late_write_upper_a;			/* bc_late_write_num range select (0 = 0-3, 1 = 4-7) */
+
+/*  CSR's which are writable via MBOX ipr chain */
+
+- Signal bc_enable_b(0,0);	  		/*  there is a Bcache				*/
+- Signal bc_enable_a(0,0);	  		/*  there is a Bcache				*/
+- Signal raw_bc_size_a(4,1);	                /*  raw value from shift chain -- can have illegal values */
+- Signal pad_raw_bc_size_a(4,1);	                /*  raw value from shift chain -- can have illegal values */
+- Signal bc_size_a(4,1);	 	  		/*  1 Mbytes to 16 Mbytes. -- always a legal value */
+- Signal pad_bc_size_a(4,1);	 	  		/*  1 Mbytes to 16 Mbytes. -- always a legal value */
+- Signal bc_size_b(4,1);	 	  		/*  1 Mbytes to 16 Mbytes.			*/
+						/* stored as 
+							1 Mb: 0000
+							2 Mb: 0001
+							4 Mb: 0011
+							8 Mb: 0111
+						       16 Mb: 1111
+						*/
+- Signal  bc_bank_enable_a;			/*  in PASS2 logic for ~MSB drive */
+
+- Signal init_mode_a;
+- Signal init_mode_2_a;
+- Signal machine_id_a(5,0);			/* machin id for IBOX */
+- Signal bc_wrt_sts_a(3,0);			/* write status in test mode */
+						/* Valid  (3)
+			  			   Dirty  (2)
+						   Shared (1)
+						   Parity (0) 
+						*/
+
+
+- Signal bch_readclk_ratio_a(15,0);		/* sysclock ratio from 1X-8X in 0.5 incs  --- obsolete, remove when huggins catches up   	*/
+- Signal bc_rdclk_ld_vector_a(15,0);		/* vector loaded to emulate bcread clocks --- obsolete, remove when huggins catches up      */
+- Signal sys_add_clk_ld_vector_a(15,0);		/*  obsolete .. waiting for huggins to catchup */
+- Signal add_sys_sysclk_ratio_a(15,0); 		/* sysclock ratio from 1X-8X in 0.5 incs  --- obsolete  	*/
+
+
+
+};

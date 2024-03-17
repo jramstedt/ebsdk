@@ -1,0 +1,59 @@
+%
+% ev6_system_pal_defs.dnr
+%
+
+%
+% Last Edit:	09-Jul-97
+%
+% Edit History
+% Who	When		What
+% ---	----		----
+% ES	09-Jul-97	Add CSERVES
+%
+
+DEF	PAL__PAL_BASE			0x10000
+DEF	PAL__OSFPAL_BASE		0x20000
+DEF	PAL__CONSOLE_BASE		0x30000
+DEF	PAL__EMUL_BASE			0xE0000
+
+DEF 	PAL__IMPURE_BASE  		0xC000
+DEF 	PAL__IMPURE_COMMON_SIZE 	0x200
+DEF 	PAL__IMPURE_SPECIFIC_SIZE 	0x600
+
+DEF 	PAL__LOGOUT_BASE		0xE000
+DEF 	PAL__LOGOUT_SPECIFIC_SIZE	0x400
+
+DEF	PAL__TEMPS_BASE			0xF000
+DEF	PAL__TEMPS_SPECIFIC_SIZE	0x200
+
+%
+% Define addresses of locations in the impure
+% common area. Assumes base at 0xC000 and locations
+% starting at 0x100.
+%
+
+PREFIX PAL
+
+DEFLIST 0xC100 8 ! start=0xC100, increment = 8
+	ENTER_OSF
+
+ENDPREFIX
+
+%
+% Define device interrupt IRQ(s) as a mask in ISUM<ei> field
+%
+
+DEF	IRQ_DEV__M			0x02	% IRQ1
+
+%
+% Define cserve functions
+%
+
+DEF	CSERVE__START			0x01
+DEF	CSERVE__CALLBACK		0x02
+
+%
+% For DP264 debug monitor
+%
+DEF	CSERVE__JTOPAL			0x09
+DEF	CSERVE__RD_IMPURE		0x0B

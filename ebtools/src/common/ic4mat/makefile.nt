@@ -1,0 +1,39 @@
+#
+# Make file to build ic4mat on NT
+#
+!INCLUDE ..\nt.inc
+#
+
+OBJECTS	=	$(OBJDIR)\ev6.obj \
+		$(OBJDIR)\ev6_cbox.obj \
+		$(OBJDIR)\ev6_chain.obj \
+		$(OBJDIR)\ev6_srom.obj \
+		$(OBJDIR)\ev6_ic.obj \
+		$(OBJDIR)\getopt.obj
+
+IC4MAT_OBJECTS	= $(OBJDIR)\ic4mat.obj $(OBJECTS)
+CHAIN_OBJECTS = $(OBJDIR)\chain2cbox.obj $(OBJECTS)
+
+ALL:	$(EXEDIR)\ic4mat.exe $(EXEDIR)\chain2cbox.exe
+
+$(OBJDIR)\ic4mat.obj:		$(SRCDIR)\ic4mat.c
+$(OBJDIR)\chain2cbox.obj:	$(SRCDIR)\chain2cbox.c
+$(OBJDIR)\ev6.obj:		$(SRCDIR)\ev6.c
+$(OBJDIR)\ev6_cbox.obj:		$(SRCDIR)\ev6_cbox.c
+$(OBJDIR)\ev6_chain.obj:	$(SRCDIR)\ev6_chain.c
+$(OBJDIR)\ev6_srom.obj:		$(SRCDIR)\ev6_srom.c
+$(OBJDIR)\ev6_ic.obj:		$(SRCDIR)\ev6_ic.c
+$(OBJDIR)\getopt.obj:		$(SRCDIR)\getopt.c
+
+$(EXEDIR)\ic4mat.exe:	$(IC4MAT_OBJECTS)
+	$(link) $(linkdebug) $(conflags) /out:$@ $(IC4MAT_OBJECTS) $(conlibs)
+
+$(EXEDIR)\chain2cbox.exe:	$(CHAIN_OBJECTS)
+	$(link) $(linkdebug) $(conflags) /out:$@ $(CHAIN_OBJECTS) $(conlibs)
+
+CLEAN:
+	-del $(CLEANFLAGS) $(IC4MAT_OBJECTS)
+	-del $(CLEANFLAGS) $(OBJDIR)\chain2cbox.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\ic4mat.exe
+	-del $(CLEANFLAGS) $(EXEDIR)\chain2cbox.exe
+

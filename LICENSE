@@ -1,0 +1,282 @@
+
+
+AV-QEK1B-TE
+
+IMPORTANT -- CAREFULLY READ THE COMPAQ LICENSE AGREEMENTS BEFORE
+PROCEEDING. FURTHER OPENING OR USE OF THE MATERIALS INDICATES YOUR
+ACCEPTANCE OF THE TERMS OF THE LICENSE AGREEMENT.
+
+Alpha Motherboards Software Developer's Kit (SDK) Software License Agreement
+
+LICENSE TERMS
+
+    SOFTWARE PROGRAMS:
+
+        * PALcode Software and Source Code
+
+        * Motherboard Tools, Firmware, and Source Code
+
+    RESTRICTED SOFTWARE PROGRAM:
+
+        * BIOS Emulation Object Libraries
+
+    THIRD-PARTY SOFTWARE PROGRAMS:
+
+        See terms accompanying the third-party software.
+
+1. GRANT
+
+Compaq Computer Corporation ("COMPAQ") grants you the right to use the
+Software Programs  and Restricted Software Program (the "Software")
+specified above on any number of computers  according to the following
+terms.
+
+You may copy, modify, and distribute the Software Programs (in both
+source and object form) and  its documentation.
+
+You may distribute but not modify the Restricted Software Program.
+
+All copies of the Software and object code derived from the sources
+are to be used solely within  products incorporating an integrated
+circuit implementing the Alpha architecture. The permission  is granted
+regardless of the origin of such integrated circuit provided that the
+COMPAQ copyright  notice and these license terms appear in all copies.
+
+You may not use the name, logos, or trademarks of COMPAQ and affiliated
+companies unless  agreed in a separate agreement. You agree to indemnify
+and hold COMPAQ harmless for all  claims and related expenses incurred
+by COMPAQ as a result of your use or distribution of the  Software and
+object code.
+
+2. COPYRIGHT
+
+The Software is owned by COMPAQ and its suppliers and is protected by
+copyright laws and  international treaties. Your use of the Software
+and associated documentation is subject to the  applicable copyright
+laws and the express rights and restrictions of these terms.
+
+3. RESTRICTIONS
+
+You may not rent, lease, or otherwise transfer the Software except as
+expressly authorized in these  terms. You may not remove any copyright,
+trademark, or other proprietary notices from the  Software or the
+media. For the Restricted Software Program you may not reverse engineer,
+decompile, or disassemble the Software, except to the extent COMPAQ
+cannot prohibit such acts  by law.
+
+4. LIMITED WARRANTY AND LIABILITY
+
+LIMITATION OF LIABILITY: THE PRODUCTS AND PRODUCT INFORMATION  FURNISHED
+HEREUNDER ARE FURNISHED "AS IS." COMPAQ DISCLAIMS ALL  WARRANTIES THAT MAY
+BE IMPLIED ON THE PRODUCTS INCLUDING, WITHOUT  LIMITATION, ALL IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS. IN  NO EVENT WILL COMPAQ
+BE LIABLE FOR ANY DAMAGES WHATSOEVER,  INCLUDING LOSS OF DATA OR USE,
+LOST PROFITS OR ANY INCIDENTAL OR  CONSEQUENTIAL DAMAGES, ARISING OUT
+OF OR IN CONNECTION WITH THIS  LICENSE OR THE USE OR PERFORMANCE OF THE
+PRODUCTS, WHETHER IN AN  ACTION OF CONTRACT OR TORT INCLUDING NEGLIGENCE.
+
+5. U.S. GOVERNMENT RESTRICTED RIGHTS
+
+Commercial Computer Software, and Computer Software Documentation, and
+Technical Data for  Commercial Items are licensed to the U.S. Government
+with COMPAQ's standard commercial  license and, when applicable, the
+rights in DFAR 252.227-7015, "Technical Data - Commercial  Items."
+
+6. GENERAL
+
+You are responsible for compliance with all applicable export or re-export
+control laws and  regulations if you export the Software. This agreement
+is governed by and is to be construed under  the laws of the Commonwealth
+of Massachusetts.
+
+If you have any questions concerning this Agreement, please contact your
+local COMPAQ sales  office or write to: Compaq Computer Corporation,
+Software Business Practices, ZKO1-2/D22,  110 Spit Brook Road, Nashua,
+NH 03062-2802.
+
+(C) 1999 Compaq Computer Corporation.  All rights reserved. Printed in
+the U.S.A.
+
+COMPAQ, the Compaq logo, and the Digital logo Registered in U.S. Patent
+and Trademark  Office.
+
+Other product names mentioned herein may be the trademarks of their
+respective companies.
+
+THIRD-PARTY LICENSING
+
+All of the third-party material used in the SDK carries copyrights that
+grant permission for source  and binary redistribution such that the SDK
+is in compliance. Users are urged to consult the  copyright notices in
+each file to determine the users' eligibility to redistribute the code
+derived  therefrom.
+
+------------------------------------------------------------------------------
+
+Free Software Foundation, Inc.
+
+Copyright (C) <copyright-dates> Free Software Foundation, Inc. This file
+is part of <package-name>.
+
+<package-name> is free software; you can redistribute it and/or modify
+it under the terms of the  GNU General Public License as published by
+the Free Software Foundation; either version 2, or  (at your option)
+any later version.
+
+<package-name> is distributed in the hope that it will be useful,
+but WITHOUT ANY  WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A  PARTICULAR PURPOSE. See the GNU General
+Public License for more details.
+
+You should have received a copy of the GNU General Public License along
+with GNU Make; see  the file COPYING. If not, write to the Free Software
+Foundation, 675 Mass Ave, Cambridge, MA  02139, USA.
+
+------------------------------------------------------------------------------
+
+Regents of the University of California
+
+Copyright (C) 1990, 1993 The Regents of the University of California. All
+rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted  provided that the following conditions
+are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+this list of conditions and  the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions  and the following disclaimer in the
+documentation and/or other materials provided with the  distribution.
+
+3. All advertising materials mentioning features or use of this software
+must display the following  acknowledgement: This product includes
+software developed by the University of California, Berkeley and its
+contributors.
+
+4. Neither the name of the University nor the names of its contributors
+may be used to endorse or  promote products derived from this software
+without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS "AS IS"
+AND  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+THE  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE REGENTS OR 
+
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY  OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+------------------------------------------------------------------------------
+
+Carnegie Mellon University
+
+Mach Operating System Copyright (C) 1991, 1990, 1989 Carnegie Mellon
+University All Rights Reserved.
+
+Permission to use, copy, modify and distribute this software and its
+documentation is hereby  granted, provided that both the copyright
+notice and this permission notice appear in all copies of  the software,
+derivative works or modified versions, and any portions thereof, and
+that both  notices appear in supporting documentation.
+
+CARNEGIE MELLON ALLOWS FREE USE OF THIS SOFTWARE IN ITS "AS IS"
+CONDITION. CARNEGIE MELLON DISCLAIMS ANY LIABILITY OF ANY KIND FOR  ANY
+DAMAGES WHATSOEVER RESULTING FROM THE USE OF THIS SOFTWARE.
+
+Carnegie Mellon requests users of this software to return to Software
+Distribution Coordinator or Software.Distribution@CS.CMU.EDU School of
+Computer Science Carnegie Mellon University Pittsburgh PA 15213-3890 any
+improvements or extensions that they make and grant Carnegie Mellon the
+rights to  redistribute these changes.
+
+-------------------------------------------------------------------------------
+
+Mark Adler, Richard B. Wales, Jean-loup Gailly, Kai Uwe Rommel and
+Igor Mandrichenko
+
+Copyright (C) 1990-1992 Mark Adler, Richard B. Wales, Jean-loup Gailly,
+Kai Uwe Rommel and  Igor Mandrichenko.
+
+Permission is granted to any individual or institution to use, copy,
+or redistribute this software so  long as all of the original files
+are included unmodified, that it is not sold for profit, and that this
+copyright notice is retained.
+
+------------------------------------------------------------------------------
+
+Third Eye Software, Inc.
+
+(C) Copyright 1984 by Third Eye Software, Inc.
+
+Third Eye Software, Inc. grants reproduction and use rights to all
+parties, PROVIDED that this  comment is maintained in the copy.
+
+Third Eye makes no claims about the applicability of this symbol table
+to a particular use.
+
+-------------------------------------------------------------------------------
+
+MIPS Computer Systems, Inc.
+
+Copyright (C) 1986 MIPS Computer Systems, Inc. All Rights Reserved.
+
+-------------------------------------------------------------------------------
+
+X Consortium
+
+Copyright (C) 1993, 1994 X Consortium
+
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and  associated documentation files (the
+"Software"), to deal in the Software without restriction,  including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense,  and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do  so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be included
+in all copies or substantial  portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND  NONINFRINGEMENT. IN
+NO EVENT SHALL THE X CONSORTIUM BE LIABLE FOR  ANY CLAIM, DAMAGES OR
+OTHER LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT OR OTHERWISE,
+ARISING FROM, OUT OF OR IN CONNECTION  WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
+
+Except as contained in this notice, the name of the X Consortium shall
+not be used in advertising  or otherwise to promote the sale, use or
+other dealings in this Software without prior written  authorization
+from the X Consortium.
+
+------------------------------------------------------------------------------
+
+Network Computing Devices, Inc.
+
+Copyright (C) 1992 Network Computing Devices, Inc.
+
+Permission to use, copy, modify, and distribute this software and
+its documentation for any  purpose and without fee is hereby granted,
+provided that the above copyright notice appear in all  copies and that
+both that copyright notice and this permission notice appear in supporting
+documentation, and that the name of Network Computing Devices may not
+be used in advertising  or publicity pertaining to distribution of the
+software without specific, written prior permission.  Network Computing
+Devices makes no respresentations about the suitability of this software
+for  any purpose. It is provided "as is" without express or implied
+warranty.
+
+NETWORK COMPUTING DEVICES DISCLAIMS ALL WARRANTIES WITH REGARD TO  THIS
+SOFTWARE, INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY  AND
+FITNESS, IN NO EVENT SHALL NETWORK COMPUTING DEVICES BE LIABLE  FOR ANY
+SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES  WHATSOEVER
+RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN  AN ACTION OF
+CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING  OUT OF OR IN
+CONNECTION WITH THE USE OR PERFORMANCE OF THIS  SOFTWARE.

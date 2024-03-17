@@ -1,0 +1,120 @@
+#! /bin/sh
+
+get_param () {
+    if [ $# -lt 1 ] ; then
+	echo Internal error: parameter required in get_param
+	exit -1
+    fi
+    prompt=$1
+    if [ $# -gt 1 ] ; then
+	default=$2
+    else
+	default=""
+    fi
+
+    echo ""
+    echo "$prompt:"
+    echo -n "    [$default]: "
+    read answer
+    if [ "$answer" = "" ] ; then
+	answer=$default
+    fi
+}
+
+get_yesno () {
+    if [ $# -lt 1 ] ; then
+	echo Internal error: parameter required in get_yesno
+	exit -1
+    fi
+    prompt=$1
+    if [ $# -gt 1 ] ; then
+	default=$2
+	if [ "$default" != "Y" -a "$default" != "y" -a "$default" != "N" -a "$default" != "n" ] ; then
+	    echo Internal error: Defualt must be Y, y, N, or n
+	    exit -1
+	fi
+    else
+	default=""
+    fi
+
+    answer=""
+
+    while [ "$answer" != "Y" -a "$answer" != "y" -a "$answer" != "N" -a "$answer" != "n" ] ; do
+	echo -n "$prompt [Y/N] <$default> "
+	read answer
+	if [ "$answer" = "" ] ; then
+	    answer=$default
+	fi
+    done
+}
+
+find_exe () {
+    exename=$1
+    exefile=""
+    for d in `echo $PATH | sed 's/:/ /g'` ; do
+	if [ -x $d/$exename ] ; then
+	    exefile=$d/$exename
+	fi
+    done
+}
+
+
+echo "======== Alpha Motherboard SDK V4.0 installation ========"
+
+if [ -f LICENSE ] ; then
+    echo ""
+    echo "Before you can use the SDK, you must read"
+    echo "and accept the COMPAQ SDK license agreement"
+    echo "Press ENTER to continue: "
+    read answer
+    more LICENSE
+    echo ""
+    get_yesno "Do you accept the license agreement?" N
+    if [ "$answer" != "Y" -a "$answer" != "y" ] ; then
+	echo "Exiting install procedure"
+	exit 1
+    fi
+fi
+
+if [ ! -f ebsdk-unix.tar.z ] ; then
+    echo "Cannot find ebsdk-unix.tar.z; make sure you are in the"
+    echo "root directory of the distribution CD"
+    exit 1
+fi
+
+SDKDIST=`pwd`
+
+find_exe acroread
+if [ "$exefile" = "" ] ; then
+    echo "The SDK documentation is provided in PDF format and"
+    echo "requires Adobe Acrobat Reader to be read."
+    echo "Acrobat Reader does not appear to be in your $PATH."
+    get_yesno "Do you wish to install Acrobat Reader at this time?" Y
+    if [ "$answer" != "n" -a "$answer" != "n" ] ; then
+	cd $SDKDIST/acroread_osf_301
+	./INSTALL
+	cd $SDKDIST
+    fi
+else
+    echo "Adobe Acrobat Reader found in $exefile"
+fi
+
+get_param "Enter directory for SDK install" $HOME/EBSDK
+INSTALLDIR=$answer
+
+if [ ! -d "$INSTALLDIR" ] ; then
+    get_yesno "$answer does not exist; create it?"
+    if [ "$answer" != "Y" -a "$answer" != "y" ] ; then
+	echo "Exiting install procedure"
+	exit 1
+    fi
+    mkdir -p $INSTALLDIR
+    if [ ! -d "$INSTALLDIR" ] ; then
+	echo Cannot create $INSTALLDIR; exiting install procedure
+	exit 1
+    fi
+fi
+
+cd $INSTALLDIR
+pcat $SDKDIST/ebsdk-unix.tar.z | tar xvf -
+

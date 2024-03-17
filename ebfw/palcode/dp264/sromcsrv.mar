@@ -1,0 +1,174 @@
+;/*
+;*****************************************************************************
+;**                                                                          *
+;**  Copyright © 1994							    *
+;**  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
+;**                                                                          *
+;**  All Rights Reserved							    *
+;**                                                                          *
+;**  Permission  is  hereby  granted  to  use, copy, modify and distribute   *
+;**  this  software  and  its  documentation,  in  both  source  code  and   *
+;**  object  code  form,  and without fee, for the purpose of distribution   *
+;**  of this software  or  modifications  of this software within products   *
+;**  incorporating  an  integrated   circuit  implementing  Digital's  AXP   *
+;**  architecture,  regardless  of the  source of such integrated circuit,   *
+;**  provided that the  above copyright  notice and this permission notice   *
+;**  appear  in  all copies,  and  that  the  name  of  Digital  Equipment   *
+;**  Corporation  not  be  used  in advertising or publicity pertaining to   *
+;**  distribution of the  document  or  software without specific, written   *
+;**  prior permission.							    *
+;**                                                                          *
+;**  Digital  Equipment  Corporation   disclaims  all   warranties  and/or   *
+;**  guarantees  with  regard  to  this  software,  including  all implied   *
+;**  warranties of fitness for  a  particular purpose and merchantability,   *
+;**  and makes  no  representations  regarding  the use of, or the results   *
+;**  of the use of, the software and documentation in terms of correctness,  *
+;**  accuracy,  reliability,  currentness  or  otherwise;  and you rely on   *
+;**  the software, documentation and results solely at your own risk.	    *
+;**                                                                          *
+;**  AXP is a trademark of Digital Equipment Corporation.		    *
+;**                                                                          *
+;*****************************************************************************
+;**
+;**  FACILITY:	
+;**
+;**	DECchip 21064/21066/211164 OSF/1 PALcode
+;**
+;**  MODULE:
+;**
+;** 	sromcsrv.s
+;** 
+;**  MODULE DESCRIPTION:
+;** 
+;**	Interface to SROM Serial Port I/O routines.
+;** 
+;**  AUTHOR: Franklin Hooker
+;** 
+;**  CREATION-DATE: 13-May-1996
+;**
+;**  $Id: sromcsrv.mar,v 1.3 1999/03/22 14:54:44 samberg Exp $
+;**
+;**  MODIFICATION HISTORY: 
+;**
+;**  $Log: sromcsrv.mar,v $
+;**  Revision 1.3  1999/03/22 14:54:44  samberg
+;**
+;**  palcode release vms 1.54 unix 1.49
+;**
+;** Revision 1.4  1998/12/29  16:30:57  samberg
+;** In srom_init, load mc_m_echo (^x100) into r0 instead of trying to use it as a literal.
+;**
+;** Revision 1.3  1997/11/12  15:31:21  samberg
+;** Make pvc clean
+;**
+;** Revision 1.2  1997/10/20  17:30:10  samberg
+;** checkin to my library
+;**
+;** Revision 1.1  1997/10/20  16:40:10  samberg
+;** Initial revision
+;**
+;**  Revision 1.2  1997/08/12  04:33:38  fdh
+;**  Modified register usage for compatibility with PALcode.
+;**
+;**  Revision 1.1  1997/08/07  14:35:53  fdh
+;**  Initial revision
+;**
+;# Revision 1.4  1997/05/02  13:45:24  pbell
+;# Updated to use the cpu.h include file instead of all
+;# the cpu type switches.
+;#
+;# Revision 1.3  1997/02/21  04:25:35  fdh
+;# Modified to save line status in a global variable
+;# instead of a PALtemp.
+;#
+;# Revision 1.2  1996/08/22  14:07:35  fdh
+;# Save/restore r15 to/from pt11.
+;#
+;# Revision 1.1  1996/05/22  22:25:47  fdh
+;# Initial revision
+;#
+;*/
+mc_m_echo		= ^x0100	; (1 << mc_v_echo)
+
+.macro	SROM_CSERVES func
+
+;/*
+;**
+;** FUNCTIONAL DESCRIPTION:
+;**
+;**      Initialize the SROM serial port for character I/O.
+;**
+;** INPUT PARAMETERS:
+;**
+;**      None
+;**
+;** OUTPUT PARAMETERS:
+;**
+;**	None
+;**
+;** SIDE EFFECTS:
+;**
+;*/
+	ALIGN_FETCH_BLOCK
+
+Sys_Cserve_Srom_Init:
+	PVC_JSR	auto, bsr=1
+	bsr	p7, autobaud_sync	; do the autobaud thing	
+	lda	r0, mc_m_echo(r31)	; get ^x100
+	bis	r24, r0, r24		; Enable echo 	
+	bis	r24, r31, r0		; Return Line Status	
+	hw_ret	(p23)
+
+
+;/*
+;**
+;** FUNCTIONAL DESCRIPTION:
+;**
+;**      Output a character to the SROM serial port.
+;**
+;** INPUT PARAMETERS:
+;**
+;**      a1 (r17) - Output Character
+;**
+;** OUTPUT PARAMETERS:
+;**
+;**	None
+;**
+;** SIDE EFFECTS:
+;**
+;*/
+	ALIGN_FETCH_BLOCK
+
+Sys_Cserve_Srom_Putc:
+	bis	r19, r31, r24
+	PVC_JSR putchar, bsr=1
+	bsr	p7, putChar
+	hw_ret	(p23)
+
+
+;/*
+;**
+;** FUNCTIONAL DESCRIPTION:
+;**
+;**      Get a character from the SROM serial port
+;**
+;** INPUT PARAMETERS:
+;**
+;**      None
+;**
+;** OUTPUT PARAMETERS:
+;**
+;**	v0 (r0) - Input Character
+;**
+;** SIDE EFFECTS:
+;**
+;*/
+	ALIGN_FETCH_BLOCK
+
+Sys_Cserve_Srom_Getc:
+	bis	r19, r31, r24
+	PVC_JSR	getchar, bsr=1
+	bsr	p7, getChar
+	hw_ret	(p23)
+
+.endm	SROM_CSERVES

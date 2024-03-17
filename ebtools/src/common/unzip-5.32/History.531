@@ -1,0 +1,89 @@
+UnZip, version 5.31, 31 May 1997
+
+New or removed features, you betcha:
+
+5.31a:
+ - OS/2, Win32:  added Watcom Win32 cross-compilation target to makefile.os2
+    [Kai Uwe]
+ - Win32:  minor performance fix in UTCtime2Localtime() [GRR]
+ - Amiga:  same performance fix in mkgmtime() [Christian Spieler]
+ - removed some unnecessary code from UnZipSFX (TestExtraField(), long strings,
+    end-of-central-dir check, backslash check, etc.) [GRR]
+ - Amiga, Win32:  made ydays[] array global const to avoid duplicate data [GRR]
+ - WinDLL:  removed bogus Unz_CreateGlobals() and Unz_DestroyGlobals() [Mike
+    White]
+5.31b:
+ - Unix:  made TIMESTAMP default option (oversight in 5.30); updated INSTALL
+    and unzip.{1,doc} appropriately [GRR]
+ - updated INSTALL with emx/gcc+RSX 5.1 USE_VFAT info [GRR, E-Yen Tan]
+ - updated various docs with projected release date [GRR]
+5.31c:
+ - updated Where, COPYING, CONTRIBS [GRR]
+ - Acorn:  simplified RunMe1st script with small srcrename exe [Sergio Monesi]
+ - removed proginfo/porting.zip (oversight in 5.30) [GRR]
+ - BeOS:  updates for DR9, including extra-field changes [Chris]
+ - BeOS:  removed zipinfo script (symlinks now supported) [GRR]
+ - Unix:  updated linux_shlib target to use .pic.o suffix on shared-library
+    objects [GRR]
+5.31d:
+ - WinDLL:  added encryption info to message function [Mike]
+ - BeOS:  updated extra-field support (flag byte, etc.) [Chris]
+
+Bugs fixed:
+
+5.31a:
+ - VMS:  typo bugfix (missing comma) in cmdline.c [Hunter Goatley]
+ - VMS:  portability bugfix for DEC C detection in make_unz.com [Brian Tillman]
+ - Amiga:  bugfix for same old DST/localtime bug [Paul Kienitz]
+ - WinCE:  corrected bugfix for DST/localtime bug, on both native and FAT file
+    systems [Steve Miller]
+ - WinCE:  bugfixes for root-directory extraction, various error messages, typos
+    [Steve M]
+ - VMS:  portability bugfix for non-standard "edit" definitions [Ian Miller]
+ - eliminated bogus comment about "coming" QDOS port from main README [Jonathan
+    Hudson]
+ - DOS, OS/2:  ifdef'd out Borland version-debug code in msdos.c and os2.c
+    [Brad Clarke, GRR]
+ - Acorn:  fixed typo in INSTALL [Sergio]
+ - Acorn:  fixed pair of typos in acorn.c [Johnny Lee, GRR]
+ - QDOS:  fixed typo in qdos.c [Johnny]
+ - OS/2:  updated BUGS to note REXX problem with `&' filenames [Daniel H, GRR]
+ - Unix/DOS:  fixed bogus "msdos\msdos.c" in Unix makefile (cross-compilation)
+    [Fred Smith]
+ - Acorn:  bugfix to remove some signed/unsigned warnings [Sergio]
+ - Amiga:  bugfix for oversight in Amiga perf patch [Paul]
+ - WinDLL:  bugfixes for missing MSVC macro and weird initialization code [Mike]
+5.31b:
+ - ifdef'd out -Z test for UnZipSFX (compilation error) [Mike Freeman, Frank
+    Donahoe, GRR]
+ - ifdef'd out unused UnZipSFX tmp variable [GRR]
+ - Unix:  made "ln" of UnZipSFX and fUnZip sources non-fatal if error occurs
+    (typically due to left-over link from a previous failed compilation);
+    added linked sources to clean target [GRR, Frank D]
+ - Amiga:  removed bogus line from filedate.c; updated Aztec makefile [Paul]
+ - DOS:  updated makefile.emx with RSX 5.1 info; removed OS/2 stuff [E-Yen Tan]
+5.31c:
+ - Unix:  fixed SVR4 packaging to include zipgrep [Eric Baatz, GRR]
+ - DLL:  fixed calling conventions on default (public) I/O functions to use
+    UZ_EXP keyword, unless otherwise handled [Russell Lang, GRR, Mike]
+ - WinDLL:  removed bogus function calls from docs and header files [Mike]
+ - BeOS:  fixed ZipInfo reporting of BeOS extra field [GRR]
+ - Unix:  fixed linux_shlib target for new(er) binutils (libunzip.so symlink)
+    [GRR]
+5.31d:
+ - Unix:  fixed zipgrep location in SVR4 packaging [Eric Baatz]
+ - WinDLL:  added list.c typecast to avoid compiler warning [Mike]
+ - Amiga:  ifdef'd out Aztec C replacements for localtime(), gmtime(), etc.,
+    to avoid conflicts with SAS/C functions [GRR, Walter Haidinger]
+ - Amiga:  fixed test for out-of-range dates in filedate.c [Walter, Paul, GRR]
+ - Amiga:  typedef'd shrint as short to avoid SAS/C crashes [Walter]
+ - added typecasts to unreduce.c (flush() calls) to avoid warnings [Walter]
+ - OS/2:  fixed order of UZ_EXP and "*" in function-pointer prototypes [Kai Uwe]
+
+==================
+
+These changes occurred in beta versions 5.31a to 5.31d.  This list may have 
+left out some bugfixes and even some features...void where prohibited, your
+mileage may vary, etc., etc.
+
+Greg Roelofs

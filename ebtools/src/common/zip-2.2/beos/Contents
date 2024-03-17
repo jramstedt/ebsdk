@@ -1,0 +1,13 @@
+Contents of the "beos" sub-directory for Zip 2.2 and later:
+
+  Contents      this file
+  README        Notes from the author of the BeOS port
+  Makefile      makefile for building (sorry, no project files)
+  beos.c        BeOS-specific routines (similar to the UNIX ones)
+  osdep.h       BeOS-specific includes and whatnot
+  zipup.h       Definitions for zip routines
+
+This port supports both Metrowerks CodeWarrior and GNU C as the compiler.
+
+- Chris Herborth (chrish@qnx.com)
+  May 21, 1997

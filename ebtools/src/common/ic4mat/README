@@ -1,0 +1,35 @@
+NAME
+
+   ic4mat - Format a binary image into instruction cache format.
+
+SYNOPSIS
+
+   ic4mat [ option ... ] file
+
+DESCRIPTION
+
+   The ic4mat tool is used to convert the binary executable image contained
+   in file into a format suitable for loading into the instruction cache of
+   an Alpha Microprocessor during the SROM bootstrap process.
+
+   Output ?
+
+OPTIONS
+
+   -21264 cbox
+		Output a format suitable for the 21264 microprocessor.
+		This format requires an additional input file, cbox,
+		which defines the state of the CBOX CSRs which make
+		up the "write once" scan chain.  See the HRM for the
+		definition of the "write once" scan chain.
+	
+	-iN	Ignore N leading bits in "write once" scan chain. default 16.
+
+   -21164PC
+
+   -21164
+
+   -21064A
+
+   -21064
+

@@ -1,0 +1,165 @@
+# Makefile for Zip, ZipCloak, ZipNote and ZipSplit
+# for emx 0.9b / gcc under MS-DOS. Derived from makefile.os2
+# By E-Yen Tan. Last updated 22 September 1996.
+#
+# This makefile should work fine with GNU make and hopefully some others.
+# Tested with GNU make 3.71 gnuish 16-bit and djgpp 32-bit versions.
+
+CC=gcc -O2 -m486 -Wimplicit
+CFLAGS=-DDOS -DMSDOS -DASM_CRC -DNO_MKTIME
+AS=gcc
+ASFLAGS=-Di386
+LDFLAGS=-o ./
+LDFLAGS2=-s -Zsmall-conv
+OUT=-o
+OBJ=.o
+CRC32=crc_gcc
+OBJA=matchgcc.o
+OBJZS=msdos.o
+OBJUS=msdos_.o
+OSDEP_H=msdos/osdep.h
+RM=del
+
+#default settings for target dependent macros:
+DIRSEP = /
+AS_DIRSEP = /
+LOCAL_OPTS =
+CCFLAGS = $(CFLAGS) $(LOCAL_OPTS)
+
+
+OBJZ1 = zip$(OBJ) zipfile$(OBJ) zipup$(OBJ) fileio$(OBJ) util$(OBJ) \
+	$(CRC32)$(OBJ) crctab$(OBJ) globals$(OBJ) \
+	deflate$(OBJ) trees$(OBJ) bits$(OBJ) crypt$(OBJ) ttyio$(OBJ)
+OBJZ  = $(OBJZ1) $(OBJZS) $(OBJA)
+
+OBJU1 = zipfile_$(OBJ) fileio_$(OBJ) util_$(OBJ) globals$(OBJ)
+OBJU  = $(OBJU1) $(OBJUS)
+
+OBJN =  zipnote$(OBJ) $(OBJU) $(OBJU2)
+OBJS =  zipsplit$(OBJ) $(OBJU) $(OBJU2)
+OBJC =  zipcloak$(OBJ) crctab$(OBJ) crypt_$(OBJ) ttyio$(OBJ) $(OBJU) $(OBJU2)
+
+ZIP_H = zip.h ziperr.h tailor.h $(OSDEP_H)
+
+# rules
+
+.SUFFIXES: .c $(OBJ)
+
+.c$(OBJ):
+	$(CC) -c -I. $(CCFLAGS) $<
+
+.asm$(OBJ):
+	$(AS) $(ASFLAGS) $< $(ASEOL)
+
+zips:   zip.exe zipnote.exe zipsplit.exe zipcloak.exe
+
+zip$(OBJ):      zip.c $(ZIP_H) revision.h crypt.h ttyio.h
+zipfile$(OBJ):  zipfile.c $(ZIP_H)
+zipup$(OBJ):    zipup.c $(ZIP_H) revision.h crypt.h os2/os2zip.h os2/zipup.h
+fileio$(OBJ):   fileio.c $(ZIP_H)
+util$(OBJ):     util.c $(ZIP_H)
+globals$(OBJ):  globals.c $(ZIP_H)
+deflate$(OBJ):  deflate.c $(ZIP_H)
+trees$(OBJ):    trees.c $(ZIP_H)
+bits$(OBJ):     bits.c $(ZIP_H) crypt.h
+crc32$(OBJ):    crc32.c $(ZIP_H)
+crctab$(OBJ):   crctab.c $(ZIP_H)
+crypt$(OBJ):    crypt.c $(ZIP_H) crypt.h ttyio.h
+ttyio$(OBJ):    ttyio.c $(ZIP_H) crypt.h ttyio.h
+
+os2zip$(OBJ):   os2/os2zip.c $(ZIP_H) os2/os2zip.h os2/os2acl.h
+	$(CC) -c -I. $(CCFLAGS) os2$(DIRSEP)os2zip.c
+
+os2$(OBJ):      os2/os2.c $(ZIP_H) os2/os2zip.h
+	$(CC) -c -I. $(CCFLAGS) os2$(DIRSEP)os2.c
+
+os2acl$(OBJ):   os2/os2acl.c os2/os2acl.h
+	$(CC) -c -I. $(CCFLAGS) os2$(DIRSEP)os2acl.c
+
+msdos$(OBJ):    msdos/msdos.c $(ZIP_H)
+	$(CC) -c -I. $(CCFLAGS) msdos$(DIRSEP)msdos.c
+
+win32zip$(OBJ): win32/win32zip.c $(ZIP_H) win32/win32zip.h win32/nt.h
+	$(CC) -c -I. $(CCFLAGS) win32$(DIRSEP)win32zip.c
+
+win32$(OBJ):    win32/win32.c $(ZIP_H) win32/win32zip.h
+	$(CC) -c -I. $(CCFLAGS) win32$(DIRSEP)win32.c
+
+nt$(OBJ):       win32/nt.c $(ZIP_H) win32/nt.h
+	$(CC) -c -I. $(CCFLAGS) win32$(DIRSEP)nt.c
+
+crc_i86$(OBJ):  msdos/crc_i86.asm                               # 16bit only
+	$(AS) $(ASFLAGS) msdos$(AS_DIRSEP)crc_i86.asm $(ASEOL)
+
+crc_i386$(OBJ): win32/crc_i386.asm                              # 32bit, MASM
+	$(AS) $(ASFLAGS) win32$(AS_DIRSEP)crc_i386.asm $(ASEOL)
+
+crc_gcc$(OBJ):  crc_i386.S                                      # 32bit, GNU AS
+	$(AS) $(ASFLAGS) -x assembler-with-cpp -c -o $@ crc_i386.S
+
+match$(OBJ):    msdos/match.asm
+	$(AS) $(ASFLAGS) msdos$(AS_DIRSEP)match.asm $(ASEOL)
+
+match32$(OBJ):  win32/match32.asm
+	$(AS) $(ASFLAGS) win32$(AS_DIRSEP)match32.asm
+
+matchgcc$(OBJ): match.S
+	$(AS) $(ASFLAGS) -x assembler-with-cpp -c -o $@ match.S
+
+zipcloak$(OBJ): zipcloak.c $(ZIP_H) revision.h crypt.h ttyio.h
+zipnote$(OBJ):  zipnote.c $(ZIP_H) revision.h
+zipsplit$(OBJ): zipsplit.c $(ZIP_H) revision.h
+
+zipfile_$(OBJ): zipfile.c $(ZIP_H)
+	$(CC) -c -I. $(CCFLAGS) -DUTIL $(OUT)$@ zipfile.c
+
+fileio_$(OBJ):  fileio.c $(ZIP_H)
+	$(CC) -c -I. $(CCFLAGS) -DUTIL $(OUT)$@ fileio.c
+
+util_$(OBJ):    util.c $(ZIP_H) os2/os2zip.h
+	$(CC) -c -I. $(CCFLAGS) -DUTIL $(OUT)$@ util.c
+
+crypt_$(OBJ):   crypt.c $(ZIP_H) crypt.h ttyio.h
+	$(CC) -c -I. $(CCFLAGS) -DUTIL $(OUT)$@ crypt.c
+
+os2zip_$(OBJ):  os2/os2zip.c $(ZIP_H) os2/os2zip.h
+	$(CC) -c -I. $(CCFLAGS) -DUTIL $(OUT)$@ os2$(DIRSEP)os2zip.c
+
+msdos_$(OBJ):   msdos/msdos.c $(ZIP_H)
+	$(CC) -c -I. $(CCFLAGS) -DUTIL $(OUT)$@ msdos$(DIRSEP)msdos.c
+
+win32_$(OBJ):   win32/win32.c $(ZIP_H) win32/win32zip.h
+	$(CC) -c -I. $(CCFLAGS) -DUTIL $(OUT)$@ win32$(DIRSEP)win32.c
+
+# This next bit is nasty, but is needed to overcome the MS-DOS command
+# line limit as response files for emx's gcc seem to only work if each
+# file is on a different line. DJGPP doesn't do this (if you are at all
+# interested).
+
+zip.exe: $(OBJZ)
+	@echo zip$(OBJ) >zip.rsp
+	@echo zipfile$(OBJ) >>zip.rsp
+	@echo zipup$(OBJ) >>zip.rsp
+	@echo fileio$(OBJ) >>zip.rsp
+	@echo util$(OBJ) >>zip.rsp
+	@echo $(CRC32)$(OBJ) >>zip.rsp
+	@echo crctab$(OBJ) >>zip.rsp
+	@echo globals$(OBJ) >>zip.rsp
+	@echo deflate$(OBJ) >>zip.rsp
+	@echo trees$(OBJ) >>zip.rsp
+	@echo bits$(OBJ) >>zip.rsp
+	@echo crypt$(OBJ) >>zip.rsp
+	@echo ttyio$(OBJ) >>zip.rsp
+	@echo $(OBJZS) >>zip.rsp
+	@echo $(OBJA) >>zip.rsp
+	$(CC) $(LDFLAGS)$@ $(DEF) @zip.rsp $(LDFLAGS2)
+	$(RM) zip.rsp
+
+zipcloak.exe: $(OBJC)
+	$(CC) $(LDFLAGS)$@ $(DEF) $(OBJC) $(LDFLAGS2)
+
+zipnote.exe: $(OBJN)
+	$(CC) $(LDFLAGS)$@ $(DEF) $(OBJN) $(LDFLAGS2)
+
+zipsplit.exe: $(OBJS)
+	$(CC) $(LDFLAGS)$@ $(DEF) $(OBJS) $(LDFLAGS2)

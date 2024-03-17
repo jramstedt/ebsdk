@@ -1,0 +1,77 @@
+/*
+** /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebtools/unix/ic4mat - Generates ICache image file [$Revision: 1.2 $ Mar 23 1999 21:23:16]
+
+EV6 Pass = 3
+*/
+
+/*** Input file: 25x_y3p2.cbx ***/
+
+cfr_frmclk_delay_a             = 0x1       
+cfr_ev6clk_delay_a             = 0x0       
+cfr_gclk_delay_a               = 0x0       
+sys_rcv_mux_cnt_preset_a       = 0x0       
+sys_clk_ratio_a                = 0x2       
+sys_clk_ld_vector_a            = 0x6db6    
+sys_fdbk_en_a                  = 0x2       
+sys_bphase_ld_vector_a         = 0x5       
+sys_frame_ld_vector_a          = 0x15      
+sysdc_delay_a                  = 0x5       
+jitter_cmd_a                   = 0x0       
+data_valid_dly_a               = 0x3       
+frame_select_a                 = 0x2       
+sys_clk_delay_a                = 0x1       
+bc_clk_delay_a                 = 0x2       
+sys_cpu_clk_delay_a            = 0x0       
+dup_tag_enable_a               = 0x0       
+prb_tag_only_a                 = 0x1       
+spec_read_enable_a             = 0x1       
+mbox_bc_prb_stall_a            = 0x0       
+sysbus_format_a                = 0x1       
+sysbus_mb_enable_a             = 0x0       
+sysbus_ack_limit_a             = 0x4       
+sysbus_vic_limit_a             = 0x0       
+tlaser_stio_mode_a             = 0x0       
+fast_mode_disable_a            = 0x1       
+bc_clean_victim_a              = 0x0       
+bc_rdvictim_a                  = 0x0       
+sys_bus_size_a                 = 0x3       
+rdvic_ack_inhibit_a            = 0x0       
+enable_stc_command_a           = 0x0       
+bc_frm_clk_a                   = 0x1       
+dcvic_threshold_a              = 0x4       
+bc_rd_rd_bubbles_a             = 0x0       
+bc_clk_ratio_a                 = 0x8       
+bc_clk_ld_vector_a             = 0x94a5    
+bc_fdbk_en_a                   = 0x2       
+bc_bphase_ld_vector_a          = 0x3       
+bc_rd_wr_bubbles_a             = 0x9       
+bc_late_write_num_a            = 0x1       
+bc_wr_rd_bubbles_a             = 0x3       
+bc_cpu_late_write_num_a        = 0x1       
+bc_cpu_clk_delay_a             = 0x1       
+bc_burst_mode_enable_a         = 0x0       
+bc_lat_data_pattern_a          = 0x1290    
+bc_lat_tag_pattern_a           = 0x10      
+bc_cf_double_clk_a             = 0x0       
+bc_clkfwd_enable_a             = 0x1       
+bc_ddm_fall_en_a               = 0x0       
+bc_ddm_rise_en_a               = 0x1       
+bc_ddmf_enable_a               = 0x1       
+bc_ddmr_enable_a               = 0x1       
+bc_ddm_rd_fall_en_a            = 0x1       
+bc_ddm_rd_rise_en_a            = 0x1       
+bc_tag_ddm_fall_en_a           = 0x0       
+bc_tag_ddm_rise_en_a           = 0x1       
+bc_tag_ddm_rd_fall_en_a        = 0x1       
+bc_tag_ddm_rd_rise_en_a        = 0x1       
+bc_pentium_mode_a              = 0x0       
+sys_cf_double_clk_a            = 0x1       
+sys_clkfwd_enable_a            = 0x1       
+sys_ddm_fall_en_a              = 0x1       
+sys_ddm_rise_en_a              = 0x1       
+sys_ddmf_enable_a              = 0x1       
+sys_ddmr_enable_a              = 0x1       
+sys_ddm_rd_fall_en_a           = 0x1       
+sys_ddm_rd_rise_en_a           = 0x1       
+bc_rcv_mux_cnt_preset_a        = 0x0       
+bc_late_write_upper_a          = 0x0       

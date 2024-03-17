@@ -1,0 +1,14 @@
+#
+# Make file to build sysgen on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:    $(EXEDIR)\mapcvt.exe
+
+$(EXEDIR)\mapcvt.exe:    $(SRCDIR)\mapcvt.c
+	cl $(SRCDIR)\mapcvt.c /Fe$(EXEDIR)\mapcvt.exe
+
+CLEAN:
+	-del $(CLEANFLAGS) $(EXEDIR)\mapcvt.exe
+

@@ -1,0 +1,79 @@
+?tacl routine
+#FRAME
+load /keep 1/ $data9.daveszip.commacs
+
+#PUSH file prev options OK model zip obj accel
+#PUSH #DEFAULTS
+VOLUME $DATA9.DAVESZIP
+load /keep 1/ macros
+
+#SET OK -1
+
+#SET options [#REST]
+[#IF NOT [#EMPTYV options] |THEN| #CHARINSV options 1 ","]
+#OUTPUT Compiler Options: [options]
+
+[#IF [#MATCH *WIDE* [options]]
+|THEN|
+  #SET model WIDE
+  #SET zip ZIPW
+|ELSE|
+  #SET model LARGE
+  #SET zip ZIPL
+]
+#SET accel $DATA9.DAVES.ZIP
+
+#OUTPUT Making ZIP using [model] memory model
+
+#SET file [#FILENAMES /MAXIMUM 1/ *C]
+[#loop |while| NOT [#EMPTYV file]
+|do|
+  #SETV prev file
+  CC [file] $T.#ZIP [options]
+  [#IF [tacl^completioncode] > 1 |THEN| #set OK 0 ]
+  #SET file [#FILENAMES /MAXIMUM 1, PREVIOUS [prev]/ *C]
+]
+
+[#IF OK |THEN|
+  BBZIPLIB
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+
+#PUSH #PROCESSFILESECURITY
+VOLUME ,"NUNU"
+
+[#IF OK |THEN|
+  BBZIP [zip] [model]
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+
+[#IF OK |THEN|
+  secure^file [accel] "UUUU" SUPER.DAVES
+  accel^file [zip] [accel]
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+
+[#IF OK
+  |THEN| #OUTPUT Successfully produced Accelerated Object [accel]
+         secure^file [accel] "UUUU" SUPER.DAVES
+  |ELSE| #OUTPUT Failed to produce Accelerated Object [accel]
+]
+
+#OUTPUT Finished
+
+#OUTPUT Setting up additonal utilities
+== ZIPNOTE
+CC ZIPNOTEC $T.#ZIP [options]
+#SET zip ZIPNOTE
+#SET accel $DATA9.DAVES.ZIPNOTE
+[#IF OK |THEN|
+  BBANY [zip] [model]
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+[#IF OK |THEN|
+  secure^file [accel] "UUUU" SUPER.DAVES
+  accel^file [zip] [accel]
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+
+#UNFRAME

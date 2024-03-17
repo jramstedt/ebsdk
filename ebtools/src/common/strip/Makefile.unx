@@ -1,0 +1,37 @@
+CC		= cc 
+CFLAGS		= -g -I. -I../include -DCROSS_COMPILE_32_TO_64_BITS=1
+LFLAGS		= -lc
+COMMON		= ../common
+INCLUDE		= ../include
+TOOLBOX	    	= ../../toolbox
+COMMONLIB	= $(COMMON)/commlib.a
+
+AOFILES= \
+	astrip.o $(COMMONLIB)
+
+COFILES= \
+	cstrip.o
+
+TOUCH = /usr/bin/touch
+#
+
+all:		astrip
+
+astrip:		$(AOFILES) \
+		$(COMMONLIB) 
+		$(CC) $(CFLAGS) -o astrip $(AOFILES) $(LFLAGS)
+
+astrip.o:	astrip.c \
+		$(INCLUDE)/a.out.h \
+		$(INCLUDE)/cross_32_to_64.h
+		$(CC) $(CFLAGS) -c astrip.c
+
+install:    	astrip
+		cp astrip $(TOOLBOX)/.
+
+clean:		
+		rm -f astrip *.o *~ core test* 
+
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+

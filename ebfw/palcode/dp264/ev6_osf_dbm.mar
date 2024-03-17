@@ -1,0 +1,21 @@
+;+
+; ev6_osf_dbm.mar
+;-
+
+;+
+; Last Edit:	20-Oct-98
+;-
+	osfpal = 1
+	beh_model = 0
+	focus = 0
+	srom = 1
+	srm_console = 0
+	reference_platform = 1
+	dbm_serial_io = 1
+	check_interrupt_pending = 1
+	mchk_en = 0
+	outled = 1
+	force_ecc = 1
+	clrmap = 0
+	kseg_hack = 0
+	va_48 = 1

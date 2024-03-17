@@ -1,0 +1,17 @@
+#
+# Make file to build hexpad on NT
+#
+!INCLUDE ..\nt.inc
+#
+ALL:	$(EXEDIR)\hexpad.exe
+
+$(OBJDIR)\hexpad.obj:	$(SRCDIR)\hexpad.c
+
+$(EXEDIR)\hexpad.exe:	$(OBJDIR)\hexpad.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		 $(OBJDIR)\hexpad.obj $(conlibs) 
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\hexpad.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\hexpad.exe
+

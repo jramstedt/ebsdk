@@ -1,0 +1,25 @@
+CC= cc
+CFLAGS= -g -DCROSS_COMPILE_32_TO_64_BITS=1 -I. -I../include
+LFLAGS= -lc
+
+TOUCH = /usr/bin/touch
+#
+all install:	commlib.a
+
+commlib.a:	disassembler.o \
+		cross_32_to_64.o 
+		-rm commlib.a
+		ar cr commlib.a disassembler.o cross_32_to_64.o 
+		ar ts commlib.a >/dev/null
+
+disassembler.o: disassembler.o
+		$(CC) $(CFLAGS) -c disassembler.c
+
+cross_32_to_64.o: cross_32_to_64.o
+		$(CC) $(CFLAGS) -c cross_32_to_64.c
+
+clean:
+		rm -f *.o *~ *bak core
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+

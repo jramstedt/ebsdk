@@ -1,0 +1,2 @@
+tail -1 resultV2 | awk  '{printf $4}' 
+echo " "

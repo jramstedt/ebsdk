@@ -1,0 +1,17 @@
+#
+# Make file to build repeat on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:	$(EXEDIR)\rpp.exe
+
+$(OBJDIR)\rpp.obj:	$(SRCDIR)\rpp.c
+
+$(EXEDIR)\rpp.exe:	$(OBJDIR)\rpp.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\rpp.obj $(conlibs) 
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\rpp.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\rpp.exe

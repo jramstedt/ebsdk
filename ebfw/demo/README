@@ -1,0 +1,62 @@
+    ================================================================
+    This Directory contains trivial programs written in C along
+    with a Makefile that can be used to build executable files
+    that are used to download and run on the EB64 for demonstration
+    purposes.  Some of these files are described here.  Others
+    are left for investigation by the users.
+    ================================================================
+
+    SOURCE FILES
+    ------------
+    hello.c     A real simple C program used to test your build environment.
+
+    size.c      A simple C program which prints the size of various data
+                types in bytes.  This program was used to produce the
+                size.sr and the size files which can be executed on the
+                EB64.
+
+    yellow.c    A little C program which makes the EB64 play a short tune
+                through the EB64 speaker.  The tune is an old American
+                folk song called "The Yellow Rose of Texas".  This was
+                compiled into yellow.sr and yellow files which can be
+                executed on the EB64.
+
+    S-RECORD FILES
+    --------------
+    hello.sr, size.sr, yellow.sr
+                An S-record file that can be downloaded with the EB64 load
+                command.  It is linked to address 300000 hex so it should be
+                run with the go command to address 300000.
+
+		eg.
+		EB64> load
+		 Send File now...
+		~>Local file name? /abss_user/fdh/eb64dbm/demo/size.sr
+		Loaded 1451 records, 36240 bytes low 300000 high 208D8F check D9
+		EB64>
+		EB64> go 300000
+
+    EXECUTABLE FILES
+    ----------------
+    hello, size, yellow
+                An image that can be downloaded with bootp.  This image is
+                also linked to address 300000 hex. Make sure that bootadr
+                is set to 300000 with the EB64 bootadr command. These files
+		are copied to the directory that is set up for downloading
+		with BOOTP.
+
+
+		eg.
+		EB64> bootadr 300000
+		EB64> netboot size
+		Ethernet Base Address: 360, DMA Mask: 1 = DRQ5
+		Init Block Address 100000
+		Init Done.
+		Ethernet 08-00-2B-36-6F-C7
+		Attempting BOOTP...success.
+		     my IP address: 16.127.16.75
+		 server IP address: 16.127.16.160
+		gateway IP address: 16.127.16.160
+		Loading from /abss_user/fdh/boot/size ...
+		####
+		Jumping to 0x300000...

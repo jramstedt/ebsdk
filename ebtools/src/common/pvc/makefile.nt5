@@ -1,0 +1,22 @@
+!include <ntwin32.mak>
+!INCLUDE ..\nt.inc
+
+
+all: $(EXEDIR)\pvc.exe
+
+
+OBJS    = pvc.obj body.obj common.obj memory.obj \
+	  rest.obj sched.obj ev4.obj ev5.obj 
+
+.c.obj:
+  $(cc) $(cdebug) $(mcflags) $(cflags) $(cvars) $*.c
+# $(cc) $(cdebug) $(mcflags) $(cflags) $(cvars) -Ox $*.c
+
+
+mcflags  = -DNT=1
+
+$(EXEDIR)\pvc.exe:	$(OBJS)
+  $(link) $(linkdebug) $(conlflags) -out:$@ $** $(conlibs)
+
+clean:
+	del /q *.obj

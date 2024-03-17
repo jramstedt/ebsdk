@@ -1,0 +1,4017 @@
+a.out file dumper [V2.0]
+Dump of a.out object file /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/osfpal of size 41216 bytes
+	text offset = 80
+	data offset = 28808
+	text relocation offset = 28928
+	data relocation offset = 28928
+	symbols offset = 28928
+Executable Code
+/sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/osfpal.o:
+Pal_Base:
+Pal_Reset:
+	[00000000] 0x74210144 	hw_mtpr/a	$1,$4
+	[00000004] 0xC02013FE 	br	$1,.+0x00004ff8
+	[00000008] 0x00000110 	pal	0x0000110
+		:
+	zero locations skipped
+		:
+	[00000010] 0x000070B0 	pal	0x00070b0
+	[00000014] 0x000070AC 	pal	0x00070ac
+		:
+	zero locations skipped
+		:
+Pal_iAccVio:
+	[00000080] 0x47FF041F 	or	$31,$31,$31
+	[00000084] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00000088] 0x47EB040C 	or	$31,$11,$12
+	[0000008C] 0x65AD010B 	hw_mfpr	$13,0x0b
+	[00000090] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00000094] 0x45A0710D 	andnot	$13,0x03,$13
+	[00000098] 0x49679739 	sll	$11,0x3c,$25
+	[0000009C] 0xFB200003 	bge	$25,.+0x0000000c
+	[000000A0] 0x47FF040B 	or	$31,$31,$11
+	[000000A4] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[000000A8] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[000000AC] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[000000B0] 0xB59E0000 	stq	$12,0x0000($30)
+	[000000B4] 0xB5BE0008 	stq	$13,0x0008($30)
+	[000000B8] 0xB7BE0010 	stq	$29,0x0010($30)
+	[000000BC] 0xB61E0018 	stq	$16,0x0018($30)
+	[000000C0] 0xB63E0020 	stq	$17,0x0020($30)
+	[000000C4] 0xB65E0028 	stq	$18,0x0028($30)
+	[000000C8] 0x65CE0155 	hw_mfpr/a	$14,$21
+	[000000CC] 0x223F0001 	lda	$17,0x0001($31)
+	[000000D0] 0x47ED0410 	or	$31,$13,$16
+	[000000D4] 0x75CE010B 	hw_mtpr	$14,0x0b
+	[000000D8] 0x43E03532 	subq	$31,0x01,$18
+	[000000DC] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[000000E0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Pal_Interrupt:
+	[00000100] 0x67390100 	hw_mfpr	$25,0x00
+	[00000104] 0x4B245689 	srl	$25,0x22,$9
+	[00000108] 0x65CE0110 	hw_mfpr	$14,0x00
+	[0000010C] 0x47FF041F 	or	$31,$31,$31
+	[00000110] 0x65AD0111 	hw_mfpr	$13,0x01
+	[00000114] 0x47FF041F 	or	$31,$31,$31
+	[00000118] 0x77FF0201 	hw_mtpr	$31,0x01
+	[0000011C] 0xF1201596 	blbs	$9,.+0x00005658
+	[00000120] 0x41AE0DA8 	cmple	$13,$14,$8
+	[00000124] 0xF5001590 	bne	$8,.+0x00005640
+	[00000128] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[0000012C] 0x47EB0409 	or	$31,$11,$9
+	[00000130] 0x4967972C 	sll	$11,0x3c,$12
+	[00000134] 0xF9800003 	bge	$12,.+0x0000000c
+	[00000138] 0x47FF040B 	or	$31,$31,$11
+	[0000013C] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00000140] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[00000144] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[00000148] 0xB53E0000 	stq	$9,0x0000($30)
+	[0000014C] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00000150] 0xB7BE0010 	stq	$29,0x0010($30)
+	[00000154] 0xB61E0018 	stq	$16,0x0018($30)
+	[00000158] 0xB63E0020 	stq	$17,0x0020($30)
+	[0000015C] 0xB65E0028 	stq	$18,0x0028($30)
+pvc$osf00$354:
+	[00000160] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00000164] 0xC3E01576 	br	$31,.+0x000055d8
+		:
+	zero locations skipped
+		:
+Pal_ItbMiss:
+	[00000180] 0x65080112 	hw_mfpr	$8,0x02
+	[00000184] 0x654A010B 	hw_mfpr	$10,0x0b
+	[00000188] 0x47FF041F 	or	$31,$31,$31
+	[0000018C] 0x754A0146 	hw_mtpr/a	$10,$6
+Itb_LdVpte:
+	[00000190] 0x6D081800 	hw_ld/q	$8,0x0800($8)
+	[00000194] 0x754A010B 	hw_mtpr	$10,0x0b
+	[00000198] 0x67FF0206 	hw_mfpr	$31,0x06
+	[0000019C] 0x65290154 	hw_mfpr/a	$9,$20
+	[000001A0] 0x45013019 	and	$8,0x09,$25
+	[000001A4] 0xF1200006 	blbs	$9,.+0x00000018
+	[000001A8] 0x432035B9 	cmpeq	$25,0x01,$25
+	[000001AC] 0xE720000A 	beq	$25,.+0x00000028
+	[000001B0] 0x47FF041F 	or	$31,$31,$31
+	[000001B4] 0x75080102 	hw_mtpr	$8,0x02
+	[000001B8] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+		:
+	zero locations skipped
+		:
+	[000001C0] 0x4941B689 	srl	$10,0x0d,$9
+	[000001C4] 0x49241729 	sll	$9,0x20,$9
+	[000001C8] 0x21293371 	lda	$9,0x3371($9)
+	[000001CC] 0x75290102 	hw_mtpr	$9,0x02
+	[000001D0] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+		:
+	zero locations skipped
+		:
+	[000001D8] 0x45003009 	and	$8,0x01,$9
+	[000001DC] 0xE52014C0 	beq	$9,.+0x00005300
+	[000001E0] 0xC3E014EF 	br	$31,.+0x000053bc
+		:
+	zero locations skipped
+		:
+Pal_DtbMiss:
+	[00000200] 0x65080207 	hw_mfpr	$8,0x07
+	[00000204] 0x654A010B 	hw_mfpr	$10,0x0b
+	[00000208] 0x65290205 	hw_mfpr	$9,0x05
+	[0000020C] 0x754A0146 	hw_mtpr/a	$10,$6
+Dtb_LdVpte:
+	[00000210] 0x6D081800 	hw_ld/q	$8,0x0800($8)
+	[00000214] 0x654A0154 	hw_mfpr/a	$10,$20
+	[00000218] 0xF1400009 	blbs	$10,.+0x00000024
+	[0000021C] 0x654A0206 	hw_mfpr	$10,0x06
+	[00000220] 0x75080203 	hw_mtpr	$8,0x03
+	[00000224] 0xE1000012 	blbc	$8,.+0x00000048
+	[00000228] 0x754A0202 	hw_mtpr	$10,0x02
+	[0000022C] 0x654A0146 	hw_mfpr/a	$10,$6
+	[00000230] 0x754A010B 	hw_mtpr	$10,0x0b
+	[00000234] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00000238] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+	[00000240] 0x65080206 	hw_mfpr	$8,0x06
+	[00000244] 0x4901B689 	srl	$8,0x0d,$9
+	[00000248] 0x49241729 	sll	$9,0x20,$9
+	[0000024C] 0x21293371 	lda	$9,0x3371($9)
+	[00000250] 0x75290203 	hw_mtpr	$9,0x03
+	[00000254] 0x47FF041F 	or	$31,$31,$31
+	[00000258] 0x75080202 	hw_mtpr	$8,0x02
+	[0000025C] 0x654A0146 	hw_mfpr/a	$10,$6
+	[00000260] 0x754A010B 	hw_mtpr	$10,0x0b
+	[00000264] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00000268] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+	[00000270] 0x47FF041F 	or	$31,$31,$31
+	[00000274] 0xC3E0149A 	br	$31,.+0x00005268
+		:
+	zero locations skipped
+		:
+Pal_DoubleMiss:
+	[00000280] 0x47FF041F 	or	$31,$31,$31
+	[00000284] 0x76D60144 	hw_mtpr/a	$22,$4
+	[00000288] 0x4903F736 	sll	$8,0x1f,$22
+	[0000028C] 0x76F70145 	hw_mtpr/a	$23,$5
+	[00000290] 0x4AC67696 	srl	$22,0x33,$22
+	[00000294] 0x66F70154 	hw_mfpr/a	$23,$20
+	[00000298] 0xF2E00014 	blbs	$23,.+0x00000050
+	[0000029C] 0x42F60417 	addq	$23,$22,$23
+	[000002A0] 0x49053736 	sll	$8,0x29,$22
+	[000002A4] 0x6EF79000 	hw_ld/pq	$23,0x0000($23)
+	[000002A8] 0x4AC67696 	srl	$22,0x33,$22
+	[000002AC] 0xE2E014DC 	blbc	$23,.+0x00005370
+	[000002B0] 0x4AE41697 	srl	$23,0x20,$23
+	[000002B4] 0x4AE1B737 	sll	$23,0x0d,$23
+	[000002B8] 0x42F60417 	addq	$23,$22,$23
+	[000002BC] 0x6EF79000 	hw_ld/pq	$23,0x0000($23)
+	[000002C0] 0xE2E014D7 	blbc	$23,.+0x0000535c
+	[000002C4] 0x76F70203 	hw_mtpr	$23,0x03
+	[000002C8] 0x66F70145 	hw_mfpr/a	$23,$5
+	[000002CC] 0x75080202 	hw_mtpr	$8,0x02
+	[000002D0] 0x66D60144 	hw_mfpr/a	$22,$4
+	[000002D4] 0x47FF041F 	or	$31,$31,$31
+	[000002D8] 0x47FF041F 	or	$31,$31,$31
+	[000002DC] 0x47FF041F 	or	$31,$31,$31
+	[000002E0] 0x47FF041F 	or	$31,$31,$31
+	[000002E4] 0x47FF041F 	or	$31,$31,$31
+	[000002E8] 0x7BFF8000 	hw_rei	
+	[000002EC] 0x66D6010B 	hw_mfpr	$22,0x0b
+	[000002F0] 0x42C09416 	addq	$22,0x04,$22
+	[000002F4] 0x76D6010B 	hw_mtpr	$22,0x0b
+	[000002F8] 0x66F70145 	hw_mfpr/a	$23,$5
+	[000002FC] 0xC3FFFFF4 	br	$31,.+0x007fffd0
+Pal_Unalign:
+	[00000300] 0x47EB040C 	or	$31,$11,$12
+	[00000304] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00000308] 0x65AD0205 	hw_mfpr	$13,0x05
+	[0000030C] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[00000310] 0x49A0D68D 	srl	$13,0x06,$13
+	[00000314] 0xF1C01592 	blbs	$14,.+0x00005648
+	[00000318] 0x67390206 	hw_mfpr	$25,0x06
+	[0000031C] 0x41C0940E 	addq	$14,0x04,$14
+	[00000320] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00000324] 0x77390140 	hw_mtpr/a	$25,$0
+	[00000328] 0x49679739 	sll	$11,0x3c,$25
+	[0000032C] 0xFB200003 	bge	$25,.+0x0000000c
+	[00000330] 0x47FF040B 	or	$31,$31,$11
+	[00000334] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00000338] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[0000033C] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[00000340] 0xB59E0000 	stq	$12,0x0000($30)
+	[00000344] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00000348] 0xB7BE0010 	stq	$29,0x0010($30)
+	[0000034C] 0xB61E0018 	stq	$16,0x0018($30)
+	[00000350] 0xB63E0020 	stq	$17,0x0020($30)
+	[00000354] 0xB65E0028 	stq	$18,0x0028($30)
+	[00000358] 0x67390142 	hw_mfpr/a	$25,$2
+	[0000035C] 0x45A3F012 	and	$13,0x1f,$18
+	[00000360] 0x66100140 	hw_mfpr/a	$16,$0
+	[00000364] 0x49A0B691 	srl	$13,0x05,$17
+	[00000368] 0x7739010B 	hw_mtpr	$25,0x0b
+	[0000036C] 0x4627F011 	and	$17,0x3f,$17
+	[00000370] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00000374] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Pal_Dfault:
+	[00000380] 0x47FF041F 	or	$31,$31,$31
+	[00000384] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00000388] 0x65AD0205 	hw_mfpr	$13,0x05
+	[0000038C] 0x6508010B 	hw_mfpr	$8,0x0b
+	[00000390] 0x49A17689 	srl	$13,0x0b,$9
+	[00000394] 0x47EB040C 	or	$31,$11,$12
+	[00000398] 0x77FF0201 	hw_mtpr	$31,0x01
+	[0000039C] 0x4527F009 	and	$9,0x3f,$9
+	[000003A0] 0x45A1F00D 	and	$13,0x0f,$13
+	[000003A4] 0xC3E014AE 	br	$31,.+0x000052b8
+		:
+	zero locations skipped
+		:
+Pal_Mchk:
+	[00000400] 0x77FF0119 	hw_mtpr	$31,0x09
+	[00000404] 0xC3E0156E 	br	$31,.+0x000055b8
+		:
+	zero locations skipped
+		:
+Pal_OpcDec:
+	[00000480] 0x47EB040C 	or	$31,$11,$12
+	[00000484] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00000488] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[0000048C] 0xF1C01534 	blbs	$14,.+0x000054d0
+	[00000490] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00000494] 0x41C0940E 	addq	$14,0x04,$14
+	[00000498] 0x49679739 	sll	$11,0x3c,$25
+	[0000049C] 0xFB200003 	bge	$25,.+0x0000000c
+	[000004A0] 0x47FF040B 	or	$31,$31,$11
+	[000004A4] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[000004A8] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[000004AC] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[000004B0] 0xB59E0000 	stq	$12,0x0000($30)
+	[000004B4] 0xB5DE0008 	stq	$14,0x0008($30)
+	[000004B8] 0xB7BE0010 	stq	$29,0x0010($30)
+	[000004BC] 0xB61E0018 	stq	$16,0x0018($30)
+	[000004C0] 0xB63E0020 	stq	$17,0x0020($30)
+	[000004C4] 0xB65E0028 	stq	$18,0x0028($30)
+	[000004C8] 0x65AD0147 	hw_mfpr/a	$13,$7
+	[000004CC] 0x47E09410 	or	$31,0x04,$16
+	[000004D0] 0x75AD010B 	hw_mtpr	$13,0x0b
+	[000004D4] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[000004D8] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Pal_Arith:
+	[00000500] 0x47FF041F 	or	$31,$31,$31
+	[00000504] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00000508] 0x47EB040C 	or	$31,$11,$12
+	[0000050C] 0x67FF0206 	hw_mfpr	$31,0x06
+	[00000510] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00000514] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[00000518] 0x47FF041F 	or	$31,$31,$31
+	[0000051C] 0xF1C01510 	blbs	$14,.+0x00005440
+	[00000520] 0x49679739 	sll	$11,0x3c,$25
+	[00000524] 0xFB200003 	bge	$25,.+0x0000000c
+	[00000528] 0x47FF040B 	or	$31,$31,$11
+	[0000052C] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00000530] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[00000534] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[00000538] 0xB59E0000 	stq	$12,0x0000($30)
+	[0000053C] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00000540] 0xB7BE0010 	stq	$29,0x0010($30)
+	[00000544] 0xB61E0018 	stq	$16,0x0018($30)
+	[00000548] 0xB63E0020 	stq	$17,0x0020($30)
+	[0000054C] 0xB65E0028 	stq	$18,0x0028($30)
+	[00000550] 0x65AD010C 	hw_mfpr	$13,0x0c
+	[00000554] 0x6631010D 	hw_mfpr	$17,0x0d
+	[00000558] 0x658C014C 	hw_mfpr/a	$12,$12
+	[0000055C] 0x49A15690 	srl	$13,0x0a,$16
+	[00000560] 0x77FF010C 	hw_mtpr	$31,0x0c
+	[00000564] 0x758C010B 	hw_mtpr	$12,0x0b
+	[00000568] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[0000056C] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Pal_Fen:
+	[00000580] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00000584] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00000588] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[0000058C] 0xF1C014F4 	blbs	$14,.+0x000053d0
+	[00000590] 0x65AD0118 	hw_mfpr	$13,0x08
+	[00000594] 0x47EB040C 	or	$31,$11,$12
+	[00000598] 0x49A3568D 	srl	$13,0x1a,$13
+	[0000059C] 0x41C09419 	addq	$14,0x04,$25
+	[000005A0] 0x45B9028E 	cmovlbs	$13,$25,$14
+	[000005A4] 0x49679739 	sll	$11,0x3c,$25
+	[000005A8] 0xFB200003 	bge	$25,.+0x0000000c
+	[000005AC] 0x47FF040B 	or	$31,$31,$11
+	[000005B0] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[000005B4] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[000005B8] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[000005BC] 0xB59E0000 	stq	$12,0x0000($30)
+	[000005C0] 0xB5DE0008 	stq	$14,0x0008($30)
+	[000005C4] 0xB7BE0010 	stq	$29,0x0010($30)
+	[000005C8] 0xB61E0018 	stq	$16,0x0018($30)
+	[000005CC] 0xB63E0020 	stq	$17,0x0020($30)
+	[000005D0] 0xB65E0028 	stq	$18,0x0028($30)
+	[000005D4] 0x65CE0147 	hw_mfpr/a	$14,$7
+	[000005D8] 0x45A0300D 	and	$13,0x01,$13
+	[000005DC] 0x41A07410 	addq	$13,0x03,$16
+	[000005E0] 0x75CE010B 	hw_mtpr	$14,0x0b
+	[000005E4] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[000005E8] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_Halt:
+	[00002000] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00002004] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00002008] 0x658C010B 	hw_mfpr	$12,0x0b
+	[0000200C] 0x4180952C 	subq	$12,0x04,$12
+	[00002010] 0x758C010B 	hw_mtpr	$12,0x0b
+	[00002014] 0x74000140 	hw_mtpr/a	$0,$0
+pvc$osf01$5000:
+	[00002018] 0xD0000F41 	bsr	$0,.+0x00003d04
+	[0000201C] 0x201F0005 	lda	$0,0x0005($31)
+	[00002020] 0xC3E013E9 	br	$31,.+0x00004fa4
+		:
+	zero locations skipped
+		:
+CallPal_Cflush:
+	[00002040] 0xC3E012F1 	br	$31,.+0x00004bc4
+		:
+	zero locations skipped
+		:
+CallPal_Draina:
+	[00002080] 0x25DF0100 	ldah	$14,0x0100($31)
+	[00002084] 0x47FF041F 	or	$31,$31,$31
+	[00002088] 0x41C0352E 	subq	$14,0x01,$14
+	[0000208C] 0x65AD0217 	hw_mfpr	$13,0x07
+	[00002090] 0x49A0D68D 	srl	$13,0x06,$13
+	[00002094] 0xEDDFFFDA 	ble	$14,.+0x007fff68
+	[00002098] 0x47FF041F 	or	$31,$31,$31
+	[0000209C] 0xF1BFFFFA 	blbs	$13,.+0x007fffe8
+	[000020A0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec03:
+	[000020C0] 0xC3E008EF 	br	$31,.+0x000023bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec04:
+	[00002100] 0xC3E008DF 	br	$31,.+0x0000237c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec05:
+	[00002140] 0xC3E008CF 	br	$31,.+0x0000233c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec06:
+	[00002180] 0xC3E008BF 	br	$31,.+0x000022fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec07:
+	[000021C0] 0xC3E008AF 	br	$31,.+0x000022bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec08:
+	[00002200] 0xC3E0089F 	br	$31,.+0x0000227c
+		:
+	zero locations skipped
+		:
+CallPal_Cserve:
+	[00002240] 0xC3E01281 	br	$31,.+0x00004a04
+		:
+	zero locations skipped
+		:
+CallPal_SwpPal:
+	[00002280] 0x421FF7A0 	cmpule	$16,0xff,$0
+	[00002284] 0x46100480 	cmoveq	$16,$16,$0
+	[00002288] 0xE000075D 	blbc	$0,.+0x00001d74
+	[0000228C] 0x420055A0 	cmpeq	$16,0x02,$0
+	[00002290] 0xE0000002 	blbc	$0,.+0x00000008
+	[00002294] 0x6610010E 	hw_mfpr	$16,0x0e
+	[00002298] 0xC3E00759 	br	$31,.+0x00001d64
+	[0000229C] 0x40003400 	addq	$0,0x01,$0
+	[000022A0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec0B:
+	[000022C0] 0xC3E0086F 	br	$31,.+0x000021bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec0C:
+	[00002300] 0xC3E0085F 	br	$31,.+0x0000217c
+		:
+	zero locations skipped
+		:
+CallPal_WrIpir:
+	[00002340] 0xC3E01239 	br	$31,.+0x000048e4
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec0E:
+	[00002380] 0xC3E0083F 	br	$31,.+0x000020fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec0F:
+	[000023C0] 0xC3E0082F 	br	$31,.+0x000020bc
+		:
+	zero locations skipped
+		:
+CallPal_RdMces:
+	[00002400] 0x64000150 	hw_mfpr/a	$0,$16
+	[00002404] 0x4403F000 	and	$0,0x1f,$0
+	[00002408] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_WrMces:
+	[00002440] 0x4600F00D 	and	$16,0x07,$13
+	[00002444] 0x65CE0150 	hw_mfpr/a	$14,$16
+	[00002448] 0x47ED050D 	ornot	$31,$13,$13
+	[0000244C] 0x4603100C 	and	$16,0x18,$12
+	[00002450] 0x45CD0001 	and	$14,$13,$1
+	[00002454] 0x44231101 	andnot	$1,0x18,$1
+	[00002458] 0x442C0401 	or	$1,$12,$1
+	[0000245C] 0x74210150 	hw_mtpr/a	$1,$16
+	[00002460] 0x47FF041F 	or	$31,$31,$31
+	[00002464] 0x47FF041F 	or	$31,$31,$31
+	[00002468] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec12:
+	[00002480] 0xC3E007FF 	br	$31,.+0x00001ffc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec13:
+	[000024C0] 0xC3E007EF 	br	$31,.+0x00001fbc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec14:
+	[00002500] 0xC3E007DF 	br	$31,.+0x00001f7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec15:
+	[00002540] 0xC3E007CF 	br	$31,.+0x00001f3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec16:
+	[00002580] 0xC3E007BF 	br	$31,.+0x00001efc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec17:
+	[000025C0] 0xC3E007AF 	br	$31,.+0x00001ebc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec18:
+	[00002600] 0xC3E0079F 	br	$31,.+0x00001e7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec19:
+	[00002640] 0xC3E0078F 	br	$31,.+0x00001e3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec1A:
+	[00002680] 0xC3E0077F 	br	$31,.+0x00001dfc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec1B:
+	[000026C0] 0xC3E0076F 	br	$31,.+0x00001dbc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec1C:
+	[00002700] 0xC3E0075F 	br	$31,.+0x00001d7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec1D:
+	[00002740] 0xC3E0074F 	br	$31,.+0x00001d3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec1E:
+	[00002780] 0xC3E0073F 	br	$31,.+0x00001cfc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec1F:
+	[000027C0] 0xC3E0072F 	br	$31,.+0x00001cbc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec20:
+	[00002800] 0xC3E0071F 	br	$31,.+0x00001c7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec21:
+	[00002840] 0xC3E0070F 	br	$31,.+0x00001c3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec22:
+	[00002880] 0xC3E006FF 	br	$31,.+0x00001bfc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec23:
+	[000028C0] 0xC3E006EF 	br	$31,.+0x00001bbc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec24:
+	[00002900] 0xC3E006DF 	br	$31,.+0x00001b7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec25:
+	[00002940] 0xC3E006CF 	br	$31,.+0x00001b3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec26:
+	[00002980] 0xC3E006BF 	br	$31,.+0x00001afc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec27:
+	[000029C0] 0xC3E006AF 	br	$31,.+0x00001abc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec28:
+	[00002A00] 0xC3E0069F 	br	$31,.+0x00001a7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec29:
+	[00002A40] 0xC3E0068F 	br	$31,.+0x00001a3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec2A:
+	[00002A80] 0xC3E0067F 	br	$31,.+0x000019fc
+		:
+	zero locations skipped
+		:
+CallPal_WrFen:
+	[00002AC0] 0x47E0340D 	or	$31,0x01,$13
+	[00002AC4] 0x64210118 	hw_mfpr	$1,0x08
+	[00002AC8] 0x49A3572D 	sll	$13,0x1a,$13
+	[00002ACC] 0x46003010 	and	$16,0x01,$16
+	[00002AD0] 0x4A03572C 	sll	$16,0x1a,$12
+	[00002AD4] 0x442D0101 	andnot	$1,$13,$1
+	[00002AD8] 0x442C0401 	or	$1,$12,$1
+	[00002ADC] 0x658C0157 	hw_mfpr/a	$12,$23
+	[00002AE0] 0x74210118 	hw_mtpr	$1,0x08
+	[00002AE4] 0x7E0C8028 	hw_st/p	$16,0x0028($12)
+	[00002AE8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00002AEC] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00002AF0] 0x67FF0140 	hw_mfpr/a	$31,$0
+pvc$osf02$225:
+	[00002AF4] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec2C:
+	[00002B00] 0xC3E0065F 	br	$31,.+0x0000197c
+		:
+	zero locations skipped
+		:
+CallPal_WrVptPtr:
+	[00002B40] 0x76100208 	hw_mtpr	$16,0x08
+	[00002B44] 0x76100113 	hw_mtpr	$16,0x03
+	[00002B48] 0x47FF041F 	or	$31,$31,$31
+	[00002B4C] 0x47FF041F 	or	$31,$31,$31
+	[00002B50] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec2E:
+	[00002B80] 0xC3E0063F 	br	$31,.+0x000018fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec2F:
+	[00002BC0] 0xC3E0062F 	br	$31,.+0x000018bc
+		:
+	zero locations skipped
+		:
+CallPal_SwpCtx:
+	[00002C00] 0x61A0C000 	rpcc	$13
+	[00002C04] 0x64000157 	hw_mfpr/a	$0,$23
+	[00002C08] 0x6ED09028 	hw_ld/pq	$22,0x0028($16)
+	[00002C0C] 0x6EF09018 	hw_ld/pq	$23,0x0018($16)
+	[00002C10] 0x49A41699 	srl	$13,0x20,$25
+	[00002C14] 0x67180152 	hw_mfpr/a	$24,$18
+	[00002C18] 0x7FC09000 	hw_st/pq	$30,0x0000($0)
+pvc$osf03$379:
+	[00002C1C] 0x76100157 	hw_mtpr/a	$16,$23
+	[00002C20] 0x7F009008 	hw_st/pq	$24,0x0008($0)
+	[00002C24] 0x41B90019 	addl	$13,$25,$25
+	[00002C28] 0x7F208018 	hw_st/p	$25,0x0018($0)
+	[00002C2C] 0x47E03418 	or	$31,0x01,$24
+	[00002C30] 0x4B035738 	sll	$24,0x1a,$24
+	[00002C34] 0x67390118 	hw_mfpr	$25,0x08
+	[00002C38] 0x46C03016 	and	$22,0x01,$22
+	[00002C3C] 0xC3E004F8 	br	$31,.+0x000013e0
+CallPal_WrVal:
+	[00002C40] 0x47FF041F 	or	$31,$31,$31
+	[00002C44] 0x76100151 	hw_mtpr/a	$16,$17
+	[00002C48] 0x47FF041F 	or	$31,$31,$31
+	[00002C4C] 0x47FF041F 	or	$31,$31,$31
+	[00002C50] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_RdVal:
+	[00002C80] 0x47FF041F 	or	$31,$31,$31
+	[00002C84] 0x64000151 	hw_mfpr/a	$0,$17
+	[00002C88] 0x47FF041F 	or	$31,$31,$31
+	[00002C8C] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_Tbi:
+	[00002CC0] 0x42005410 	addq	$16,0x02,$16
+	[00002CC4] 0xC2E00000 	br	$23,.+0x00000000
+	[00002CC8] 0x4200D3B6 	cmpult	$16,0x06,$22
+	[00002CCC] 0x22F713B8 	lda	$23,0x13b8($23)
+	[00002CD0] 0x4A009730 	sll	$16,0x04,$16
+	[00002CD4] 0xE2C00002 	blbc	$22,.+0x00000008
+	[00002CD8] 0x42F00417 	addq	$23,$16,$23
+pvc$osf04$2000:
+	[00002CDC] 0x6BF70000 	jmp	$31,($23),.+0x000000
+	[00002CE0] 0x7BFF8000 	hw_rei	
+	[00002CE4] 0x47FF041F 	or	$31,$31,$31
+		:
+	zero locations skipped
+		:
+CallPal_WrEnt:
+	[00002D00] 0x4220F3B6 	cmpult	$17,0x07,$22
+	[00002D04] 0xC2E00000 	br	$23,.+0x00000000
+	[00002D08] 0x46007110 	andnot	$16,0x03,$16
+	[00002D0C] 0xE2C00004 	blbc	$22,.+0x00000010
+	[00002D10] 0x22F714B8 	lda	$23,0x14b8($23)
+	[00002D14] 0x4A209731 	sll	$17,0x04,$17
+	[00002D18] 0x42370417 	addq	$17,$23,$23
+pvc$osf05$3000:
+	[00002D1C] 0x6BF70000 	jmp	$31,($23),.+0x000000
+	[00002D20] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_SwpIpl:
+	[00002D40] 0x4600F010 	and	$16,0x07,$16
+	[00002D44] 0x66D60148 	hw_mfpr/a	$22,$8
+	[00002D48] 0x4AD000D6 	extbl	$22,$16,$22
+	[00002D4C] 0x47EB0400 	or	$31,$11,$0
+	[00002D50] 0x47F0040B 	or	$31,$16,$11
+	[00002D54] 0x47FF041F 	or	$31,$31,$31
+	[00002D58] 0x76D60110 	hw_mtpr	$22,0x00
+pvc$osf06$217:
+	[00002D5C] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_RdPs:
+	[00002D80] 0x47EB0400 	or	$31,$11,$0
+	[00002D84] 0x47FF041F 	or	$31,$31,$31
+	[00002D88] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_WrKgp:
+	[00002DC0] 0x47FF041F 	or	$31,$31,$31
+	[00002DC4] 0x76100156 	hw_mtpr/a	$16,$22
+	[00002DC8] 0x47FF041F 	or	$31,$31,$31
+	[00002DCC] 0x47FF041F 	or	$31,$31,$31
+	[00002DD0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_WrUsp:
+	[00002E00] 0x47FF041F 	or	$31,$31,$31
+	[00002E04] 0x76100152 	hw_mtpr/a	$16,$18
+	[00002E08] 0x47FF041F 	or	$31,$31,$31
+	[00002E0C] 0x47FF041F 	or	$31,$31,$31
+	[00002E10] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec39:
+	[00002E40] 0xC3E0058F 	br	$31,.+0x0000163c
+		:
+	zero locations skipped
+		:
+CallPal_RdUsp:
+	[00002E80] 0x47FF041F 	or	$31,$31,$31
+	[00002E84] 0x64000152 	hw_mfpr/a	$0,$18
+	[00002E88] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec3B:
+	[00002EC0] 0xC3E0056F 	br	$31,.+0x000015bc
+		:
+	zero locations skipped
+		:
+CallPal_Whami:
+	[00002F00] 0x47FF041F 	or	$31,$31,$31
+	[00002F04] 0x64000150 	hw_mfpr/a	$0,$16
+	[00002F08] 0x480030C0 	extbl	$0,0x01,$0
+	[00002F0C] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_RetSys:
+	[00002F40] 0x233E0030 	lda	$25,0x0030($30)
+	[00002F44] 0x47F9040E 	or	$31,$25,$14
+	[00002F48] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[00002F4C] 0xA6FE0008 	ldq	$23,0x0008($30)
+	[00002F50] 0xA7BE0010 	ldq	$29,0x0010($30)
+	[00002F54] 0xBBFEFFFC 	stl_c	$31,0xfffc($30)
+	[00002F58] 0x217F0008 	lda	$11,0x0008($31)
+	[00002F5C] 0x67DE0152 	hw_mfpr/a	$30,$18
+	[00002F60] 0x46E07117 	andnot	$23,0x03,$23
+	[00002F64] 0x77390153 	hw_mtpr/a	$25,$19
+	[00002F68] 0x756B0201 	hw_mtpr	$11,0x01
+	[00002F6C] 0x756B010F 	hw_mtpr	$11,0x0f
+	[00002F70] 0x63E0E000 	rc	$31
+	[00002F74] 0x76F7010B 	hw_mtpr	$23,0x0b
+	[00002F78] 0x77FF0110 	hw_mtpr	$31,0x00
+pvc$osf07$217:
+	[00002F7C] 0x7BFF8000 	hw_rei	
+CallPal_OpcDec3E:
+	[00002F80] 0xC3E0053F 	br	$31,.+0x000014fc
+		:
+	zero locations skipped
+		:
+CallPal_Rti:
+	[00002FC0] 0x233E0030 	lda	$25,0x0030($30)
+	[00002FC4] 0x47F9040E 	or	$31,$25,$14
+	[00002FC8] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[00002FCC] 0x63E0E000 	rc	$31
+	[00002FD0] 0xA599FFD0 	ldq	$12,0xffd0($25)
+	[00002FD4] 0xA5B9FFD8 	ldq	$13,0xffd8($25)
+	[00002FD8] 0xA659FFF8 	ldq	$18,0xfff8($25)
+	[00002FDC] 0xA639FFF0 	ldq	$17,0xfff0($25)
+	[00002FE0] 0xA619FFE8 	ldq	$16,0xffe8($25)
+	[00002FE4] 0xA7B9FFE0 	ldq	$29,0xffe0($25)
+	[00002FE8] 0x45A0710D 	andnot	$13,0x03,$13
+	[00002FEC] 0xBBF9FFFC 	stl_c	$31,0xfffc($25)
+	[00002FF0] 0x4581100B 	and	$12,0x08,$11
+	[00002FF4] 0x75AD010B 	hw_mtpr	$13,0x0b
+	[00002FF8] 0xE5600491 	beq	$11,.+0x00001244
+	[00002FFC] 0xC3E00498 	br	$31,.+0x00001260
+CallPal_Bpt:
+	[00003000] 0x47EB040C 	or	$31,$11,$12
+	[00003004] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00003008] 0x77FF0201 	hw_mtpr	$31,0x01
+	[0000300C] 0xC3E0049C 	br	$31,.+0x00001270
+		:
+	zero locations skipped
+		:
+CallPal_BugChk:
+	[00003040] 0x47EB040C 	or	$31,$11,$12
+	[00003044] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00003048] 0x77FF0201 	hw_mtpr	$31,0x01
+	[0000304C] 0xC3E004A4 	br	$31,.+0x00001290
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec82:
+	[00003080] 0xC3E004FF 	br	$31,.+0x000013fc
+		:
+	zero locations skipped
+		:
+CallPal_CallSys:
+	[000030C0] 0x45611018 	and	$11,0x08,$24
+	[000030C4] 0x66D60153 	hw_mfpr/a	$22,$19
+	[000030C8] 0xE70004B5 	beq	$24,.+0x000012d4
+	[000030CC] 0x66F7010B 	hw_mfpr	$23,0x0b
+	[000030D0] 0xC3E0049B 	br	$31,.+0x0000126c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec84:
+	[00003100] 0xC3E004DF 	br	$31,.+0x0000137c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec85:
+	[00003140] 0xC3E004CF 	br	$31,.+0x0000133c
+		:
+	zero locations skipped
+		:
+CallPal_Imb:
+	[00003180] 0x60004000 	mb	
+	[00003184] 0x67FF020F 	hw_mfpr	$31,0x0f
+	[00003188] 0x47FF041F 	or	$31,$31,$31
+	[0000318C] 0x47FF041F 	or	$31,$31,$31
+	[00003190] 0xC3E003D3 	br	$31,.+0x00000f4c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec87:
+	[000031C0] 0xC3E004AF 	br	$31,.+0x000012bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec88:
+	[00003200] 0xC3E0049F 	br	$31,.+0x0000127c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec89:
+	[00003240] 0xC3E0048F 	br	$31,.+0x0000123c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec8A:
+	[00003280] 0xC3E0047F 	br	$31,.+0x000011fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec8B:
+	[000032C0] 0xC3E0046F 	br	$31,.+0x000011bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec8C:
+	[00003300] 0xC3E0045F 	br	$31,.+0x0000117c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec8D:
+	[00003340] 0xC3E0044F 	br	$31,.+0x0000113c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec8E:
+	[00003380] 0xC3E0043F 	br	$31,.+0x000010fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec8F:
+	[000033C0] 0xC3E0042F 	br	$31,.+0x000010bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec90:
+	[00003400] 0xC3E0041F 	br	$31,.+0x0000107c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec91:
+	[00003440] 0xC3E0040F 	br	$31,.+0x0000103c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec92:
+	[00003480] 0xC3E003FF 	br	$31,.+0x00000ffc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec93:
+	[000034C0] 0xC3E003EF 	br	$31,.+0x00000fbc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec94:
+	[00003500] 0xC3E003DF 	br	$31,.+0x00000f7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec95:
+	[00003540] 0xC3E003CF 	br	$31,.+0x00000f3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec96:
+	[00003580] 0xC3E003BF 	br	$31,.+0x00000efc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec97:
+	[000035C0] 0xC3E003AF 	br	$31,.+0x00000ebc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec98:
+	[00003600] 0xC3E0039F 	br	$31,.+0x00000e7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec99:
+	[00003640] 0xC3E0038F 	br	$31,.+0x00000e3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec9A:
+	[00003680] 0xC3E0037F 	br	$31,.+0x00000dfc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec9B:
+	[000036C0] 0xC3E0036F 	br	$31,.+0x00000dbc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec9C:
+	[00003700] 0xC3E0035F 	br	$31,.+0x00000d7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec9D:
+	[00003740] 0xC3E0034F 	br	$31,.+0x00000d3c
+		:
+	zero locations skipped
+		:
+CallPal_RdUnique:
+	[00003780] 0x64000157 	hw_mfpr/a	$0,$23
+	[00003784] 0x6C009020 	hw_ld/pq	$0,0x0020($0)
+	[00003788] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_WrUnique:
+	[000037C0] 0x47FF041F 	or	$31,$31,$31
+	[000037C4] 0x658C0157 	hw_mfpr/a	$12,$23
+	[000037C8] 0x7E0C9020 	hw_st/pq	$16,0x0020($12)
+	[000037CC] 0x47FF041F 	or	$31,$31,$31
+	[000037D0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA0:
+	[00003800] 0xC3E0031F 	br	$31,.+0x00000c7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA1:
+	[00003840] 0xC3E0030F 	br	$31,.+0x00000c3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA2:
+	[00003880] 0xC3E002FF 	br	$31,.+0x00000bfc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA3:
+	[000038C0] 0xC3E002EF 	br	$31,.+0x00000bbc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA4:
+	[00003900] 0xC3E002DF 	br	$31,.+0x00000b7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA5:
+	[00003940] 0xC3E002CF 	br	$31,.+0x00000b3c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA6:
+	[00003980] 0xC3E002BF 	br	$31,.+0x00000afc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA7:
+	[000039C0] 0xC3E002AF 	br	$31,.+0x00000abc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA8:
+	[00003A00] 0xC3E0029F 	br	$31,.+0x00000a7c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecA9:
+	[00003A40] 0xC3E0028F 	br	$31,.+0x00000a3c
+		:
+	zero locations skipped
+		:
+CallPal_GenTrap:
+	[00003A80] 0x47EB040C 	or	$31,$11,$12
+	[00003A84] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00003A88] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00003A8C] 0xC3E0024C 	br	$31,.+0x00000930
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecAB:
+	[00003AC0] 0xC3E0026F 	br	$31,.+0x000009bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecAC:
+	[00003B00] 0xC3E0025F 	br	$31,.+0x0000097c
+		:
+	zero locations skipped
+		:
+CallPal_DbgStop:
+	[00003B40] 0x47EB040C 	or	$31,$11,$12
+	[00003B44] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00003B48] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00003B4C] 0xC3E00234 	br	$31,.+0x000008d0
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecAE:
+	[00003B80] 0xC3E0023F 	br	$31,.+0x000008fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecAF:
+	[00003BC0] 0xC3E0022F 	br	$31,.+0x000008bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB0:
+	[00003C00] 0xC3E0021F 	br	$31,.+0x0000087c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB1:
+	[00003C40] 0xC3E0020F 	br	$31,.+0x0000083c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB2:
+	[00003C80] 0xC3E001FF 	br	$31,.+0x000007fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB3:
+	[00003CC0] 0xC3E001EF 	br	$31,.+0x000007bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB4:
+	[00003D00] 0xC3E001DF 	br	$31,.+0x0000077c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB5:
+	[00003D40] 0xC3E001CF 	br	$31,.+0x0000073c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB6:
+	[00003D80] 0xC3E001BF 	br	$31,.+0x000006fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB7:
+	[00003DC0] 0xC3E001AF 	br	$31,.+0x000006bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB8:
+	[00003E00] 0xC3E0019F 	br	$31,.+0x0000067c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecB9:
+	[00003E40] 0xC3E0018F 	br	$31,.+0x0000063c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecBA:
+	[00003E80] 0xC3E0017F 	br	$31,.+0x000005fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecBB:
+	[00003EC0] 0xC3E0016F 	br	$31,.+0x000005bc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecBC:
+	[00003F00] 0xC3E0015F 	br	$31,.+0x0000057c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecBD:
+	[00003F40] 0xC3E0014F 	br	$31,.+0x0000053c
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecBE:
+	[00003F80] 0xC3E0013F 	br	$31,.+0x000004fc
+		:
+	zero locations skipped
+		:
+CallPal_OpcDecBF:
+	[00003FC0] 0xC3E0012F 	br	$31,.+0x000004bc
+		:
+	zero locations skipped
+		:
+CallPal_SwpPalCont:
+	[00004000] 0x64210150 	hw_mfpr/a	$1,$16
+	[00004004] 0x48281601 	zap	$1,0x40,$1
+	[00004008] 0x201F0053 	lda	$0,0x0053($31)
+	[0000400C] 0x48061720 	sll	$0,0x30,$0
+	[00004010] 0x44200401 	or	$1,$0,$1
+	[00004014] 0x74210150 	hw_mtpr/a	$1,$16
+	[00004018] 0x47FF0400 	or	$31,$31,$0
+pvc$osf08$1007:
+	[0000401C] 0x6BF00000 	jmp	$31,($16),.+0x000000
+CallPal_SwpCtxCont:
+	[00004020] 0x4AC35736 	sll	$22,0x1a,$22
+	[00004024] 0x47380119 	andnot	$25,$24,$25
+	[00004028] 0x4AE41698 	srl	$23,0x20,$24
+	[0000402C] 0x6DD09010 	hw_ld/pq	$14,0x0010($16)
+	[00004030] 0x4B00972C 	sll	$24,0x04,$12
+	[00004034] 0x47360419 	or	$25,$22,$25
+	[00004038] 0x4B073738 	sll	$24,0x39,$24
+	[0000403C] 0x42ED012D 	subl	$23,$13,$13
+	[00004040] 0x77180200 	hw_mtpr	$24,0x00
+	[00004044] 0x758C0103 	hw_mtpr	$12,0x03
+	[00004048] 0x49C7F68C 	srl	$14,0x3f,$12
+	[0000404C] 0x49C1B72E 	sll	$14,0x0d,$14
+	[00004050] 0x45CC040E 	or	$14,$12,$14
+	[00004054] 0x77390118 	hw_mtpr	$25,0x08
+	[00004058] 0x49A0956D 	insll	$13,0x04,$13
+	[0000405C] 0x6F309008 	hw_ld/pq	$25,0x0008($16)
+	[00004060] 0x75AD020D 	hw_mtpr	$13,0x0d
+pvc$osf09$379:
+	[00004064] 0x75CE0154 	hw_mtpr/a	$14,$20
+	[00004068] 0x6FD09000 	hw_ld/pq	$30,0x0000($16)
+pvc$osf10$379:
+	[0000406C] 0x77390152 	hw_mtpr/a	$25,$18
+	[00004070] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+		:
+	zero locations skipped
+		:
+Tbi_Table:
+pvc$osf11$2000.1:
+	[00004080] 0x77FF020A 	hw_mtpr	$31,0x0a
+	[00004084] 0x77FF0105 	hw_mtpr	$31,0x05
+	[00004088] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+	[0000408C] 0x47FF041F 	or	$31,$31,$31
+pvc$osf12$2000.2:
+	[00004090] 0x77FF0209 	hw_mtpr	$31,0x09
+	[00004094] 0x77FF0106 	hw_mtpr	$31,0x06
+	[00004098] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+	[0000409C] 0x47FF041F 	or	$31,$31,$31
+pvc$osf13$2000.3:
+	[000040A0] 0x7BFF8000 	hw_rei	
+	[000040A4] 0x47FF041F 	or	$31,$31,$31
+	[000040A8] 0x47FF041F 	or	$31,$31,$31
+	[000040AC] 0x47FF041F 	or	$31,$31,$31
+pvc$osf14$2000.4:
+	[000040B0] 0x47FF041F 	or	$31,$31,$31
+	[000040B4] 0x47FF041F 	or	$31,$31,$31
+	[000040B8] 0x76310107 	hw_mtpr	$17,0x07
+	[000040BC] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+pvc$osf15$2000.5:
+	[000040C0] 0x7631020B 	hw_mtpr	$17,0x0b
+	[000040C4] 0x47FF041F 	or	$31,$31,$31
+	[000040C8] 0x47FF041F 	or	$31,$31,$31
+	[000040CC] 0xC3E00032 	br	$31,.+0x000000c8
+pvc$osf16$2000.6:
+	[000040D0] 0x7631020B 	hw_mtpr	$17,0x0b
+	[000040D4] 0x47FF041F 	or	$31,$31,$31
+	[000040D8] 0x76310107 	hw_mtpr	$17,0x07
+	[000040DC] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+CallPal_IcFlushCont:
+	[000040E0] 0x47FF041F 	or	$31,$31,$31
+	[000040E4] 0x77FF0119 	hw_mtpr	$31,0x09
+	[000040E8] 0x47FF041F 	or	$31,$31,$31
+	[000040EC] 0x47FF041F 	or	$31,$31,$31
+	[000040F0] 0x47FF041F 	or	$31,$31,$31
+	[000040F4] 0x47FF041F 	or	$31,$31,$31
+	[000040F8] 0x47FF041F 	or	$31,$31,$31
+	[000040FC] 0x47FF041F 	or	$31,$31,$31
+	[00004100] 0x47FF041F 	or	$31,$31,$31
+	[00004104] 0x47FF041F 	or	$31,$31,$31
+	[00004108] 0x47FF041F 	or	$31,$31,$31
+	[0000410C] 0x47FF041F 	or	$31,$31,$31
+	[00004110] 0x47FF041F 	or	$31,$31,$31
+	[00004114] 0x47FF041F 	or	$31,$31,$31
+	[00004118] 0x47FF041F 	or	$31,$31,$31
+	[0000411C] 0x47FF041F 	or	$31,$31,$31
+	[00004120] 0x47FF041F 	or	$31,$31,$31
+	[00004124] 0x47FF041F 	or	$31,$31,$31
+	[00004128] 0x47FF041F 	or	$31,$31,$31
+	[0000412C] 0x47FF041F 	or	$31,$31,$31
+	[00004130] 0x47FF041F 	or	$31,$31,$31
+	[00004134] 0x47FF041F 	or	$31,$31,$31
+	[00004138] 0x47FF041F 	or	$31,$31,$31
+	[0000413C] 0x47FF041F 	or	$31,$31,$31
+	[00004140] 0x47FF041F 	or	$31,$31,$31
+	[00004144] 0x47FF041F 	or	$31,$31,$31
+	[00004148] 0x47FF041F 	or	$31,$31,$31
+	[0000414C] 0x47FF041F 	or	$31,$31,$31
+	[00004150] 0x47FF041F 	or	$31,$31,$31
+	[00004154] 0x47FF041F 	or	$31,$31,$31
+	[00004158] 0x47FF041F 	or	$31,$31,$31
+	[0000415C] 0x47FF041F 	or	$31,$31,$31
+	[00004160] 0x47FF041F 	or	$31,$31,$31
+	[00004164] 0x47FF041F 	or	$31,$31,$31
+	[00004168] 0x47FF041F 	or	$31,$31,$31
+	[0000416C] 0x47FF041F 	or	$31,$31,$31
+	[00004170] 0x47FF041F 	or	$31,$31,$31
+	[00004174] 0x47FF041F 	or	$31,$31,$31
+	[00004178] 0x47FF041F 	or	$31,$31,$31
+	[0000417C] 0x47FF041F 	or	$31,$31,$31
+	[00004180] 0x47FF041F 	or	$31,$31,$31
+	[00004184] 0x47FF041F 	or	$31,$31,$31
+	[00004188] 0x47FF041F 	or	$31,$31,$31
+	[0000418C] 0x47FF041F 	or	$31,$31,$31
+	[00004190] 0x47FF041F 	or	$31,$31,$31
+	[00004194] 0x47FF041F 	or	$31,$31,$31
+OneCycle_Then_hw_rei:
+	[00004198] 0x47FF041F 	or	$31,$31,$31
+	[0000419C] 0x47FF041F 	or	$31,$31,$31
+	[000041A0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+WrEnt_Table:
+pvc$osf17$3000.1:
+	[000041C0] 0x47FF041F 	or	$31,$31,$31
+	[000041C4] 0x7610014B 	hw_mtpr/a	$16,$11
+	[000041C8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000041CC] 0x7BFF8000 	hw_rei	
+pvc$osf18$3000.2:
+	[000041D0] 0x47FF041F 	or	$31,$31,$31
+	[000041D4] 0x7610014C 	hw_mtpr/a	$16,$12
+	[000041D8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000041DC] 0x7BFF8000 	hw_rei	
+pvc$osf19$3000.3:
+	[000041E0] 0x47FF041F 	or	$31,$31,$31
+	[000041E4] 0x76100155 	hw_mtpr/a	$16,$21
+	[000041E8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000041EC] 0x7BFF8000 	hw_rei	
+pvc$osf20$3000.4:
+	[000041F0] 0x47FF041F 	or	$31,$31,$31
+	[000041F4] 0x76100147 	hw_mtpr/a	$16,$7
+	[000041F8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000041FC] 0x7BFF8000 	hw_rei	
+pvc$osf21$3000.5:
+	[00004200] 0x47FF041F 	or	$31,$31,$31
+	[00004204] 0x76100142 	hw_mtpr/a	$16,$2
+	[00004208] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000420C] 0x7BFF8000 	hw_rei	
+pvc$osf22$3000.6:
+	[00004210] 0x47FF041F 	or	$31,$31,$31
+	[00004214] 0x76100149 	hw_mtpr/a	$16,$9
+	[00004218] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000421C] 0x7BFF8000 	hw_rei	
+pvc$osf23$3000.7:
+	[00004220] 0x47FF041F 	or	$31,$31,$31
+	[00004224] 0x7610014D 	hw_mtpr/a	$16,$13
+	[00004228] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000422C] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_Rti_ToKern:
+	[00004240] 0x4580F00B 	and	$12,0x07,$11
+	[00004244] 0x658C0148 	hw_mfpr/a	$12,$8
+	[00004248] 0x498B00CC 	extbl	$12,$11,$12
+	[0000424C] 0x77390153 	hw_mtpr/a	$25,$19
+	[00004250] 0x758C0110 	hw_mtpr	$12,0x00
+	[00004254] 0x47F9041E 	or	$31,$25,$30
+pvc$osf24$217:
+	[00004258] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_Rti_ToUser:
+	[00004260] 0x756B0201 	hw_mtpr	$11,0x01
+	[00004264] 0x756B010F 	hw_mtpr	$11,0x0f
+	[00004268] 0x67DE0152 	hw_mfpr/a	$30,$18
+	[0000426C] 0x77FF0110 	hw_mtpr	$31,0x00
+	[00004270] 0x77390153 	hw_mtpr/a	$25,$19
+pvc$osf25$248:
+	[00004274] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_BptCont:
+	[00004280] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[00004284] 0x49679739 	sll	$11,0x3c,$25
+	[00004288] 0xFB200003 	bge	$25,.+0x0000000c
+	[0000428C] 0x47FF040B 	or	$31,$31,$11
+	[00004290] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00004294] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[00004298] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[0000429C] 0xB59E0000 	stq	$12,0x0000($30)
+	[000042A0] 0xB5DE0008 	stq	$14,0x0008($30)
+	[000042A4] 0xB7BE0010 	stq	$29,0x0010($30)
+	[000042A8] 0xB61E0018 	stq	$16,0x0018($30)
+	[000042AC] 0xB63E0020 	stq	$17,0x0020($30)
+	[000042B0] 0xB65E0028 	stq	$18,0x0028($30)
+	[000042B4] 0x65AD0147 	hw_mfpr/a	$13,$7
+	[000042B8] 0x47E01410 	or	$31,0x00,$16
+	[000042BC] 0x75AD010B 	hw_mtpr	$13,0x0b
+	[000042C0] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[000042C4] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_BugChkCont:
+	[000042E0] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[000042E4] 0x49679739 	sll	$11,0x3c,$25
+	[000042E8] 0xFB200003 	bge	$25,.+0x0000000c
+	[000042EC] 0x47FF040B 	or	$31,$31,$11
+	[000042F0] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[000042F4] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[000042F8] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[000042FC] 0xB59E0000 	stq	$12,0x0000($30)
+	[00004300] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00004304] 0xB7BE0010 	stq	$29,0x0010($30)
+	[00004308] 0xB61E0018 	stq	$16,0x0018($30)
+	[0000430C] 0xB63E0020 	stq	$17,0x0020($30)
+	[00004310] 0xB65E0028 	stq	$18,0x0028($30)
+	[00004314] 0x65AD0147 	hw_mfpr/a	$13,$7
+	[00004318] 0x47E03410 	or	$31,0x01,$16
+	[0000431C] 0x75AD010B 	hw_mtpr	$13,0x0b
+	[00004320] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00004324] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_CallSysCont:
+	[00004340] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00004344] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00004348] 0x49679739 	sll	$11,0x3c,$25
+	[0000434C] 0xFB200003 	bge	$25,.+0x0000000c
+	[00004350] 0x47FF040B 	or	$31,$31,$11
+	[00004354] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00004358] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[0000435C] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[00004360] 0xB71E0000 	stq	$24,0x0000($30)
+	[00004364] 0xB6FE0008 	stq	$23,0x0008($30)
+	[00004368] 0xB7BE0010 	stq	$29,0x0010($30)
+	[0000436C] 0xB61E0018 	stq	$16,0x0018($30)
+	[00004370] 0xB63E0020 	stq	$17,0x0020($30)
+	[00004374] 0xB65E0028 	stq	$18,0x0028($30)
+	[00004378] 0x658C0149 	hw_mfpr/a	$12,$9
+	[0000437C] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00004380] 0x758C010B 	hw_mtpr	$12,0x0b
+	[00004384] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00004388] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CalPal_CallSys_FromKern:
+	[000043A0] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[000043A4] 0x41C0952E 	subq	$14,0x04,$14
+	[000043A8] 0xC3E0056F 	br	$31,.+0x000015bc
+		:
+	zero locations skipped
+		:
+CallPal_GenTrapCont:
+	[000043C0] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[000043C4] 0x49679739 	sll	$11,0x3c,$25
+	[000043C8] 0xFB200003 	bge	$25,.+0x0000000c
+	[000043CC] 0x47FF040B 	or	$31,$31,$11
+	[000043D0] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[000043D4] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[000043D8] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[000043DC] 0xB59E0000 	stq	$12,0x0000($30)
+	[000043E0] 0xB5DE0008 	stq	$14,0x0008($30)
+	[000043E4] 0xB7BE0010 	stq	$29,0x0010($30)
+	[000043E8] 0xB61E0018 	stq	$16,0x0018($30)
+	[000043EC] 0xB63E0020 	stq	$17,0x0020($30)
+	[000043F0] 0xB65E0028 	stq	$18,0x0028($30)
+	[000043F4] 0x65AD0147 	hw_mfpr/a	$13,$7
+	[000043F8] 0x47E05410 	or	$31,0x02,$16
+	[000043FC] 0x75AD010B 	hw_mtpr	$13,0x0b
+	[00004400] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00004404] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_DbgStopCont:
+	[00004420] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[00004424] 0x49679739 	sll	$11,0x3c,$25
+	[00004428] 0xFB200003 	bge	$25,.+0x0000000c
+	[0000442C] 0x47FF040B 	or	$31,$31,$11
+	[00004430] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00004434] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[00004438] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[0000443C] 0xB59E0000 	stq	$12,0x0000($30)
+	[00004440] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00004444] 0xB7BE0010 	stq	$29,0x0010($30)
+	[00004448] 0xB61E0018 	stq	$16,0x0018($30)
+	[0000444C] 0xB63E0020 	stq	$17,0x0020($30)
+	[00004450] 0xB65E0028 	stq	$18,0x0028($30)
+	[00004454] 0x65AD014D 	hw_mfpr/a	$13,$13
+	[00004458] 0x47FF0410 	or	$31,$31,$16
+	[0000445C] 0x75AD010B 	hw_mtpr	$13,0x0b
+	[00004460] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00004464] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CallPal_OpcDec:
+	[00004480] 0x47EB040C 	or	$31,$11,$12
+	[00004484] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00004488] 0x77FF0201 	hw_mtpr	$31,0x01
+	[0000448C] 0x65CE010B 	hw_mfpr	$14,0x0b
+	[00004490] 0x49679739 	sll	$11,0x3c,$25
+	[00004494] 0xFB200003 	bge	$25,.+0x0000000c
+	[00004498] 0x47FF040B 	or	$31,$31,$11
+	[0000449C] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[000044A0] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[000044A4] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[000044A8] 0xB59E0000 	stq	$12,0x0000($30)
+	[000044AC] 0xB5DE0008 	stq	$14,0x0008($30)
+	[000044B0] 0xB7BE0010 	stq	$29,0x0010($30)
+	[000044B4] 0xB61E0018 	stq	$16,0x0018($30)
+	[000044B8] 0xB63E0020 	stq	$17,0x0020($30)
+	[000044BC] 0xB65E0028 	stq	$18,0x0028($30)
+	[000044C0] 0x65AD0147 	hw_mfpr/a	$13,$7
+	[000044C4] 0x47E09410 	or	$31,0x04,$16
+	[000044C8] 0x75AD010B 	hw_mtpr	$13,0x0b
+	[000044CC] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[000044D0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+ResetContinue:
+	[00005000] 0x74000140 	hw_mtpr/a	$0,$0
+	[00005004] 0x77FF0105 	hw_mtpr	$31,0x05
+	[00005008] 0x77FF020A 	hw_mtpr	$31,0x0a
+	[0000500C] 0x2021FFF8 	lda	$1,0xfff8($1)
+	[00005010] 0x7421010E 	hw_mtpr	$1,0x0e
+	[00005014] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005018] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000501C] 0x6421010E 	hw_mfpr	$1,0x0e
+	[00005020] 0x6C018014 	hw_ld/p	$0,0x0014($1)
+	[00005024] 0x40010400 	addq	$0,$1,$0
+	[00005028] 0x20001FFF 	lda	$0,0x1fff($0)
+	[0000502C] 0x4801B680 	srl	$0,0x0d,$0
+	[00005030] 0x4801B720 	sll	$0,0x0d,$0
+	[00005034] 0x74000143 	hw_mtpr/a	$0,$3
+	[00005038] 0x201F0000 	lda	$0,0x0000($31)
+	[0000503C] 0x74000145 	hw_mtpr/a	$0,$5
+	[00005040] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005044] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005048] 0x64210143 	hw_mfpr/a	$1,$3
+	[0000504C] 0x20210200 	lda	$1,0x0200($1)
+	[00005050] 0x64000140 	hw_mfpr/a	$0,$0
+	[00005054] 0x7C019310 	hw_st/pq	$0,0x0310($1)
+	[00005058] 0x64000144 	hw_mfpr/a	$0,$4
+	[0000505C] 0x7C019318 	hw_st/pq	$0,0x0318($1)
+	[00005060] 0x7C419320 	hw_st/pq	$2,0x0320($1)
+	[00005064] 0x7C619328 	hw_st/pq	$3,0x0328($1)
+	[00005068] 0x7C819330 	hw_st/pq	$4,0x0330($1)
+	[0000506C] 0x7CA19338 	hw_st/pq	$5,0x0338($1)
+	[00005070] 0x64A50118 	hw_mfpr	$5,0x08
+	[00005074] 0x249F4000 	ldah	$4,0x4000($31)
+	[00005078] 0x44A40104 	andnot	$5,$4,$4
+	[0000507C] 0x74840118 	hw_mtpr	$4,0x08
+	[00005080] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005084] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005088] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000508C] 0x47FF041F 	or	$31,$31,$31
+	[00005090] 0x7CC19340 	hw_st/pq	$6,0x0340($1)
+	[00005094] 0x7CE19348 	hw_st/pq	$7,0x0348($1)
+	[00005098] 0x7D019350 	hw_st/pq	$8,0x0350($1)
+	[0000509C] 0x7D219358 	hw_st/pq	$9,0x0358($1)
+	[000050A0] 0x7D419360 	hw_st/pq	$10,0x0360($1)
+	[000050A4] 0x7D619368 	hw_st/pq	$11,0x0368($1)
+	[000050A8] 0x7D819370 	hw_st/pq	$12,0x0370($1)
+	[000050AC] 0x7DA19378 	hw_st/pq	$13,0x0378($1)
+	[000050B0] 0x7DC19380 	hw_st/pq	$14,0x0380($1)
+	[000050B4] 0x7DE19388 	hw_st/pq	$15,0x0388($1)
+	[000050B8] 0x7E019390 	hw_st/pq	$16,0x0390($1)
+	[000050BC] 0x7E219398 	hw_st/pq	$17,0x0398($1)
+	[000050C0] 0x7E4193A0 	hw_st/pq	$18,0x03a0($1)
+	[000050C4] 0x7E6193A8 	hw_st/pq	$19,0x03a8($1)
+	[000050C8] 0x7E8193B0 	hw_st/pq	$20,0x03b0($1)
+	[000050CC] 0x7EA193B8 	hw_st/pq	$21,0x03b8($1)
+	[000050D0] 0x7EC193C0 	hw_st/pq	$22,0x03c0($1)
+	[000050D4] 0x7EE193C8 	hw_st/pq	$23,0x03c8($1)
+	[000050D8] 0x7F0193D0 	hw_st/pq	$24,0x03d0($1)
+	[000050DC] 0x7F2193D8 	hw_st/pq	$25,0x03d8($1)
+	[000050E0] 0x7F4193E0 	hw_st/pq	$26,0x03e0($1)
+	[000050E4] 0x7F6193E8 	hw_st/pq	$27,0x03e8($1)
+	[000050E8] 0x7F8193F0 	hw_st/pq	$28,0x03f0($1)
+	[000050EC] 0x7FA193F8 	hw_st/pq	$29,0x03f8($1)
+	[000050F0] 0x7FC19000 	hw_st/pq	$30,0x0000($1)
+	[000050F4] 0x7FE19008 	hw_st/pq	$31,0x0008($1)
+	[000050F8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000050FC] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005100] 0x74A50118 	hw_mtpr	$5,0x08
+	[00005104] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005108] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000510C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005110] 0x47FF041F 	or	$31,$31,$31
+	[00005114] 0x2021FE00 	lda	$1,0xfe00($1)
+	[00005118] 0x77FF0109 	hw_mtpr	$31,0x09
+	[0000511C] 0x77FF010A 	hw_mtpr	$31,0x0a
+	[00005120] 0x77FF0108 	hw_mtpr	$31,0x08
+	[00005124] 0x243F6402 	ldah	$1,0x6402($31)
+	[00005128] 0x47E03400 	or	$31,0x01,$0
+	[0000512C] 0x48041720 	sll	$0,0x20,$0
+	[00005130] 0x44010401 	or	$0,$1,$1
+	[00005134] 0x74210118 	hw_mtpr	$1,0x08
+	[00005138] 0xC3E00001 	br	$31,.+0x00000004
+		:
+	zero locations skipped
+		:
+set_icsr:
+	[00005140] 0x47FF041F 	or	$31,$31,$31
+	[00005144] 0x77FF0119 	hw_mtpr	$31,0x09
+	[00005148] 0x47FF041F 	or	$31,$31,$31
+	[0000514C] 0x47FF041F 	or	$31,$31,$31
+	[00005150] 0x47FF041F 	or	$31,$31,$31
+	[00005154] 0x47FF041F 	or	$31,$31,$31
+	[00005158] 0x47FF041F 	or	$31,$31,$31
+	[0000515C] 0x47FF041F 	or	$31,$31,$31
+	[00005160] 0x47FF041F 	or	$31,$31,$31
+	[00005164] 0x47FF041F 	or	$31,$31,$31
+	[00005168] 0x47FF041F 	or	$31,$31,$31
+	[0000516C] 0x47FF041F 	or	$31,$31,$31
+	[00005170] 0x47FF041F 	or	$31,$31,$31
+	[00005174] 0x47FF041F 	or	$31,$31,$31
+	[00005178] 0x47FF041F 	or	$31,$31,$31
+	[0000517C] 0x47FF041F 	or	$31,$31,$31
+	[00005180] 0x47FF041F 	or	$31,$31,$31
+	[00005184] 0x47FF041F 	or	$31,$31,$31
+	[00005188] 0x47FF041F 	or	$31,$31,$31
+	[0000518C] 0x47FF041F 	or	$31,$31,$31
+	[00005190] 0x47FF041F 	or	$31,$31,$31
+	[00005194] 0x47FF041F 	or	$31,$31,$31
+	[00005198] 0x47FF041F 	or	$31,$31,$31
+	[0000519C] 0x47FF041F 	or	$31,$31,$31
+	[000051A0] 0x47FF041F 	or	$31,$31,$31
+	[000051A4] 0x47FF041F 	or	$31,$31,$31
+	[000051A8] 0x47FF041F 	or	$31,$31,$31
+	[000051AC] 0x47FF041F 	or	$31,$31,$31
+	[000051B0] 0x47FF041F 	or	$31,$31,$31
+	[000051B4] 0x47FF041F 	or	$31,$31,$31
+	[000051B8] 0x47FF041F 	or	$31,$31,$31
+	[000051BC] 0x47FF041F 	or	$31,$31,$31
+	[000051C0] 0x47FF041F 	or	$31,$31,$31
+	[000051C4] 0x47FF041F 	or	$31,$31,$31
+	[000051C8] 0x47FF041F 	or	$31,$31,$31
+	[000051CC] 0x47FF041F 	or	$31,$31,$31
+	[000051D0] 0x47FF041F 	or	$31,$31,$31
+	[000051D4] 0x47FF041F 	or	$31,$31,$31
+	[000051D8] 0x47FF041F 	or	$31,$31,$31
+	[000051DC] 0x47FF041F 	or	$31,$31,$31
+	[000051E0] 0x47FF041F 	or	$31,$31,$31
+	[000051E4] 0x47FF041F 	or	$31,$31,$31
+	[000051E8] 0x47FF041F 	or	$31,$31,$31
+	[000051EC] 0x47FF041F 	or	$31,$31,$31
+	[000051F0] 0x47FF041F 	or	$31,$31,$31
+	[000051F4] 0x47FF041F 	or	$31,$31,$31
+	[000051F8] 0x47FF041F 	or	$31,$31,$31
+	[000051FC] 0x47FF041F 	or	$31,$31,$31
+	[00005200] 0x203F0004 	lda	$1,0x0004($31)
+	[00005204] 0x7421020F 	hw_mtpr	$1,0x0f
+	[00005208] 0x203F0001 	lda	$1,0x0001($31)
+	[0000520C] 0x74210216 	hw_mtpr	$1,0x06
+	[00005210] 0x47FF041F 	or	$31,$31,$31
+	[00005214] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005218] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000521C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005220] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005224] 0x77FF0210 	hw_mtpr	$31,0x00
+	[00005228] 0x217F0007 	lda	$11,0x0007($31)
+	[0000522C] 0x203F001F 	lda	$1,0x001f($31)
+	[00005230] 0x74210110 	hw_mtpr	$1,0x00
+	[00005234] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00005238] 0x77FF0201 	hw_mtpr	$31,0x01
+	[0000523C] 0x77FF010C 	hw_mtpr	$31,0x0c
+	[00005240] 0x67FF0206 	hw_mfpr	$31,0x06
+	[00005244] 0x203F3800 	lda	$1,0x3800($31)
+	[00005248] 0x7421011A 	hw_mtpr	$1,0x0a
+	[0000524C] 0x203F0003 	lda	$1,0x0003($31)
+	[00005250] 0x74210212 	hw_mtpr	$1,0x02
+	[00005254] 0x6000E000 	rc	$0
+	[00005258] 0x77FF014B 	hw_mtpr/a	$31,$11
+	[0000525C] 0x64000150 	hw_mfpr/a	$0,$16
+	[00005260] 0x48061681 	srl	$0,0x30,$1
+	[00005264] 0x48081600 	zap	$0,0x40,$0
+	[00005268] 0x74000150 	hw_mtpr/a	$0,$16
+	[0000526C] 0x219F0053 	lda	$12,0x0053($31)
+	[00005270] 0x402C05A1 	cmpeq	$1,$12,$1
+	[00005274] 0xF020006A 	blbs	$1,.+0x000001a8
+	[00005278] 0x77FF0200 	hw_mtpr	$31,0x00
+	[0000527C] 0x77FF0103 	hw_mtpr	$31,0x03
+	[00005280] 0x203F0067 	lda	$1,0x0067($31)
+	[00005284] 0x48237721 	sll	$1,0x1b,$1
+	[00005288] 0x74210115 	hw_mtpr	$1,0x05
+	[0000528C] 0x201F0008 	lda	$0,0x0008($31)
+	[00005290] 0x74000150 	hw_mtpr/a	$0,$16
+	[00005294] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005298] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000529C] 0x47E03401 	or	$31,0x01,$1
+	[000052A0] 0x48241721 	sll	$1,0x20,$1
+	[000052A4] 0x77FF020D 	hw_mtpr	$31,0x0d
+	[000052A8] 0x7421020E 	hw_mtpr	$1,0x0e
+	[000052AC] 0x77FF0151 	hw_mtpr/a	$31,$17
+	[000052B0] 0x77FF0217 	hw_mtpr	$31,0x07
+	[000052B4] 0x77FF0152 	hw_mtpr/a	$31,$18
+	[000052B8] 0x47E03401 	or	$31,0x01,$1
+	[000052BC] 0x74210156 	hw_mtpr/a	$1,$22
+	[000052C0] 0x203F0002 	lda	$1,0x0002($31)
+	[000052C4] 0x48241721 	sll	$1,0x20,$1
+	[000052C8] 0x74210208 	hw_mtpr	$1,0x08
+	[000052CC] 0x74210113 	hw_mtpr	$1,0x03
+	[000052D0] 0x77FF0154 	hw_mtpr/a	$31,$20
+	[000052D4] 0x241FFFF0 	ldah	$0,0xfff0($31)
+	[000052D8] 0x481C1600 	zap	$0,0xe0,$0
+	[000052DC] 0x6FE090E8 	hw_ld/pq	$31,0x00e8($0)
+	[000052E0] 0x6FE09168 	hw_ld/pq	$31,0x0168($0)
+	[000052E4] 0x6FE09168 	hw_ld/pq	$31,0x0168($0)
+	[000052E8] 0x4A62168C 	srl	$19,0x10,$12
+	[000052EC] 0x499F960C 	zap	$12,0xfc,$12
+	[000052F0] 0x25BF0001 	ldah	$13,0x0001($31)
+	[000052F4] 0x21ADDECB 	lda	$13,0xdecb($13)
+	[000052F8] 0x418D05AC 	cmpeq	$12,$13,$12
+	[000052FC] 0xE580000E 	beq	$12,.+0x00000038
+	[00005300] 0x658C0143 	hw_mfpr/a	$12,$3
+	[00005304] 0x64210144 	hw_mfpr/a	$1,$4
+	[00005308] 0x21AC0418 	lda	$13,0x0418($12)
+	[0000530C] 0x7C2D90F8 	hw_st/pq	$1,0x00f8($13)
+	[00005310] 0x7C4D9100 	hw_st/pq	$2,0x0100($13)
+	[00005314] 0x7C6D9148 	hw_st/pq	$3,0x0148($13)
+	[00005318] 0x7DED9110 	hw_st/pq	$15,0x0110($13)
+	[0000531C] 0x7E0D9118 	hw_st/pq	$16,0x0118($13)
+	[00005320] 0x7E2D9120 	hw_st/pq	$17,0x0120($13)
+	[00005324] 0x7E4D9128 	hw_st/pq	$18,0x0128($13)
+	[00005328] 0x7E6D9130 	hw_st/pq	$19,0x0130($13)
+	[0000532C] 0x7E8D9138 	hw_st/pq	$20,0x0138($13)
+	[00005330] 0x7EAD9140 	hw_st/pq	$21,0x0140($13)
+	[00005334] 0x47FF0413 	or	$31,$31,$19
+	[00005338] 0x658C0143 	hw_mfpr/a	$12,$3
+	[0000533C] 0x21AC00A0 	lda	$13,0x00a0($12)
+	[00005340] 0x75AD0157 	hw_mtpr/a	$13,$23
+pvc$osf27$5010:
+	[00005344] 0xD1A004A0 	bsr	$13,.+0x00001280
+	[00005348] 0x65CE0143 	hw_mfpr/a	$14,$3
+	[0000534C] 0x7FEE9500 	hw_st/pq	$31,0x0500($14)
+	[00005350] 0x64210143 	hw_mfpr/a	$1,$3
+	[00005354] 0x20210200 	lda	$1,0x0200($1)
+	[00005358] 0x64000118 	hw_mfpr	$0,0x08
+	[0000535C] 0x245F4000 	ldah	$2,0x4000($31)
+	[00005360] 0x44020102 	andnot	$0,$2,$2
+	[00005364] 0x74420118 	hw_mtpr	$2,0x08
+	[00005368] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000536C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005370] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005374] 0x47FF041F 	or	$31,$31,$31
+	[00005378] 0x6C419320 	hw_ld/pq	$2,0x0320($1)
+	[0000537C] 0x6C619328 	hw_ld/pq	$3,0x0328($1)
+	[00005380] 0x6C819330 	hw_ld/pq	$4,0x0330($1)
+	[00005384] 0x6CA19338 	hw_ld/pq	$5,0x0338($1)
+	[00005388] 0x6CC19340 	hw_ld/pq	$6,0x0340($1)
+	[0000538C] 0x6CE19348 	hw_ld/pq	$7,0x0348($1)
+	[00005390] 0x6D019350 	hw_ld/pq	$8,0x0350($1)
+	[00005394] 0x6D219358 	hw_ld/pq	$9,0x0358($1)
+	[00005398] 0x6D419360 	hw_ld/pq	$10,0x0360($1)
+	[0000539C] 0x6D619368 	hw_ld/pq	$11,0x0368($1)
+	[000053A0] 0x6D819370 	hw_ld/pq	$12,0x0370($1)
+	[000053A4] 0x6DA19378 	hw_ld/pq	$13,0x0378($1)
+	[000053A8] 0x6DC19380 	hw_ld/pq	$14,0x0380($1)
+	[000053AC] 0x6DE19388 	hw_ld/pq	$15,0x0388($1)
+	[000053B0] 0x6E019390 	hw_ld/pq	$16,0x0390($1)
+	[000053B4] 0x6E219398 	hw_ld/pq	$17,0x0398($1)
+	[000053B8] 0x6E4193A0 	hw_ld/pq	$18,0x03a0($1)
+	[000053BC] 0x6E6193A8 	hw_ld/pq	$19,0x03a8($1)
+	[000053C0] 0x6E8193B0 	hw_ld/pq	$20,0x03b0($1)
+	[000053C4] 0x6EA193B8 	hw_ld/pq	$21,0x03b8($1)
+	[000053C8] 0x6EC193C0 	hw_ld/pq	$22,0x03c0($1)
+	[000053CC] 0x6EE193C8 	hw_ld/pq	$23,0x03c8($1)
+	[000053D0] 0x6F0193D0 	hw_ld/pq	$24,0x03d0($1)
+	[000053D4] 0x6F2193D8 	hw_ld/pq	$25,0x03d8($1)
+	[000053D8] 0x6F4193E0 	hw_ld/pq	$26,0x03e0($1)
+	[000053DC] 0x6F6193E8 	hw_ld/pq	$27,0x03e8($1)
+	[000053E0] 0x6F8193F0 	hw_ld/pq	$28,0x03f0($1)
+	[000053E4] 0x6FA193F8 	hw_ld/pq	$29,0x03f8($1)
+	[000053E8] 0x6FC19000 	hw_ld/pq	$30,0x0000($1)
+	[000053EC] 0x6FE19008 	hw_ld/pq	$31,0x0008($1)
+	[000053F0] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000053F4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000053F8] 0x74000118 	hw_mtpr	$0,0x08
+	[000053FC] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005400] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005404] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005408] 0x47FF041F 	or	$31,$31,$31
+	[0000540C] 0x6C019310 	hw_ld/pq	$0,0x0310($1)
+	[00005410] 0x6C219318 	hw_ld/pq	$1,0x0318($1)
+	[00005414] 0x64000145 	hw_mfpr/a	$0,$5
+	[00005418] 0xC3E006EB 	br	$31,.+0x00001bac
+		:
+	zero locations skipped
+		:
+	[00005420] 0x6421010E 	hw_mfpr	$1,0x0e
+	[00005424] 0x6D818014 	hw_ld/p	$12,0x0014($1)
+	[00005428] 0x4181040C 	addq	$12,$1,$12
+	[0000542C] 0x218C1FFF 	lda	$12,0x1fff($12)
+	[00005430] 0x4981B68C 	srl	$12,0x0d,$12
+	[00005434] 0x4981B72C 	sll	$12,0x0d,$12
+	[00005438] 0x758C0143 	hw_mtpr/a	$12,$3
+	[0000543C] 0x6020C000 	rpcc	$1
+	[00005440] 0x6ED29028 	hw_ld/pq	$22,0x0028($18)
+	[00005444] 0x6EF28018 	hw_ld/p	$23,0x0018($18)
+	[00005448] 0x6F12801C 	hw_ld/p	$24,0x001c($18)
+	[0000544C] 0x6F329010 	hw_ld/pq	$25,0x0010($18)
+	[00005450] 0x4B27F68D 	srl	$25,0x3f,$13
+	[00005454] 0x4B21B739 	sll	$25,0x0d,$25
+	[00005458] 0x472D0419 	or	$25,$13,$25
+	[0000545C] 0x77390154 	hw_mtpr/a	$25,$20
+	[00005460] 0x76520157 	hw_mtpr/a	$18,$23
+	[00005464] 0x46207111 	andnot	$17,0x03,$17
+	[00005468] 0x7631010B 	hw_mtpr	$17,0x0b
+	[0000546C] 0x76730113 	hw_mtpr	$19,0x03
+	[00005470] 0x76730208 	hw_mtpr	$19,0x08
+	[00005474] 0x6FD29008 	hw_ld/pq	$30,0x0008($18)
+	[00005478] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[0000547C] 0x4B073728 	sll	$24,0x39,$8
+	[00005480] 0x75080200 	hw_mtpr	$8,0x00
+	[00005484] 0x4B009738 	sll	$24,0x04,$24
+	[00005488] 0x77180103 	hw_mtpr	$24,0x03
+	[0000548C] 0x67390118 	hw_mfpr	$25,0x08
+	[00005490] 0x231F0001 	lda	$24,0x0001($31)
+	[00005494] 0x4B035738 	sll	$24,0x1a,$24
+	[00005498] 0x47380119 	andnot	$25,$24,$25
+	[0000549C] 0x46C03016 	and	$22,0x01,$22
+	[000054A0] 0x4AC35736 	sll	$22,0x1a,$22
+	[000054A4] 0x46D90419 	or	$22,$25,$25
+	[000054A8] 0x77390118 	hw_mtpr	$25,0x08
+	[000054AC] 0x42E10121 	subl	$23,$1,$1
+	[000054B0] 0x48209561 	insll	$1,0x04,$1
+	[000054B4] 0x7421020D 	hw_mtpr	$1,0x0d
+pvc$osf48$5060:
+	[000054B8] 0xD0000500 	bsr	$0,.+0x00001400
+	[000054BC] 0x47FF0400 	or	$31,$31,$0
+	[000054C0] 0x6FD29000 	hw_ld/pq	$30,0x0000($18)
+	[000054C4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[000054C8] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+		:
+	zero locations skipped
+		:
+PteInvalid:
+	[000054E0] 0x47EB040C 	or	$31,$11,$12
+	[000054E4] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[000054E8] 0x65CE0146 	hw_mfpr/a	$14,$6
+	[000054EC] 0xF1C0007F 	blbs	$14,.+0x000001fc
+	[000054F0] 0x77FF0201 	hw_mtpr	$31,0x01
+	[000054F4] 0xE5200005 	beq	$9,.+0x00000014
+	[000054F8] 0x65290205 	hw_mfpr	$9,0x05
+	[000054FC] 0x49217699 	srl	$9,0x0b,$25
+	[00005500] 0x432315B9 	cmpeq	$25,0x18,$25
+	[00005504] 0x47FF041F 	or	$31,$31,$31
+	[00005508] 0xF320001F 	blbs	$25,.+0x0000007c
+	[0000550C] 0x47EA040D 	or	$31,$10,$13
+	[00005510] 0x47FF041F 	or	$31,$31,$31
+	[00005514] 0x49679739 	sll	$11,0x3c,$25
+	[00005518] 0xFB200003 	bge	$25,.+0x0000000c
+	[0000551C] 0x47FF040B 	or	$31,$31,$11
+	[00005520] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00005524] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[00005528] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[0000552C] 0xB59E0000 	stq	$12,0x0000($30)
+	[00005530] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00005534] 0xB7BE0010 	stq	$29,0x0010($30)
+	[00005538] 0xB61E0018 	stq	$16,0x0018($30)
+	[0000553C] 0xB63E0020 	stq	$17,0x0020($30)
+	[00005540] 0xB65E0028 	stq	$18,0x0028($30)
+	[00005544] 0xFB200001 	bge	$25,.+0x00000004
+	[00005548] 0x49003688 	srl	$8,0x01,$8
+	[0000554C] 0x223F0001 	lda	$17,0x0001($31)
+	[00005550] 0x49011688 	srl	$8,0x08,$8
+	[00005554] 0x67390155 	hw_mfpr/a	$25,$21
+	[00005558] 0x47FF041F 	or	$31,$31,$31
+	[0000555C] 0xE1200001 	blbc	$9,.+0x00000004
+	[00005560] 0x49009688 	srl	$8,0x04,$8
+	[00005564] 0x45001291 	cmovlbs	$8,0x00,$17
+	[00005568] 0x47ED0410 	or	$31,$13,$16
+	[0000556C] 0x45203012 	and	$9,0x01,$18
+	[00005570] 0x47FF041F 	or	$31,$31,$31
+	[00005574] 0xF5200001 	bne	$9,.+0x00000004
+	[00005578] 0x43E03532 	subq	$31,0x01,$18
+	[0000557C] 0x7739010B 	hw_mtpr	$25,0x0b
+	[00005580] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00005584] 0x7BFF8000 	hw_rei	
+	[00005588] 0x4180940C 	addq	$12,0x04,$12
+	[0000558C] 0x758C010B 	hw_mtpr	$12,0x0b
+	[00005590] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005594] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+ItbFoe:
+	[000055A0] 0x47EB040C 	or	$31,$11,$12
+	[000055A4] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[000055A8] 0x77FF0201 	hw_mtpr	$31,0x01
+	[000055AC] 0x47EA040D 	or	$31,$10,$13
+	[000055B0] 0x49679739 	sll	$11,0x3c,$25
+	[000055B4] 0xFB200003 	bge	$25,.+0x0000000c
+	[000055B8] 0x47FF040B 	or	$31,$31,$11
+	[000055BC] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[000055C0] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[000055C4] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[000055C8] 0xB59E0000 	stq	$12,0x0000($30)
+	[000055CC] 0xB5BE0008 	stq	$13,0x0008($30)
+	[000055D0] 0xB7BE0010 	stq	$29,0x0010($30)
+	[000055D4] 0xB61E0018 	stq	$16,0x0018($30)
+	[000055D8] 0xB63E0020 	stq	$17,0x0020($30)
+	[000055DC] 0xB65E0028 	stq	$18,0x0028($30)
+	[000055E0] 0xFB200001 	bge	$25,.+0x00000004
+	[000055E4] 0x49003688 	srl	$8,0x01,$8
+	[000055E8] 0x223F0001 	lda	$17,0x0001($31)
+	[000055EC] 0x49011688 	srl	$8,0x08,$8
+	[000055F0] 0x67390155 	hw_mfpr/a	$25,$21
+	[000055F4] 0x47ED0410 	or	$31,$13,$16
+	[000055F8] 0x45007291 	cmovlbs	$8,0x03,$17
+	[000055FC] 0x43E03532 	subq	$31,0x01,$18
+	[00005600] 0x7739010B 	hw_mtpr	$25,0x0b
+	[00005604] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00005608] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+FakePte:
+	[00005620] 0x4AE11697 	srl	$23,0x08,$23
+	[00005624] 0x66D6010B 	hw_mfpr	$22,0x0b
+	[00005628] 0x22D60004 	lda	$22,0x0004($22)
+	[0000562C] 0x211F3300 	lda	$8,0x3300($31)
+	[00005630] 0x46FF02C8 	cmovlbc	$23,$31,$8
+	[00005634] 0x76D6010B 	hw_mtpr	$22,0x0b
+	[00005638] 0x66D60144 	hw_mfpr/a	$22,$4
+	[0000563C] 0x66F70145 	hw_mfpr/a	$23,$5
+	[00005640] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+DfaultContinue:
+	[00005660] 0xF1000019 	blbs	$8,.+0x00000064
+	[00005664] 0x47E8040E 	or	$31,$8,$14
+	[00005668] 0x412315AA 	cmpeq	$9,0x18,$10
+	[0000566C] 0xF5400028 	bne	$10,.+0x000000a0
+	[00005670] 0x65290206 	hw_mfpr	$9,0x06
+	[00005674] 0x49679739 	sll	$11,0x3c,$25
+	[00005678] 0xFB200003 	bge	$25,.+0x0000000c
+	[0000567C] 0x47FF040B 	or	$31,$31,$11
+	[00005680] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00005684] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[00005688] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[0000568C] 0xB59E0000 	stq	$12,0x0000($30)
+	[00005690] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00005694] 0xB7BE0010 	stq	$29,0x0010($30)
+	[00005698] 0xB61E0018 	stq	$16,0x0018($30)
+	[0000569C] 0xB63E0020 	stq	$17,0x0020($30)
+	[000056A0] 0xB65E0028 	stq	$18,0x0028($30)
+	[000056A4] 0x45A03012 	and	$13,0x01,$18
+	[000056A8] 0x47E90410 	or	$31,$9,$16
+	[000056AC] 0x49A03691 	srl	$13,0x01,$17
+	[000056B0] 0x67390155 	hw_mfpr/a	$25,$21
+	[000056B4] 0x46203291 	cmovlbs	$17,0x01,$17
+	[000056B8] 0x7739010B 	hw_mtpr	$25,0x0b
+	[000056BC] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[000056C0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+	[000056C8] 0x45C07108 	andnot	$14,0x03,$8
+	[000056CC] 0x654A010E 	hw_mfpr	$10,0x0e
+	[000056D0] 0x67FF0206 	hw_mfpr	$31,0x06
+	[000056D4] 0x41480528 	subq	$10,$8,$8
+	[000056D8] 0x21480190 	lda	$10,0x0190($8)
+	[000056DC] 0x47FF041F 	or	$31,$31,$31
+	[000056E0] 0xE540009F 	beq	$10,.+0x0000027c
+	[000056E4] 0x21480210 	lda	$10,0x0210($8)
+	[000056E8] 0xE540009D 	beq	$10,.+0x00000274
+KspNotValid:
+	[000056EC] 0x4561110B 	andnot	$11,0x08,$11
+	[000056F0] 0x74000140 	hw_mtpr/a	$0,$0
+	[000056F4] 0x756B0201 	hw_mtpr	$11,0x01
+	[000056F8] 0x756B010F 	hw_mtpr	$11,0x0f
+	[000056FC] 0x75CE010B 	hw_mtpr	$14,0x0b
+pvc$osf29$5000:
+	[00005700] 0xD0000187 	bsr	$0,.+0x0000061c
+	[00005704] 0x201F0002 	lda	$0,0x0002($31)
+	[00005708] 0xC3E0062F 	br	$31,.+0x000018bc
+		:
+	zero locations skipped
+		:
+	[00005710] 0x756B0201 	hw_mtpr	$11,0x01
+	[00005714] 0x756B010F 	hw_mtpr	$11,0x0f
+	[00005718] 0x67FF0206 	hw_mfpr	$31,0x06
+	[0000571C] 0x41C0940E 	addq	$14,0x04,$14
+	[00005720] 0x75CE010B 	hw_mtpr	$14,0x0b
+	[00005724] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005728] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+InterruptContinue:
+	[00005740] 0x47FF041F 	or	$31,$31,$31
+	[00005744] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00005748] 0x41A3F5AC 	cmpeq	$13,0x1f,$12
+	[0000574C] 0xF5800010 	bne	$12,.+0x00000040
+	[00005750] 0x41A3D5AC 	cmpeq	$13,0x1e,$12
+	[00005754] 0xF580006A 	bne	$12,.+0x000001a8
+	[00005758] 0x41A3B5AC 	cmpeq	$13,0x1d,$12
+	[0000575C] 0xF5800074 	bne	$12,.+0x000001d0
+	[00005760] 0xC3E0045F 	br	$31,.+0x0000117c
+		:
+	zero locations skipped
+		:
+PassiveRelease:
+	[00005768] 0x756B0201 	hw_mtpr	$11,0x01
+	[0000576C] 0x47FF041F 	or	$31,$31,$31
+	[00005770] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005774] 0x7BFF8000 	hw_rei	
+HaltHandler:
+	[00005778] 0x756B0201 	hw_mtpr	$11,0x01
+	[0000577C] 0x74000140 	hw_mtpr/a	$0,$0
+pvc$osf28$5000:
+	[00005780] 0xD0000167 	bsr	$0,.+0x0000059c
+	[00005784] 0x201F0001 	lda	$0,0x0001($31)
+	[00005788] 0xC3E0060F 	br	$31,.+0x0000183c
+		:
+	zero locations skipped
+		:
+ErrorHandler:
+	[00005790] 0x658C0148 	hw_mfpr/a	$12,$8
+	[00005794] 0x4980F0CD 	extbl	$12,0x07,$13
+	[00005798] 0x47E0F40B 	or	$31,0x07,$11
+	[0000579C] 0x75AD0110 	hw_mtpr	$13,0x00
+	[000057A0] 0x4B23F68C 	srl	$25,0x1f,$12
+	[000057A4] 0xF180048C 	blbs	$12,.+0x00001230
+	[000057A8] 0x4B24168C 	srl	$25,0x20,$12
+	[000057AC] 0xF1800002 	blbs	$12,.+0x00000008
+	[000057B0] 0xC3FFF603 	br	$31,.+0x007fd80c
+		:
+	zero locations skipped
+		:
+IntCrdHandler:
+	[000057B8] 0x60004000 	mb	
+	[000057BC] 0x74000140 	hw_mtpr/a	$0,$0
+	[000057C0] 0x74210141 	hw_mtpr/a	$1,$1
+	[000057C4] 0x25DFFFF0 	ldah	$14,0xfff0($31)
+	[000057C8] 0x49DC160E 	zap	$14,0xe0,$14
+	[000057CC] 0x6C0E9148 	hw_ld/pq	$0,0x0148($14)
+	[000057D0] 0x6D4E9068 	hw_ld/pq	$10,0x0068($14)
+	[000057D4] 0x440A041F 	or	$0,$10,$31
+pvc$osf100$5100:
+	[000057D8] 0xD1A00041 	bsr	$13,.+0x00000104
+	[000057DC] 0x6D2E9168 	hw_ld/pq	$9,0x0168($14)
+	[000057E0] 0x65AD0150 	hw_mfpr/a	$13,$16
+	[000057E4] 0x49A0768E 	srl	$13,0x03,$14
+	[000057E8] 0xF1C00023 	blbs	$14,.+0x0000008c
+	[000057EC] 0x45A0940E 	or	$13,0x04,$14
+	[000057F0] 0x203F0630 	lda	$1,0x0630($31)
+	[000057F4] 0x48221721 	sll	$1,0x10,$1
+	[000057F8] 0x49C7960E 	zap	$14,0x3c,$14
+	[000057FC] 0x45C1040E 	or	$14,$1,$14
+	[00005800] 0x203F0086 	lda	$1,0x0086($31)
+	[00005804] 0x48241721 	sll	$1,0x20,$1
+	[00005808] 0x45C1040E 	or	$14,$1,$14
+	[0000580C] 0x75CE0150 	hw_mtpr/a	$14,$16
+	[00005810] 0x65CE0143 	hw_mfpr/a	$14,$3
+	[00005814] 0x25DF0000 	ldah	$14,0x0000($31)
+	[00005818] 0x21CE0568 	lda	$14,0x0568($14)
+	[0000581C] 0x49A05681 	srl	$13,0x02,$1
+	[00005820] 0xE0200004 	blbc	$1,.+0x00000010
+	[00005824] 0x203F0003 	lda	$1,0x0003($31)
+	[00005828] 0x4823D721 	sll	$1,0x1e,$1
+	[0000582C] 0x7C2E8004 	hw_st/p	$1,0x0004($14)
+	[00005830] 0xC3E00011 	br	$31,.+0x00000044
+	[00005834] 0x203F0001 	lda	$1,0x0001($31)
+	[00005838] 0x4827F721 	sll	$1,0x3f,$1
+	[0000583C] 0x20210038 	lda	$1,0x0038($1)
+	[00005840] 0x7C2E9000 	hw_st/pq	$1,0x0000($14)
+	[00005844] 0x203F0038 	lda	$1,0x0038($31)
+	[00005848] 0x48241721 	sll	$1,0x20,$1
+	[0000584C] 0x20210018 	lda	$1,0x0018($1)
+	[00005850] 0x7C2E9008 	hw_st/pq	$1,0x0008($14)
+	[00005854] 0x64210150 	hw_mfpr/a	$1,$16
+	[00005858] 0x482092C1 	extwl	$1,0x04,$1
+	[0000585C] 0x7C2E9010 	hw_st/pq	$1,0x0010($14)
+	[00005860] 0x7C0E9018 	hw_st/pq	$0,0x0018($14)
+	[00005864] 0x7D4E9020 	hw_st/pq	$10,0x0020($14)
+	[00005868] 0x7D2E9028 	hw_st/pq	$9,0x0028($14)
+	[0000586C] 0x7F2E9030 	hw_st/pq	$25,0x0030($14)
+	[00005870] 0xC3E00001 	br	$31,.+0x00000004
+		:
+	zero locations skipped
+		:
+CrdAck:
+	[00005878] 0x64000140 	hw_mfpr/a	$0,$0
+	[0000587C] 0x64210141 	hw_mfpr/a	$1,$1
+	[00005880] 0x215F0001 	lda	$10,0x0001($31)
+	[00005884] 0x4944172A 	sll	$10,0x20,$10
+	[00005888] 0x754A0115 	hw_mtpr	$10,0x05
+	[0000588C] 0x49A07688 	srl	$13,0x03,$8
+	[00005890] 0xF100000B 	blbs	$8,.+0x0000002c
+	[00005894] 0x221F0002 	lda	$16,0x0002($31)
+	[00005898] 0x223F0630 	lda	$17,0x0630($31)
+	[0000589C] 0x43E03532 	subq	$31,0x01,$18
+	[000058A0] 0x6739014B 	hw_mfpr/a	$25,$11
+	[000058A4] 0x4A455692 	srl	$18,0x2a,$18
+	[000058A8] 0x7739010B 	hw_mtpr	$25,0x0b
+	[000058AC] 0x4A455732 	sll	$18,0x2a,$18
+	[000058B0] 0x45D20412 	or	$14,$18,$18
+	[000058B4] 0x47FF041F 	or	$31,$31,$31
+	[000058B8] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+CrdDismissInterrupt:
+	[000058C0] 0x47FF041F 	or	$31,$31,$31
+	[000058C4] 0xC3FFF5BE 	br	$31,.+0x007fd6f8
+		:
+	zero locations skipped
+		:
+CrdScrubMemory:
+	[000058E0] 0x4804F689 	srl	$0,0x27,$9
+	[000058E4] 0xF1200005 	blbs	$9,.+0x00000014
+	[000058E8] 0x47FF041F 	or	$31,$31,$31
+	[000058EC] 0x47FF041F 	or	$31,$31,$31
+	[000058F0] 0x6D209400 	hw_ld/pq	$9,0x0400($0)
+	[000058F4] 0x47FF041F 	or	$31,$31,$31
+	[000058F8] 0x7D209400 	hw_st/pq	$9,0x0400($0)
+pvc$osf101$5100.1:
+	[000058FC] 0x6BED8000 	ret	$31,($13),.+0x000000
+PowerFailHandler:
+	[00005900] 0x658C0148 	hw_mfpr/a	$12,$8
+	[00005904] 0x4980D0CD 	extbl	$12,0x06,$13
+	[00005908] 0x47E0D40B 	or	$31,0x06,$11
+	[0000590C] 0x75AD0110 	hw_mtpr	$13,0x00
+	[00005910] 0x223F0640 	lda	$17,0x0640($31)
+	[00005914] 0x6739014B 	hw_mfpr/a	$25,$11
+	[00005918] 0x221F0003 	lda	$16,0x0003($31)
+	[0000591C] 0x7739010B 	hw_mtpr	$25,0x0b
+	[00005920] 0x47FF041F 	or	$31,$31,$31
+	[00005924] 0x47FF041F 	or	$31,$31,$31
+	[00005928] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+PerfHandler:
+	[00005930] 0x658C0148 	hw_mfpr/a	$12,$8
+	[00005934] 0x4980D0CD 	extbl	$12,0x06,$13
+	[00005938] 0x47E0D40B 	or	$31,0x06,$11
+	[0000593C] 0x75AD0110 	hw_mtpr	$13,0x00
+	[00005940] 0x223F0650 	lda	$17,0x0650($31)
+	[00005944] 0x6739014B 	hw_mfpr/a	$25,$11
+	[00005948] 0x221F0004 	lda	$16,0x0004($31)
+	[0000594C] 0x7739010B 	hw_mtpr	$25,0x0b
+	[00005950] 0x47FF041F 	or	$31,$31,$31
+	[00005954] 0x47FF041F 	or	$31,$31,$31
+	[00005958] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+MchkBugCheck:
+	[00005960] 0x233F008E 	lda	$25,0x008e($31)
+	[00005964] 0xC3E00002 	br	$31,.+0x00000008
+MchkOSBugCheck:
+	[00005968] 0x233F0090 	lda	$25,0x0090($31)
+	[0000596C] 0xC3E00000 	br	$31,.+0x00000000
+	[00005970] 0x4B241739 	sll	$25,0x20,$25
+	[00005974] 0x75CE014A 	hw_mtpr/a	$14,$10
+	[00005978] 0x75CE010B 	hw_mtpr	$14,0x0b
+	[0000597C] 0x658C0150 	hw_mfpr/a	$12,$16
+	[00005980] 0x4987960C 	zap	$12,0x3c,$12
+	[00005984] 0x4599040C 	or	$12,$25,$12
+	[00005988] 0x233F0670 	lda	$25,0x0670($31)
+	[0000598C] 0x4B221739 	sll	$25,0x10,$25
+	[00005990] 0x45990419 	or	$12,$25,$25
+	[00005994] 0x74000140 	hw_mtpr/a	$0,$0
+	[00005998] 0x47203419 	or	$25,0x01,$25
+	[0000599C] 0x77390150 	hw_mtpr/a	$25,$16
+	[000059A0] 0x25DFFFF0 	ldah	$14,0xfff0($31)
+	[000059A4] 0x74210141 	hw_mtpr/a	$1,$1
+	[000059A8] 0x49DC160E 	zap	$14,0xe0,$14
+	[000059AC] 0x74840144 	hw_mtpr/a	$4,$4
+	[000059B0] 0x74A50145 	hw_mtpr/a	$5,$5
+	[000059B4] 0x74C60146 	hw_mtpr/a	$6,$6
+	[000059B8] 0xF180003D 	blbs	$12,.+0x000000f4
+	[000059BC] 0xC3E00025 	br	$31,.+0x00000094
+MchkContinue:
+	[000059C0] 0x47FF041F 	or	$31,$31,$31
+	[000059C4] 0x74000140 	hw_mtpr/a	$0,$0
+	[000059C8] 0x47FF041F 	or	$31,$31,$31
+	[000059CC] 0x47FF041F 	or	$31,$31,$31
+	[000059D0] 0x47FF041F 	or	$31,$31,$31
+	[000059D4] 0x47FF041F 	or	$31,$31,$31
+	[000059D8] 0x47FF041F 	or	$31,$31,$31
+	[000059DC] 0x47FF041F 	or	$31,$31,$31
+	[000059E0] 0x47FF041F 	or	$31,$31,$31
+	[000059E4] 0x47FF041F 	or	$31,$31,$31
+	[000059E8] 0x47FF041F 	or	$31,$31,$31
+	[000059EC] 0x47FF041F 	or	$31,$31,$31
+	[000059F0] 0x47FF041F 	or	$31,$31,$31
+	[000059F4] 0x47FF041F 	or	$31,$31,$31
+	[000059F8] 0x201F0670 	lda	$0,0x0670($31)
+	[000059FC] 0x65AD0150 	hw_mfpr/a	$13,$16
+	[00005A00] 0x48021720 	sll	$0,0x10,$0
+	[00005A04] 0x45A0340E 	or	$13,0x01,$14
+	[00005A08] 0x49C7960E 	zap	$14,0x3c,$14
+	[00005A0C] 0x75CE0150 	hw_mtpr/a	$14,$16
+	[00005A10] 0x47FF041F 	or	$31,$31,$31
+	[00005A14] 0x45C0040E 	or	$14,$0,$14
+	[00005A18] 0x201F0098 	lda	$0,0x0098($31)
+	[00005A1C] 0x658C010B 	hw_mfpr	$12,0x0b
+	[00005A20] 0x48041720 	sll	$0,0x20,$0
+	[00005A24] 0x74840144 	hw_mtpr/a	$4,$4
+	[00005A28] 0x45C0040E 	or	$14,$0,$14
+	[00005A2C] 0x75CE0150 	hw_mtpr/a	$14,$16
+	[00005A30] 0x25DFFFF0 	ldah	$14,0xfff0($31)
+	[00005A34] 0x74210141 	hw_mtpr/a	$1,$1
+	[00005A38] 0x49DC160E 	zap	$14,0xe0,$14
+	[00005A3C] 0x758C014A 	hw_mtpr/a	$12,$10
+	[00005A40] 0x77FF0119 	hw_mtpr	$31,0x09
+	[00005A44] 0xF1A0001A 	blbs	$13,.+0x00000068
+	[00005A48] 0xF180001D 	blbs	$12,.+0x00000074
+	[00005A4C] 0x74C60146 	hw_mtpr/a	$6,$6
+	[00005A50] 0x74A50145 	hw_mtpr/a	$5,$5
+MchkCommon:
+	[00005A54] 0x60004000 	mb	
+	[00005A58] 0x6421011A 	hw_mfpr	$1,0x0a
+pvc$osf30$379:
+	[00005A5C] 0x65080212 	hw_mfpr	$8,0x02
+	[00005A60] 0x77FF0210 	hw_mtpr	$31,0x00
+	[00005A64] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005A68] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005A6C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005A70] 0x47FF041F 	or	$31,$31,$31
+	[00005A74] 0x6D2E9188 	hw_ld/pq	$9,0x0188($14)
+	[00005A78] 0x453F041F 	or	$9,$31,$31
+	[00005A7C] 0x6D4E90E8 	hw_ld/pq	$10,0x00e8($14)
+	[00005A80] 0x6D8E9148 	hw_ld/pq	$12,0x0148($14)
+	[00005A84] 0x6DAE9108 	hw_ld/pq	$13,0x0108($14)
+	[00005A88] 0x6C0E9068 	hw_ld/pq	$0,0x0068($14)
+	[00005A8C] 0x459F041F 	or	$12,$31,$31
+	[00005A90] 0x441F041F 	or	$0,$31,$31
+	[00005A94] 0x6F2E9168 	hw_ld/pq	$25,0x0168($14)
+	[00005A98] 0x6FEE9168 	hw_ld/pq	$31,0x0168($14)
+	[00005A9C] 0x47FF0405 	or	$31,$31,$5
+	[00005AA0] 0x64C60150 	hw_mfpr/a	$6,$16
+	[00005AA4] 0x48C092C6 	extwl	$6,0x04,$6
+	[00005AA8] 0x44C03106 	andnot	$6,0x01,$6
+	[00005AAC] 0xC3E00008 	br	$31,.+0x00000020
+pvc$osf31$5000:
+HaltDoubleMchk:
+	[00005AB0] 0xD000009B 	bsr	$0,.+0x0000026c
+	[00005AB4] 0x201F0006 	lda	$0,0x0006($31)
+	[00005AB8] 0xC3E00543 	br	$31,.+0x0000150c
+		:
+	zero locations skipped
+		:
+MchkFromPal:
+pvc$osf32$5000:
+	[00005AC0] 0xD0000097 	bsr	$0,.+0x0000025c
+	[00005AC4] 0x201F0007 	lda	$0,0x0007($31)
+	[00005AC8] 0xC3E0053F 	br	$31,.+0x000014fc
+		:
+	zero locations skipped
+		:
+MchkLogOut:
+	[00005AD0] 0x65CE0143 	hw_mfpr/a	$14,$3
+	[00005AD4] 0x21CE05A0 	lda	$14,0x05a0($14)
+	[00005AD8] 0x208501B8 	lda	$4,0x01b8($5)
+	[00005ADC] 0x7C8E9000 	hw_st/pq	$4,0x0000($14)
+	[00005AE0] 0x209F0160 	lda	$4,0x0160($31)
+	[00005AE4] 0x48841724 	sll	$4,0x20,$4
+	[00005AE8] 0x208400D8 	lda	$4,0x00d8($4)
+	[00005AEC] 0x7C8E9008 	hw_st/pq	$4,0x0008($14)
+	[00005AF0] 0x64A50145 	hw_mfpr/a	$5,$5
+	[00005AF4] 0x7CCE9010 	hw_st/pq	$6,0x0010($14)
+	[00005AF8] 0x64840144 	hw_mfpr/a	$4,$4
+	[00005AFC] 0x7C2E9108 	hw_st/pq	$1,0x0108($14)
+	[00005B00] 0x64C60146 	hw_mfpr/a	$6,$6
+	[00005B04] 0x7D0E9110 	hw_st/pq	$8,0x0110($14)
+	[00005B08] 0x64210141 	hw_mfpr/a	$1,$1
+	[00005B0C] 0x7D2E9128 	hw_st/pq	$9,0x0128($14)
+	[00005B10] 0x7D4E9130 	hw_st/pq	$10,0x0130($14)
+	[00005B14] 0x7D8E9140 	hw_st/pq	$12,0x0140($14)
+	[00005B18] 0x7DAE9138 	hw_st/pq	$13,0x0138($14)
+	[00005B1C] 0x7C0E9148 	hw_st/pq	$0,0x0148($14)
+	[00005B20] 0x7F2E9150 	hw_st/pq	$25,0x0150($14)
+	[00005B24] 0x6739014A 	hw_mfpr/a	$25,$10
+	[00005B28] 0x7F2E90D8 	hw_st/pq	$25,0x00d8($14)
+	[00005B2C] 0x64000205 	hw_mfpr	$0,0x05
+	[00005B30] 0x7C0E9120 	hw_st/pq	$0,0x0120($14)
+	[00005B34] 0x64000206 	hw_mfpr	$0,0x06
+	[00005B38] 0x7C0E9118 	hw_st/pq	$0,0x0118($14)
+	[00005B3C] 0x64000100 	hw_mfpr	$0,0x00
+	[00005B40] 0x7C0E90F8 	hw_st/pq	$0,0x00f8($14)
+	[00005B44] 0x64000118 	hw_mfpr	$0,0x08
+	[00005B48] 0x7C0E9100 	hw_st/pq	$0,0x0100($14)
+	[00005B4C] 0x6400010E 	hw_mfpr	$0,0x0e
+	[00005B50] 0x7C0E90F0 	hw_st/pq	$0,0x00f0($14)
+	[00005B54] 0x6400010D 	hw_mfpr	$0,0x0d
+	[00005B58] 0x7C0E90E8 	hw_st/pq	$0,0x00e8($14)
+	[00005B5C] 0x6400010C 	hw_mfpr	$0,0x0c
+	[00005B60] 0x7C0E90E0 	hw_st/pq	$0,0x00e0($14)
+	[00005B64] 0x25BFFFF0 	ldah	$13,0xfff0($31)
+	[00005B68] 0x49BC160D 	zap	$13,0xe0,$13
+	[00005B6C] 0x6DAD91E8 	hw_ld/pq	$13,0x01e8($13)
+	[00005B70] 0x7DAE9158 	hw_st/pq	$13,0x0158($14)
+	[00005B74] 0x64000140 	hw_mfpr/a	$0,$0
+	[00005B78] 0x7C0E9018 	hw_st/pq	$0,0x0018($14)
+	[00005B7C] 0x64000141 	hw_mfpr/a	$0,$1
+	[00005B80] 0x7C0E9020 	hw_st/pq	$0,0x0020($14)
+	[00005B84] 0x64000142 	hw_mfpr/a	$0,$2
+	[00005B88] 0x7C0E9028 	hw_st/pq	$0,0x0028($14)
+	[00005B8C] 0x64000143 	hw_mfpr/a	$0,$3
+	[00005B90] 0x7C0E9030 	hw_st/pq	$0,0x0030($14)
+	[00005B94] 0x64000144 	hw_mfpr/a	$0,$4
+	[00005B98] 0x7C0E9038 	hw_st/pq	$0,0x0038($14)
+	[00005B9C] 0x64000145 	hw_mfpr/a	$0,$5
+	[00005BA0] 0x7C0E9040 	hw_st/pq	$0,0x0040($14)
+	[00005BA4] 0x64000146 	hw_mfpr/a	$0,$6
+	[00005BA8] 0x7C0E9048 	hw_st/pq	$0,0x0048($14)
+	[00005BAC] 0x64000147 	hw_mfpr/a	$0,$7
+	[00005BB0] 0x7C0E9050 	hw_st/pq	$0,0x0050($14)
+	[00005BB4] 0x64000148 	hw_mfpr/a	$0,$8
+	[00005BB8] 0x7C0E9058 	hw_st/pq	$0,0x0058($14)
+	[00005BBC] 0x64000149 	hw_mfpr/a	$0,$9
+	[00005BC0] 0x7C0E9060 	hw_st/pq	$0,0x0060($14)
+	[00005BC4] 0x6400014A 	hw_mfpr/a	$0,$10
+	[00005BC8] 0x7C0E9068 	hw_st/pq	$0,0x0068($14)
+	[00005BCC] 0x6400014B 	hw_mfpr/a	$0,$11
+	[00005BD0] 0x7C0E9070 	hw_st/pq	$0,0x0070($14)
+	[00005BD4] 0x6400014C 	hw_mfpr/a	$0,$12
+	[00005BD8] 0x7C0E9078 	hw_st/pq	$0,0x0078($14)
+	[00005BDC] 0x6400014D 	hw_mfpr/a	$0,$13
+	[00005BE0] 0x7C0E9080 	hw_st/pq	$0,0x0080($14)
+	[00005BE4] 0x6400014E 	hw_mfpr/a	$0,$14
+	[00005BE8] 0x7C0E9088 	hw_st/pq	$0,0x0088($14)
+	[00005BEC] 0x6400014F 	hw_mfpr/a	$0,$15
+	[00005BF0] 0x7C0E9090 	hw_st/pq	$0,0x0090($14)
+	[00005BF4] 0x64000150 	hw_mfpr/a	$0,$16
+	[00005BF8] 0x7C0E9098 	hw_st/pq	$0,0x0098($14)
+	[00005BFC] 0x64000151 	hw_mfpr/a	$0,$17
+	[00005C00] 0x7C0E90A0 	hw_st/pq	$0,0x00a0($14)
+	[00005C04] 0x64000152 	hw_mfpr/a	$0,$18
+	[00005C08] 0x7C0E90A8 	hw_st/pq	$0,0x00a8($14)
+	[00005C0C] 0x64000153 	hw_mfpr/a	$0,$19
+	[00005C10] 0x7C0E90B0 	hw_st/pq	$0,0x00b0($14)
+	[00005C14] 0x64000154 	hw_mfpr/a	$0,$20
+	[00005C18] 0x7C0E90B8 	hw_st/pq	$0,0x00b8($14)
+	[00005C1C] 0x64000155 	hw_mfpr/a	$0,$21
+	[00005C20] 0x7C0E90C0 	hw_st/pq	$0,0x00c0($14)
+	[00005C24] 0x64000156 	hw_mfpr/a	$0,$22
+	[00005C28] 0x7C0E90C8 	hw_st/pq	$0,0x00c8($14)
+	[00005C2C] 0x64000157 	hw_mfpr/a	$0,$23
+	[00005C30] 0x7C0E90D0 	hw_st/pq	$0,0x00d0($14)
+pvc$osf33$5050:
+	[00005C34] 0xD00003CC 	bsr	$0,.+0x00000f30
+	[00005C38] 0x64000140 	hw_mfpr/a	$0,$0
+	[00005C3C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005C40] 0x211F3800 	lda	$8,0x3800($31)
+	[00005C44] 0x7508011A 	hw_mtpr	$8,0x0a
+	[00005C48] 0x211F0003 	lda	$8,0x0003($31)
+	[00005C4C] 0x75080212 	hw_mtpr	$8,0x02
+	[00005C50] 0x77FF010C 	hw_mtpr	$31,0x0c
+	[00005C54] 0x67390150 	hw_mfpr/a	$25,$16
+	[00005C58] 0x4B2092D9 	extwl	$25,0x04,$25
+	[00005C5C] 0xF3200020 	blbs	$25,.+0x00000080
+	[00005C60] 0x47EE040C 	or	$31,$14,$12
+	[00005C64] 0x47EB040D 	or	$31,$11,$13
+	[00005C68] 0x65CE014A 	hw_mfpr/a	$14,$10
+	[00005C6C] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00005C70] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00005C74] 0x49679739 	sll	$11,0x3c,$25
+	[00005C78] 0xFB200003 	bge	$25,.+0x0000000c
+	[00005C7C] 0x47FF040B 	or	$31,$31,$11
+	[00005C80] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00005C84] 0x67DE0153 	hw_mfpr/a	$30,$19
+	[00005C88] 0x23DEFFD0 	lda	$30,0xffd0($30)
+	[00005C8C] 0xB5BE0000 	stq	$13,0x0000($30)
+	[00005C90] 0xB5DE0008 	stq	$14,0x0008($30)
+	[00005C94] 0xB7BE0010 	stq	$29,0x0010($30)
+	[00005C98] 0xB61E0018 	stq	$16,0x0018($30)
+	[00005C9C] 0xB63E0020 	stq	$17,0x0020($30)
+	[00005CA0] 0xB65E0028 	stq	$18,0x0028($30)
+	[00005CA4] 0x67390148 	hw_mfpr/a	$25,$8
+	[00005CA8] 0x4B20F0D9 	extbl	$25,0x07,$25
+	[00005CAC] 0x47E0F40B 	or	$31,0x07,$11
+	[00005CB0] 0x77390110 	hw_mtpr	$25,0x00
+	[00005CB4] 0x6739014B 	hw_mfpr/a	$25,$11
+	[00005CB8] 0x221F0002 	lda	$16,0x0002($31)
+	[00005CBC] 0x66310150 	hw_mfpr/a	$17,$16
+	[00005CC0] 0x7739010B 	hw_mtpr	$25,0x0b
+	[00005CC4] 0x43E03532 	subq	$31,0x01,$18
+	[00005CC8] 0x4A2052D1 	extwl	$17,0x02,$17
+	[00005CCC] 0x4A455692 	srl	$18,0x2a,$18
+	[00005CD0] 0x4A455732 	sll	$18,0x2a,$18
+	[00005CD4] 0x67BD0156 	hw_mfpr/a	$29,$22
+	[00005CD8] 0x45920412 	or	$12,$18,$18
+	[00005CDC] 0x7BFF8000 	hw_rei	
+	[00005CE0] 0x221F0002 	lda	$16,0x0002($31)
+	[00005CE4] 0x223F0660 	lda	$17,0x0660($31)
+	[00005CE8] 0x43E03532 	subq	$31,0x01,$18
+	[00005CEC] 0x6739014B 	hw_mfpr/a	$25,$11
+	[00005CF0] 0x4A455692 	srl	$18,0x2a,$18
+	[00005CF4] 0x7739010B 	hw_mtpr	$25,0x0b
+	[00005CF8] 0x4A455732 	sll	$18,0x2a,$18
+	[00005CFC] 0x45D20412 	or	$14,$18,$18
+	[00005D00] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+UpdatePCB:
+	[00005D20] 0x658C0157 	hw_mfpr/a	$12,$23
+	[00005D24] 0x45611019 	and	$11,0x08,$25
+	[00005D28] 0x61A0C000 	rpcc	$13
+	[00005D2C] 0xE7200003 	beq	$25,.+0x0000000c
+	[00005D30] 0x77DE0152 	hw_mtpr/a	$30,$18
+	[00005D34] 0x7FCC9008 	hw_st/pq	$30,0x0008($12)
+	[00005D38] 0xC3E00001 	br	$31,.+0x00000004
+	[00005D3C] 0x7FCC9000 	hw_st/pq	$30,0x0000($12)
+	[00005D40] 0x49A4168E 	srl	$13,0x20,$14
+	[00005D44] 0x41AE000E 	addl	$13,$14,$14
+	[00005D48] 0x7DCC8018 	hw_st/p	$14,0x0018($12)
+pvc$osf34$5000.1:
+	[00005D4C] 0x6BE08000 	ret	$31,($0),.+0x000000
+		:
+	zero locations skipped
+		:
+SaveState:
+	[00005D60] 0x20210200 	lda	$1,0x0200($1)
+	[00005D64] 0x7FE19300 	hw_st/pq	$31,0x0300($1)
+	[00005D68] 0x7C019308 	hw_st/pq	$0,0x0308($1)
+	[00005D6C] 0x64000140 	hw_mfpr/a	$0,$0
+	[00005D70] 0x7C019310 	hw_st/pq	$0,0x0310($1)
+	[00005D74] 0x64000144 	hw_mfpr/a	$0,$4
+	[00005D78] 0x7C019318 	hw_st/pq	$0,0x0318($1)
+	[00005D7C] 0x7C419320 	hw_st/pq	$2,0x0320($1)
+	[00005D80] 0x64000145 	hw_mfpr/a	$0,$5
+	[00005D84] 0x7C019328 	hw_st/pq	$0,0x0328($1)
+	[00005D88] 0x7C819330 	hw_st/pq	$4,0x0330($1)
+	[00005D8C] 0x7CA19338 	hw_st/pq	$5,0x0338($1)
+	[00005D90] 0x64A50118 	hw_mfpr	$5,0x08
+	[00005D94] 0x249F4000 	ldah	$4,0x4000($31)
+	[00005D98] 0x44A40104 	andnot	$5,$4,$4
+	[00005D9C] 0x74840118 	hw_mtpr	$4,0x08
+	[00005DA0] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005DA4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005DA8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005DAC] 0x47FF041F 	or	$31,$31,$31
+	[00005DB0] 0x7CC19340 	hw_st/pq	$6,0x0340($1)
+	[00005DB4] 0x7CE19348 	hw_st/pq	$7,0x0348($1)
+	[00005DB8] 0x7D019350 	hw_st/pq	$8,0x0350($1)
+	[00005DBC] 0x7D219358 	hw_st/pq	$9,0x0358($1)
+	[00005DC0] 0x7D419360 	hw_st/pq	$10,0x0360($1)
+	[00005DC4] 0x7D619368 	hw_st/pq	$11,0x0368($1)
+	[00005DC8] 0x7D819370 	hw_st/pq	$12,0x0370($1)
+	[00005DCC] 0x7DA19378 	hw_st/pq	$13,0x0378($1)
+	[00005DD0] 0x7DC19380 	hw_st/pq	$14,0x0380($1)
+	[00005DD4] 0x7DE19388 	hw_st/pq	$15,0x0388($1)
+	[00005DD8] 0x7E019390 	hw_st/pq	$16,0x0390($1)
+	[00005DDC] 0x7E219398 	hw_st/pq	$17,0x0398($1)
+	[00005DE0] 0x7E4193A0 	hw_st/pq	$18,0x03a0($1)
+	[00005DE4] 0x7E6193A8 	hw_st/pq	$19,0x03a8($1)
+	[00005DE8] 0x7E8193B0 	hw_st/pq	$20,0x03b0($1)
+	[00005DEC] 0x7EA193B8 	hw_st/pq	$21,0x03b8($1)
+	[00005DF0] 0x7EC193C0 	hw_st/pq	$22,0x03c0($1)
+	[00005DF4] 0x7EE193C8 	hw_st/pq	$23,0x03c8($1)
+	[00005DF8] 0x7F0193D0 	hw_st/pq	$24,0x03d0($1)
+	[00005DFC] 0x7F2193D8 	hw_st/pq	$25,0x03d8($1)
+	[00005E00] 0x7F4193E0 	hw_st/pq	$26,0x03e0($1)
+	[00005E04] 0x7F6193E8 	hw_st/pq	$27,0x03e8($1)
+	[00005E08] 0x7F8193F0 	hw_st/pq	$28,0x03f0($1)
+	[00005E0C] 0x7FA193F8 	hw_st/pq	$29,0x03f8($1)
+	[00005E10] 0x7FC19000 	hw_st/pq	$30,0x0000($1)
+	[00005E14] 0x7FE19008 	hw_st/pq	$31,0x0008($1)
+	[00005E18] 0x2021FE00 	lda	$1,0xfe00($1)
+	[00005E1C] 0x20210418 	lda	$1,0x0418($1)
+	[00005E20] 0x64000140 	hw_mfpr/a	$0,$0
+	[00005E24] 0x7C019300 	hw_st/pq	$0,0x0300($1)
+	[00005E28] 0x64000141 	hw_mfpr/a	$0,$1
+	[00005E2C] 0x7C019308 	hw_st/pq	$0,0x0308($1)
+	[00005E30] 0x64000142 	hw_mfpr/a	$0,$2
+	[00005E34] 0x7C019310 	hw_st/pq	$0,0x0310($1)
+	[00005E38] 0x64000143 	hw_mfpr/a	$0,$3
+	[00005E3C] 0x7C019318 	hw_st/pq	$0,0x0318($1)
+	[00005E40] 0x64000144 	hw_mfpr/a	$0,$4
+	[00005E44] 0x7C019320 	hw_st/pq	$0,0x0320($1)
+	[00005E48] 0x64000145 	hw_mfpr/a	$0,$5
+	[00005E4C] 0x7C019328 	hw_st/pq	$0,0x0328($1)
+	[00005E50] 0x64000146 	hw_mfpr/a	$0,$6
+	[00005E54] 0x7C019330 	hw_st/pq	$0,0x0330($1)
+	[00005E58] 0x64000147 	hw_mfpr/a	$0,$7
+	[00005E5C] 0x7C019338 	hw_st/pq	$0,0x0338($1)
+	[00005E60] 0x64000148 	hw_mfpr/a	$0,$8
+	[00005E64] 0x7C019340 	hw_st/pq	$0,0x0340($1)
+	[00005E68] 0x64000149 	hw_mfpr/a	$0,$9
+	[00005E6C] 0x7C019348 	hw_st/pq	$0,0x0348($1)
+	[00005E70] 0x6400014A 	hw_mfpr/a	$0,$10
+	[00005E74] 0x7C019350 	hw_st/pq	$0,0x0350($1)
+	[00005E78] 0x6400014B 	hw_mfpr/a	$0,$11
+	[00005E7C] 0x7C019358 	hw_st/pq	$0,0x0358($1)
+	[00005E80] 0x6400014C 	hw_mfpr/a	$0,$12
+	[00005E84] 0x7C019360 	hw_st/pq	$0,0x0360($1)
+	[00005E88] 0x6400014D 	hw_mfpr/a	$0,$13
+	[00005E8C] 0x7C019368 	hw_st/pq	$0,0x0368($1)
+	[00005E90] 0x6400014E 	hw_mfpr/a	$0,$14
+	[00005E94] 0x7C019370 	hw_st/pq	$0,0x0370($1)
+	[00005E98] 0x6400014F 	hw_mfpr/a	$0,$15
+	[00005E9C] 0x7C019378 	hw_st/pq	$0,0x0378($1)
+	[00005EA0] 0x64000150 	hw_mfpr/a	$0,$16
+	[00005EA4] 0x7C019380 	hw_st/pq	$0,0x0380($1)
+	[00005EA8] 0x64000151 	hw_mfpr/a	$0,$17
+	[00005EAC] 0x7C019388 	hw_st/pq	$0,0x0388($1)
+	[00005EB0] 0x64000152 	hw_mfpr/a	$0,$18
+	[00005EB4] 0x7C019390 	hw_st/pq	$0,0x0390($1)
+	[00005EB8] 0x64000153 	hw_mfpr/a	$0,$19
+	[00005EBC] 0x7C019398 	hw_st/pq	$0,0x0398($1)
+	[00005EC0] 0x64000154 	hw_mfpr/a	$0,$20
+	[00005EC4] 0x7C0193A0 	hw_st/pq	$0,0x03a0($1)
+	[00005EC8] 0x64000155 	hw_mfpr/a	$0,$21
+	[00005ECC] 0x7C0193A8 	hw_st/pq	$0,0x03a8($1)
+	[00005ED0] 0x64000156 	hw_mfpr/a	$0,$22
+	[00005ED4] 0x7C0193B0 	hw_st/pq	$0,0x03b0($1)
+	[00005ED8] 0x64000157 	hw_mfpr/a	$0,$23
+	[00005EDC] 0x7C0193B8 	hw_st/pq	$0,0x03b8($1)
+	[00005EE0] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005EE4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005EE8] 0x74A50118 	hw_mtpr	$5,0x08
+	[00005EEC] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005EF0] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005EF4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00005EF8] 0x47FF041F 	or	$31,$31,$31
+	[00005EFC] 0x7D0193C0 	hw_st/pq	$8,0x03c0($1)
+	[00005F00] 0x7D2193C8 	hw_st/pq	$9,0x03c8($1)
+	[00005F04] 0x7D4193D0 	hw_st/pq	$10,0x03d0($1)
+	[00005F08] 0x7D6193D8 	hw_st/pq	$11,0x03d8($1)
+	[00005F0C] 0x7D8193E0 	hw_st/pq	$12,0x03e0($1)
+	[00005F10] 0x7DA193E8 	hw_st/pq	$13,0x03e8($1)
+	[00005F14] 0x7DC193F0 	hw_st/pq	$14,0x03f0($1)
+	[00005F18] 0x7F2193F8 	hw_st/pq	$25,0x03f8($1)
+	[00005F1C] 0x6400010B 	hw_mfpr	$0,0x0b
+	[00005F20] 0x7C019000 	hw_st/pq	$0,0x0000($1)
+	[00005F24] 0x6400010E 	hw_mfpr	$0,0x0e
+	[00005F28] 0x7C019008 	hw_st/pq	$0,0x0008($1)
+	[00005F2C] 0x64000205 	hw_mfpr	$0,0x05
+	[00005F30] 0x7C019010 	hw_st/pq	$0,0x0010($1)
+	[00005F34] 0x64000206 	hw_mfpr	$0,0x06
+	[00005F38] 0x7C019018 	hw_st/pq	$0,0x0018($1)
+	[00005F3C] 0x64000118 	hw_mfpr	$0,0x08
+	[00005F40] 0x7C019020 	hw_st/pq	$0,0x0020($1)
+	[00005F44] 0x64000110 	hw_mfpr	$0,0x00
+	[00005F48] 0x7C019028 	hw_st/pq	$0,0x0028($1)
+	[00005F4C] 0x6400010F 	hw_mfpr	$0,0x0f
+	[00005F50] 0x7C019030 	hw_st/pq	$0,0x0030($1)
+	[00005F54] 0x64000103 	hw_mfpr	$0,0x03
+	[00005F58] 0x7C019038 	hw_st/pq	$0,0x0038($1)
+	[00005F5C] 0x6400010A 	hw_mfpr	$0,0x0a
+	[00005F60] 0x7C019040 	hw_st/pq	$0,0x0040($1)
+	[00005F64] 0x64000109 	hw_mfpr	$0,0x09
+	[00005F68] 0x7C019048 	hw_st/pq	$0,0x0048($1)
+	[00005F6C] 0x64000108 	hw_mfpr	$0,0x08
+	[00005F70] 0x7C019078 	hw_st/pq	$0,0x0078($1)
+	[00005F74] 0x64000100 	hw_mfpr	$0,0x00
+	[00005F78] 0x7C019050 	hw_st/pq	$0,0x0050($1)
+	[00005F7C] 0x64000113 	hw_mfpr	$0,0x03
+	[00005F80] 0x7C019058 	hw_st/pq	$0,0x0058($1)
+	[00005F84] 0x6400020F 	hw_mfpr	$0,0x0f
+	[00005F88] 0x7C019060 	hw_st/pq	$0,0x0060($1)
+	[00005F8C] 0x64000216 	hw_mfpr	$0,0x06
+	[00005F90] 0x7C019068 	hw_st/pq	$0,0x0068($1)
+pvc$osf35$379:
+	[00005F94] 0x64000217 	hw_mfpr	$0,0x07
+	[00005F98] 0x7C019070 	hw_st/pq	$0,0x0070($1)
+	[00005F9C] 0x6400011A 	hw_mfpr	$0,0x0a
+	[00005FA0] 0x7C019088 	hw_st/pq	$0,0x0088($1)
+	[00005FA4] 0x6400011C 	hw_mfpr	$0,0x0c
+	[00005FA8] 0x7C019090 	hw_st/pq	$0,0x0090($1)
+	[00005FAC] 0x6400010C 	hw_mfpr	$0,0x0c
+	[00005FB0] 0x7C019098 	hw_st/pq	$0,0x0098($1)
+	[00005FB4] 0x6400010D 	hw_mfpr	$0,0x0d
+	[00005FB8] 0x7C0190A0 	hw_st/pq	$0,0x00a0($1)
+	[00005FBC] 0x64000111 	hw_mfpr	$0,0x01
+	[00005FC0] 0x7C0190A8 	hw_st/pq	$0,0x00a8($1)
+	[00005FC4] 0x25DFFFF0 	ldah	$14,0xfff0($31)
+	[00005FC8] 0x49DC160E 	zap	$14,0xe0,$14
+	[00005FCC] 0x47FF041F 	or	$31,$31,$31
+	[00005FD0] 0x47FF041F 	or	$31,$31,$31
+	[00005FD4] 0x47FF041F 	or	$31,$31,$31
+	[00005FD8] 0x64000212 	hw_mfpr	$0,0x02
+	[00005FDC] 0x7C0190B0 	hw_st/pq	$0,0x00b0($1)
+	[00005FE0] 0x60004000 	mb	
+	[00005FE4] 0x6C4E90A8 	hw_ld/pq	$2,0x00a8($14)
+	[00005FE8] 0x6DAE91E8 	hw_ld/pq	$13,0x01e8($14)
+	[00005FEC] 0x6C8E9188 	hw_ld/pq	$4,0x0188($14)
+	[00005FF0] 0x6CAE9148 	hw_ld/pq	$5,0x0148($14)
+	[00005FF4] 0x6CCE9108 	hw_ld/pq	$6,0x0108($14)
+	[00005FF8] 0x6CEE9068 	hw_ld/pq	$7,0x0068($14)
+	[00005FFC] 0x4485041F 	or	$4,$5,$31
+	[00006000] 0x44C7041F 	or	$6,$7,$31
+	[00006004] 0x6D0E90E8 	hw_ld/pq	$8,0x00e8($14)
+	[00006008] 0x6D2E9168 	hw_ld/pq	$9,0x0168($14)
+	[0000600C] 0x6FEE9168 	hw_ld/pq	$31,0x0168($14)
+	[00006010] 0x60004000 	mb	
+	[00006014] 0x2021FBE8 	lda	$1,0xfbe8($1)
+	[00006018] 0x64000118 	hw_mfpr	$0,0x08
+	[0000601C] 0x47E03402 	or	$31,0x01,$2
+	[00006020] 0x48435722 	sll	$2,0x1a,$2
+	[00006024] 0x44400400 	or	$2,$0,$0
+	[00006028] 0x74000118 	hw_mtpr	$0,0x08
+	[0000602C] 0x77FF020A 	hw_mtpr	$31,0x0a
+	[00006030] 0x4821B680 	srl	$1,0x0d,$0
+	[00006034] 0x48041720 	sll	$0,0x20,$0
+	[00006038] 0x20003300 	lda	$0,0x3300($0)
+	[0000603C] 0x74000203 	hw_mtpr	$0,0x03
+	[00006040] 0x74210202 	hw_mtpr	$1,0x02
+	[00006044] 0x20812000 	lda	$4,0x2000($1)
+	[00006048] 0x4881B680 	srl	$4,0x0d,$0
+	[0000604C] 0x48041720 	sll	$0,0x20,$0
+	[00006050] 0x20003300 	lda	$0,0x3300($0)
+	[00006054] 0x74000203 	hw_mtpr	$0,0x03
+	[00006058] 0x74840202 	hw_mtpr	$4,0x02
+	[0000605C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006060] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006064] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006068] 0x47FF041F 	or	$31,$31,$31
+	[0000606C] 0x20210200 	lda	$1,0x0200($1)
+	[00006070] 0x9C010010 	stt	$0,0x0010($1)
+	[00006074] 0x9C210018 	stt	$1,0x0018($1)
+	[00006078] 0x9C410020 	stt	$2,0x0020($1)
+	[0000607C] 0x9C610028 	stt	$3,0x0028($1)
+	[00006080] 0x9C810030 	stt	$4,0x0030($1)
+	[00006084] 0x9CA10038 	stt	$5,0x0038($1)
+	[00006088] 0x9CC10040 	stt	$6,0x0040($1)
+	[0000608C] 0x9CE10048 	stt	$7,0x0048($1)
+	[00006090] 0x9D010050 	stt	$8,0x0050($1)
+	[00006094] 0x9D210058 	stt	$9,0x0058($1)
+	[00006098] 0x9D410060 	stt	$10,0x0060($1)
+	[0000609C] 0x9D610068 	stt	$11,0x0068($1)
+	[000060A0] 0x9D810070 	stt	$12,0x0070($1)
+	[000060A4] 0x9DA10078 	stt	$13,0x0078($1)
+	[000060A8] 0x9DC10080 	stt	$14,0x0080($1)
+	[000060AC] 0x9DE10088 	stt	$15,0x0088($1)
+	[000060B0] 0x9E010090 	stt	$16,0x0090($1)
+	[000060B4] 0x9E210098 	stt	$17,0x0098($1)
+	[000060B8] 0x9E4100A0 	stt	$18,0x00a0($1)
+	[000060BC] 0x9E6100A8 	stt	$19,0x00a8($1)
+	[000060C0] 0x9E8100B0 	stt	$20,0x00b0($1)
+	[000060C4] 0x9EA100B8 	stt	$21,0x00b8($1)
+	[000060C8] 0x9EC100C0 	stt	$22,0x00c0($1)
+	[000060CC] 0x9EE100C8 	stt	$23,0x00c8($1)
+	[000060D0] 0x9F0100D0 	stt	$24,0x00d0($1)
+	[000060D4] 0x9F2100D8 	stt	$25,0x00d8($1)
+	[000060D8] 0x9F4100E0 	stt	$26,0x00e0($1)
+	[000060DC] 0x9F6100E8 	stt	$27,0x00e8($1)
+	[000060E0] 0x9F8100F0 	stt	$28,0x00f0($1)
+	[000060E4] 0x9FA100F8 	stt	$29,0x00f8($1)
+	[000060E8] 0x9FC10100 	stt	$30,0x0100($1)
+	[000060EC] 0x9FE10108 	stt	$31,0x0108($1)
+	[000060F0] 0x2021FE00 	lda	$1,0xfe00($1)
+	[000060F4] 0x20210418 	lda	$1,0x0418($1)
+	[000060F8] 0x77FF020A 	hw_mtpr	$31,0x0a
+	[000060FC] 0x2021FBE8 	lda	$1,0xfbe8($1)
+	[00006100] 0x20210200 	lda	$1,0x0200($1)
+	[00006104] 0x47E03400 	or	$31,0x01,$0
+	[00006108] 0x7C019300 	hw_st/pq	$0,0x0300($1)
+	[0000610C] 0x6C019308 	hw_ld/pq	$0,0x0308($1)
+	[00006110] 0x2021FE00 	lda	$1,0xfe00($1)
+pvc$osf36$5020.1:
+	[00006114] 0x6BE38000 	ret	$31,($3),.+0x000000
+		:
+	zero locations skipped
+		:
+RestoreState:
+	[00006120] 0x77FF020A 	hw_mtpr	$31,0x0a
+	[00006124] 0x4821B680 	srl	$1,0x0d,$0
+	[00006128] 0x48041720 	sll	$0,0x20,$0
+	[0000612C] 0x20003300 	lda	$0,0x3300($0)
+	[00006130] 0x74000203 	hw_mtpr	$0,0x03
+	[00006134] 0x74210202 	hw_mtpr	$1,0x02
+	[00006138] 0x20812000 	lda	$4,0x2000($1)
+	[0000613C] 0x4881B680 	srl	$4,0x0d,$0
+	[00006140] 0x48041720 	sll	$0,0x20,$0
+	[00006144] 0x20003300 	lda	$0,0x3300($0)
+	[00006148] 0x74000203 	hw_mtpr	$0,0x03
+	[0000614C] 0x74840202 	hw_mtpr	$4,0x02
+	[00006150] 0x64000118 	hw_mfpr	$0,0x08
+	[00006154] 0x47E03402 	or	$31,0x01,$2
+	[00006158] 0x44421402 	or	$2,0x10,$2
+	[0000615C] 0x48435722 	sll	$2,0x1a,$2
+	[00006160] 0x44020400 	or	$0,$2,$0
+	[00006164] 0x74420118 	hw_mtpr	$2,0x08
+	[00006168] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000616C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006170] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006174] 0x20210200 	lda	$1,0x0200($1)
+	[00006178] 0x8C010010 	ldt	$0,0x0010($1)
+	[0000617C] 0x8C210018 	ldt	$1,0x0018($1)
+	[00006180] 0x8C410020 	ldt	$2,0x0020($1)
+	[00006184] 0x8C610028 	ldt	$3,0x0028($1)
+	[00006188] 0x8C810030 	ldt	$4,0x0030($1)
+	[0000618C] 0x8CA10038 	ldt	$5,0x0038($1)
+	[00006190] 0x8CC10040 	ldt	$6,0x0040($1)
+	[00006194] 0x8CE10048 	ldt	$7,0x0048($1)
+	[00006198] 0x8D010050 	ldt	$8,0x0050($1)
+	[0000619C] 0x8D210058 	ldt	$9,0x0058($1)
+	[000061A0] 0x8D410060 	ldt	$10,0x0060($1)
+	[000061A4] 0x8D610068 	ldt	$11,0x0068($1)
+	[000061A8] 0x8D810070 	ldt	$12,0x0070($1)
+	[000061AC] 0x8DA10078 	ldt	$13,0x0078($1)
+	[000061B0] 0x8DC10080 	ldt	$14,0x0080($1)
+	[000061B4] 0x8DE10088 	ldt	$15,0x0088($1)
+	[000061B8] 0x8E010090 	ldt	$16,0x0090($1)
+	[000061BC] 0x8E210098 	ldt	$17,0x0098($1)
+	[000061C0] 0x8E4100A0 	ldt	$18,0x00a0($1)
+	[000061C4] 0x8E6100A8 	ldt	$19,0x00a8($1)
+	[000061C8] 0x8E8100B0 	ldt	$20,0x00b0($1)
+	[000061CC] 0x8EA100B8 	ldt	$21,0x00b8($1)
+	[000061D0] 0x8EC100C0 	ldt	$22,0x00c0($1)
+	[000061D4] 0x8EE100C8 	ldt	$23,0x00c8($1)
+	[000061D8] 0x8F0100D0 	ldt	$24,0x00d0($1)
+	[000061DC] 0x8F2100D8 	ldt	$25,0x00d8($1)
+	[000061E0] 0x8F4100E0 	ldt	$26,0x00e0($1)
+	[000061E4] 0x8F6100E8 	ldt	$27,0x00e8($1)
+	[000061E8] 0x8F8100F0 	ldt	$28,0x00f0($1)
+	[000061EC] 0x8FA100F8 	ldt	$29,0x00f8($1)
+	[000061F0] 0x8FC10100 	ldt	$30,0x0100($1)
+	[000061F4] 0x8FE10108 	ldt	$31,0x0108($1)
+	[000061F8] 0x2021FE00 	lda	$1,0xfe00($1)
+	[000061FC] 0x20210418 	lda	$1,0x0418($1)
+	[00006200] 0x6C019300 	hw_ld/pq	$0,0x0300($1)
+	[00006204] 0x74000140 	hw_mtpr/a	$0,$0
+	[00006208] 0x6C019308 	hw_ld/pq	$0,0x0308($1)
+	[0000620C] 0x74000141 	hw_mtpr/a	$0,$1
+	[00006210] 0x6C019310 	hw_ld/pq	$0,0x0310($1)
+	[00006214] 0x74000142 	hw_mtpr/a	$0,$2
+	[00006218] 0x6C019318 	hw_ld/pq	$0,0x0318($1)
+	[0000621C] 0x74000143 	hw_mtpr/a	$0,$3
+	[00006220] 0x6C019320 	hw_ld/pq	$0,0x0320($1)
+	[00006224] 0x74000144 	hw_mtpr/a	$0,$4
+	[00006228] 0x6C019328 	hw_ld/pq	$0,0x0328($1)
+	[0000622C] 0x74000145 	hw_mtpr/a	$0,$5
+	[00006230] 0x6C019330 	hw_ld/pq	$0,0x0330($1)
+	[00006234] 0x74000146 	hw_mtpr/a	$0,$6
+	[00006238] 0x6C019338 	hw_ld/pq	$0,0x0338($1)
+	[0000623C] 0x74000147 	hw_mtpr/a	$0,$7
+	[00006240] 0x6C019340 	hw_ld/pq	$0,0x0340($1)
+	[00006244] 0x74000148 	hw_mtpr/a	$0,$8
+	[00006248] 0x6C019348 	hw_ld/pq	$0,0x0348($1)
+	[0000624C] 0x74000149 	hw_mtpr/a	$0,$9
+	[00006250] 0x6C019350 	hw_ld/pq	$0,0x0350($1)
+	[00006254] 0x7400014A 	hw_mtpr/a	$0,$10
+	[00006258] 0x6C019358 	hw_ld/pq	$0,0x0358($1)
+	[0000625C] 0x7400014B 	hw_mtpr/a	$0,$11
+	[00006260] 0x6C019360 	hw_ld/pq	$0,0x0360($1)
+	[00006264] 0x7400014C 	hw_mtpr/a	$0,$12
+	[00006268] 0x6C019368 	hw_ld/pq	$0,0x0368($1)
+	[0000626C] 0x7400014D 	hw_mtpr/a	$0,$13
+	[00006270] 0x6C019370 	hw_ld/pq	$0,0x0370($1)
+	[00006274] 0x7400014E 	hw_mtpr/a	$0,$14
+	[00006278] 0x6C019378 	hw_ld/pq	$0,0x0378($1)
+	[0000627C] 0x7400014F 	hw_mtpr/a	$0,$15
+	[00006280] 0x6C019380 	hw_ld/pq	$0,0x0380($1)
+	[00006284] 0x74000150 	hw_mtpr/a	$0,$16
+	[00006288] 0x6C019388 	hw_ld/pq	$0,0x0388($1)
+	[0000628C] 0x74000151 	hw_mtpr/a	$0,$17
+	[00006290] 0x6C019390 	hw_ld/pq	$0,0x0390($1)
+	[00006294] 0x74000152 	hw_mtpr/a	$0,$18
+	[00006298] 0x6C019398 	hw_ld/pq	$0,0x0398($1)
+	[0000629C] 0x74000153 	hw_mtpr/a	$0,$19
+	[000062A0] 0x6C0193A0 	hw_ld/pq	$0,0x03a0($1)
+	[000062A4] 0x74000154 	hw_mtpr/a	$0,$20
+	[000062A8] 0x6C0193A8 	hw_ld/pq	$0,0x03a8($1)
+	[000062AC] 0x74000155 	hw_mtpr/a	$0,$21
+	[000062B0] 0x6C0193B0 	hw_ld/pq	$0,0x03b0($1)
+	[000062B4] 0x74000156 	hw_mtpr/a	$0,$22
+	[000062B8] 0x6C0193B8 	hw_ld/pq	$0,0x03b8($1)
+	[000062BC] 0x74000157 	hw_mtpr/a	$0,$23
+	[000062C0] 0x6C019000 	hw_ld/pq	$0,0x0000($1)
+	[000062C4] 0x7400010B 	hw_mtpr	$0,0x0b
+	[000062C8] 0x6C019008 	hw_ld/pq	$0,0x0008($1)
+	[000062CC] 0x7400010E 	hw_mtpr	$0,0x0e
+	[000062D0] 0x6C019028 	hw_ld/pq	$0,0x0028($1)
+	[000062D4] 0x74000110 	hw_mtpr	$0,0x00
+	[000062D8] 0x6C019030 	hw_ld/pq	$0,0x0030($1)
+	[000062DC] 0x7400010F 	hw_mtpr	$0,0x0f
+	[000062E0] 0x74000201 	hw_mtpr	$0,0x01
+	[000062E4] 0x6C019038 	hw_ld/pq	$0,0x0038($1)
+	[000062E8] 0x74000103 	hw_mtpr	$0,0x03
+	[000062EC] 0x48009680 	srl	$0,0x04,$0
+	[000062F0] 0x48073720 	sll	$0,0x39,$0
+	[000062F4] 0x74000200 	hw_mtpr	$0,0x00
+	[000062F8] 0x6C019058 	hw_ld/pq	$0,0x0058($1)
+	[000062FC] 0x74000113 	hw_mtpr	$0,0x03
+	[00006300] 0x74000208 	hw_mtpr	$0,0x08
+	[00006304] 0x6C019060 	hw_ld/pq	$0,0x0060($1)
+	[00006308] 0x7400020F 	hw_mtpr	$0,0x0f
+	[0000630C] 0x6C019040 	hw_ld/pq	$0,0x0040($1)
+	[00006310] 0x7400010A 	hw_mtpr	$0,0x0a
+	[00006314] 0x6C019048 	hw_ld/pq	$0,0x0048($1)
+	[00006318] 0x74000109 	hw_mtpr	$0,0x09
+	[0000631C] 0x6C019078 	hw_ld/pq	$0,0x0078($1)
+	[00006320] 0x74000108 	hw_mtpr	$0,0x08
+	[00006324] 0x6C019070 	hw_ld/pq	$0,0x0070($1)
+	[00006328] 0x74000217 	hw_mtpr	$0,0x07
+	[0000632C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006330] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006334] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006338] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000633C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006340] 0x6D0193C0 	hw_ld/pq	$8,0x03c0($1)
+	[00006344] 0x6D2193C8 	hw_ld/pq	$9,0x03c8($1)
+	[00006348] 0x6D4193D0 	hw_ld/pq	$10,0x03d0($1)
+	[0000634C] 0x6D6193D8 	hw_ld/pq	$11,0x03d8($1)
+	[00006350] 0x6D8193E0 	hw_ld/pq	$12,0x03e0($1)
+	[00006354] 0x6DA193E8 	hw_ld/pq	$13,0x03e8($1)
+	[00006358] 0x6DC193F0 	hw_ld/pq	$14,0x03f0($1)
+	[0000635C] 0x6F2193F8 	hw_ld/pq	$25,0x03f8($1)
+	[00006360] 0x6C019068 	hw_ld/pq	$0,0x0068($1)
+	[00006364] 0x74000216 	hw_mtpr	$0,0x06
+	[00006368] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000636C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006370] 0x64000118 	hw_mfpr	$0,0x08
+	[00006374] 0x245F4000 	ldah	$2,0x4000($31)
+	[00006378] 0x44020102 	andnot	$0,$2,$2
+	[0000637C] 0x74420118 	hw_mtpr	$2,0x08
+	[00006380] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006384] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006388] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000638C] 0x47FF041F 	or	$31,$31,$31
+	[00006390] 0x2021FBE8 	lda	$1,0xfbe8($1)
+	[00006394] 0x20210200 	lda	$1,0x0200($1)
+	[00006398] 0x6C819330 	hw_ld/pq	$4,0x0330($1)
+	[0000639C] 0x6CA19338 	hw_ld/pq	$5,0x0338($1)
+	[000063A0] 0x6CC19340 	hw_ld/pq	$6,0x0340($1)
+	[000063A4] 0x6CE19348 	hw_ld/pq	$7,0x0348($1)
+	[000063A8] 0x6D019350 	hw_ld/pq	$8,0x0350($1)
+	[000063AC] 0x6D219358 	hw_ld/pq	$9,0x0358($1)
+	[000063B0] 0x6D419360 	hw_ld/pq	$10,0x0360($1)
+	[000063B4] 0x6D619368 	hw_ld/pq	$11,0x0368($1)
+	[000063B8] 0x6D819370 	hw_ld/pq	$12,0x0370($1)
+	[000063BC] 0x6DA19378 	hw_ld/pq	$13,0x0378($1)
+	[000063C0] 0x6DC19380 	hw_ld/pq	$14,0x0380($1)
+	[000063C4] 0x6DE19388 	hw_ld/pq	$15,0x0388($1)
+	[000063C8] 0x6E019390 	hw_ld/pq	$16,0x0390($1)
+	[000063CC] 0x6E219398 	hw_ld/pq	$17,0x0398($1)
+	[000063D0] 0x6E4193A0 	hw_ld/pq	$18,0x03a0($1)
+	[000063D4] 0x6E6193A8 	hw_ld/pq	$19,0x03a8($1)
+	[000063D8] 0x6E8193B0 	hw_ld/pq	$20,0x03b0($1)
+	[000063DC] 0x6EA193B8 	hw_ld/pq	$21,0x03b8($1)
+	[000063E0] 0x6EC193C0 	hw_ld/pq	$22,0x03c0($1)
+	[000063E4] 0x6EE193C8 	hw_ld/pq	$23,0x03c8($1)
+	[000063E8] 0x6F0193D0 	hw_ld/pq	$24,0x03d0($1)
+	[000063EC] 0x6F2193D8 	hw_ld/pq	$25,0x03d8($1)
+	[000063F0] 0x6F4193E0 	hw_ld/pq	$26,0x03e0($1)
+	[000063F4] 0x6F6193E8 	hw_ld/pq	$27,0x03e8($1)
+	[000063F8] 0x6F8193F0 	hw_ld/pq	$28,0x03f0($1)
+	[000063FC] 0x6FA193F8 	hw_ld/pq	$29,0x03f8($1)
+	[00006400] 0x6FC19000 	hw_ld/pq	$30,0x0000($1)
+	[00006404] 0x6FE19008 	hw_ld/pq	$31,0x0008($1)
+	[00006408] 0x2021FE00 	lda	$1,0xfe00($1)
+	[0000640C] 0x20210418 	lda	$1,0x0418($1)
+	[00006410] 0x6C019020 	hw_ld/pq	$0,0x0020($1)
+	[00006414] 0x74000118 	hw_mtpr	$0,0x08
+	[00006418] 0x77FF020A 	hw_mtpr	$31,0x0a
+	[0000641C] 0x2021FBE8 	lda	$1,0xfbe8($1)
+	[00006420] 0x20210200 	lda	$1,0x0200($1)
+	[00006424] 0x7FE19300 	hw_st/pq	$31,0x0300($1)
+	[00006428] 0x60004000 	mb	
+	[0000642C] 0x6C419320 	hw_ld/pq	$2,0x0320($1)
+	[00006430] 0x6C019310 	hw_ld/pq	$0,0x0310($1)
+	[00006434] 0x2021FE00 	lda	$1,0xfe00($1)
+pvc$osf37$5030.1:
+	[00006438] 0x6BE38000 	ret	$31,($3),.+0x000000
+	[0000643C] 0x00000000
+Pal_OsfpalEnd:
+		:
+	zero locations skipped
+		:
+/sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/srom_dbm.o:
+keypressed:
+	[00006440] 0x64000100 	hw_mfpr	$0,0x00
+	[00006444] 0x48043680 	srl	$0,0x21,$0
+	[00006448] 0x44003000 	and	$0,0x01,$0
+	[0000644C] 0x48043720 	sll	$0,0x21,$0
+	[00006450] 0x74000115 	hw_mtpr	$0,0x05
+	[00006454] 0x440034C0 	cmovne	$0,0x01,$0
+pvc$serial_keypressed_ret$4009.1:
+	[00006458] 0x6BF48000 	ret	$31,($20),.+0x000000
+getChar:
+	[0000645C] 0x205F0008 	lda	$2,0x0008($31)
+char_start:
+	[00006460] 0x64000117 	hw_mfpr	$0,0x07
+	[00006464] 0xF41FFFFE 	bne	$0,.+0x007ffff8
+pvc$serial_waitbit_1$4000:
+	[00006468] 0xD2800020 	bsr	$20,.+0x00000080
+get_bits:
+pvc$serial_waitbit_2$4000:
+	[0000646C] 0xD2800021 	bsr	$20,.+0x00000084
+	[00006470] 0x64000117 	hw_mfpr	$0,0x07
+	[00006474] 0x4800D680 	srl	$0,0x06,$0
+	[00006478] 0x48020720 	sll	$0,$2,$0
+	[0000647C] 0x44020402 	or	$0,$2,$2
+	[00006480] 0x20420001 	lda	$2,0x0001($2)
+	[00006484] 0x445FF000 	and	$2,0xff,$0
+	[00006488] 0x400213A1 	cmpult	$0,0x10,$1
+	[0000648C] 0xF43FFFF7 	bne	$1,.+0x007fffdc
+stop_get:
+pvc$serial_waitbit_3$4000:
+	[00006490] 0xD2800018 	bsr	$20,.+0x00000060
+	[00006494] 0x64210117 	hw_mfpr	$1,0x07
+pvc$serial_keypressed_1$4009:
+	[00006498] 0xD29FFFE9 	bsr	$20,.+0x007fffa4
+	[0000649C] 0x484030C0 	extbl	$2,0x01,$0
+	[000064A0] 0x4AE11681 	srl	$23,0x08,$1
+	[000064A4] 0xE0200004 	blbc	$1,.+0x00000010
+	[000064A8] 0x440B1801 	xor	$0,0x58,$1
+	[000064AC] 0xF4200002 	bne	$1,.+0x00000008
+	[000064B0] 0x203F0100 	lda	$1,0x0100($31)
+	[000064B4] 0x46E10117 	andnot	$23,$1,$23
+exit_getchar:
+pvc$serial_getchar_ret$4002.1:
+	[000064B8] 0x6BF68000 	ret	$31,($22),.+0x000000
+putChar:
+	[000064BC] 0x4AE11682 	srl	$23,0x08,$2
+	[000064C0] 0xE0400009 	blbc	$2,.+0x00000024
+	[000064C4] 0x205F0010 	lda	$2,0x0010($31)
+	[000064C8] 0x22313F00 	lda	$17,0x3f00($17)
+	[000064CC] 0x42203451 	s4addq	$17,0x01,$17
+	[000064D0] 0x4A20F731 	sll	$17,0x07,$17
+data_bit:
+	[000064D4] 0x76310116 	hw_mtpr	$17,0x06
+	[000064D8] 0x4A203691 	srl	$17,0x01,$17
+	[000064DC] 0x40403522 	subq	$2,0x01,$2
+pvc$serial_waitbit_4$4000:
+	[000064E0] 0xD2800004 	bsr	$20,.+0x00000010
+	[000064E4] 0xF45FFFFB 	bne	$2,.+0x007fffec
+exit_putChar:
+pvc$serial_putchar_ret$4001.1:
+	[000064E8] 0x6BF68000 	ret	$31,($22),.+0x000000
+waitBitHalf:
+	[000064EC] 0x4AE43680 	srl	$23,0x21,$0
+	[000064F0] 0xC3E00001 	br	$31,.+0x00000004
+waitBitTime:
+	[000064F4] 0x4AE41680 	srl	$23,0x20,$0
+waitBitCont:
+wait_init:
+	[000064F8] 0x203F0001 	lda	$1,0x0001($31)
+	[000064FC] 0x48241721 	sll	$1,0x20,$1
+	[00006500] 0x7421020E 	hw_mtpr	$1,0x0e
+	[00006504] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006508] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[0000650C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006510] 0x67FF0140 	hw_mfpr/a	$31,$0
+wait:
+	[00006514] 0x6020C000 	rpcc	$1
+	[00006518] 0x4821F621 	zapnot	$1,0x0f,$1
+	[0000651C] 0x400109A1 	cmplt	$0,$1,$1
+	[00006520] 0xE43FFFFC 	beq	$1,.+0x007ffff0
+pvc$serial_waitbit_ret$4000.1:
+	[00006524] 0x6BF48000 	ret	$31,($20),.+0x000000
+autobaud_sync:
+	[00006528] 0x203F0001 	lda	$1,0x0001($31)
+	[0000652C] 0x48241721 	sll	$1,0x20,$1
+pvc$serial_keypressed_2$4009:
+	[00006530] 0xD29FFFC3 	bsr	$20,.+0x007fff0c
+poll_start:
+	[00006534] 0x64000117 	hw_mfpr	$0,0x07
+	[00006538] 0xF41FFFFE 	bne	$0,.+0x007ffff8
+	[0000653C] 0x7421020E 	hw_mtpr	$1,0x0e
+poll_h:
+	[00006540] 0x64000117 	hw_mfpr	$0,0x07
+	[00006544] 0xE41FFFFE 	beq	$0,.+0x007ffff8
+	[00006548] 0x6020C000 	rpcc	$1
+	[0000654C] 0x483E1601 	zap	$1,0xf0,$1
+poll_l:
+	[00006550] 0x6000C000 	rpcc	$0
+	[00006554] 0x481E1600 	zap	$0,0xf0,$0
+	[00006558] 0x48207722 	sll	$1,0x03,$2
+	[0000655C] 0x404003A0 	cmpult	$2,$0,$0
+	[00006560] 0xF4000003 	bne	$0,.+0x0000000c
+	[00006564] 0x64000117 	hw_mfpr	$0,0x07
+	[00006568] 0xF41FFFF9 	bne	$0,.+0x007fffe4
+	[0000656C] 0xC3FFFFF4 	br	$31,.+0x007fffd0
+end_sync:
+	[00006570] 0x201F0000 	lda	$0,0x0000($31)
+simple_div:
+	[00006574] 0x4C013402 	mulq	$0,0x09,$2
+	[00006578] 0x404103A2 	cmpult	$2,$1,$2
+	[0000657C] 0xE4400002 	beq	$2,.+0x00000008
+	[00006580] 0x40003400 	addq	$0,0x01,$0
+	[00006584] 0xC3FFFFFB 	br	$31,.+0x007fffec
+set_baud:
+	[00006588] 0x48041720 	sll	$0,0x20,$0
+	[0000658C] 0x22E00100 	lda	$23,0x0100($0)
+pvc$serial_autosync_ret$4010.1:
+	[00006590] 0x6BF58000 	ret	$31,($21),.+0x000000
+		:
+	zero locations skipped
+		:
+/sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/sromcsrv.o:
+Sys_Cserve_Srom_Init:
+	[00006598] 0xD2BFFFE3 	bsr	$21,.+0x007fff8c
+	[0000659C] 0x46E01417 	or	$23,0x00,$23
+	[000065A0] 0x46FF0400 	or	$23,$31,$0
+	[000065A4] 0x7BFF8000 	hw_rei	
+Sys_Cserve_Srom_Putc:
+	[000065A8] 0x467F0417 	or	$19,$31,$23
+	[000065AC] 0xD2DFFFC3 	bsr	$22,.+0x007fff0c
+	[000065B0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve_Srom_Getc:
+	[000065B8] 0x467F0417 	or	$19,$31,$23
+	[000065BC] 0xD2DFFFA7 	bsr	$22,.+0x007ffe9c
+	[000065C0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+/sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/platform.o:
+Sys_Reset:
+	[000065C8] 0x243F1F1E 	ldah	$1,0x1f1e($31)
+	[000065CC] 0x20211615 	lda	$1,0x1615($1)
+	[000065D0] 0x48241721 	sll	$1,0x20,$1
+	[000065D4] 0x273F1502 	ldah	$25,0x1502($31)
+	[000065D8] 0x23390100 	lda	$25,0x0100($25)
+	[000065DC] 0x44390401 	or	$1,$25,$1
+	[000065E0] 0x74210148 	hw_mtpr/a	$1,$8
+	[000065E4] 0x658C0143 	hw_mfpr/a	$12,$3
+	[000065E8] 0x204C0418 	lda	$2,0x0418($12)
+	[000065EC] 0x6C229130 	hw_ld/pq	$1,0x0130($2)
+	[000065F0] 0x48221681 	srl	$1,0x10,$1
+	[000065F4] 0x259F0001 	ldah	$12,0x0001($31)
+	[000065F8] 0x218CDECB 	lda	$12,0xdecb($12)
+	[000065FC] 0x418105AC 	cmpeq	$12,$1,$12
+	[00006600] 0xE5800015 	beq	$12,.+0x00000054
+	[00006604] 0x6C2290F8 	hw_ld/pq	$1,0x00f8($2)
+	[00006608] 0x259F0001 	ldah	$12,0x0001($31)
+	[0000660C] 0x218C8010 	lda	$12,0x8010($12)
+	[00006610] 0x442C0410 	or	$1,$12,$16
+	[00006614] 0x46005110 	andnot	$16,0x02,$16
+	[00006618] 0x7E0290F8 	hw_st/pq	$16,0x00f8($2)
+	[0000661C] 0x241FFFF0 	ldah	$0,0xfff0($31)
+	[00006620] 0x481C1600 	zap	$0,0xe0,$0
+	[00006624] 0x6E229100 	hw_ld/pq	$17,0x0100($2)
+	[00006628] 0x211F0001 	lda	$8,0x0001($31)
+	[0000662C] 0x4904F728 	sll	$8,0x27,$8
+	[00006630] 0x213F0075 	lda	$9,0x0075($31)
+	[00006634] 0x49239729 	sll	$9,0x1c,$9
+	[00006638] 0x45280409 	or	$9,$8,$9
+	[0000663C] 0x6E698000 	hw_ld/p	$19,0x0000($9)
+	[00006640] 0x215F0075 	lda	$10,0x0075($31)
+	[00006644] 0x4943972A 	sll	$10,0x1c,$10
+	[00006648] 0x214A0200 	lda	$10,0x0200($10)
+	[0000664C] 0x4548040A 	or	$10,$8,$10
+	[00006650] 0x6E8A8000 	hw_ld/p	$20,0x0000($10)
+pvc$osf81$5080:
+	[00006654] 0xD1C00244 	bsr	$14,.+0x00000910
+	[00006658] 0x243F5800 	ldah	$1,0x5800($31)
+	[0000665C] 0x20210140 	lda	$1,0x0140($1)
+	[00006660] 0x48209721 	sll	$1,0x04,$1
+	[00006664] 0x233F0001 	lda	$25,0x0001($31)
+	[00006668] 0x4B24F739 	sll	$25,0x27,$25
+	[0000666C] 0x44390401 	or	$1,$25,$1
+	[00006670] 0x233F0011 	lda	$25,0x0011($31)
+	[00006674] 0x4B201179 	insbl	$25,0x00,$25
+	[00006678] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[0000667C] 0x60004000 	mb	
+	[00006680] 0x60004000 	mb	
+	[00006684] 0x243F5800 	ldah	$1,0x5800($31)
+	[00006688] 0x20210142 	lda	$1,0x0142($1)
+	[0000668C] 0x48209721 	sll	$1,0x04,$1
+	[00006690] 0x233F0001 	lda	$25,0x0001($31)
+	[00006694] 0x4B24F739 	sll	$25,0x27,$25
+	[00006698] 0x44390401 	or	$1,$25,$1
+	[0000669C] 0x233F0008 	lda	$25,0x0008($31)
+	[000066A0] 0x4B203179 	insbl	$25,0x01,$25
+	[000066A4] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[000066A8] 0x60004000 	mb	
+	[000066AC] 0x60004000 	mb	
+	[000066B0] 0x243F5800 	ldah	$1,0x5800($31)
+	[000066B4] 0x20210142 	lda	$1,0x0142($1)
+	[000066B8] 0x48209721 	sll	$1,0x04,$1
+	[000066BC] 0x233F0001 	lda	$25,0x0001($31)
+	[000066C0] 0x4B24F739 	sll	$25,0x27,$25
+	[000066C4] 0x44390401 	or	$1,$25,$1
+	[000066C8] 0x233F0002 	lda	$25,0x0002($31)
+	[000066CC] 0x4B203179 	insbl	$25,0x01,$25
+	[000066D0] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[000066D4] 0x60004000 	mb	
+	[000066D8] 0x60004000 	mb	
+	[000066DC] 0x243F5800 	ldah	$1,0x5800($31)
+	[000066E0] 0x20210142 	lda	$1,0x0142($1)
+	[000066E4] 0x48209721 	sll	$1,0x04,$1
+	[000066E8] 0x233F0001 	lda	$25,0x0001($31)
+	[000066EC] 0x4B24F739 	sll	$25,0x27,$25
+	[000066F0] 0x44390401 	or	$1,$25,$1
+	[000066F4] 0x233F0001 	lda	$25,0x0001($31)
+	[000066F8] 0x4B203179 	insbl	$25,0x01,$25
+	[000066FC] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[00006700] 0x60004000 	mb	
+	[00006704] 0x60004000 	mb	
+	[00006708] 0x243F5800 	ldah	$1,0x5800($31)
+	[0000670C] 0x20210142 	lda	$1,0x0142($1)
+	[00006710] 0x48209721 	sll	$1,0x04,$1
+	[00006714] 0x233F0001 	lda	$25,0x0001($31)
+	[00006718] 0x4B24F739 	sll	$25,0x27,$25
+	[0000671C] 0x44390401 	or	$1,$25,$1
+	[00006720] 0x233F00FF 	lda	$25,0x00ff($31)
+	[00006724] 0x4B203179 	insbl	$25,0x01,$25
+	[00006728] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[0000672C] 0x60004000 	mb	
+	[00006730] 0x60004000 	mb	
+	[00006734] 0x243F5800 	ldah	$1,0x5800($31)
+	[00006738] 0x20210040 	lda	$1,0x0040($1)
+	[0000673C] 0x48209721 	sll	$1,0x04,$1
+	[00006740] 0x233F0001 	lda	$25,0x0001($31)
+	[00006744] 0x4B24F739 	sll	$25,0x27,$25
+	[00006748] 0x44390401 	or	$1,$25,$1
+	[0000674C] 0x233F0011 	lda	$25,0x0011($31)
+	[00006750] 0x4B201179 	insbl	$25,0x00,$25
+	[00006754] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[00006758] 0x60004000 	mb	
+	[0000675C] 0x60004000 	mb	
+	[00006760] 0x243F5800 	ldah	$1,0x5800($31)
+	[00006764] 0x20210042 	lda	$1,0x0042($1)
+	[00006768] 0x48209721 	sll	$1,0x04,$1
+	[0000676C] 0x233F0001 	lda	$25,0x0001($31)
+	[00006770] 0x4B24F739 	sll	$25,0x27,$25
+	[00006774] 0x44390401 	or	$1,$25,$1
+	[00006778] 0x233F0000 	lda	$25,0x0000($31)
+	[0000677C] 0x4B203179 	insbl	$25,0x01,$25
+	[00006780] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[00006784] 0x60004000 	mb	
+	[00006788] 0x60004000 	mb	
+	[0000678C] 0x243F5800 	ldah	$1,0x5800($31)
+	[00006790] 0x20210042 	lda	$1,0x0042($1)
+	[00006794] 0x48209721 	sll	$1,0x04,$1
+	[00006798] 0x233F0001 	lda	$25,0x0001($31)
+	[0000679C] 0x4B24F739 	sll	$25,0x27,$25
+	[000067A0] 0x44390401 	or	$1,$25,$1
+	[000067A4] 0x233F0004 	lda	$25,0x0004($31)
+	[000067A8] 0x4B203179 	insbl	$25,0x01,$25
+	[000067AC] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[000067B0] 0x60004000 	mb	
+	[000067B4] 0x60004000 	mb	
+	[000067B8] 0x243F5800 	ldah	$1,0x5800($31)
+	[000067BC] 0x20210042 	lda	$1,0x0042($1)
+	[000067C0] 0x48209721 	sll	$1,0x04,$1
+	[000067C4] 0x233F0001 	lda	$25,0x0001($31)
+	[000067C8] 0x4B24F739 	sll	$25,0x27,$25
+	[000067CC] 0x44390401 	or	$1,$25,$1
+	[000067D0] 0x233F0001 	lda	$25,0x0001($31)
+	[000067D4] 0x4B203179 	insbl	$25,0x01,$25
+	[000067D8] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[000067DC] 0x60004000 	mb	
+	[000067E0] 0x60004000 	mb	
+	[000067E4] 0x243F5800 	ldah	$1,0x5800($31)
+	[000067E8] 0x20210042 	lda	$1,0x0042($1)
+	[000067EC] 0x48209721 	sll	$1,0x04,$1
+	[000067F0] 0x233F0001 	lda	$25,0x0001($31)
+	[000067F4] 0x4B24F739 	sll	$25,0x27,$25
+	[000067F8] 0x44390401 	or	$1,$25,$1
+	[000067FC] 0x233F00FF 	lda	$25,0x00ff($31)
+	[00006800] 0x4B203179 	insbl	$25,0x01,$25
+	[00006804] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[00006808] 0x60004000 	mb	
+	[0000680C] 0x60004000 	mb	
+	[00006810] 0x243F7200 	ldah	$1,0x7200($31)
+	[00006814] 0x20210000 	lda	$1,0x0000($1)
+	[00006818] 0x48209721 	sll	$1,0x04,$1
+	[0000681C] 0x233F0001 	lda	$25,0x0001($31)
+	[00006820] 0x4B24F739 	sll	$25,0x27,$25
+	[00006824] 0x44390401 	or	$1,$25,$1
+	[00006828] 0x6C218000 	hw_ld/p	$1,0x0000($1)
+	[0000682C] 0x48201681 	srl	$1,0x00,$1
+	[00006830] 0x483FD601 	zap	$1,0xfe,$1
+	[00006834] 0x243F5800 	ldah	$1,0x5800($31)
+	[00006838] 0x20210140 	lda	$1,0x0140($1)
+	[0000683C] 0x48209721 	sll	$1,0x04,$1
+	[00006840] 0x233F0001 	lda	$25,0x0001($31)
+	[00006844] 0x4B24F739 	sll	$25,0x27,$25
+	[00006848] 0x44390401 	or	$1,$25,$1
+	[0000684C] 0x233F0020 	lda	$25,0x0020($31)
+	[00006850] 0x4B201179 	insbl	$25,0x00,$25
+	[00006854] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[00006858] 0x60004000 	mb	
+	[0000685C] 0x60004000 	mb	
+	[00006860] 0x243F5800 	ldah	$1,0x5800($31)
+	[00006864] 0x20210040 	lda	$1,0x0040($1)
+	[00006868] 0x48209721 	sll	$1,0x04,$1
+	[0000686C] 0x233F0001 	lda	$25,0x0001($31)
+	[00006870] 0x4B24F739 	sll	$25,0x27,$25
+	[00006874] 0x44390401 	or	$1,$25,$1
+	[00006878] 0x233F0020 	lda	$25,0x0020($31)
+	[0000687C] 0x4B201179 	insbl	$25,0x00,$25
+	[00006880] 0x7F218000 	hw_st/p	$25,0x0000($1)
+	[00006884] 0x60004000 	mb	
+	[00006888] 0x60004000 	mb	
+	[0000688C] 0x203F0001 	lda	$1,0x0001($31)
+	[00006890] 0x4824F721 	sll	$1,0x27,$1
+	[00006894] 0x233F0074 	lda	$25,0x0074($31)
+	[00006898] 0x4B239739 	sll	$25,0x1c,$25
+	[0000689C] 0x23390100 	lda	$25,0x0100($25)
+	[000068A0] 0x47210419 	or	$25,$1,$25
+	[000068A4] 0x243F0000 	ldah	$1,0x0000($31)
+	[000068A8] 0x20211C00 	lda	$1,0x1c00($1)
+	[000068AC] 0x6C598000 	hw_ld/p	$2,0x0000($25)
+	[000068B0] 0x44410102 	andnot	$2,$1,$2
+	[000068B4] 0x7C598000 	hw_st/p	$2,0x0000($25)
+pvc$osf41$5010.1:
+	[000068B8] 0x6BED8000 	ret	$31,($13),.+0x000000
+Sys_ResetViaSwppal:
+	[000068BC] 0x243F1F1E 	ldah	$1,0x1f1e($31)
+	[000068C0] 0x20211615 	lda	$1,0x1615($1)
+	[000068C4] 0x48241721 	sll	$1,0x20,$1
+	[000068C8] 0x273F1502 	ldah	$25,0x1502($31)
+	[000068CC] 0x23390100 	lda	$25,0x0100($25)
+	[000068D0] 0x44390401 	or	$1,$25,$1
+	[000068D4] 0x74210148 	hw_mtpr/a	$1,$8
+pvc$osf48$5060.1:
+	[000068D8] 0x6BE08000 	ret	$31,($0),.+0x000000
+		:
+	zero locations skipped
+		:
+Sys_Interrupt:
+	[000068E0] 0x41A2F5AC 	cmpeq	$13,0x17,$12
+	[000068E4] 0xF5800008 	bne	$12,.+0x00000020
+	[000068E8] 0x41A2D5AC 	cmpeq	$13,0x16,$12
+	[000068EC] 0xF5800008 	bne	$12,.+0x00000020
+	[000068F0] 0x41A2B5AC 	cmpeq	$13,0x15,$12
+	[000068F4] 0xF5800024 	bne	$12,.+0x00000090
+	[000068F8] 0x41A295AC 	cmpeq	$13,0x14,$12
+	[000068FC] 0xF580002E 	bne	$12,.+0x000000b8
+	[00006900] 0x47FF041F 	or	$31,$31,$31
+	[00006904] 0xC3FFF1AE 	br	$31,.+0x007fc6b8
+Int23Handler:
+	[00006908] 0x47FF041F 	or	$31,$31,$31
+	[0000690C] 0xC3E00030 	br	$31,.+0x000000c0
+Int22Handler:
+	[00006910] 0x658C0148 	hw_mfpr/a	$12,$8
+	[00006914] 0x4980B0CD 	extbl	$12,0x05,$13
+	[00006918] 0x47E0B40B 	or	$31,0x05,$11
+	[0000691C] 0x75AD0110 	hw_mtpr	$13,0x00
+	[00006920] 0x658C014B 	hw_mfpr/a	$12,$11
+	[00006924] 0x25DF5800 	ldah	$14,0x5800($31)
+	[00006928] 0x21CE00E0 	lda	$14,0x00e0($14)
+	[0000692C] 0x49C0972E 	sll	$14,0x04,$14
+	[00006930] 0x233F0001 	lda	$25,0x0001($31)
+	[00006934] 0x4B24F739 	sll	$25,0x27,$25
+	[00006938] 0x45D9040E 	or	$14,$25,$14
+	[0000693C] 0x233F000C 	lda	$25,0x000c($31)
+	[00006940] 0x4B201179 	insbl	$25,0x00,$25
+	[00006944] 0x7F2E8000 	hw_st/p	$25,0x0000($14)
+	[00006948] 0x60004000 	mb	
+	[0000694C] 0x60004000 	mb	
+	[00006950] 0x25DF5800 	ldah	$14,0x5800($31)
+	[00006954] 0x21CE00E2 	lda	$14,0x00e2($14)
+	[00006958] 0x49C0972E 	sll	$14,0x04,$14
+	[0000695C] 0x233F0001 	lda	$25,0x0001($31)
+	[00006960] 0x4B24F739 	sll	$25,0x27,$25
+	[00006964] 0x45D9040E 	or	$14,$25,$14
+	[00006968] 0x6DCE8000 	hw_ld/p	$14,0x0000($14)
+	[0000696C] 0x49C1168E 	srl	$14,0x08,$14
+	[00006970] 0x49DFD60E 	zap	$14,0xfe,$14
+	[00006974] 0x758C010B 	hw_mtpr	$12,0x0b
+	[00006978] 0x47E03410 	or	$31,0x01,$16
+	[0000697C] 0x47FF041F 	or	$31,$31,$31
+	[00006980] 0x47FF041F 	or	$31,$31,$31
+	[00006984] 0x7BFF8000 	hw_rei	
+Int21Handler:
+	[00006988] 0x658C0148 	hw_mfpr/a	$12,$8
+	[0000698C] 0x498070CD 	extbl	$12,0x03,$13
+	[00006990] 0x47E0740B 	or	$31,0x03,$11
+	[00006994] 0x75AD0110 	hw_mtpr	$13,0x00
+	[00006998] 0x658C014B 	hw_mfpr/a	$12,$11
+	[0000699C] 0x223F0800 	lda	$17,0x0800($31)
+	[000069A0] 0x758C010B 	hw_mtpr	$12,0x0b
+	[000069A4] 0x47E07410 	or	$31,0x03,$16
+	[000069A8] 0x47FF041F 	or	$31,$31,$31
+	[000069AC] 0x47FF041F 	or	$31,$31,$31
+	[000069B0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Int20Handler:
+	[000069B8] 0x658C0148 	hw_mfpr/a	$12,$8
+	[000069BC] 0x4980F0CD 	extbl	$12,0x07,$13
+	[000069C0] 0x47E0F40B 	or	$31,0x07,$11
+	[000069C4] 0x75AD0110 	hw_mtpr	$13,0x00
+	[000069C8] 0x21DF021E 	lda	$14,0x021e($31)
+	[000069CC] 0xC3E0004E 	br	$31,.+0x00000138
+DismissInterrupt:
+	[000069D0] 0x47FF041F 	or	$31,$31,$31
+	[000069D4] 0xC3FFF17A 	br	$31,.+0x007fc5e8
+Sys_IntMchkHandler:
+	[000069D8] 0x259F5800 	ldah	$12,0x5800($31)
+	[000069DC] 0x218C00C2 	lda	$12,0x00c2($12)
+	[000069E0] 0x4980972C 	sll	$12,0x04,$12
+	[000069E4] 0x233F0001 	lda	$25,0x0001($31)
+	[000069E8] 0x4B24F739 	sll	$25,0x27,$25
+	[000069EC] 0x4599040C 	or	$12,$25,$12
+	[000069F0] 0x6D8C8000 	hw_ld/p	$12,0x0000($12)
+	[000069F4] 0x4981168C 	srl	$12,0x08,$12
+	[000069F8] 0x499FD60C 	zap	$12,0xfe,$12
+	[000069FC] 0x4980F68D 	srl	$12,0x07,$13
+	[00006A00] 0xE1A0001F 	blbc	$13,.+0x0000007c
+	[00006A04] 0x4980568D 	srl	$12,0x02,$13
+	[00006A08] 0xF1A0001D 	blbs	$13,.+0x00000074
+	[00006A0C] 0x4580940D 	or	$12,0x04,$13
+	[00006A10] 0x45A1F00D 	and	$13,0x0f,$13
+	[00006A14] 0x25DF5800 	ldah	$14,0x5800($31)
+	[00006A18] 0x21CE00C2 	lda	$14,0x00c2($14)
+	[00006A1C] 0x49C0972E 	sll	$14,0x04,$14
+	[00006A20] 0x233F0001 	lda	$25,0x0001($31)
+	[00006A24] 0x4B24F739 	sll	$25,0x27,$25
+	[00006A28] 0x45D9040E 	or	$14,$25,$14
+	[00006A2C] 0x45BFF019 	and	$13,0xff,$25
+	[00006A30] 0x4B203179 	insbl	$25,0x01,$25
+	[00006A34] 0x7F2E8000 	hw_st/p	$25,0x0000($14)
+	[00006A38] 0x60004000 	mb	
+	[00006A3C] 0x60004000 	mb	
+	[00006A40] 0x47EC040D 	or	$31,$12,$13
+	[00006A44] 0x45A1F00D 	and	$13,0x0f,$13
+	[00006A48] 0x25DF5800 	ldah	$14,0x5800($31)
+	[00006A4C] 0x21CE00C2 	lda	$14,0x00c2($14)
+	[00006A50] 0x49C0972E 	sll	$14,0x04,$14
+	[00006A54] 0x233F0001 	lda	$25,0x0001($31)
+	[00006A58] 0x4B24F739 	sll	$25,0x27,$25
+	[00006A5C] 0x45D9040E 	or	$14,$25,$14
+	[00006A60] 0x45BFF019 	and	$13,0xff,$25
+	[00006A64] 0x4B203179 	insbl	$25,0x01,$25
+	[00006A68] 0x7F2E8000 	hw_st/p	$25,0x0000($14)
+	[00006A6C] 0x60004000 	mb	
+	[00006A70] 0x60004000 	mb	
+	[00006A74] 0x21DF0204 	lda	$14,0x0204($31)
+	[00006A78] 0xC3E00023 	br	$31,.+0x0000008c
+		:
+	zero locations skipped
+		:
+	[00006A80] 0x4980D68D 	srl	$12,0x06,$13
+	[00006A84] 0xE1A0001E 	blbc	$13,.+0x00000078
+	[00006A88] 0x4980768D 	srl	$12,0x03,$13
+	[00006A8C] 0xF1A0001C 	blbs	$13,.+0x00000070
+	[00006A90] 0x4581140D 	or	$12,0x08,$13
+	[00006A94] 0x45A1F00D 	and	$13,0x0f,$13
+	[00006A98] 0x25DF5800 	ldah	$14,0x5800($31)
+	[00006A9C] 0x21CE00C2 	lda	$14,0x00c2($14)
+	[00006AA0] 0x49C0972E 	sll	$14,0x04,$14
+	[00006AA4] 0x233F0001 	lda	$25,0x0001($31)
+	[00006AA8] 0x4B24F739 	sll	$25,0x27,$25
+	[00006AAC] 0x45D9040E 	or	$14,$25,$14
+	[00006AB0] 0x45BFF019 	and	$13,0xff,$25
+	[00006AB4] 0x4B203179 	insbl	$25,0x01,$25
+	[00006AB8] 0x7F2E8000 	hw_st/p	$25,0x0000($14)
+	[00006ABC] 0x60004000 	mb	
+	[00006AC0] 0x60004000 	mb	
+	[00006AC4] 0x47EC040D 	or	$31,$12,$13
+	[00006AC8] 0x45A1F00D 	and	$13,0x0f,$13
+	[00006ACC] 0x25DF5800 	ldah	$14,0x5800($31)
+	[00006AD0] 0x21CE00C2 	lda	$14,0x00c2($14)
+	[00006AD4] 0x49C0972E 	sll	$14,0x04,$14
+	[00006AD8] 0x233F0001 	lda	$25,0x0001($31)
+	[00006ADC] 0x4B24F739 	sll	$25,0x27,$25
+	[00006AE0] 0x45D9040E 	or	$14,$25,$14
+	[00006AE4] 0x45BFF019 	and	$13,0xff,$25
+	[00006AE8] 0x4B203179 	insbl	$25,0x01,$25
+	[00006AEC] 0x7F2E8000 	hw_st/p	$25,0x0000($14)
+	[00006AF0] 0x60004000 	mb	
+	[00006AF4] 0x60004000 	mb	
+	[00006AF8] 0x21DF0206 	lda	$14,0x0206($31)
+	[00006AFC] 0xC3E00002 	br	$31,.+0x00000008
+	[00006B00] 0x21DF0202 	lda	$14,0x0202($31)
+	[00006B04] 0xC3E00000 	br	$31,.+0x00000000
+Sys_IntMchkHandlerMerge:
+	[00006B08] 0x658C010B 	hw_mfpr	$12,0x0b
+	[00006B0C] 0x41C0340E 	addq	$14,0x01,$14
+	[00006B10] 0x49C4172E 	sll	$14,0x20,$14
+	[00006B14] 0x758C014A 	hw_mtpr/a	$12,$10
+	[00006B18] 0x658C0150 	hw_mfpr/a	$12,$16
+	[00006B1C] 0x74000140 	hw_mtpr/a	$0,$0
+	[00006B20] 0x4987960C 	zap	$12,0x3c,$12
+	[00006B24] 0xF19FFBE2 	blbs	$12,.+0x007fef88
+	[00006B28] 0x458E040C 	or	$12,$14,$12
+	[00006B2C] 0x21DF0660 	lda	$14,0x0660($31)
+	[00006B30] 0x49C2172E 	sll	$14,0x10,$14
+	[00006B34] 0x458E040E 	or	$12,$14,$14
+	[00006B38] 0x45C0340E 	or	$14,0x01,$14
+	[00006B3C] 0x75CE0150 	hw_mtpr/a	$14,$16
+	[00006B40] 0x25DFFFF0 	ldah	$14,0xfff0($31)
+	[00006B44] 0x74210141 	hw_mtpr/a	$1,$1
+	[00006B48] 0x49DC160E 	zap	$14,0xe0,$14
+	[00006B4C] 0x74840144 	hw_mtpr/a	$4,$4
+	[00006B50] 0x74A50145 	hw_mtpr/a	$5,$5
+	[00006B54] 0x74C60146 	hw_mtpr/a	$6,$6
+	[00006B58] 0xC3FFFBBE 	br	$31,.+0x007feef8
+		:
+	zero locations skipped
+		:
+Sys_MchkLogOut:
+	[00006B68] 0x25BF0874 	ldah	$13,0x0874($31)
+	[00006B6C] 0x21AD0008 	lda	$13,0x0008($13)
+	[00006B70] 0x49A1972D 	sll	$13,0x0c,$13
+	[00006B74] 0x6F2D8000 	hw_ld/p	$25,0x0000($13)
+	[00006B78] 0x7F2E9160 	hw_st/pq	$25,0x0160($14)
+	[00006B7C] 0x232D0040 	lda	$25,0x0040($13)
+	[00006B80] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006B84] 0x7F2E9168 	hw_st/pq	$25,0x0168($14)
+	[00006B88] 0x232D0200 	lda	$25,0x0200($13)
+	[00006B8C] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006B90] 0x7F2E9170 	hw_st/pq	$25,0x0170($14)
+	[00006B94] 0x232D0240 	lda	$25,0x0240($13)
+	[00006B98] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006B9C] 0x7F2E9178 	hw_st/pq	$25,0x0178($14)
+	[00006BA0] 0x232D0280 	lda	$25,0x0280($13)
+	[00006BA4] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006BA8] 0x7F2E9180 	hw_st/pq	$25,0x0180($14)
+	[00006BAC] 0x232D0300 	lda	$25,0x0300($13)
+	[00006BB0] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006BB4] 0x7F2E9188 	hw_st/pq	$25,0x0188($14)
+	[00006BB8] 0x232D0400 	lda	$25,0x0400($13)
+	[00006BBC] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006BC0] 0x7F2E9190 	hw_st/pq	$25,0x0190($14)
+	[00006BC4] 0x232D0440 	lda	$25,0x0440($13)
+	[00006BC8] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006BCC] 0x7F2E9198 	hw_st/pq	$25,0x0198($14)
+	[00006BD0] 0x232D0800 	lda	$25,0x0800($13)
+	[00006BD4] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006BD8] 0x7F2E91A0 	hw_st/pq	$25,0x01a0($14)
+	[00006BDC] 0x232D0840 	lda	$25,0x0840($13)
+	[00006BE0] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006BE4] 0x7F2E91A8 	hw_st/pq	$25,0x01a8($14)
+	[00006BE8] 0x232D0880 	lda	$25,0x0880($13)
+	[00006BEC] 0x6F398000 	hw_ld/p	$25,0x0000($25)
+	[00006BF0] 0x7F2E91B0 	hw_st/pq	$25,0x01b0($14)
+pvc$osf42$5050.1:
+	[00006BF4] 0x6BE08000 	ret	$31,($0),.+0x000000
+		:
+	zero locations skipped
+		:
+Sys_Cflush:
+	[00006C08] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_WrIpir:
+	[00006C28] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve:
+	[00006C48] 0x424035A0 	cmpeq	$18,0x01,$0
+	[00006C4C] 0xF400001E 	bne	$0,.+0x00000078
+	[00006C50] 0x424055A0 	cmpeq	$18,0x02,$0
+	[00006C54] 0xF400001E 	bne	$0,.+0x00000078
+	[00006C58] 0x424135A0 	cmpeq	$18,0x09,$0
+	[00006C5C] 0xF400001E 	bne	$0,.+0x00000078
+	[00006C60] 0x424155A0 	cmpeq	$18,0x0a,$0
+	[00006C64] 0xF400006A 	bne	$0,.+0x000001a8
+	[00006C68] 0x424175A0 	cmpeq	$18,0x0b,$0
+	[00006C6C] 0xF400006C 	bne	$0,.+0x000001b0
+	[00006C70] 0x4241F5A0 	cmpeq	$18,0x0f,$0
+	[00006C74] 0xF400006C 	bne	$0,.+0x000001b0
+	[00006C78] 0x424215A0 	cmpeq	$18,0x10,$0
+	[00006C7C] 0xF4000084 	bne	$0,.+0x00000210
+	[00006C80] 0x424235A0 	cmpeq	$18,0x11,$0
+	[00006C84] 0xF4000080 	bne	$0,.+0x00000200
+	[00006C88] 0x424255A0 	cmpeq	$18,0x12,$0
+	[00006C8C] 0xF400008A 	bne	$0,.+0x00000228
+	[00006C90] 0x424275A0 	cmpeq	$18,0x13,$0
+	[00006C94] 0xF400008E 	bne	$0,.+0x00000238
+	[00006C98] 0x4242D5A0 	cmpeq	$18,0x16,$0
+	[00006C9C] 0xF4000098 	bne	$0,.+0x00000260
+	[00006CA0] 0x4242F5A0 	cmpeq	$18,0x17,$0
+	[00006CA4] 0xF4000090 	bne	$0,.+0x00000240
+	[00006CA8] 0x424315A0 	cmpeq	$18,0x18,$0
+	[00006CAC] 0xF41FFE3A 	bne	$0,.+0x007ff8e8
+	[00006CB0] 0x424335A0 	cmpeq	$18,0x19,$0
+	[00006CB4] 0xF41FFE3C 	bne	$0,.+0x007ff8f0
+	[00006CB8] 0x424415A0 	cmpeq	$18,0x20,$0
+	[00006CBC] 0xF41FFE3E 	bne	$0,.+0x007ff8f8
+	[00006CC0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve_Ldqp:
+	[00006CC8] 0x6C109000 	hw_ld/pq	$0,0x0000($16)
+	[00006CCC] 0x7BFF8000 	hw_rei	
+Sys_Cserve_Stqp:
+	[00006CD0] 0x7E309000 	hw_st/pq	$17,0x0000($16)
+	[00006CD4] 0x7BFF8000 	hw_rei	
+Sys_Cserve_Jtopal:
+	[00006CD8] 0x46007116 	andnot	$16,0x03,$22
+	[00006CDC] 0x46C03416 	or	$22,0x01,$22
+	[00006CE0] 0x66F70143 	hw_mfpr/a	$23,$3
+	[00006CE4] 0x22F70418 	lda	$23,0x0418($23)
+	[00006CE8] 0x6E779130 	hw_ld/pq	$19,0x0130($23)
+	[00006CEC] 0x4A621681 	srl	$19,0x10,$1
+	[00006CF0] 0x483F9601 	zap	$1,0xfc,$1
+	[00006CF4] 0x271F0001 	ldah	$24,0x0001($31)
+	[00006CF8] 0x2318DECB 	lda	$24,0xdecb($24)
+	[00006CFC] 0x403805A1 	cmpeq	$1,$24,$1
+	[00006D00] 0xE020000B 	blbc	$1,.+0x0000002c
+	[00006D04] 0x6C3790F8 	hw_ld/pq	$1,0x00f8($23)
+	[00006D08] 0x6C579100 	hw_ld/pq	$2,0x0100($23)
+	[00006D0C] 0x6C779148 	hw_ld/pq	$3,0x0148($23)
+	[00006D10] 0x6DF79110 	hw_ld/pq	$15,0x0110($23)
+	[00006D14] 0x6E179118 	hw_ld/pq	$16,0x0118($23)
+	[00006D18] 0x6E379120 	hw_ld/pq	$17,0x0120($23)
+	[00006D1C] 0x6E579128 	hw_ld/pq	$18,0x0128($23)
+	[00006D20] 0x6E979138 	hw_ld/pq	$20,0x0138($23)
+	[00006D24] 0x6EB79140 	hw_ld/pq	$21,0x0140($23)
+	[00006D28] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006D2C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006D30] 0x77FF0150 	hw_mtpr/a	$31,$16
+	[00006D34] 0x76D6010B 	hw_mtpr	$22,0x0b
+	[00006D38] 0xC3E00003 	br	$31,.+0x0000000c
+		:
+	zero locations skipped
+		:
+	[00006D48] 0x47FF041F 	or	$31,$31,$31
+	[00006D4C] 0x77FF0119 	hw_mtpr	$31,0x09
+	[00006D50] 0x47FF041F 	or	$31,$31,$31
+	[00006D54] 0x47FF041F 	or	$31,$31,$31
+	[00006D58] 0x47FF041F 	or	$31,$31,$31
+	[00006D5C] 0x47FF041F 	or	$31,$31,$31
+	[00006D60] 0x47FF041F 	or	$31,$31,$31
+	[00006D64] 0x47FF041F 	or	$31,$31,$31
+	[00006D68] 0x47FF041F 	or	$31,$31,$31
+	[00006D6C] 0x47FF041F 	or	$31,$31,$31
+	[00006D70] 0x47FF041F 	or	$31,$31,$31
+	[00006D74] 0x47FF041F 	or	$31,$31,$31
+	[00006D78] 0x47FF041F 	or	$31,$31,$31
+	[00006D7C] 0x47FF041F 	or	$31,$31,$31
+	[00006D80] 0x47FF041F 	or	$31,$31,$31
+	[00006D84] 0x47FF041F 	or	$31,$31,$31
+	[00006D88] 0x47FF041F 	or	$31,$31,$31
+	[00006D8C] 0x47FF041F 	or	$31,$31,$31
+	[00006D90] 0x47FF041F 	or	$31,$31,$31
+	[00006D94] 0x47FF041F 	or	$31,$31,$31
+	[00006D98] 0x47FF041F 	or	$31,$31,$31
+	[00006D9C] 0x47FF041F 	or	$31,$31,$31
+	[00006DA0] 0x47FF041F 	or	$31,$31,$31
+	[00006DA4] 0x47FF041F 	or	$31,$31,$31
+	[00006DA8] 0x47FF041F 	or	$31,$31,$31
+	[00006DAC] 0x47FF041F 	or	$31,$31,$31
+	[00006DB0] 0x47FF041F 	or	$31,$31,$31
+	[00006DB4] 0x47FF041F 	or	$31,$31,$31
+	[00006DB8] 0x47FF041F 	or	$31,$31,$31
+	[00006DBC] 0x47FF041F 	or	$31,$31,$31
+	[00006DC0] 0x47FF041F 	or	$31,$31,$31
+	[00006DC4] 0x47FF041F 	or	$31,$31,$31
+	[00006DC8] 0x47FF041F 	or	$31,$31,$31
+	[00006DCC] 0x47FF041F 	or	$31,$31,$31
+	[00006DD0] 0x47FF041F 	or	$31,$31,$31
+	[00006DD4] 0x47FF041F 	or	$31,$31,$31
+	[00006DD8] 0x47FF041F 	or	$31,$31,$31
+	[00006DDC] 0x47FF041F 	or	$31,$31,$31
+	[00006DE0] 0x47FF041F 	or	$31,$31,$31
+	[00006DE4] 0x47FF041F 	or	$31,$31,$31
+	[00006DE8] 0x47FF041F 	or	$31,$31,$31
+	[00006DEC] 0x47FF041F 	or	$31,$31,$31
+	[00006DF0] 0x47FF041F 	or	$31,$31,$31
+	[00006DF4] 0x47FF041F 	or	$31,$31,$31
+	[00006DF8] 0x47FF041F 	or	$31,$31,$31
+	[00006DFC] 0x47FF041F 	or	$31,$31,$31
+	[00006E00] 0x47FF041F 	or	$31,$31,$31
+	[00006E04] 0x47FF041F 	or	$31,$31,$31
+	[00006E08] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve_Wr_Int:
+	[00006E10] 0x76100148 	hw_mtpr/a	$16,$8
+	[00006E14] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006E18] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006E1C] 0x7BFF8000 	hw_rei	
+Sys_Cserve_Rd_Impure:
+	[00006E20] 0x64000143 	hw_mfpr/a	$0,$3
+	[00006E24] 0x7BFF8000 	hw_rei	
+Sys_Cserve_Putc:
+	[00006E28] 0x251F5800 	ldah	$8,0x5800($31)
+	[00006E2C] 0x210807FA 	lda	$8,0x07fa($8)
+	[00006E30] 0x49009728 	sll	$8,0x04,$8
+	[00006E34] 0x233F0001 	lda	$25,0x0001($31)
+	[00006E38] 0x4B24F739 	sll	$25,0x27,$25
+	[00006E3C] 0x45190408 	or	$8,$25,$8
+	[00006E40] 0x6D088000 	hw_ld/p	$8,0x0000($8)
+	[00006E44] 0x49011688 	srl	$8,0x08,$8
+	[00006E48] 0x491FD608 	zap	$8,0xfe,$8
+	[00006E4C] 0x4900B688 	srl	$8,0x05,$8
+	[00006E50] 0xE11FFFF5 	blbc	$8,.+0x007fffd4
+	[00006E54] 0x251F5800 	ldah	$8,0x5800($31)
+	[00006E58] 0x210807F0 	lda	$8,0x07f0($8)
+	[00006E5C] 0x49009728 	sll	$8,0x04,$8
+	[00006E60] 0x201F0001 	lda	$0,0x0001($31)
+	[00006E64] 0x4804F720 	sll	$0,0x27,$0
+	[00006E68] 0x45000408 	or	$8,$0,$8
+	[00006E6C] 0x461FF000 	and	$16,0xff,$0
+	[00006E70] 0x48001160 	insbl	$0,0x00,$0
+	[00006E74] 0x7C088000 	hw_st/p	$0,0x0000($8)
+	[00006E78] 0x60004000 	mb	
+	[00006E7C] 0x60004000 	mb	
+	[00006E80] 0x201F0001 	lda	$0,0x0001($31)
+	[00006E84] 0x7BFF8000 	hw_rei	
+Sys_Cserve_Rd_Icsr:
+	[00006E88] 0x64000118 	hw_mfpr	$0,0x08
+	[00006E8C] 0x7BFF8000 	hw_rei	
+Sys_Cserve_Wr_Icsr:
+	[00006E90] 0x251F6000 	ldah	$8,0x6000($31)
+	[00006E94] 0x46080408 	or	$16,$8,$8
+	[00006E98] 0x75080118 	hw_mtpr	$8,0x08
+	[00006E9C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EA0] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EA4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EA8] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EAC] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EB0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve_Rd_BcCtl:
+	[00006EB8] 0x65080143 	hw_mfpr/a	$8,$3
+	[00006EBC] 0x21080418 	lda	$8,0x0418($8)
+	[00006EC0] 0x6C0890F8 	hw_ld/pq	$0,0x00f8($8)
+	[00006EC4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EC8] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve_Rd_BcCfg:
+	[00006ED0] 0x65080143 	hw_mfpr/a	$8,$3
+	[00006ED4] 0x21080418 	lda	$8,0x0418($8)
+	[00006ED8] 0x6C089100 	hw_ld/pq	$0,0x0100($8)
+	[00006EDC] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EE0] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve_Rd_BcCfgOff:
+	[00006EE8] 0x65080143 	hw_mfpr/a	$8,$3
+	[00006EEC] 0x21080418 	lda	$8,0x0418($8)
+	[00006EF0] 0x6C089148 	hw_ld/pq	$0,0x0148($8)
+	[00006EF4] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006EF8] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Sys_Cserve_Wr_Bcache:
+	[00006F00] 0x241FFFF0 	ldah	$0,0xfff0($31)
+	[00006F04] 0x481C1600 	zap	$0,0xe0,$0
+	[00006F08] 0x46005110 	andnot	$16,0x02,$16
+	[00006F0C] 0x211F0001 	lda	$8,0x0001($31)
+	[00006F10] 0x4904F728 	sll	$8,0x27,$8
+	[00006F14] 0x213F0075 	lda	$9,0x0075($31)
+	[00006F18] 0x49239729 	sll	$9,0x1c,$9
+	[00006F1C] 0x45280409 	or	$9,$8,$9
+	[00006F20] 0x215F0075 	lda	$10,0x0075($31)
+	[00006F24] 0x4943972A 	sll	$10,0x1c,$10
+	[00006F28] 0x214A0200 	lda	$10,0x0200($10)
+	[00006F2C] 0x4548040A 	or	$10,$8,$10
+pvc$osf80$5080:
+	[00006F30] 0xD1C0000D 	bsr	$14,.+0x00000034
+	[00006F34] 0x65080143 	hw_mfpr/a	$8,$3
+	[00006F38] 0x21080418 	lda	$8,0x0418($8)
+	[00006F3C] 0x7E0890F8 	hw_st/pq	$16,0x00f8($8)
+	[00006F40] 0x7E289100 	hw_st/pq	$17,0x0100($8)
+	[00006F44] 0x47E03400 	or	$31,0x01,$0
+	[00006F48] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006F4C] 0x67FF0140 	hw_mfpr/a	$31,$0
+	[00006F50] 0x7BFF8000 	hw_rei	
+		:
+	zero locations skipped
+		:
+Wr_Bcache:
+	[00006F68] 0x47FF041F 	or	$31,$31,$31
+	[00006F6C] 0x47FF041F 	or	$31,$31,$31
+	[00006F70] 0x219F0064 	lda	$12,0x0064($31)
+	[00006F74] 0x4180352C 	subq	$12,0x01,$12
+	[00006F78] 0xFD800003 	bgt	$12,.+0x0000000c
+	[00006F7C] 0x60004000 	mb	
+	[00006F80] 0x7E009128 	hw_st/pq	$16,0x0128($0)
+	[00006F84] 0x60004000 	mb	
+	[00006F88] 0xFD800003 	bgt	$12,.+0x0000000c
+	[00006F8C] 0x7E2091C8 	hw_st/pq	$17,0x01c8($0)
+	[00006F90] 0x60004000 	mb	
+	[00006F94] 0x7E698000 	hw_st/p	$19,0x0000($9)
+	[00006F98] 0xFD800003 	bgt	$12,.+0x0000000c
+	[00006F9C] 0x60004000 	mb	
+	[00006FA0] 0x7E8A8000 	hw_st/p	$20,0x0000($10)
+	[00006FA4] 0x60004000 	mb	
+	[00006FA8] 0xFD9FFFF2 	bgt	$12,.+0x007fffc8
+pvc$osf80$5080.1:
+	[00006FAC] 0x6BEE8000 	ret	$31,($14),.+0x000000
+		:
+	zero locations skipped
+		:
+Sys_EnterConsole:
+	[00006FC8] 0x74210144 	hw_mtpr/a	$1,$4
+	[00006FCC] 0x74630145 	hw_mtpr/a	$3,$5
+	[00006FD0] 0x64210143 	hw_mfpr/a	$1,$3
+pvc$osf43$5020:
+	[00006FD4] 0xD07FFB62 	bsr	$3,.+0x007fed88
+	[00006FD8] 0x64210154 	hw_mfpr/a	$1,$20
+	[00006FDC] 0x44203401 	or	$1,0x01,$1
+	[00006FE0] 0x74210154 	hw_mtpr/a	$1,$20
+	[00006FE4] 0x27DF0100 	ldah	$30,0x0100($31)
+	[00006FE8] 0x23DEE000 	lda	$30,0xe000($30)
+	[00006FEC] 0x77DE0153 	hw_mtpr/a	$30,$19
+	[00006FF0] 0x217F0007 	lda	$11,0x0007($31)
+	[00006FF4] 0x203F001F 	lda	$1,0x001f($31)
+	[00006FF8] 0x74210110 	hw_mtpr	$1,0x00
+	[00006FFC] 0x77FF010F 	hw_mtpr	$31,0x0f
+	[00007000] 0x77FF0201 	hw_mtpr	$31,0x01
+	[00007004] 0x77FF020A 	hw_mtpr	$31,0x0a
+	[00007008] 0x77FF0105 	hw_mtpr	$31,0x05
+	[0000700C] 0x77FF0109 	hw_mtpr	$31,0x09
+	[00007010] 0x77FF010A 	hw_mtpr	$31,0x0a
+	[00007014] 0x77FF0108 	hw_mtpr	$31,0x08
+	[00007018] 0xC0200001 	br	$1,.+0x00000004
+	[0000701C] 0x00010000 	pal	0x0010000
+	[00007020] 0x6C218000 	hw_ld/p	$1,0x0000($1)
+	[00007024] 0x7421010B 	hw_mtpr	$1,0x0b
+	[00007028] 0x64210144 	hw_mfpr/a	$1,$4
+	[0000702C] 0x64630145 	hw_mfpr/a	$3,$5
+	[00007030] 0x44000401 	or	$0,$0,$1
+	[00007034] 0x7BFFC000 	# BAD INSTRUCTION 0x7bffc000 
+
+Data
+_etext:
+	[0x00007038] 0x3A644924
+	[0x0000703C] 0x66736F20
+	[0x00007040] 0x2E6C6170
+	[0x00007044] 0x20762C73
+	[0x00007048] 0x20322E31
+	[0x0000704C] 0x39393931
+	[0x00007050] 0x2F34302F
+	[0x00007054] 0x32203531
+	[0x00007058] 0x36353A30
+	[0x0000705C] 0x2032323A
+	[0x00007060] 0x61726170
+	[0x00007064] 0x20736964
+	[0x00007068] 0x20707845
+	[0x0000706C] 0x00000024
+	[0x00007070] 0x3A644924
+	[0x00007074] 0x616C7020
+	[0x00007078] 0x726F6674
+	[0x0000707C] 0x2C732E6D
+	[0x00007080] 0x2E312076
+	[0x00007084] 0x2E312E31
+	[0x00007088] 0x39312031
+	[0x0000708C] 0x312F3839
+	[0x00007090] 0x39322F32
+	[0x00007094] 0x3A313220
+	[0x00007098] 0x303A3633
+	[0x0000709C] 0x61702037
+	[0x000070A0] 0x69646172
+	[0x000070A4] 0x78452073
+	[0x000070A8] 0x00242070
+	[000070AC] 0x00000000
+Pal_End:
+		:
+	zero locations skipped
+		:
+Symbols
+	TYPE,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00000000  /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/osfpal.o
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000000  Pal_Base
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000000  Pal_Reset
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005000  ResetContinue
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000080  Pal_iAccVio
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000100  Pal_Interrupt
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005778  HaltHandler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005768  PassiveRelease
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000160  pvc$osf00$354
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005740  InterruptContinue
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000180  Pal_ItbMiss
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000190  Itb_LdVpte
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000054E0  PteInvalid
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000055A0  ItbFoe
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000200  Pal_DtbMiss
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000210  Dtb_LdVpte
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000280  Pal_DoubleMiss
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005620  FakePte
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000300  Pal_Unalign
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005960  MchkBugCheck
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000380  Pal_Dfault
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005660  DfaultContinue
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000400  Pal_Mchk
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000059C0  MchkContinue
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000480  Pal_OpcDec
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000500  Pal_Arith
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00000580  Pal_Fen
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002000  CallPal_Halt
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002018  pvc$osf01$5000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005D20  UpdatePCB
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002040  CallPal_Cflush
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002080  CallPal_Draina
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000020C0  CallPal_OpcDec03
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004480  CallPal_OpcDec
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002100  CallPal_OpcDec04
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002140  CallPal_OpcDec05
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002180  CallPal_OpcDec06
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000021C0  CallPal_OpcDec07
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002200  CallPal_OpcDec08
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002240  CallPal_Cserve
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002280  CallPal_SwpPal
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004000  CallPal_SwpPalCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000022C0  CallPal_OpcDec0B
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002300  CallPal_OpcDec0C
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002340  CallPal_WrIpir
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002380  CallPal_OpcDec0E
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000023C0  CallPal_OpcDec0F
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002400  CallPal_RdMces
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002440  CallPal_WrMces
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002480  CallPal_OpcDec12
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000024C0  CallPal_OpcDec13
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002500  CallPal_OpcDec14
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002540  CallPal_OpcDec15
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002580  CallPal_OpcDec16
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000025C0  CallPal_OpcDec17
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002600  CallPal_OpcDec18
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002640  CallPal_OpcDec19
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002680  CallPal_OpcDec1A
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000026C0  CallPal_OpcDec1B
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002700  CallPal_OpcDec1C
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002740  CallPal_OpcDec1D
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002780  CallPal_OpcDec1E
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000027C0  CallPal_OpcDec1F
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002800  CallPal_OpcDec20
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002840  CallPal_OpcDec21
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002880  CallPal_OpcDec22
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000028C0  CallPal_OpcDec23
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002900  CallPal_OpcDec24
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002940  CallPal_OpcDec25
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002980  CallPal_OpcDec26
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000029C0  CallPal_OpcDec27
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002A00  CallPal_OpcDec28
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002A40  CallPal_OpcDec29
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002A80  CallPal_OpcDec2A
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002AC0  CallPal_WrFen
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002AF4  pvc$osf02$225
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002B00  CallPal_OpcDec2C
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002B40  CallPal_WrVptPtr
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002B80  CallPal_OpcDec2E
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002BC0  CallPal_OpcDec2F
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002C00  CallPal_SwpCtx
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002C1C  pvc$osf03$379
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004020  CallPal_SwpCtxCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002C40  CallPal_WrVal
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002C80  CallPal_RdVal
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002CC0  CallPal_Tbi
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004080  Tbi_Table
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002CDC  pvc$osf04$2000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002D00  CallPal_WrEnt
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000041C0  WrEnt_Table
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002D1C  pvc$osf05$3000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002D40  CallPal_SwpIpl
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002D5C  pvc$osf06$217
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002D80  CallPal_RdPs
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002DC0  CallPal_WrKgp
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002E00  CallPal_WrUsp
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002E40  CallPal_OpcDec39
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002E80  CallPal_RdUsp
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002EC0  CallPal_OpcDec3B
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002F00  CallPal_Whami
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002F40  CallPal_RetSys
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002F7C  pvc$osf07$217
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00002F80  CallPal_OpcDec3E
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004240  CallPal_Rti_ToKern
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004260  CallPal_Rti_ToUser
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003000  CallPal_Bpt
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004280  CallPal_BptCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003040  CallPal_BugChk
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000042E0  CallPal_BugChkCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003080  CallPal_OpcDec82
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000030C0  CallPal_CallSys
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000043A0  CalPal_CallSys_FromKern
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004340  CallPal_CallSysCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003100  CallPal_OpcDec84
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003140  CallPal_OpcDec85
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003180  CallPal_Imb
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000040E0  CallPal_IcFlushCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000031C0  CallPal_OpcDec87
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003200  CallPal_OpcDec88
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003240  CallPal_OpcDec89
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003280  CallPal_OpcDec8A
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000032C0  CallPal_OpcDec8B
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003300  CallPal_OpcDec8C
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003340  CallPal_OpcDec8D
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003380  CallPal_OpcDec8E
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000033C0  CallPal_OpcDec8F
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003400  CallPal_OpcDec90
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003440  CallPal_OpcDec91
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003480  CallPal_OpcDec92
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000034C0  CallPal_OpcDec93
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003500  CallPal_OpcDec94
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003540  CallPal_OpcDec95
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003580  CallPal_OpcDec96
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000035C0  CallPal_OpcDec97
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003600  CallPal_OpcDec98
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003640  CallPal_OpcDec99
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003680  CallPal_OpcDec9A
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000036C0  CallPal_OpcDec9B
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003700  CallPal_OpcDec9C
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003740  CallPal_OpcDec9D
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003780  CallPal_RdUnique
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000037C0  CallPal_WrUnique
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003800  CallPal_OpcDecA0
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003840  CallPal_OpcDecA1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003880  CallPal_OpcDecA2
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000038C0  CallPal_OpcDecA3
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003900  CallPal_OpcDecA4
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003940  CallPal_OpcDecA5
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003980  CallPal_OpcDecA6
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000039C0  CallPal_OpcDecA7
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003A00  CallPal_OpcDecA8
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003A40  CallPal_OpcDecA9
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003A80  CallPal_GenTrap
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000043C0  CallPal_GenTrapCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003AC0  CallPal_OpcDecAB
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003B00  CallPal_OpcDecAC
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003B40  CallPal_DbgStop
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004420  CallPal_DbgStopCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003B80  CallPal_OpcDecAE
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003BC0  CallPal_OpcDecAF
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003C00  CallPal_OpcDecB0
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003C40  CallPal_OpcDecB1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003C80  CallPal_OpcDecB2
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003CC0  CallPal_OpcDecB3
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003D00  CallPal_OpcDecB4
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003D40  CallPal_OpcDecB5
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003D80  CallPal_OpcDecB6
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003DC0  CallPal_OpcDecB7
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003E00  CallPal_OpcDecB8
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003E40  CallPal_OpcDecB9
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003E80  CallPal_OpcDecBA
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003EC0  CallPal_OpcDecBB
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003F00  CallPal_OpcDecBC
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003F40  CallPal_OpcDecBD
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003F80  CallPal_OpcDecBE
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00003FC0  CallPal_OpcDecBF
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x0000401C  pvc$osf08$1007
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004064  pvc$osf09$379
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x0000406C  pvc$osf10$379
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004080  pvc$osf11$2000.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004090  pvc$osf12$2000.2
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000040A0  pvc$osf13$2000.3
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000040B0  pvc$osf14$2000.4
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000040C0  pvc$osf15$2000.5
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004198  OneCycle_Then_hw_rei
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000040D0  pvc$osf16$2000.6
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000041C0  pvc$osf17$3000.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000041D0  pvc$osf18$3000.2
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000041E0  pvc$osf19$3000.3
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000041F0  pvc$osf20$3000.4
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004200  pvc$osf21$3000.5
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004210  pvc$osf22$3000.6
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004220  pvc$osf23$3000.7
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004258  pvc$osf24$217
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00004274  pvc$osf25$248
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005968  MchkOSBugCheck
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005140  set_icsr
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005344  pvc$osf27$5010
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000054B8  pvc$osf48$5060
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000056EC  KspNotValid
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005700  pvc$osf29$5000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005790  ErrorHandler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005900  PowerFailHandler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005930  PerfHandler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005780  pvc$osf28$5000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000057B8  IntCrdHandler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000057D8  pvc$osf100$5100
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000058E0  CrdScrubMemory
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005878  CrdAck
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000058C0  CrdDismissInterrupt
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000058FC  pvc$osf101$5100.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005AC0  MchkFromPal
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005A5C  pvc$osf30$379
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005AD0  MchkLogOut
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005AB0  pvc$osf31$5000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005AC0  pvc$osf32$5000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005C34  pvc$osf33$5050
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005D4C  pvc$osf34$5000.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00005F94  pvc$osf35$379
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006114  pvc$osf36$5020.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006438  pvc$osf37$5030.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x0000643C  Pal_OsfpalEnd
+	TYPE,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006440  /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/srom_dbm.o
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006458  pvc$serial_keypressed_ret$4009.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006460  char_start
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006468  pvc$serial_waitbit_1$4000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064EC  waitBitHalf
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x0000646C  get_bits
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x0000646C  pvc$serial_waitbit_2$4000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064F4  waitBitTime
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006490  stop_get
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006490  pvc$serial_waitbit_3$4000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006498  pvc$serial_keypressed_1$4009
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064B8  exit_getchar
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064B8  pvc$serial_getchar_ret$4002.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064E8  exit_putChar
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064D4  data_bit
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064E0  pvc$serial_waitbit_4$4000
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064E8  pvc$serial_putchar_ret$4001.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064F8  waitBitCont
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000064F8  wait_init
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006514  wait
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006524  pvc$serial_waitbit_ret$4000.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006530  pvc$serial_keypressed_2$4009
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006534  poll_start
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006540  poll_h
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006550  poll_l
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006570  end_sync
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006574  simple_div
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006588  set_baud
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006590  pvc$serial_autosync_ret$4010.1
+	TYPE,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006598  /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/sromcsrv.o
+	TYPE,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000065C8  /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/platform.o
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006654  pvc$osf81$5080
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000068B8  pvc$osf41$5010.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000068D8  pvc$osf48$5060.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006908  Int23Handler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006910  Int22Handler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006988  Int21Handler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000069B8  Int20Handler
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x000069D0  DismissInterrupt
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006B08  Sys_IntMchkHandlerMerge
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006BF4  pvc$osf42$5050.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006CC8  Sys_Cserve_Ldqp
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006CD0  Sys_Cserve_Stqp
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006CD8  Sys_Cserve_Jtopal
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006E10  Sys_Cserve_Wr_Int
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006E20  Sys_Cserve_Rd_Impure
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006E28  Sys_Cserve_Putc
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006E90  Sys_Cserve_Wr_Icsr
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006E88  Sys_Cserve_Rd_Icsr
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006EB8  Sys_Cserve_Rd_BcCtl
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006ED0  Sys_Cserve_Rd_BcCfg
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006F00  Sys_Cserve_Wr_Bcache
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006EE8  Sys_Cserve_Rd_BcCfgOff
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006F30  pvc$osf80$5080
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006FAC  pvc$osf80$5080.1
+	TEXT		other = 0x00000000  desc = 0x00000000  value = 0x00006FD4  pvc$osf43$5020
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006C28  Sys_WrIpir
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000065A8  Sys_Cserve_Srom_Putc
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000068E0  Sys_Interrupt
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000065C8  Sys_Reset
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000065B8  Sys_Cserve_Srom_Getc
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006598  Sys_Cserve_Srom_Init
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000068BC  Sys_ResetViaSwppal
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006C48  Sys_Cserve
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x0000645C  getChar
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000069D8  Sys_IntMchkHandler
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006440  keypressed
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00002FC0  CallPal_Rti
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00005D60  SaveState
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006FC8  Sys_EnterConsole
+	DATA,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000070AC  Pal_End
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00005AB0  HaltDoubleMchk
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006F68  Wr_Bcache
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006B68  Sys_MchkLogOut
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006C08  Sys_Cflush
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006120  RestoreState
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00006528  autobaud_sync
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00007038  _etext
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000064BC  putChar
+	TEXT,EXT	other = 0x00000000  desc = 0x00000000  value = 0x00005A54  MchkCommon
+	DATA,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000070B0  _edata
+	BSS,EXT	other = 0x00000000  desc = 0x00000000  value = 0x000070B0  _end

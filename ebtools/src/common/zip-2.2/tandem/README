@@ -1,0 +1,25 @@
+Last Amended:  03/09/97 by Dave Smith
+
+Tandem Port of Info ZIP
+=======================
+
+Recent changes:
+1. Tidy up COMMACS/MACROS/MAKE
+
+A few notes about the files on this subvol
+
+COMMACS   -  used by MAKE (compiler)
+MACROS    -  used by MAKE (bind)
+MAKE      -  recompile ZIP code, attempts to only recompile changed code
+README    -  this file
+
+*C        -  Source file
+*H        -  Header files
+*O        -  Individual object files (when compiled by MAKE)
+
+Install Notes:
+==============
+- restore all files to a single subvol
+- restore other files as ASCII
+- replace all references to $DATA9.DAVESZIP with whatever subvol you use
+- replace references to SUPER.DAVES with whatever user id you use

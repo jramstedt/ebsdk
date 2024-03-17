@@ -1,0 +1,99 @@
+Alpha Motherboard Software Developers Kit V4.0
+
+System Requirements
+
+	An Alpha-based system running Digitial UNIX V4.0A or later
+	or Windows NT 4.0 with Service Pack 3
+
+	65Mb of free disk space
+
+	For Digital UNIX: DEC C++ V5.7 or later
+
+	For Windows NT: Microsoft Visual C++ V5.0 or later
+
+Documentation is provided in PDF format.  Viewing the documentation
+requires Adobe Acrobat Reader 3 or later.  Acrobat Reader is provided
+on the SDK CD for both Digital UNIX and Windows NT.  The Windows NT
+version requires Digital FX!32, which is also provided on the CD.
+The install procedure detects whether or not these components are
+installed on your system and offers to install them if missing.
+
+SDK Contents:
+
+The SDK includes source code for the Serial ROM CPU initialization
+code (SROM), Debug Monitor, Failsafe Booter, example PALcode, and
+sample programs.  The SDK also includes all tools other than the
+native C++ compiler required to build the SDK components.
+
+SDK Quick Start:
+
+The SDK comes with all binaries (tools and firmware) pre-built from
+the included sources.
+
+To install the SDK files on your system:
+
+	Windows NT: Run "SETUP.EXE" in the top-level directory of the CD
+	Digital UNIX: Mount the CD, change to the top-level directory,
+	   and run the "sdksetup" script
+
+	Read the license agreement and answer all the questions.
+
+To rebuild the firmware from sources, do the following at a shell
+prompt (UNIX) or a command line window (NT):
+
+	Change to the "ebfw" subdirectory of the SDK tree
+	Type "configure".  Answer the questions.  You should only have to
+	   do this step once.
+	Type "clean" to clean out all the old executables and object files
+	Type "build" to build new object files and executables.
+
+To rebuild the SDK tools from sources, do the following at a shell
+prompt (UNIX) or a command line window (NT):
+
+	If you have not yet configured the SDK, change to the "ebfw"
+	    subdirectory of the SDK tree and issue the "configure" command
+	Type "clean" to clean out all the old toolbox executables
+	Type "build" to build new toolbox executables
+
+The SDK directory tree is structured as follows:
+
+ebsdk ----+---- ebfw (SDK firmware sources)
+          |      |
+          |      +---- dbm (Debug Monitor sources)
+          |      +---- demo (Demo programs)
+          |      +---- dhry (Dhrystone benchmark demo)
+          |      +---- ether (ethernet interface library)
+          |      +---- h (include files)
+          |      +---- ladebug (code to interface with DEC Ladebug)
+          |      +---- lib (utility functions)
+          |      +---- library (location of the BIOS emulation library)
+          |      +---- obj (binaries built by SDK go here)
+          |      |      |
+          |      |      +---- dp264 (one subdirectory 
+          |      |      +---- lx164  for each supported
+          |      |      +---- sx164  platform)
+          |      |
+          |      +---- palcode (example PALcode)
+          |      |      |
+          |      |      +---- dp264 (one subdirectory 
+          |      |      +---- lx164  for each supported
+          |      |      +---- sx164  platform)
+          |      |
+          |      +---- srom (SROM sources)
+          |      |      |
+          |      |      +---- dp264 (one subdirectory 
+          |      |      +---- lx164  for each supported
+          |      |      +---- sx164  platform)
+          |      |
+          |      +---- stubs (placeholder functions)
+          |
+          |
+          +---- ebtools (tools for building SDK)
+                 |
+                 +---- unix (tools used for building under Digital UNIX)
+                 +---- ntalpha (tools used for building under Windows NT)
+                 +---- src (sources for all tools)
+                        |
+                        +---- common (tools for both NT and UNIX)
+                        +---- unix (UNIX-specific tools)
+                        +---- ntalpha (NT-specific tools)

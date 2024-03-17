@@ -1,0 +1,25 @@
+CC		= cc
+CFLAGS		= -g -I. -I../include
+LFLAGS		= -lc
+COMMON		= ../common
+INCLUDE		= ../include
+TOOLBOX	    	= ../../toolbox
+
+TOUCH = /usr/bin/touch
+#
+all		: rpp
+
+rpp:		rpp.o 
+		$(CC) $(CFLAGS) -g -o rpp rpp.o $(COMMONLIB) $(LFLAGS)
+
+rpp.o:	    	rpp.c
+		$(CC) $(CFLAGS) -c rpp.c
+
+install:    	rpp
+		cp rpp $(TOOLBOX)/.
+
+clean:
+		rm -f *.o *~ core rpp 
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+

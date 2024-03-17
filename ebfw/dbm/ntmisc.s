@@ -1,0 +1,66 @@
+	.globl	deposit_quad
+	.ent	deposit_quad
+deposit_quad:
+	call_pal	0x87
+	ret		$31,($26)
+	.end	deposit_quad
+
+	.globl	SRM_hack_Waitforever
+	.ent	SRM_hack_Waitforever
+SRM_hack_Waitforever:
+	mb
+	.long	0x47e11400
+	.long	0x77e02840
+	.long	0x201f2086
+	.long	0x24000050
+	.long	0x213f01a0
+	.long	0x25290008
+	.long	0x49231729
+	.long	0x77e01110
+	.long	0x21290080
+	.long	0x6fc91000
+	.long	0x213f0130
+	.long	0x25290008
+	.long	0x49231729
+	.long	0x21290a00
+	.long	0x20bf0045
+	.long	0x7ca91000
+	.long	0x21290040
+	.long	0x47ff041f
+	.long	0x47ff041f
+	.long	0x7ca91000
+	.long	0x60004000
+	.long	0x47c07009
+	.long	0x20bf0a00
+	.long	0x209f0a40
+	.long	0x452404c5
+	.long	0x209f0130
+	.long	0x24840008
+	.long	0x48831724
+	.long	0x40850405
+	.long	0x209f0100
+	.long	0x41240649
+	.long	0x249f8000
+	.long	0x48821724
+	.long	0x44890404
+	.long	0x63e4e800
+	.long	0xe7e0000f
+	.long	0x47ff041f
+	.long	0x60004000
+	.long	0x6c850000
+	.long	0x47ff041f
+	.long	0xf09ffffb
+	.long	0x47ff041f
+	.long	0x60004000
+	.long	0x6f290000
+	.long	0x47203419
+	.long	0x47ff041f
+	.long	0x60004000
+	.long	0x47ff041f
+	.long	0x77ff1310
+	.long	0xf7e00000
+	.long	0x7bf92000
+	.long	0xe7fffff0
+	mb
+	ret	$31,($26)
+	.end	SRM_hack_Waitforever

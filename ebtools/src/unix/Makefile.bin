@@ -1,0 +1,7 @@
+all: ${PROGRAMS} ${PROGRAM}
+
+clean:
+	rm -f ${PROGRAMS} ${PROGRAM} ${OBJECTS} *~
+
+${PROGRAM} : ${OBJECTS}
+	cc ${LDFLAGS} -o ${PROGRAM} ${OBJECTS} ${LIBRARIES}

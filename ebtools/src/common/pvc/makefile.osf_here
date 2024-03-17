@@ -1,0 +1,11 @@
+CFLAGS = -DEV6
+all : pvc
+
+SFILES		= pvc.c body.c common.c memory.c rest.c sched.c \
+		   ev4.c ev5.c  ev6.c ev6_rest.c
+
+OBJS		= $(SFILES:.c=.o)
+
+pvc:		$(OBJS)
+		cc -DEV6 -g3 -o pvc $(OBJS)
+

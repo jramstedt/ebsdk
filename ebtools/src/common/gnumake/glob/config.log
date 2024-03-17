@@ -1,0 +1,34 @@
+This file contains any messages produced by compilers while
+running configure, to aid debugging if configure makes a mistake.
+
+configure:552: checking for a BSD compatible install
+configure:614: checking whether build environment is sane
+configure:661: checking for working aclocal
+configure:674: checking for working autoconf
+configure:687: checking for working automake
+configure:700: checking for working autoheader
+configure:713: checking for working makeinfo
+configure:726: checking whether make sets ${MAKE}
+configure:756: checking for gcc
+configure:833: checking whether the C compiler (cc  ) works
+configure:847: cc -o conftest    conftest.c  1>&5
+configure:867: checking whether the C compiler (cc  ) is a cross-compiler
+configure:872: checking whether we are using GNU C
+configure:926: checking for ar
+configure:955: checking for ranlib
+configure:982: checking how to run the C preprocessor
+configure:1042: checking for AIX
+configure:1067: checking for minix/config.h
+configure:1115: checking for POSIXized ISC
+configure:1136: checking for working const
+configure:1211: checking for ANSI C header files
+configure:1318: checking for memory.h
+configure:1318: checking for unistd.h
+configure:1318: checking for string.h
+configure:1359: checking for dirent.h that defines DIR
+configure:1397: checking for opendir in -ldir
+configure:1480: checking whether closedir returns void
+configure:1494: cc -o conftest -g   conftest.c  1>&5
+configure:1519: checking for working alloca.h
+configure:1552: checking for alloca
+configure:1746: checking for working strcoll

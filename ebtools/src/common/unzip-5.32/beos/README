@@ -1,0 +1,46 @@
+UnZip 5.32 for BeOS
+
+UnZip 5.30 was the first official release of Info-ZIP's UnZip to support
+the filesystem in BeOS.
+
+UnZip 5.31 supports the new filesystem present in Advanced Access Release
+DR9 of BeOS.
+
+UnZip 5.32 adds several important bug fixes.
+
+*** WARNING ***
+The format of the data stored for the BeOS file attributes had to change 
+between unzip 5.31b and unzip 5.31c!  This makes the new unzip incompatible
+with the old zip's BeOS file attributes.
+
+You can still unpack the _data_ in older zip files (and there are several
+floating around, even though the unzip 5.31b for DR9 beta was only available
+for a week), but you won't be able to recover the file attributes in those
+archives.
+
+The new scheme makes handling BeOS file attributes much more robust, and
+allows for possible future expansion without another round of
+incompatibilities.
+
+That's life on the edge!
+*** WARNING ***
+
+The new filesystem allows for huge files (up to several terabytes!) with
+huge amounts of meta-data (up to several terabytes!).  The existing ZIP
+format was designed when this much data on a personal computer was
+science fiction; as a result, it's quite possible that large amounts of file
+attributes (more than maybe 100+K bytes) could be truncated.  Zip and UnZip
+try to deal with this in a fairly sensible way, working on the assumption
+that the data in the file is more important than the data in the file
+attributes.
+
+KNOWN BUGS
+
+Zip and UnZip are unable to save or restore the file attributes associated
+with symbolic links.  This is a shortcoming in the C API for accessing file
+attributes and will be addressed by a future version of BeOS.
+
+Please report any bugs to Zip-Bugs@lists.wku.edu.
+
+- Chris Herborth (chrish@qnx.com)
+  Sept. 12/1997

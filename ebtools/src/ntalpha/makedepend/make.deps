@@ -1,0 +1,27 @@
+# DO NOT DELETE
+
+main.o: def.h c:\devstudio\vc\include/stdio.h c:\devstudio\vc\include/ctype.h
+main.o: c:\devstudio\vc\include/sys/types.h c:\devstudio\vc\include/fcntl.h
+main.o: c:\devstudio\vc\include/sys/stat.h c:\devstudio\vc\include/stdlib.h
+main.o: c:\devstudio\vc\include/signal.h c:\devstudio\vc\include/string.h
+main.o: c:\devstudio\vc\include/malloc.h imakemdep.h
+cppsetup.o: def.h c:\devstudio\vc\include/stdio.h
+cppsetup.o: c:\devstudio\vc\include/ctype.h
+cppsetup.o: c:\devstudio\vc\include/sys/types.h
+cppsetup.o: c:\devstudio\vc\include/fcntl.h
+cppsetup.o: c:\devstudio\vc\include/sys/stat.h
+cppsetup.o: c:\devstudio\vc\include/stdlib.h ifparser.h
+ifparser.o: ifparser.h c:\devstudio\vc\include/stdio.h
+ifparser.o: c:\devstudio\vc\include/ctype.h
+include.o: def.h c:\devstudio\vc\include/stdio.h
+include.o: c:\devstudio\vc\include/ctype.h
+include.o: c:\devstudio\vc\include/sys/types.h
+include.o: c:\devstudio\vc\include/fcntl.h c:\devstudio\vc\include/sys/stat.h
+include.o: c:\devstudio\vc\include/stdlib.h
+parse.o: def.h c:\devstudio\vc\include/stdio.h
+parse.o: c:\devstudio\vc\include/ctype.h c:\devstudio\vc\include/sys/types.h
+parse.o: c:\devstudio\vc\include/fcntl.h c:\devstudio\vc\include/sys/stat.h
+parse.o: c:\devstudio\vc\include/stdlib.h
+pr.o: def.h c:\devstudio\vc\include/stdio.h c:\devstudio\vc\include/ctype.h
+pr.o: c:\devstudio\vc\include/sys/types.h c:\devstudio\vc\include/fcntl.h
+pr.o: c:\devstudio\vc\include/sys/stat.h c:\devstudio\vc\include/stdlib.h

@@ -1,0 +1,40 @@
+#
+#	Generic Makefile (V2).    MAY NEED MODIFICATION
+#
+#	Must invoke with:	SRC=progname [other equates as listed below]
+#
+# ar x /usr/lib/libc.a __divq.o
+# ar x /usr/lib/libc.a __divl.o
+#
+#
+
+all:	compile run
+
+compile:	
+	ar x /usr/lib/libc.a __divq.o
+	ar x /usr/lib/libc.a __divl.o
+	ar x /usr/lib/libc.a strcpy.o
+	ar x /usr/lib/libc.a strcmp.o
+	cc -c -O SCW*.c
+	cc -O2 -D_INTRINSICS -o dhryV1 dhryV1.c strcmp.o strcpy.o __divq.o __divl.o -DREG=register -DLOOPS=5000000 -DHZ=60 -DGETRUSAGE -non_shared -unsigned
+	cc -O3 -D_INTRINSICS -o dhryV2 dhryV2_1.c dhryV2_2.c strcmp.o strcpy.o __divl.o __divq.o SCWsynch.o SCWtimer.o -DHZ=60 -DLOOPS=5000000 -DREG=register -lbsd -non_shared
+run:	compile
+	dhryV1 1>resultV1 2>>error
+	echo -n "result for dhryV1 (dhrystone/sec) "
+	postdhry.V1
+	dhryV2 1>resultV2 2>>error
+	echo -n "result for dhryV2 (dhrystone/sec) "
+	postdhry.V2
+
+run_d1:	
+	dhryV1 1>resultV1 2>>error
+	echo -n "result for dhryV1 (dhrystone/sec) "
+	postdhry.V1
+
+run_d2:	
+	dhryV2 1>resultV2 2>>error
+	echo -n "result for dhryV2 (dhrystone/sec) "
+	postdhry.V2
+
+clean:
+	-rm *.o *.u dhryV1 dhryV2 output resultV1 resultV2 SCW.data error

@@ -1,0 +1,24 @@
+#!/bin/sh
+#
+#  Simple utility to make every tool for this host.
+#  Run as:
+#	build [target]
+#  The build utility also supports various
+#  makefile targets.
+#  For example:
+#	build -target=install
+#
+
+export PATH || (echo "OOPS, this isn't sh.  Desperation time."; sh $0 $argv; kill $$)
+
+subdirs="include common gnumake bit pvc list strip ic4mat srec srom repeat objtest makerom uload sysgen rcsv hfcomp mini_dbg hex32 hexpad"
+
+for dir in $subdirs ; do
+    if [ ! -f $dir/Makefile ] ; then
+	echo "***** No Makefile in $dir"
+    else
+	echo "##### Cleaning $dir #####"
+        (cd $dir ; make -f Makefile clean)
+    fi
+done
+

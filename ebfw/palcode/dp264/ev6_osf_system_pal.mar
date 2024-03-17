@@ -1,0 +1,3619 @@
+;+
+; ev6_osf_system_pal.mar
+;-
+
+;+
+; Last Edit:	09-Apr-99
+;-
+	GOTO_FREE_CODE
+
+;+
+; sys__cflush
+;
+; Entry:
+;	r16	page frame number (PFN) of page to be flushed
+;	p23	pc of instruction following call_pal instruction
+;
+; Function:
+;	Flush all dstream caches of 1 entire page.
+;
+; Note on implementation:
+;	The dcache is a 64K byte, two-way set associative,
+;	virtually indexed, physically tagged, 64-byte block cache.
+;	With 32K bytes of data per set, that means that EV6
+;	requires 2 additional bits of virtual address beyond the
+;	bits which specify an 8K byte page in order to specify a
+;	dcache row index. Conceptually, a given virtual address
+;	may be found in 4 distinct places in the cache.
+;
+;	We need to do 2 loads per block because the dcache is
+;	2-way set associative. And that needs to be multiplied
+;	by 4 because given a PA, bits <14:13> need to be
+;	toggled through the 4 combinations to make sure all
+;	4 synonym locations are checked.
+;
+; 	We of course also have to worry about flushing the bcache,
+;	so we need to toggle tag bits greater than the bcache size.
+;	So we strip the high bits of the PFN so that we can an
+;	address between 0 and four times the size of the bcache.
+;	We then toggle tag bits to get two addresses and run
+;	through the 4 combinations.
+;-
+	ALIGN_CACHE_BLOCK
+sys__cflush:
+.if ne reference_platform
+;
+; We assume a bcache no larger than 4 MB = 2**22.
+;
+bcache_size = 22
+
+	sll     r16, #page_offset_size_bits+<64-<bcache_size+2>>, p4
+	srl     p4, #64-<bcache_size+2>, p4		; shift into position
+	ldah    p5, 1@<bcache_size-16>(r31)		; get 1st toggle bit
+	ldah    p6, 2@<bcache_size-16>(r31)		; get 2nd toggle bit
+	xor     p4, p5, p5				; xor to get 1st addr
+	xor	p4, p6, p6				; xor to get 2nd addr
+
+	bis	r31, #<8192>/<64*8>, p7			; count of loads
+
+sys__cflush_outer_loop:
+	subq	p7, #1, p7				; decrement counter
+	bis	r31, #3, p4				; <14:13> bits
+
+sys__cflush_inner_loop:
+	sll	p4, #13, p4				; shift <14:13> up
+	bis	p5, p4, p5				; or in <14:13>
+	bis	p6, p4, p6				; or in <14:13>
+	hw_mfpr	p20, EV6__ISUM				; get isum
+
+	hw_ldq/p r31, 64*0(p5)				; first set
+	hw_ldq/p r31, 64*0(p6)				; second set
+	
+	hw_ldq/p r31, 64*1(p5)				; first set
+	hw_ldq/p r31, 64*1(p6)				; second set
+
+	hw_ldq/p r31, 64*2(p5)				; first set
+	hw_ldq/p r31, 64*2(p6)				; second set
+
+	hw_ldq/p r31, 64*3(p5)				; first set
+	hw_ldq/p r31, 64*3(p6)				; second set
+
+	hw_ldq/p r31, 64*4(p5)				; first set
+	hw_ldq/p r31, 64*4(p6)				; second set
+	
+	hw_ldq/p r31, 64*5(p5)				; first set
+	hw_ldq/p r31, 64*5(p6)				; second set
+	
+	hw_ldq/p r31, 64*6(p5)				; first set
+	hw_ldq/p r31, 64*6(p6)				; second set
+	
+	hw_ldq/p r31, 64*7(p5)				; first set
+	hw_ldq/p r31, 64*7(p6)				; second set
+
+	xor	p5, p4, p5				; zap <14:13>
+	xor	p6, p4, p6				; zap <14:13>
+	srl	p4, #13, p4				; shift <14:13> down
+	subq	p4, #1, p4				; decrement inner loop
+	bne	p20, sys__cflush_interrupt		; need to take interrupt
+	blt	p4, sys__cflush_do_outer		; branch for next block
+	br	r31, sys__cflush_inner_loop		; next combination
+
+sys__cflush_do_outer:
+	beq	p7, sys__cflush_done			; branch if done
+	lda	p5, <64*8>(p5)				; next block
+	lda	p6, <64*8>(p6)				; next block
+	br	r31, sys__cflush_outer_loop		; next group
+
+sys__cflush_done:
+	hw_ret	(p23)					; return to user
+
+
+sys__cflush_interrupt:
+	subq	p23, #4, p23				; back up pc
+	hw_ret	(p23)					; take interrupt
+
+.iff					; if ne reference_platform
+
+	hw_ret	(p23)
+
+.endc					; if ne reference_platform
+
+
+;+
+; sys__wripir
+;
+; Entry:
+;	r16(a0)	processor number
+;	p23	pc of instruction following call_pal instruction
+; Function:
+;	Request an interprocessor interrupt.
+;-
+	ALIGN_CACHE_BLOCK
+sys__wripir:
+	NOP
+	NOP
+	NOP
+	NOP
+
+    .if eq force_path				; 1.41
+	hw_ret	(p23)				; return
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; align
+	PVC_VIOLATE <1007>
+	PVC_VIOLATE <1020>			; stop permutation
+	hw_jmp	(p23)				; return with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+
+;+
+; sys__wtint
+;
+; Entry:
+;	Entered from call_pal__wrint
+;
+; Function:
+;	The wait for interrupt instruction requests that, if possible, the
+;	PALcode wait for the first of either of the following conditions
+;	before returning:
+;		any interrupt other than a clock tick
+;		the first clock tick after the specified number
+;
+; Current state:
+;	p23		pc of instruction following the call_pal instruction
+;	r16(a0)		maximum nmber of interval clock ticks to skip
+;
+; Exit state:
+;	r0(v0)		number of interval clock ticks actually skipped
+;
+;-
+
+.if ne reference_platform
+
+IRQ_IP 	= 8				; position within EV6__ISUM__IE field
+IRQ_CLK = 4
+IRQ_DEV	= 2
+IRQ_ERR = 1
+
+IRQ_NOCLK = <IRQ_IP ! IRQ_DEV ! IRQ_ERR>	; checked during cache sweep
+
+sys__wtint:
+
+;
+; First, check for 0 ticks.
+;
+	beq	r16, sys__wtint_noticks
+;
+; Now save state.
+;
+	PVC_JSR	save_state, bsr=1
+	bsr	p7, pal__save_state		; save state
+;
+; Now enable device interrupts, so we can detect them.
+;
+	bis	r31, #<IRQ_NOCLK>, p4		; platform IRQ mask minus CLK
+	sll	p4, #EV6__IER__EIEN__S, p4	; shift into place
+	hw_mtpr	p4, EV6__IER			; (4,0L) write new ier
+	bis	r31, r31, r31
+;
+; Now save what cpu we are.
+;
+	hw_ldq/p p6, PT__WHAMI(p_temp)		; get my cpu number
+	sll	p6, #EV6__SIRR__SIR__S, p6	; cpu number into place
+	hw_mtpr	p6, EV6__SIRR			; (4,0L) save cpu number
+;
+; Set up 48-bit kseg so we can do ECB's to clean and invalidate
+; the data caches.
+;
+	bis	r31, #<4@EV6__M_CTL__SPE__S>, p4
+	hw_mtpr	p4, EV6__M_CTL			; (6,0L) write m_ctl
+	bis	r31, #<1@EV6__VA_CTL__VA_48__S>, p5
+	hw_mtpr	p5, EV6__VA_CTL			; (5,1L)
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x70>	; stall till they all retire
+;
+; Determine the bcache size from the transformed write-many chain.
+; The following transformation is done on the write_many value
+; to make the shift-in work easily.
+;
+; 	<35:30>|<29:24>|<23:18>|<17:12>|<11:06>|<05:00> =>
+; 	<05:00>|<11:06>|<17;12>|<23:18>|<29:24>|<35:30>
+;
+; The size is found at <5:2> in the untransformed value,
+; and thus at <35:32> in the transformed value.
+;	0000	1  megabytes
+;	0001	2  megabytes
+;	0011	4  megabytes
+;	0111	8  megabytes
+;	1111	16 megabytes
+;
+; We need to calculate twice the size of the bcache.
+; The write-many chain is stored in CNS__WRITE_MANY.
+; The size is store in chain<35:32>.
+;
+	hw_ldq/p p7, PT__IMPURE(p_temp)		; get impure pointer
+	hw_ldq/p p20, CNS__WRITE_MANY(p7)	; get write-many chain
+	srl	p20, #32, p4			; get size
+	and	p4, #^xF, p4			; clean it
+	addq	p4, #1, p4			; add 1
+	sll	p4, #1, p4			; multiply by 2
+;
+; We will be turning off the bcache, so we will need to zap the write many
+; chain bits for enable and size.
+;
+;                 |3333|3322|2222|2222|1111|1111|11                     
+;                 |5432|1098|7654|3210|9876|5432|1098|7654|3210|
+;                 +====+====+====+====+====+====+====+====+====+
+; BC_ENABLE       |    | 1  |  11|1  1|11  |111 |    |    |    |
+; BC_SIZE1        |   1|  1 |    |    |    |    |    |    |   1|
+; BC_SIZE2        |  1 |   1|    |    |    |    |1   |    |    |
+; BC_SIZE3        | 1  |    |1   |    |    |    | 1  |    |    |
+; BC_SIZE4        |1   |    | 1  |    |    |    |  1 |    |    |
+;                 +====+====+====+====+====+====+====+====+====+
+;                   F    7    F    9    C    E    E    0    1
+;
+	GET_32CONS	p6, <^x7F9CEE01>, r31		; get low 32
+	bic	p20, p6, p20				; clear bits
+	bis	r31, #^xF, p6				; get ^xF
+	sll	p6, #32, p6				; shift into position
+	bic	p20, p6, p20				; new write many chain
+;
+; Turn off SBE.
+;
+; Current state:
+;	p4	twice the size of the bcache in megabytes
+;	p20	write many chain to turn bcache off
+;
+	ALIGN_CACHE_BLOCK <^x47FF041F>	; align with nops
+
+	mb				; wait for MEM-OP's to complete
+	lda     r0, ^x0086(r31)		; load I_CTL.....
+	hw_mtpr r0, EV6__I_CTL		; .....SDE=2, IC_EN=3, SBE=0
+	br      r0, .			; create dest address
+
+	addq    r0, #17, r0		; finish computing dest address 
+	hw_mtpr r31, EV6__IC_FLUSH	; flush the Icache
+	bne     r31, .			; separate retires
+	PVC_VIOLATE <1007>
+	hw_jmp_stall (r0)		; force flush
+
+;
+; NOTE:
+;
+; The rest of the code should be pulled into the icache before we start
+; invalidating the data caches. We do that by jumping through the
+; cache blocks.
+;
+
+;
+; Now flush data caches. ECB twice the size of the bcache,
+; i.e, 2 - 32 megabytes. Use a double loop, doing a megabyte at a
+; time and check whether we need to punt periodically.
+;
+; Current state:
+;	p4	twice the size of the cache in megabytes
+;	p20	write many chain to turn bcache off
+;
+
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+
+sys__wtint_touch0:
+	mb					; (1)
+	br	r31, sys__wtint_touch1		; (2)
+
+sys__wtint_start_flush:
+	ldah	p6, ^x8000(r31)			; (3) Kseg = 0xffff8000.00000000
+	sll	p6, #16, p6			; (4) shift into place
+
+sys__wtint_outer_loop:
+	hw_mfpr	p7, EV6__ISUM			; (3) get ISUM
+
+	subq	p4, #1, p4			; (4) decrement outer counter
+	lda	p5, ^x4000(r31)			; (5) ^x4000 * 64 = 1mb
+
+	bne	p7, sys__wtint_punt		; (6) got an interrupt
+	br	r31, sys__wtint_inner_loop	; (7) go to inner loop
+
+sys__wtint_inner_loop:
+	subq	p5, #1, p5			; (8) decrement inner counter
+	ecb	(p6)				; (9) ecb
+	lda	p6, 64(p6)			; (10) next address
+	beq	p5, sys__wtint_loop_test	; (11) if done 
+	br	r31, sys__wtint_inner_loop	; (12) loop back
+
+sys__wtint_loop_test:
+	beq	p4, sys__wtint_bc_off		; (13) now turn off bcache
+	br	r31, sys__wtint_outer_loop	; (14) next megabyte
+
+;
+; Now turn the bcache off. We probably don't need to do this as long
+; as we have pulled everything into the icache, but the debug (where we
+; just jump to wakeup) needs it anyway.
+;
+; Current state:
+;	p20	write many chain with bcache off
+;
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+
+sys__wtint_touch1:
+	mb					; (1)
+	br	r31, sys__wtint_touch2		; (2)
+	bis	r31, r31, r31			; (3)
+	bis	r31, r31, r31			; (4)				
+
+sys__wtint_bc_off:
+	bis	p20, r31, r2			; (5) move chain to r2
+	addq	r31, #6, r0			; (6) shift in 6x 6-bits
+sys__wtint_bc_off_loop::
+	PVC_VIOLATE<30>				;
+	hw_mtpr	r2, EV6__DATA			; (7) (6,0L) shift in 6 bits
+	subq	r0, #1, r0			; (8) decrement R0
+
+	beq	r0, sys__wtint_bc_off_done	; (9) done if R0 is zero
+	srl	r2, #6, r2			; (10) align next 6 bits
+	br	r31, sys__wtint_bc_off_loop	; (11) continue shifting
+sys__wtint_bc_off_done:
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x40>	; (12) IPR write - sets SCBD 6
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x40>	; (13) stalls until write retires
+	beq	r31, sys__wtint_clocks		; (14) predicts fall thru
+	PVC_VIOLATE <1006>
+	br	r31, .-4			; (15) predict infinite loop
+	addq	r31, r31, r2			; (16) nop
+;
+; Bcache should now be off.
+; Now add CLK to interrupts that can wake the CPU.
+;
+
+IRQ_MASK = ^x0F
+
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+
+sys__wtint_touch2:
+	mb					; (1)
+	br	r31, sys__wtint_touch3		; (2)
+
+sys__wtint_clocks:
+	bis	r31, #<IRQ_MASK>, p4		; (3) platform IRQ mask
+	sll	p4, #EV6__IER__EIEN__S, p4	; (4) shift into place
+	hw_mtpr	p4, EV6__IER			; (5) (4,0L) write new ier
+	br	r31, sys__wtint_addr		; (6) form external address
+;
+; Get address of IICx register and PRBEN register.
+;
+; IICx	cpu 0	380	00 => 0011 1000 0000
+;	cpu 1	3c0	01 => 0011 1100 0000
+;	cpu 2	700	10 => 0111 0000 0000
+;	cpu 3	740	11 => 0111 0100 0000
+;
+;So we start with ^b0011 0000 0000
+;Then OR the whami into <10:9>
+;Then we XOR whami with ^b10 and OR it into <7:6>
+;
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+
+sys__wtint_touch3:
+	mb					; (1)
+	br	r31, sys__wtint_touch4		; (2)
+
+sys__wtint_addr:
+	lda	p4, ^x801A(r31)			; (3) start to generate csr addr
+	zapnot	p4, #3, p4			; (4) zap extension
+	sll	p4, #28, p4			; (5) now have 801.A000.0000
+	lda	p20, ^x340(p4)			; (6) PRBEN address
+
+	lda	p4, ^x300(p4)			; (7) now have 801.A000.0300
+	hw_ldq/p p5, PT__WHAMI(p_temp)		; (8) get whami
+	sll	p5, #9, p6			; (9) move whami to <10:9>
+	xor	p5, #^b10, p7			; (10) xor
+	sll	p7, #6, p7			; (11) move to <7:6>
+
+	bis	p4, p6, p4			; (12) OR into <10:9>
+	bis	p4, p7, p4			; (13) OR into <7:6> to get IICx
+	br	r31, sys__wtint_sleep		; (14)
+;
+; Write the Cchip IIC CSR corresponding to its CPU ID with the
+; number of interval timer interrupts it wishes to ignore.
+; Read PRBEN to turn off probes
+;
+; Current state:
+;	p4	address of IIC CSR for this CPU
+;	p20	address of PRBEN register
+;	r16	number of ticks to skip
+;
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+
+sys__wtint_touch4:
+	mb					; (1)
+	br	r31, sys__wtint_start_flush	; (2)
+
+sys__wtint_sleep:
+	zapnot	r16, #7, p23			; (3) clean number of ticks
+	hw_stq/p p23, (p4)			; (4) store number of ticks
+	mb					; (5) force it out
+
+	hw_mtpr	r31, EV6__SLEEP			; (6) (4-7,0L) prepare to sleep
+	bis	r31, r31, r31			; (7)
+	bis	r31, r31, r31			; (8)
+
+	ASSUME_FETCH_BLOCK
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^xF0>	; (9) stall
+	hw_ldq/p p5, (p20)			; (10) turn off probes
+	bis p5, p5, p6				; (11) consume data
+	mb					; (12) do an memory barrier
+
+	hw_mtpr	31, EV6__SLEEP			; (13) (4-7,0L) now do it
+	PVC_VIOLATE <1006>
+	br	r31, .-4			; (14) branch to self
+;
+; Got an interrupt while we were flushing the bcache.
+;
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+
+sys__wtint_punt:
+	PVC_JSR	restore_state, bsr=1
+	bsr	p7, pal__restore_state		; (3) restore state
+	br	r31, sys__wtint_noticks		; (4) return
+;
+; Called with skipped ticks = 0. Just return.
+;
+sys__wtint_noticks:
+	bis	r31, r31, r0			; zero ticks skipped
+	hw_ret	(p23)
+
+.endc
+
+	END_FREE_CODE
+
+;+
+; IPL table
+;	proc_corr_err		7
+;	performance monitor	6
+;	interprocessor,clock	5
+;	high priority device	4
+;	low priority device	3
+;	system software		2
+;	system software		1
+;	user/system software	0
+;
+; This table of 8 quadwords, is indexed into by IPL, are used to write IER.
+; The EIEN portion will be dependent on the meaning of the IRQ pins
+; of the chip.
+;
+; Sample for tsunami:
+;	IRQ<0> = errors			ipl 7 
+;	IRQ<1> = device			ipl 4
+;	IRQ<2> = clock			ipl 5
+;	IRQ<3> = interprocessor		ipl 5
+;-
+.if ne reference_platform
+IRQ_IP 	= 8				; position within EV6__ISUM__IE field
+IRQ_CLK = 4
+IRQ_DEV	= 2
+IRQ_ERR = 1
+
+ipl3 = ^x0F				; mask for EV6__IER__EIEN field
+ipl4 = ^x0D
+ipl5 = ^x01
+ipl6 = ^x01
+ipl7 = ^x00
+
+.iff					; if ne reference_platform
+
+ipl3 = ^x00
+ipl4 = ^x00
+ipl5 = ^x00
+ipl6 = ^x00
+ipl7 = ^x00
+
+.endc					; if ne reference_platform
+
+;
+; The format of the IER_CM register is as follows:
+;	IER_CM<30:29>		performance counter interrupt enables
+;	IER_CM<31>		correct read error interrupt enable
+;	IER_CM<32>		serial line interrupt enable
+;	IER_CM<38:33>		external interrupt enables (EIEN)
+;
+	. = ^x0D00
+
+IPL_TABLE:
+
+ASSUME <IPL_TABLE - TRAP__START> le <^x7FFF>
+IRQ_MASK = ^x0F
+
+; ipl 0
+	.quad	<<IRQ_MASK@EV6__IER__EIEN__S>!<^x1@EV6__IER__CREN__S>! -
+		 <^x3@EV6__IER__PCEN__S>>
+; ipl 1
+	.quad	<<IRQ_MASK@EV6__IER__EIEN__S>!<^x1@EV6__IER__CREN__S>! -
+		 <^x3@EV6__IER__PCEN__S>>
+; ipl 2
+	.quad	<<IRQ_MASK@EV6__IER__EIEN__S>!<^x1@EV6__IER__CREN__S>! -
+		 <^x3@EV6__IER__PCEN__S>>
+; ipl 3
+	.quad	<<ipl3@EV6__IER__EIEN__S>!<^x1@EV6__IER__CREN__S>! -
+		 <^x3@EV6__IER__PCEN__S>>
+; ipl 4
+	.quad	<<ipl4@EV6__IER__EIEN__S>!<^x1@EV6__IER__CREN__S>! -
+		 <^x3@EV6__IER__PCEN__S>>
+; ipl 5
+	.quad	<<^x1@EV6__IER__CREN__S>!<^x3@EV6__IER__PCEN__S>>
+; ipl 6
+	.quad	<^x1@EV6__IER__CREN__S>
+; ipl 7
+	.quad	0
+
+	GOTO_FREE_CODE
+
+.if ne	check_interrupt_pending
+;+
+; sys__deassert_interrupt
+;
+; Entry:
+;	Entered from rei when isum<device_irq> is set.
+;
+; Function:
+; 	Some platforms, such as those with tsunami, have a problem with the
+; 	latency between clearing an interrupt and the interrupt being
+;	deasserted.
+;
+; 	Those platforms are opting to, on isum<device_irq> set, write to
+; 	a tsunami csr to deassert the interrupt. A real interrupt will
+; 	re-assert on the next polling loop.
+;
+; Current state:
+;	p23	exc_addr 
+;-
+	ALIGN_FETCH_BLOCK
+
+sys__deassert_interrupt:
+
+    .if ne reference_platform
+;
+; Write to MISC<DEVSUP> bit for this cpu.
+; The MISC CSR is at 801.A000.0080.
+; Find out who we are from PT__WHAMI.
+;
+; <sample code below>
+;
+	lda	p4, ^x801A(r31)			; generate 801.A000.0000
+	zapnot	p4, #3, p4			; zap extension
+	sll	p4, #28, p4			; move into place
+	hw_ldq/p p5, PT__WHAMI(p_temp)		; get whami
+	bis	r31, #1, p6			; get a one
+	addq	p5, #40, p5			; bit position + whami
+	sll	p6, p5, p6			; shift into position
+	hw_stq/p p6, ^x80(p4)			; write to 801.A000.0080
+
+    .endc					; if ne reference_platform
+
+	hw_ret_stall (p23)			; return
+.endc						; if ne check_interrupt_pending
+
+
+;+
+; sys__interrupt_ei
+;
+; Interrupt from external source.
+;
+; Entry:
+;	p4	isum
+;	p7	ei bits in <5:0>
+;	p23	exc_addr
+;-
+sys__interrupt_ei:
+.if ne reference_platform
+;
+;	IRQ<0> = errors			ipl 7
+;	IRQ<1> = device			ipl 4
+;	IRQ<2> = clock			ipl 5
+;	IRQ<3> = interprocessor		ipl 5
+;
+	and	p7, #IRQ_CLK, p5		; check for clock
+	beq	p5, sys__int_check_ip		; check ip if not
+	br	r31, sys__int_clk		; branch for clock
+sys__int_check_ip:
+	and	p7, #IRQ_IP, p5			; check for interprocessor
+	beq	p5, sys__int_check_dev		; check dev if not
+	br	r31, sys__int_ip		; branch for ip
+sys__int_check_dev:
+	and	p7, #IRQ_DEV, p5		; check for devices
+	beq	p5, sys__int_check_err		; check err if not
+	br	r31, sys__int_dev		; branch for devices
+sys__int_check_err:
+	and	p7, #IRQ_ERR, p5		; check for errors
+	beq	p5, sys__int_pal_err		; pal error if not
+	br	r31, sys__int_err		; branch for errors
+;
+; Since p7 was non-zero, we don't get here unless there is a pal bug.
+;
+sys__int_pal_err:
+	lda	p7, MCHK__BUGCHECK(r31)		; mchk code
+	br	r31, trap__pal_bugcheck
+
+;+
+; Clock interrupt.
+;
+; Current state:
+;	p23	exc_addr
+;
+; Do some of the processing as a sample.
+;-
+sys__int_clk:
+
+;
+; Clear the timer interrupt request for this cpu.
+; On Tsunami for example, we would write the MISC<ININTR> bit for this cpu.
+; The MISC CSR is at 801.A000.0080
+; Find out who we are from PT__WHAMI.
+;
+;	<sample code below>
+;
+	lda	p4, ^x801A(r31)			; generate 801.A000.0000
+	zapnot	p4, #3, p4			; zap extension
+	sll	p4, #28, p4			; move into place
+	hw_ldq/p p5, PT__WHAMI(p_temp)		; get whami
+	lda	p6, ^x10(r31)			; start at bit position 4
+	sll	p6, p5, p6			; shift left by whami
+	hw_stq/p p6, ^x80(p4)			; write to 801.A000.0080
+	hw_ldq/p p6, ^x80(p4)			; make sure write completes
+	mb
+;
+; Now get ready to post the interrupt.
+;
+	hw_stq/p p23, PT__STACK_PC(p_temp)	; store pc for post
+	bis	r31, #OSF_A0_INT__CLK, p5	; mark clock
+	hw_stq/p p5, PT__NEW_A0(p_temp)		; save new a0 away
+
+	lda	p6, OSF_IPL__CLK(r31)		; ipl for clock
+	br	r31, sys__int_post		; post interrupt
+
+;+
+; Interrupts that need to be handled.
+;-
+sys__int_ip:
+sys__int_dev:
+
+    .if eq force_path			; 1.41
+	hw_ret	(p23)			; return to user
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>	; align
+	PVC_VIOLATE <1007>
+	PVC_VIOLATE <1020>		; stop permutation
+	hw_jmp	(p23)			; return with jmp
+	br	r31, .-4		; stop predictor
+    .endc				; 1.41
+
+;+
+; Error interrupt from system
+;
+; Current state:
+;	p4	ev6__isum
+;	p7	ev6__isum__ei bits in <5:0>
+;	p23	exc_addr
+;-
+sys__int_err:
+	extbl	p_misc, #2, p5				; get mces
+	zap	p_misc, #^x78, p_misc			; clear mchk_code & SCBv
+
+	bis	p5, #<1@MCES__MCHK__S>, p6		; set MCES<MCHK>
+	sll	p6, #OSF_P_MISC__MCES__MCHK__S, p6	; shift into position
+	bis	p_misc, p6, p_misc			; or back mces
+
+	lda	p6, SCB__SYSMCHK(r31)			; SCB vector
+	sll	p6, #OSF_P_MISC__SCBV__S, p6		; move SCBv into position
+	bis	p_misc, p6, p_misc			; or back scbv
+
+	lda	p6, MCHK__SYS_HRD_ERR(r31)		; mchk code
+	sll	p6, #OSF_P_MISC__MCHK_CODE__S, p6	; mchk code into position
+	bis	p_misc, p6, p_misc			; or back mchk code
+
+	blbs	p5, sys__double_machine_check		; halt on double
+	blbs	p23, sys__machine_check_while_in_pal	; halt on in pal mode
+
+;
+; Compute where the frame is.
+;
+; Current state:
+;	p4	isum
+;	p23	exc_addr
+;
+	hw_ldq/p p6, PT__WHAMI(p_temp)			; get whami
+
+	lda	p5, PAL__LOGOUT_SPECIFIC_SIZE(r31)	; short&long size
+	mulq	p6, p5, p5				; * whami
+
+	GET_32CONS	p6, PAL__LOGOUT_BASE, r31	; logout base
+	addq	p5, p6, p5				; (size*whami) + base
+	lda	p5, MCHK__BASE(p5)			; start of mchk area
+
+	hw_stq/p p23, MCHK__EXC_ADDR(p5)		; store exc_addr
+	hw_stq/p p23, PT__STACK_PC(p_temp)		; save fault pc
+
+	hw_stq/p p4, MCHK__ISUM(p5)			; store isum
+	hw_stq/p r31, MCHK__DC1_SYNDROME(p5)
+	hw_stq/p r31, MCHK__DC0_SYNDROME(p5)
+	hw_stq/p r31, MCHK__C_STAT(p5)
+	hw_stq/p r31, MCHK__C_STS(p5)
+	hw_stq/p r31, MCHK__C_ADDR(p5)
+
+	hw_stq/p r31, MCHK__MM_STAT(p5)			; store 0
+
+	hw_stq/p r31, MCHK__I_STAT(p5)			; store 0
+	hw_stq/p r31, MCHK__DC_STAT(p5)			; store 0
+
+	bis	r31, r31, p20				; no retry
+;
+; Current state
+;
+;	p5	base of mchk area
+;	p20	retry flag
+;
+	br	r31, sys__mchk_header			; go build frame
+.endc						; if ne reference_platform
+
+.if eq reference_platform
+
+    .if eq force_path				; 1.41
+	hw_ret	(p23)				; return
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; 1.42 align
+	PVC_VIOLATE <1007>
+	PVC_VIOLATE <1020>			; stop permutation
+	hw_jmp	(p23)				; return with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+
+.endc
+
+
+;+
+; sys__interrupt_sl
+;
+; Function:
+;	Handle serial line interrupt. Ack the interrupt.
+;	The rest of the exercise is left to the platform programmer.
+; Entry:
+;	p23	exc_addr
+;	p4	ev6__isum
+;-
+	ALIGN_FETCH_BLOCK
+sys__interrupt_sl:
+.if ne reference_platform
+	lda	p7, 1(r31)			; get a 1
+	sll	p7, #EV6__HW_INT_CLR__SL__S, p7	; shift into position to ack
+	hw_mtpr	p7, EV6__HW_INT_CLR		; (4,0L) ack the interrupt
+	bis	r31, r31, r31			; fill out fetch block
+
+	hw_mtpr	p7, EV6__HW_INT_CLR		; (4,0L) ack the interrupt
+						; (pvc #35)
+
+    .if eq force_path				; 1.41
+	hw_ret_stall (p23)			; return
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; align
+	PVC_VIOLATE <1007>
+	PVC_VIOLATE <1020>			; stop permutation
+	hw_jmp_stall (p23)			; return with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+
+.iff
+
+    .if eq force_path				; 1.41
+	hw_ret_stall (p23)			; return
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; align
+	PVC_VIOLATE <1007>
+	PVC_VIOLATE <1020>			; stop permutation
+	hw_jmp_stall (p23)			; return with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+
+.endc
+
+;+
+; sys__interrupt_pc
+;
+; Function:
+;	Handle performance counter interrupts.
+; Entry:
+;	p23	exc_addr
+;	p4	ev6__isum
+;-
+sys__interrupt_pc:
+	hw_stq/p p23, PT__STACK_PC(p_temp)	; store pc for post
+	bis	r31, #OSF_A0_INT__PERFMON, p5	; mark perfmon
+	hw_stq/p p5, PT__NEW_A0(p_temp)		; save new a0 away
+	lda	p7, SCB__PERFMON(r31)		; SCB offset
+	hw_stq/p p7, PT__NEW_A1(p_temp)		; store it for post
+
+	bis	r31, r31, p6			; assume pc0, r4 will be 0
+	srl	p4, #<EV6__ISUM__PC__S+1>, p5	; get pc1 bit
+	cmovlbs	p5, #1, p6			; if pc1, r4 will be 1
+	hw_stq/p p6, PT__NEW_A2(p_temp)		; indicate which counter
+
+	lda	p7, 1(r31)			; get a 1
+	sll	p7, p6, p7			; bit 0 if pc0, bit 1 if pc1
+	sll	p7, #EV6__HW_INT_CLR__PC__S, p7	; move into position to ack
+	PVC_VIOLATE <35>
+	hw_mtpr	p7, EV6__HW_INT_CLR		; (4,0L) ack the interrupt
+
+	lda	p6, OSF_IPL__PERFMON(r31)	; ipl for performance counter
+	br	r31, sys__int_post		; post interrupt
+
+;+
+; sys__int_post
+;
+; Function:
+;	Post interrupt.
+;
+; Current state:
+;	p6		new IPL
+;
+;	PT__STACK_PC	exc_addr
+;	PT__NEW_A0	type
+;	PT__NEW_A1	interrupt vector
+;	PT__NEW_A2	mchk => kseg pointer to logout area
+;			perfmon => pc indicator
+;-
+sys__int_post:
+	and	p_misc, #<1@OSF_P_MISC__CM__S>, p4	; current mode
+	and	p_misc, #OSF_P_MISC__PS__M, p20		; save original ps
+	beq	p4, sys__int_post_cm_done		; skip switch if kernel
+;
+; Switch to kernel mode.
+;
+post_cm_offset = <sys__int_post_cm_done - sys__int_post_cm>
+
+	hw_stq/p r30, PT__USP(p_temp)			; save user SP
+	hw_ldq/p r30, PT__KSP(p_temp)			; get kernel SP
+
+	br	p4, sys__int_post_cm			; change mode to kernel
+sys__int_post_cm:
+	addq	p4, #<post_cm_offset+1>, p4		; jump past in palmode
+	hw_mtpr	r31, EV6__PS				; (4,0L) switch to kern
+	bsr	r31, .					; push prediction stack
+	PVC_JSR	post_cm					; synch up
+	hw_ret_stall (p4)				; pop prediction stack
+	PVC_JSR	post_cm, dest=1
+sys__int_post_cm_done:
+
+	bic	p_misc, #OSF_P_MISC__PS__M, p_misc	; clear PS
+	bis	p_misc, p6, p_misc			; cm=0, ipl=p6
+
+	hw_mfpr	p4, EV6__PAL_BASE		; (4,0L) get pal base
+	s8addq	p6, p4, p4			; pal base + index
+	lda	p4, ipl_offset(p4)		; pal base + table base + index
+	hw_ldq/p p4, (p4)			; get new ier
+	hw_mtpr	p4, EV6__IER			; (4,0L) write new ier
+
+	lda	r30, <0-OSF_FRM__SIZE>(r30)		; allocate stack space
+
+	stq	p20, OSF_FRM__PS(r30)			; save original ps
+	stq	r18, OSF_FRM__A2(r30)			; save a2
+
+	hw_ldq/p p20, PT__STACK_PC(p_temp)		; 1.39 get exc_addr back
+
+	stq	r29, OSF_FRM__GP(r30)			; save gp
+	stq	r16, OSF_FRM__A0(r30)			; save a0
+	stq	r17, OSF_FRM__A1(r30)			; save a1
+	stq	p20, OSF_FRM__PC(r30)			; 1.39 save exc_addr
+
+	hw_ldq/p p23, PT__ENT_INT(p_temp)		; get entry point
+	hw_ldq/p r29, PT__KGP(p_temp)			; get kgp
+	hw_ldq/p r16, PT__NEW_A0(p_temp)		; a0 <- type
+	hw_ldq/p r17, PT__NEW_A1(p_temp)		; a1 <- vector
+	hw_ldq/p r18, PT__NEW_A2(p_temp)		; a2 <- ptr to logout
+							; 	or pc indicator
+	hw_ret_stall	(p23)				; to os
+
+;+
+; CRD interrupt.
+;
+; On DC_STAT<ECC_ERR_LD> and C_STAT <> 0, the hardware guarantees a good local
+; copy. But on bcache and memory errors, we should scrub and store to make
+; sure memory will be cleaned eventually.
+;
+; Also, non-target quadwords are not corrected at all, so that's
+; another good reason to scrub.
+;
+; If DC_STAT<ECC_ERR_LD> and C_STAT = 0, we got a error on a speculative load.
+; or on a bcache victim on a dcache/bcache miss. If C_STAT = 0, we don't get a
+; C_ADDR, so we can't scrub.
+;
+; We can also enter here via a crd that signals we got a ISTREAM_MEM_ERR
+; or ISTREAM_BC_ERR mchk down a bad path. We need to scrub the error in this
+; case also.
+;
+; We can also enter here with a double bit error that has slipped into
+; c_stat after we took the crd. So look for that case, and take a mchk
+; if so. Note that c_stat double bit error bit is not locked, so we
+; can detect this condition.
+;
+; Current state:
+;	p23		exc_addr
+;-
+	ALIGN_CACHE_BLOCK
+sys__crd:
+;
+; First, fetch the cbox error chain, unlocking the error in the process.
+;
+    .if eq force_path			; 1.41
+	PVC_JSR	cbox, bsr=1
+	bsr	p5, sys__cbox
+    .iff
+	br	p5, sys__cbox
+	PVC_JSR cbox_hack, dest=1
+    .endc				; 1.41
+;
+; First check for a double bit error that came in just after the
+; single bit error.
+;
+; Current state:
+;	p5		available
+;	p20<43:39>	c_stat<4:0>
+;
+	sll	p20, #<64-<CHAIN__STAT__S+CHAIN__STAT__V>>, p5
+	srl	p5, #<64-CHAIN__STAT__V>, p5		; get c_stat
+	and	p5, #<1@EV6__C_STAT__DOUBLE__S>, p5	; check for dbl
+	bne	p5, sys__mchk__double_bit		; mchk if so
+;
+; Now continue with logout.
+;
+; Current state:
+;	p4		scratched
+;	p6		scratched
+;	p20<59:52>	dc1_syndrome<7:0>
+;	   <51:44>	dc0_syndrome<7:0>
+;	   <43:39>	c_stat<4:0>
+;	   <38:35>	c_sts<3:0>
+;	p23		exc_addr
+;
+;	pass1
+;	-----
+;	p7 <44:08>	c_addr<6:42>
+;	   <07:06>	raz
+;	   <05:00>	UNDEFINED
+;	pass2
+;	-----
+;	p7 <40:04>	c_addr<6:42>
+;	   <03:00>	raz
+;
+	hw_stq/p p23, PT__STACK_PC(p_temp)	; exc_addr for post, free up reg
+
+	extbl	p_misc, #2, p23			; get mces
+	zap	p_misc, #^x78, p_misc		; clean mchk_code and SCBv
+
+	srl	p23, #MCES__DPC__S, p6		; get dpc
+	blbs	p6, sys__crd_skip_frame		; dpc => don't build frame
+
+	bis	p23, #<1@MCES__PCE__S>, p6		; set MCES<PCE>
+	sll	p6, #OSF_P_MISC__MCES__MCHK__S, p6	; shift into position
+	bis	p_misc, p6, p_misc			; or back mces
+
+	lda	p6, SCB__PROC_CORR_ERR(r31)		; SCB vector
+	sll	p6, #OSF_P_MISC__SCBV__S, p6		; move SCBv into position
+	bis	p_misc, p6, p_misc			; or back scbv
+
+	lda	p6, MCHK__CORR_ECC(r31)			; mchk code
+	sll	p6, #OSF_P_MISC__MCHK_CODE__S, p6	; mchk code into position
+	bis	p_misc, p6, p_misc			; or back mchk code
+;
+; Now compute where the frame is.
+;
+; Current state:
+;	p7	cbox error chain info
+;	p20	cbox error chain info
+;	p23	old mces
+;
+	hw_ldq/p p4, PT__WHAMI(p_temp)			; get whami
+
+	lda	p5, PAL__LOGOUT_SPECIFIC_SIZE(r31)	; short&long size
+	mulq	p4, p5, p5				; * whami
+
+	GET_32CONS	p6, PAL__LOGOUT_BASE, r31	; logout base
+	addq	p5, p6, p5				; (size*whami) + base
+	lda	p5, MCHK_CRD__BASE(p5)			; start of mchk crd area
+
+	srl	p23, #MCES__PCE__S, p6			; get PCE
+	blbs	p6, sys__crd_second			; set => second error
+
+;
+; Now construct the cbox error registers and log them.
+; Current state:
+;
+;	p5		base of crd logout frame
+;
+;	p7		c_addr
+;
+;	p20<59:52>	dc1_syndrome<7:0>
+;	   <51:44>	dc0_syndrome<7:0>
+;	   <43:39>	c_stat<4:0>
+;	   <38:35>	c_sts<3:0>
+;
+;	p23		old mces
+;
+;	p_misc		updated with new mces, SCB, mchk code
+;
+
+CHAIN__DC1__S	= 52
+CHAIN__DC1__V	= 8
+CHAIN__DC0__S	= 44
+CHAIN__DC0__V	= 8
+CHAIN__STAT__S	= 39
+CHAIN__STAT__V	= 5
+CHAIN__STS__S	= 35
+CHAIN__STS__V	= 4
+
+sys__crd_arrange_cbox:
+	sll	p20, #<64-<CHAIN__DC1__S+CHAIN__DC1__V>>, p4
+	srl	p4, #<64-CHAIN__DC1__V>, p4
+	hw_stq/p p4, MCHK_CRD__DC1_SYNDROME(p5)			; store syn1
+
+	sll	p20, #<64-<CHAIN__DC0__S+CHAIN__DC0__V>>, p4
+	srl	p4, #<64-CHAIN__DC0__V>, p4
+	hw_stq/p p4, MCHK_CRD__DC0_SYNDROME(p5)			; store syn0
+
+	sll	p20, #<64-<CHAIN__STAT__S+CHAIN__STAT__V>>, p4
+	srl	p4, #<64-CHAIN__STAT__V>, p4
+	hw_stq/p p4, MCHK_CRD__C_STAT(p5)			; store stat
+
+	sll	p20, #<64-<CHAIN__STS__S+CHAIN__STS__V>>, p4
+	srl	p4, #<64-CHAIN__STS__V>, p4
+	hw_stq/p p4, MCHK_CRD__C_STS(p5)			; store sts
+;
+; Now get the error address.
+;
+; Current state:
+;
+;	p5		base of crd logout frame
+;
+;	pass1
+;	-----
+;	p7 <44:08>	c_addr<6:42>
+;	   <07:06>	raz
+;	   <05:00>	UNDEFINED
+;	pass2
+;	-----
+;	p7 <40:04>	c_addr<6:42>
+;	   <03:00>	raz
+;
+
+.if ne ev6_p1
+	C_ADDR_SHIFT = 45
+	and	p7, #^x3F, p7			; zap UNDEFINED bits
+.iff
+	C_ADDR_SHIFT = 41
+.endc
+
+	addq	r31, #C_ADDR_SHIFT, p6		; initialize shift count
+	addq	r31, r31, p4			; initialize output shift data
+
+sys__crd_addr:
+	and	p7, #1, p20			; clear all but bit 0
+	addq	p20, p4, p4			; accumulate output shift data
+	subq	p6, #1, p6			; decrement shift count
+	beq	p6, sys__crd_addr_done		; all done
+
+	sll 	p4, #1, p4			; shift output data 1 bit left
+	srl 	p7, #1, p7			; shift input data 1 bit right
+	br	r31, sys__crd_addr		; do next shift
+
+sys__crd_addr_done:
+	sll 	p4, #6, p4			; shift error address 6 bits left
+	hw_stq/p p4, MCHK_CRD__C_ADDR(p5)	; store addr
+;
+; Save off a clean mm_state.
+;
+	hw_stq/p r31, MCHK_CRD__MM_STAT(p5)	; store 0 for mm_stat
+;
+;
+; Fetch I_STAT, DC_STAT. Clear I_STAT. Clear only crd-type errors in DC_STAT, in
+; case we need to take a delayed dstream mchk once we are out of PALmode.
+;
+; Then check to see if we need to scrub.
+; The cases:
+;	C_STAT<ISTREAM_xx_ERR>
+;	DC_STAT<ECC_ERR_LD> and C_STAT <> 0 and C_STAT <> DSTREAM_DC_ERR
+;
+; Current state:
+;	p5	base of crd logout frame
+;
+;
+	EV6__DC_STAT__W1C_CRD = -
+		<<1@EV6__DC_STAT__ECC_ERR_ST__S> ! -
+		<1@EV6__DC_STAT__ECC_ERR_LD__S>>
+
+	DSTREAM_DC_ERR = 5
+;
+; The ev6_p2 definition will still work for ev6_p3. Bit ^x1e becomes
+; a RO bit for the new performance counter implementation.
+;
+.if ne ev6_p3
+	EV6__I_STAT__PAR__S = ^x1d
+	EV6__I_STAT__W1C = -
+		<<1@EV6__I_STAT__PAR__S>>
+.iff
+	EV6__I_STAT__TPE__S = ^x1d
+	EV6__I_STAT__DPE__S = ^x1e
+	EV6__I_STAT__W1C = -
+		<<1@EV6__I_STAT__TPE__S> ! -
+		<1@EV6__I_STAT__DPE__S>>
+.endc
+
+	hw_mfpr p4, EV6__I_STAT				; (4,0L) get i_stat
+	hw_mfpr	p6, EV6__DC_STAT			; (6,0L) get dc_stat
+	hw_stq/p p4, MCHK_CRD__I_STAT(p5)		; store i_stat
+	hw_stq/p p6, MCHK_CRD__DC_STAT(p5)		; store dc_stat
+
+	GET_32CONS 	p4, EV6__I_STAT__W1C, r31
+	hw_mtpr	p4, EV6__I_STAT				; (4,0L)
+
+	GET_16CONS	p4, EV6__DC_STAT__W1C_CRD, r31
+	hw_mtpr p4, EV6__DC_STAT			; (6,0L)
+	
+	hw_ldq/p p20, MCHK_CRD__C_STAT(p5)		; get c_stat back
+	beq	p20, sys__crd_merge			; if zero, can't scrub
+
+	and	p20, #<1@EV6__C_STAT__ISTREAM__S>, p4	; check for istream
+	bne	p4, sys__crd_do_scrub			; scrub if so
+
+	cmpeq	p20, #DSTREAM_DC_ERR, p4		; check for dcache
+	bne	p4, sys__crd_merge			; don't scrub if so
+
+	and	p6, #<1@EV6__DC_STAT__ECC_ERR_LD__S>, p4; check for ld
+	bne	p4, sys__crd_do_scrub			; scrub if so
+	br	r31, sys__crd_merge			; don't scrub if not 
+;
+; Scrub the error.
+; Current state:
+;	p5	base of crd logout frame
+;
+
+sys__crd_do_scrub:
+	hw_ldq/p p4, MCHK_CRD__C_ADDR(p5)	; get address back
+
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+	lda	p20, ^x3301(r31)		; set WE, RE
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; wait for retire
+	srl	p4, #13, p6			; shift byte offset
+	sll	p6, #EV6__DTB_PTE0__PFN__S, p6	; shift into position
+	bis	p6, p20, p6			; produce pte
+
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; Edit 1.36
+
+	PVC_VIOLATE <2>				; ignore scoreboard violation
+	hw_mtpr	p4, EV6__DTB_TAG0		; (2&6,0L) write tag0
+	hw_mtpr p4, EV6__DTB_TAG1		; (1&5,1L) write tag1
+	hw_mtpr	p6, <EV6__DTB_PTE0 ! ^x44>	; (0,4,2,6) (0L) write pte0
+	hw_mtpr	p6, <EV6__DTB_PTE1 ! ^x22>	; (3,7,1,5) (1L) write pte1
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; 1.41 wait for retire
+
+	mb					; quiet before we start
+    .if eq force_path			; 1.41
+	PVC_JSR scrub, bsr=1
+	bsr	p7, sys__crd_scrub
+    .iff
+	br	p7, sys__crd_scrub
+	PVC_JSR scrub_hack, dest=1
+    .endc				; 1.41
+
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; wait for retire
+	br	r31, sys__crd_merge
+;+
+; sys__crd_scrub
+;
+; Called from above and from dpc and pce cases.
+; After the scrub, read the cbox chain again.
+; The scrub will cause a crd, but will get cleared along with the
+; calling code's clear of hw_int_clr.
+;
+; Current state:
+;	mb	preceded this call
+;	p4	address to scrub
+;	p5	base of crd logout frame
+;	p7	return address
+; Exit state:
+;	p5	base of crd logout frame
+;		calling code needs to clear hw_int_clr
+;-
+
+	ALIGN_CACHE_BLOCK
+sys__crd_scrub:
+	ldq	p6, ^x00(p4)			; re-read the bad block QW #0
+	ldq	p6, ^x08(p4)			; re-read the bad block QW #1
+	ldq	p6, ^x10(p4)			; re-read the bad block QW #2
+	ldq	p6, ^x18(p4)			; re-read the bad block QW #3
+	ldq	p6, ^x20(p4)			; re-read the bad block QW #4
+	ldq	p6, ^x28(p4)			; re-read the bad block QW #5
+	ldq	p6, ^x30(p4)			; re-read the bad block QW #6
+	mb					; no other mem-ops till done
+	ldq_l	p6, ^x38(p4)			; re-read the bad block QW #7
+	stq_c	p6, ^x38(p4)			; now store it to force scrub
+	mb
+	and	p6, r31, p6			; consumer of above
+	beq	p6, sys__crd_scrub_done		; these 2 lines......
+	PVC_VIOLATE <1006>
+	br	r31, .-4			; .....stop pre-fetching
+sys__crd_scrub_done:
+	bis	p5, r31, p23			; save base of logout frame
+	hw_stq/p p7, PT__R0(p_temp)		; save p7 off somewhere
+
+    .if eq force_path				; 1.41
+	PVC_JSR	cbox, bsr=1
+	bsr	p5, sys__cbox			; get the cbox error chain again
+    .iff
+	PVC_VIOLATE <1008>			; 1.42 tell pvc to skip routine
+	br	p5, sys__cbox
+    .endc					; 1.41
+
+	bis	p23, r31, p5			; base of frame to p5
+	hw_ldq/p p7, PT__R0(p_temp)		; restore p7
+	bis	p7, #1, p7			; return in PALmode
+
+    .if eq force_path				; 1.41
+	PVC_JSR scrub, dest=1
+	hw_ret	(p7)				; return
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; align
+	PVC_JSR scrub_hack
+	hw_jmp	(p7)				; return with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+;
+; Now clear the crd and dc_stat.
+;
+sys__crd_merge:
+	bis r31, #1, p7 			; get a 1
+	sll	p7, #EV6__HW_INT_CLR__CR__S, p7	; shift into position
+	PVC_VIOLATE <35>
+	hw_mtpr	p7, EV6__HW_INT_CLR		; (4,0L)
+
+	GET_16CONS	p7, EV6__DC_STAT__W1C_CRD, r31
+	hw_mtpr p7, EV6__DC_STAT		; (6,0L)
+	bis	r31, r31 ,r31
+	bis	r31, r31 ,r31
+	bis	r31, r31 ,r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x50>	; stall till they retire
+;
+; Write the first 2 quadwords of the logout area
+; Merge from system crd handling.
+;
+
+sys__crd_header:
+	lda	p20, 1(r31)			; set retry flag
+	sll	p20, #63, p20			; shift retry into position
+	lda	p20, MCHK_CRD__SIZE(p20)	; flag ! frame size
+	hw_stq/p p20, MCHK_CRD__FLAG_FRAME(p5)	; store flag ! frame size
+	lda	p20, MCHK_CRD__SYSTEM_BASE(r31)	; system offset ???
+	sll	p20, #32, p20			; shift into position
+	lda	p20, MCHK_CRD__CPU_BASE(p20)	; sys offset ! cpu offset
+	hw_stq/p p20, MCHK_CRD__OFFSETS(p5)	; store offsets
+;+
+; Store the pal specific information. Also add revision number.
+;-
+ASSUME OSF_P_MISC__MCHK_CODE__S eq 40
+
+	GET_16CONS	p6, MCHK_CRD__REV, r31	; get revision
+	sll	p6, #32, p6			; shift into position
+	extwl	p_misc, #5, p20			; get mchk_code field
+	bis	p20, p6, p20			; combine the two
+	hw_stq/p p20, MCHK_CRD__MCHK_CODE(p5)	; store mchk code and rev
+;+
+; Store the system-specific part of the logout frame
+;-
+
+;+
+; Post machine check interrupt. This is the same as mchk.
+;-
+	br	r31, sys__mchk_post
+
+;+
+; Second error occured.
+;
+; Current state:
+;	p5		base of mchk_crd area
+;	p7		raw c_addr
+;	p20		raw c_stat
+;	PT__FAULT_PC	exc_addr
+;-
+sys__crd_second:
+	lda	p6, 3(r31)			; set retry and 2nd error flags
+	sll	p6, #30, p6			; move to <31:30> of flag long
+	hw_stl/p p6, MCHK_CRD__FLAG_FRAME+4(p5)	; store flag longword
+
+;+
+; PCE or DPC set.
+; Check to see if we need to scrub.
+; Then clear errors and dismiss.
+;
+; Current state:
+;	p7		raw c_addr
+;	p20		raw c_stat
+;	PT__STACK_PC	exc_addr
+;-
+sys__crd_skip_frame:
+
+	hw_mfpr	p6, EV6__DC_STAT			; (6,0L) get dc_stat
+
+	GET_32CONS 	p4, EV6__I_STAT__W1C, r31
+	hw_mtpr	p4, EV6__I_STAT				; (4,0L)
+
+	GET_16CONS	p4, EV6__DC_STAT__W1C_CRD, r31
+	hw_mtpr p4, EV6__DC_STAT			; (6,0L)
+	
+	sll	p20, #<64-<CHAIN__STAT__S+CHAIN__STAT__V>>, p20
+	srl	p20, #<64-CHAIN__STAT__V>, p20		; get c_stat
+
+	beq	p20, sys__crd_skip_frame_merge		; if zero, can't scrub
+
+	and	p20, #<1@EV6__C_STAT__ISTREAM__S>, p4	; check for istream
+	bne	p4, sys__crd_skip_frame_do_scrub	; scrub if so
+
+	cmpeq	p20, #DSTREAM_DC_ERR, p4		; check for dcache
+	bne	p4, sys__crd_skip_frame_merge		; don't scrub if so
+
+	and	p6, #<1@EV6__DC_STAT__ECC_ERR_LD__S>, p4; check for ld
+	bne	p4, sys__crd_skip_frame_do_scrub	; scrub if so
+	br	r31, sys__crd_skip_frame_merge		; don't scrub if not
+
+sys__crd_skip_frame_do_scrub:
+
+	addq	r31, #C_ADDR_SHIFT, p6		; initialize shift count
+	addq	r31, r31, p4			; initialize output shift data
+
+sys__crd_skip_frame_addr:
+	and	p7, #1, p20			; clear all but bit 0
+	addq	p20, p4, p4			; accumulate output shift data
+	subq	p6, #1, p6			; decrement shift count
+	beq	p6, sys__crd_skip_frame_addr_done
+
+	sll 	p4, #1, p4			; shift output data 1 bit left
+	srl 	p7, #1, p7			; shift input data 1 bit right
+	br	r31, sys__crd_skip_frame_addr	; do next shift
+
+sys__crd_skip_frame_addr_done:
+	sll 	p4, #6, p4			; shift error address 6 bits left
+
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+	lda	p20, ^x3301(r31)		; set WE, RE
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; wait for retire
+	srl	p4, #13, p6			; shift byte offset
+	sll	p6, #EV6__DTB_PTE0__PFN__S, p6	; shift into position
+	bis	p6, p20, p6			; produce pte
+
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; Edit 1.36
+
+	PVC_VIOLATE <2>				; ignore scoreboard violation
+	hw_mtpr	p4, EV6__DTB_TAG0		; (2&6,0L) write tag0
+	hw_mtpr p4, EV6__DTB_TAG1		; (1&5,1L) write tag1
+	hw_mtpr	p6, <EV6__DTB_PTE0 ! ^x44>	; (0,4,2,6) (0L) write pte0
+	hw_mtpr	p6, <EV6__DTB_PTE1 ! ^x22>	; (3,7,1,5) (1L) write pte1
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; 1.41 wait for retire
+
+	mb					; quiet before we start
+    .if eq force_path				; 1.41
+	PVC_JSR scrub, bsr=1
+	bsr	p7, sys__crd_scrub
+    .iff
+	PVC_VIOLATE <1008>			; 1.42 tell pvc to skip routine
+	br	p7, sys__crd_scrub
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; 1.43 separate fetch blocks
+    .endc					; 1.41
+
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; wait for retire
+	br	r31, sys__crd_skip_frame_merge
+;
+; Now clear the crd.
+;
+sys__crd_skip_frame_merge:
+	bis	r31, #1, p7				; get a 1
+	sll	p7, #EV6__HW_INT_CLR__CR__S, p7		; shift into position
+
+	hw_mtpr	p7, EV6__HW_INT_CLR			; (4,0L)
+	hw_ldq/p p23, PT__STACK_PC(p_temp)		; get exc_addr back
+
+	GET_16CONS	p7, EV6__DC_STAT__W1C_CRD, r31
+	hw_mtpr p7, EV6__DC_STAT			; (6,0L) clear dc_stat
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	p7, <EV6__HW_INT_CLR ! ^x40>		; (4,0L) force retire
+
+    .if eq force_path				; 1.41
+	hw_ret_stall (p23)			; dismiss
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>
+	PVC_VIOLATE <1007>
+	PVC_VIOLATE <1020>			; stop permutation
+	hw_jmp_stall (p23)			; dismiss with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+
+;+
+; sys__mchk_dc_tag_perr
+;
+; Dcache tag parity error occured during the initial tag probe of a load
+; or store instruction. This error created a synchronous fault to the dfault
+; PALcode entry point, and was corrected. We start off treating the fault
+; as a mchk. If we are in palmode, we halt. If no machine checks are in
+; progress, we turn the fault into a crd. If a mchk is in progress, we
+; dismiss.
+;
+; Current state:
+;	p5		mm_stat
+;	p23		exc_addr
+;-
+
+ASSUME OSF_P_MISC__MCES__MCHK__S eq 16
+ASSUME OSF_P_MISC__SCBV__S eq 24
+ASSUME OSF_P_MISC__MCHK_CODE__S eq 40
+
+	ALIGN_CACHE_BLOCK
+
+sys__mchk_dc_tag_perr:
+	blbs	p23, sys__dc_tag_perr_while_in_pal	; halt on in pal mode
+
+	bis	p5, r31, p20			; save off mm_stat
+	extbl	p_misc, #2, p5			; get mces
+	blbs	p5, sys__perr_dis		; dimiss if MCES<MCHK>
+
+	hw_stq/p p23, PT__STACK_PC(p_temp)	; save for post, free up register
+	extbl	p_misc, #2, p23			; get mces
+	zap	p_misc, #^x78, p_misc		; clean mchk_code and SCBv
+
+	srl	p23, #MCES__DPC__S, p6		; get dpc
+	blbs	p6, sys__perr_skip_frame	; dpc => don't build frame
+
+	bis	p23, #<1@MCES__PCE__S>, p6		; set MCES<PCE>
+	sll	p6, #OSF_P_MISC__MCES__MCHK__S, p6	; shift into position
+	bis	p_misc, p6, p_misc			; or back mces
+
+	lda	p6, SCB__PROC_CORR_ERR(r31)		; SCB vector
+	sll	p6, #OSF_P_MISC__SCBV__S, p6		; SCBv into position
+	bis	p_misc, p6, p_misc			; or back scbv
+
+	lda	p6, MCHK__DC_TAG_PERR(r31)		; mchk code
+	sll	p6, #OSF_P_MISC__MCHK_CODE__S, p6	; mchk code into position
+	bis	p_misc, p6, p_misc			; or back mchk code
+;
+; Now compute where the frame is.
+;
+	hw_ldq/p p4, PT__WHAMI(p_temp)			; get whami
+
+	lda	p5, PAL__LOGOUT_SPECIFIC_SIZE(r31)	; short&long size
+	mulq	p4, p5, p5				; * whami
+
+	GET_32CONS	p6, PAL__LOGOUT_BASE, r31	; logout base
+	addq	p5, p6, p5				; (size*whami) + base
+	lda	p5, MCHK__BASE(p5)			; start of mchk area
+
+	srl	p23, #MCES__PCE__S, p6			; get PCE
+	blbs	p6, sys__perr_second			; set => second error
+;
+; To be neat, write 0 to the cbox logout quadwords. Log ic_stat and
+; dc_stat but don't clear them.
+;
+	hw_stq/p r31, MCHK_CRD__DC1_SYNDROME(p5)	; store 0
+	hw_stq/p r31, MCHK_CRD__DC0_SYNDROME(p5)	; store 0
+	hw_stq/p r31, MCHK_CRD__C_STAT(p5)		; store 0
+	hw_stq/p r31, MCHK_CRD__C_STS(p5)		; store 0
+	hw_stq/p r31, MCHK_CRD__C_ADDR(p5)		; store 0
+
+	hw_stq/p p20, MCHK_CRD__MM_STAT(p5)		; store mm_stat
+
+	hw_mfpr p4, EV6__I_STAT				; (4,0L) get i_stat
+	hw_mfpr	p6, EV6__DC_STAT			; (6,0L) get dc_stat
+	hw_stq/p p4, MCHK_CRD__I_STAT(p5)		; store i_stat
+	hw_stq/p p6, MCHK_CRD__DC_STAT(p5)		; store dc_stat
+
+	br	r31, sys__crd_header			; merge to finish
+
+;+
+; PCE set on dc_tag_perr.
+;
+; sys__perr_second
+;
+; Current state:
+;	p5		base of mchk_crd area
+;	PT__STACK_PC	exc_addr
+;-
+sys__perr_second:
+	lda	p6, 3(r31)			; set retry and 2nd error flags
+	sll	p6, #30, p6			; move to <31:30> of flag long
+	hw_stl/p p6, MCHK_CRD__FLAG_FRAME+4(p5)	; store flag longword
+;+
+; PCE or DPC set on dc_tag_perr. Dismiss.
+;-
+sys__perr_skip_frame:
+	hw_ldq/p p23, PT__STACK_PC(p_temp)		; get exc_addr back
+
+sys__perr_dis:
+
+    .if eq force_path				; 1.41
+	hw_ret_stall (p23)			; dismiss
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; align
+	PVC_VIOLATE <1007>
+	PVC_VIOLATE <1020>			; stop permutation
+	hw_jmp_stall (p23)			; dismiss with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+
+;+
+; sys__mchk
+;
+; Current state:
+;	p23		exc_addr
+; 
+; Should we fetch any vulnerable registers earlier?
+;-
+	ALIGN_CACHE_BLOCK
+
+sys__mchk:
+;
+; First, fetch the cbox error chain, unlocking the error in the process.
+;
+    .if eq force_path				; 1.41
+	PVC_JSR	cbox, bsr=1
+	bsr	p5, sys__cbox			; get the cbox error chain
+    .iff
+	PVC_VIOLATE <1008>			; 1.42 tell pvc to skip routine
+	br	p5, sys__cbox
+    .endc					; 1.41
+;
+; May enter here for double bit error just after single bit error.
+;
+
+sys__mchk__double_bit:
+
+;
+; Now continue with logout.
+;
+; Current state:
+;	p4		scratched
+;	p6		scratched
+;	p20<59:52>	dc1_syndrome<7:0>
+;	   <51:44>	dc0_syndrome<7:0>
+;	   <43:39>	c_stat<4:0>
+;	   <38:35>	c_sts<3:0>
+;	p23		exc_addr
+;
+;	pass1
+;	-----
+;	p7 <44:08>	c_addr<6:42>
+;	   <07:06>	raz
+;	   <05:00>	UNDEFINED
+;	pass2
+;	-----
+;	p7 <40:04>	c_addr<6:42>
+;	   <03:00>	raz
+;
+
+ASSUME OSF_P_MISC__MCES__MCHK__S eq 16
+ASSUME OSF_P_MISC__SCBV__S eq 24
+ASSUME OSF_P_MISC__MCHK_CODE__S eq 40
+
+	hw_stq/p p_misc, PT__P_MISC(p_temp)	; save p_misc for mchk_to_crd
+
+	extbl	p_misc, #2, p5				; get mces
+	zap	p_misc, #^x78, p_misc			; clear mchk_code & SCBv
+
+	bis	p5, #<1@MCES__MCHK__S>, p6		; set MCES<MCHK>
+	sll	p6, #OSF_P_MISC__MCES__MCHK__S, p6	; shift into position
+	bis	p_misc, p6, p_misc			; or back mces
+
+	lda	p6, SCB__PROCMCHK(r31)			; SCB vector
+	sll	p6, #OSF_P_MISC__SCBV__S, p6		; move SCBv into position
+	bis	p_misc, p6, p_misc			; or back scbv
+
+	lda	p6, MCHK__PROC_HRD_ERR(r31)		; mchk code
+	sll	p6, #OSF_P_MISC__MCHK_CODE__S, p6	; mchk code into position
+	bis	p_misc, p6, p_misc			; or back mchk code
+
+	blbs	p5, sys__double_machine_check		; halt on double
+	blbs	p23, sys__machine_check_while_in_pal	; halt on in pal mode
+;+
+; Compute where the frame is.
+;
+; Current state:
+;	p7	cbox error chain info
+;	p20	cbox error chain info
+;	p23	exc_addr
+;-
+	hw_ldq/p p4, PT__WHAMI(p_temp)			; get whami
+
+	lda	p5, PAL__LOGOUT_SPECIFIC_SIZE(r31)	; short&long size
+	mulq	p4, p5, p5				; * whami
+
+	GET_32CONS	p6, PAL__LOGOUT_BASE, r31	; logout base
+	addq	p5, p6, p5				; (size*whami) + base
+	lda	p5, MCHK__BASE(p5)			; start of mchk area
+
+	hw_stq/p p23, MCHK__EXC_ADDR(p5)		; store exc_addr
+	hw_stq/p p23, PT__STACK_PC(p_temp)		; save fault pc
+
+	hw_mfpr	p4, EV6__ISUM				; get isum here
+	hw_stq/p p4, MCHK__ISUM(p5)			; save isum
+
+;+
+; Now construct the cbox error registers and log them.
+; Current state:
+;
+;	p5		base of mchk logout frame
+;
+;	p7		c_addr
+;
+;	p20<59:52>	dc1_syndrome<7:0>
+;	   <51:44>	dc0_syndrome<7:0>
+;	   <43:39>	c_stat<4:0>
+;	   <38:35>	c_sts<3:0>
+;
+;	p_misc		updated with new mces, SCB, mchk code
+;-
+sys__mchk_arrange_cbox:
+	sll	p20, #<64-<CHAIN__DC1__S+CHAIN__DC1__V>>, p4
+	srl	p4, #<64-CHAIN__DC1__V>, p4
+	hw_stq/p p4, MCHK__DC1_SYNDROME(p5)		; store syn1
+
+	sll	p20, #<64-<CHAIN__DC0__S+CHAIN__DC0__V>>, p4
+	srl	p4, #<64-CHAIN__DC0__V>, p4
+	hw_stq/p p4, MCHK__DC0_SYNDROME(p5)		; store syn0
+
+	sll	p20, #<64-<CHAIN__STAT__S+CHAIN__STAT__V>>, p4
+	srl	p4, #<64-CHAIN__STAT__V>, p4
+	hw_stq/p p4, MCHK__C_STAT(p5)			; store stat
+
+	sll	p20, #<64-<CHAIN__STS__S+CHAIN__STS__V>>, p4
+	srl	p4, #<64-CHAIN__STS__V>, p4
+	hw_stq/p p4, MCHK__C_STS(p5)			; store sts
+;
+; Now get the error address.
+;
+; Current state:
+;
+;	p5		base of mchk logout frame
+;
+;	pass1
+;	-----
+;	p7 <44:08>	c_addr<6:42>
+;	   <07:06>	raz
+;	   <05:00>	UNDEFINED
+;	pass2
+;	-----
+;	p7 <40:04>	c_addr<6:42>
+;	   <03:00>	raz
+;
+
+.if ne ev6_p1
+	C_ADDR_SHIFT = 45
+	and	p7, #^x3F, p7			; zap UNDEFINED bits
+.iff
+	C_ADDR_SHIFT = 41
+.endc
+
+	addq	r31, #C_ADDR_SHIFT, p6		; initialize shift count
+	addq	r31, r31, p4			; initialize output shift data
+
+sys__mchk_addr:
+	and	p7, #1, p20			; clear all but bit 0
+	addq	p20, p4, p4			; accumulate output shift data
+	subq	p6, #1, p6			; decrement shift count
+	beq	p6, sys__mchk_addr_done		; all done
+
+	sll 	p4, #1, p4			; shift output data 1 bit left
+	srl 	p7, #1, p7			; shift input data 1 bit right
+	br	r31, sys__mchk_addr		; do next shift
+
+sys__mchk_addr_done:
+	sll 	p4, #6, p4			; shift error address 6 bits left
+	hw_stq/p p4, MCHK__C_ADDR(p5)		; store addr
+
+;+
+; Fetch rest of short frame registers
+;-
+	EV6__DC_STAT__W1C = -
+		<<1@EV6__DC_STAT__TPERR_P0__S> ! -
+		<1@EV6__DC_STAT__TPERR_P1__S> ! -
+		<1@EV6__DC_STAT__ECC_ERR_ST__S> ! -
+		<1@EV6__DC_STAT__ECC_ERR_LD__S> ! -
+		<1@EV6__DC_STAT__SEO__S>>
+
+	hw_mfpr p4, EV6__MM_STAT		; (0L) get mm_stat
+	hw_stq/p p4, MCHK__MM_STAT(p5)		; store mm_stat
+
+	hw_mfpr p4, EV6__I_STAT			; (4,0L) get i_stat
+	hw_mfpr	p6, EV6__DC_STAT		; (6,0L) get dc_stat
+	hw_stq/p p4, MCHK__I_STAT(p5)		; store i_stat
+	hw_stq/p p6, MCHK__DC_STAT(p5)		; store dc_stat
+
+	GET_32CONS 	p4, EV6__I_STAT__W1C, r31
+	hw_mtpr	p4, EV6__I_STAT			; (4,0L) clear i_stat
+	GET_16CONS	p6, EV6__DC_STAT__W1C, r31
+	hw_mtpr p6, EV6__DC_STAT		; (6,0L) clear dc_stat
+
+	mb					; protect mm_stat ??
+
+;
+; Current state:
+;	p5		base of machine logout frame
+;
+; Check for re-tryable:
+;	(1) icache fill error. Hardware has flushed the icache, but the
+;		PALcode must scrub the block in the bcache.
+;
+; Decode of c_stat:
+;	0.0000		no error
+;	0.0001		BC_PERR (bcache parity error)
+;	0.0010		DC_PERR (ttag parity error)
+;	0.0011		DSTREAM_MEM_ERR
+;	0.0100		DSTREAM_BC_ERR
+;	0.0101		DSTREAM_DC_ERR
+;	0.011x		PROBE_BC_ERR (?)
+;
+;	0.1000		reserved
+;	0.1001		reserved
+;	0.1010		reserved
+;	0.1011		ISTREAM_MEM_ERR
+;	0.1100		ISTREAM_BC_ERR
+;	0.1101		reserved
+;	0.111x		reserved
+;
+;	1.xxxx		double bit error
+;	1.0011		mem double on dstream (p3)
+;	1.0100		bcache double on dstream (p3)
+;	1.1011		mem double on istream (p3)
+;	1.1100		bcache double on istream (p3)
+;
+ASSUME EV6__C_STAT__ISTREAM__S eq 3
+ASSUME EV6__C_STAT__DOUBLE__S eq 4
+ASSUME OSF_P_MISC__MCHK_CODE__S eq 40
+
+	hw_ldq/p p23, MCHK__C_STAT(p5)			; get error code back
+	and	p23, #<1@EV6__C_STAT__DOUBLE__S>, p7	; check for double
+	bne	p7, sys__mchk_double			; branch if so
+	and	p23, #<1@EV6__C_STAT__ISTREAM__S>, p7	; check for istream
+	bne	p7, sys__mchk_istream			; branch if so
+sys__mchk_double:
+	bis	r31, r31, p20				; no retry
+	bis	r31, #1, p7				; get a 1
+	sll	p7, #EV6__HW_INT_CLR__MCHK_D__S, p7	; shift into position
+	PVC_VIOLATE <35>
+	hw_mtpr	p7, EV6__HW_INT_CLR			; (4,0L) clear dstream
+;
+; Write the first 2 quadwords of the logout area
+;
+; Current state:
+;	p5	base of mchk area
+;	p20	retry flag
+;
+sys__mchk_header:
+	sll	p20, #63, p20			; shift retry into position
+	lda	p20, MCHK__SIZE(p20)		; flag ! frame size
+	hw_stq/p p20, MCHK__FLAG_FRAME(p5)	; store flag ! frame size
+	lda	p20, MCHK__SYSTEM_BASE(r31)	; system offset ???
+	sll	p20, #32, p20			; shift into position
+	lda	p20, MCHK__CPU_BASE(p20)	; sys offset ! cpu offset
+	hw_stq/p p20, MCHK__OFFSETS(p5)		; store offsets
+
+;+
+; Fetch long frame cpu registers.
+;
+; Current state:
+;	p5	base of machine check logout frame
+;-
+	ALIGN_FETCH_BLOCK <^x47FF041F>
+
+sys__mchk_registers:
+	hw_mfpr	p6, EV6__PROCESS_CONTEXT	; (4,0L) get process context
+	bis	r31, r31, r31			; don't write isum here
+	bis	r31, r31, r31			; don't write isum here
+	hw_stq/p p6, MCHK__PROCESS_CONTEXT(p5)	; store process context
+
+	hw_mfpr	p4, EV6__IER_CM			; (4,0L) get ier_cm
+	bis	r31, r31, r31			; don't get isum here
+	bis	r31, r31, r31			; don't write isum here
+	hw_stq/p p4, MCHK__IER_CM(p5)		; store ier_cm
+
+	hw_mfpr	p4, EV6__PAL_BASE		; (4,0L) get pal_base
+	bis	r31, r31, r31			; don't get isum here
+	bis	r31, r31, r31			; don't write isum here
+	hw_stq/p p4, MCHK__PAL_BASE(p5)		; store pal_base
+
+	hw_mfpr	p4, EV6__I_CTL			; (4,0L) get i_ctl
+	hw_stq/p p4, MCHK__I_CTL(p5)		; store i_ctl
+;+
+; Store the pal specific information. Also add revision number.
+;-
+ASSUME OSF_P_MISC__MCHK_CODE__S eq 40
+
+	GET_16CONS	p6, MCHK__REV, r31	; get revision
+	sll	p6, #32, p6			; shift into position
+	extwl	p_misc, #5, p20			; get mchk_code field
+	bis	p20, p6, p20			; combine the two
+	hw_stq/p p20, MCHK__MCHK_CODE(p5)	; store mchk code and rev
+;+
+; Store the system-specific part of the logout frame
+;-
+
+;+
+; Post machine check interrupt.
+;
+; Current state:
+;	p5		logout frame address
+;
+;	PT__STACK_PC	current pc
+;-
+EV6__M_CTL__SPE2__S = 3
+
+sys__mchk_post:
+	lda	p7, OSF_A0_INT__MCHK(r31)	; mark machine check
+	hw_stq/p p7, PT__NEW_A0(p_temp)		; save new a0 away
+
+	extwl	p_misc, #3, p4			; SCBV
+	hw_stq/p p4, PT__NEW_A1(p_temp)		; save new a1 away
+
+	hw_ldq/p p6, PT__M_CTL(p_temp)		; get M_CTL
+	bis	r31, #42, p4			; assume 43-bit spe
+	srl	p6, #EV6__M_CTL__SPE2__S, p6	; check out 48-bit spe
+	cmovlbs	p6, #47, p4			; change shift count if so
+
+	subq	r31, #1, p7			; get a -1
+	srl	p7, p4, p7			; shift off low bits of kseg addr
+	sll	p7, p4, p7			; shift back into position
+	bis	p7, p5, p7			; kseg pointer to logout area
+	hw_stq/p p7, PT__NEW_A2(p_temp)		; save new a2 away
+
+	bis	r31, #OSF_IPL__MCHK, p6		; new ipl
+	br	r31, sys__int_post		; post interrupt
+
+;+
+; Istream => recoverable. The hardware has scrubbed the icache, but the
+; PALcode needs to scrub the bcache and memory.
+;
+; We do this we quadword loads to the block. The hardware will do the
+; scrub. However, a good scrubbing causes a crd. Check for a crd
+; interrupt, read the cbox chain again, and do a write to hw_int_clr.
+;
+; Question: Do I need to be aligned and do I have to be careful with
+; the istream pre-fetching? For now, use Quinn's code as is. I have added
+; an mb on the front to isolate this scrub, but it is also probably not
+; necessary.
+;
+; Also, we have a crd that occurs along with the mchk, which would allow
+; us to detect and correct a mchk down a bad path. The hw_int_clr wirte
+; clears everything up.
+;
+; Current state:
+;	p5		base of mchk logout frame
+;-
+
+;+
+; 1.41
+;
+; First check for CMOV -- if exc_addr - 4 was a cmov, we must kill
+; the machine because the cmov may or may not have actually
+; been executed and we really have no way of knowing.
+;
+; Rather than compare the opcode and function of each possible 
+; type of CMOV, we'll compare the bits that are common across 
+; all of them. This may end up matching a few additional 
+; instructions but that's ok. With a quick look through the 
+; current instruction assignments, the only other instructions
+; with the same opcode as either of these are xor and ornot
+; both of which have function codes which will not match the
+; test below.
+;
+; The function encodings for the CMOVs are:
+;
+;  CMOVEQ  010.0100
+;  CMOVGE  100.0110
+;  CMOVGT  110.0110        FCMOVEQ 000.0010.1010
+;  CMOVLBC 001.0110        FCMOVGE 000.0010.1101
+;  CMOVLBS 001.0100        FCMOVGT 000.0010.1111
+;  CMOVLE  110.0100        FCMOVLE 000.0010.1110
+;  CMOVLT  100.0100        FCMOVLT 000.0010.1100
+;  CMOVNE  010.0110        FCMOVNE 000.0010.1011
+;  ----------------        ---------------------
+;          xxx.01x0                000.0010.1xxx
+;
+; All of the integer CMOV instructions are opcode 0x11 and
+; the FP CMOV instructions are opcode 0x17.
+;
+; The function for integer CMOVs (int operate format)
+; is instr<11:5> and for fp CMOVs (FP operate format) is
+; instr<15:5>. In both cases the opcode is instr<31:26>.
+;
+; So what we'll do is mask the instruction down to
+; the opcode and care function bits (2 mask ops -- 
+; int and fp) and then compare against the actual
+; opcode and care bits.
+;
+; Therefore the mask and compare values are:
+;
+;  Integer: Mask: 0xfc0001a0 Compare: 0x44000080
+;  FP:      Mask: 0xfc00ff00 Compare: 0xfc000500
+;
+; Current state:
+;	p5		base of mchk logout frame
+;	PT__STACK_PC	exc_addr
+;-
+
+INT_CMOV_MASK = ^xfc0001a0
+INT_CMOV_CMP = ^x44000080
+FP_CMOV_MASK = ^xfc00ff00 
+FP_CMOV_CMP = ^x5c000500    
+
+sys__mchk_istream:				; 1.41
+	hw_stq/p p5, PT__R1(p_temp)		; save off frame addr
+	hw_ldq/p p20, PT__STACK_PC(p_temp)	; get back exc_addr
+	subq	p20, #4, p20			; subtract 4
+;
+; Get the instruction. A tb miss is okay.
+; A tnv or dfault will be a fatal mchk.
+;
+; Current state:
+;	PT__R1		saved frame addr
+;	PT__STACK_PC	save exc_addr
+;
+sys__mchk_istream_check_cmov:		; 1.41
+	ldl	p20, (p20)		; get instruction
+	zap     p20, #^xf0, p20		; clean any sign extension
+
+	GET_32CONS	p4, INT_CMOV_MASK, r31, verify=0; int CMOV mask
+	zap	p4, #^xf0, p4				; clean sign ext
+	GET_32CONS	p5, INT_CMOV_CMP, r31		; int CMOV compare
+
+	and	p20, p4, p4		; mask it
+	cmpeq	p4, p5, p6		; is it an int CMOV?
+
+	GET_32CONS	p4, FP_CMOV_MASK, r31, verify=0	; fp CMOV mask
+	zap	p4, #^xf0, p4				; clean sign ext
+	GET_32CONS	p5, INT_CMOV_CMP, r31		; fp CMOV compare
+
+	and	p20, p4, p4		; mask it
+	cmpeq	p4, p5, p7		; is it an fp CMOV?
+
+	bis	p6, p7, p6			; is it a CMOV? (merge results)
+	bne	p6, sys__mchk_istream_cmov_err	; branch if so
+	br	r31, sys__mchk_istream_not_cmov	; branch for not
+;+
+; PC-4 is a CMOV. Make a fatal mchk.
+;
+; Current state:
+; 	PT__STACK_PC	exc_addr
+; 	PT__R1		frame addr
+;-
+sys__mchk_istream_cmov_err:				; 1.41
+	hw_ldq/p p5, PT__R1(p_temp)			; get back frame addr
+
+	zap	p_misc, #^x60, p_misc			; clean old code
+	lda	p6, MCHK__ISTREAM_CMOV(r31)		; mchk code
+	sll	p6, #OSF_P_MISC__MCHK_CODE__S, p6	; into position
+	bis	p_misc, p6, p_misc			; or in new code
+
+	bis	r31, r31, p20				; no retry
+	br	r31, sys__mchk_header			; take fatal mchk
+;+
+; Couldn't get the instruction for some reason.
+;
+; Current state:
+; 	PT__STACK_PC	exc_addr
+; 	PT__R1		frame addr
+;-
+sys__mchk_istream_cmov_fault:				; 1.41
+	hw_ldq/p p5, PT__R1(p_temp)			; get back frame addr
+
+	zap	p_misc, #^x60, p_misc			; clean old code
+	lda	p6, MCHK__ISTREAM_CMOV_FAULT(r31)	; mchk code
+	sll	p6, #OSF_P_MISC__MCHK_CODE__S, p6	; into position
+	bis	p_misc, p6, p_misc			; or in new code
+
+	bis	r31, r31, p20				; no retry
+	br	r31, sys__mchk_header			; take fatal mchk
+
+;+
+; PC-4 not a CMOV. Back to business. Scrub the address.
+;
+; Current state:
+;	PT__R1		addr of frame
+;	PT__STACK_PC	exc_addr
+;-
+sys__mchk_istream_not_cmov:			; 1.41
+	hw_ldq/p p5, PT__R1(p_temp)		; 1.41 get back frame addr
+
+	hw_ldq/p p4, MCHK__C_ADDR(p5)		; get back address
+
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+	lda	p20, ^x3301(r31)		; set WE, RE
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; wait for retire
+	srl	p4, #13, p6			; shift byte offset
+	sll	p6, #EV6__DTB_PTE0__PFN__S, p6	; shift into position
+	bis	p6, p20, p6			; produce pte
+
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; Edit 1.36
+
+	PVC_VIOLATE <2>				; ignore scoreboard violation
+	hw_mtpr	p4, EV6__DTB_TAG0		; (2&6,0L) write tag0
+	hw_mtpr p4, EV6__DTB_TAG1		; (1&5,1L) write tag1
+	hw_mtpr	p6, <EV6__DTB_PTE0 ! ^x44>	; (0,4,2,6) (0L) write pte0
+	hw_mtpr	p6, <EV6__DTB_PTE1 ! ^x22>	; (3,7,1,5) (1L) write pte1
+
+	mb					; quiet before we start
+	br	r31, sys__mchk_scrub
+
+	ALIGN_CACHE_BLOCK
+sys__mchk_scrub:
+	ldq	p6, ^x00(p4)			; re-read the bad block QW #0
+	ldq	p6, ^x08(p4)			; re-read the bad block QW #1
+	ldq	p6, ^x10(p4)			; re-read the bad block QW #2
+	ldq	p6, ^x18(p4)			; re-read the bad block QW #3
+	ldq	p6, ^x20(p4)			; re-read the bad block QW #4
+	ldq	p6, ^x28(p4)			; re-read the bad block QW #5
+	ldq	p6, ^x30(p4)			; re-read the bad block QW #6
+	mb					; no other mem-ops till done
+	ldq_l	p6, ^x38(p4)			; re-read the bad block QW #7
+	stq_c	p6, ^x38(p4)			; now store it to force scrub
+	mb
+	and	p6, r31, p6			; consumer of above
+	beq	p6, sys__mchk_scrub_done	; these 2 lines......
+	PVC_VIOLATE <1006>
+	br	r31, .-4			; .....stop pre-fetching
+
+sys__mchk_scrub_done:
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; wait for retire
+;
+; Now clear the chain and the interrupt and dc_stat.
+;
+sys__mchk_clear_crd:
+	bis	p5, r31, p23			; save base of logout frame
+
+    .if eq force_path				; 1.41
+	PVC_JSR	cbox, bsr=1
+	bsr	p5, sys__cbox			; get the cbox error chain again
+    .iff
+	PVC_VIOLATE <1008>			; 1.42 tell pvc to skip routine
+	br	p5, sys__cbox
+    .endc					; 1.41
+
+	bis	p23, r31, p5			; base of mchk frame to p5
+;
+; Current state:
+;	p5		base of mchk logout frame
+;
+	bis	r31, #1, p7			; get a 1
+	sll	p7, #EV6__HW_INT_CLR__CR__S, p7	; shift into position
+	PVC_VIOLATE <35>
+	hw_mtpr	p7, EV6__HW_INT_CLR		; (4,0L)
+
+	GET_16CONS	p7, EV6__DC_STAT__W1C_CRD, r31
+	hw_mtpr p7, EV6__DC_STAT		; (6,0L)
+	bis	r31, r31 ,r31
+	bis	r31, r31 ,r31
+	bis	r31, r31 ,r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x50>	; stall till they retire
+
+;+
+; Now turn mchk into a processor corrected machine check.
+; Re-write the mces, SCBV, and code value.
+; Get the cbox registers from the machine logout frame.
+;
+;	p5		base of mchk logout frame
+;	PT__STACK_PC	exc_addr
+;-
+sys__mchk_to_crd:
+	hw_ldq/p p_misc, PT__P_MISC(p_temp)	; recover p_misc
+
+	extbl	p_misc, #2, p23			; get mces
+	zap	p_misc, #^x78, p_misc		; clean mchk_code and SCBv
+
+	srl	p23, #MCES__DPC__S, p6		; get dpc
+	blbs	p6, sys__perr_skip_frame	; dpc => don't build frame
+
+	bis	p23, #<1@MCES__PCE__S>, p6		; set MCES<PCE>
+	sll	p6, #OSF_P_MISC__MCES__MCHK__S, p6	; shift into position
+	bis	p_misc, p6, p_misc			; or back mces
+
+	lda	p6, SCB__PROC_CORR_ERR(r31)		; SCB vector
+	sll	p6, #OSF_P_MISC__SCBV__S, p6		; SCBv into position
+	bis	p_misc, p6, p_misc			; or back scbv
+
+	lda	p6, MCHK__CORR_ECC(r31)			; mchk code
+	sll	p6, #OSF_P_MISC__MCHK_CODE__S, p6	; mchk code into position
+	bis	p_misc, p6, p_misc			; or back mchk code
+
+;
+; Now compute where the crd frame is.
+; Current state:
+;	p5		base of mchk logout frame
+;
+	bis	p5, r31, p20				; move to p20
+	lda	p5,  <MCHK_CRD__BASE - MCHK__BASE>(p20)	; compute crd base
+
+	srl	p23, #MCES__PCE__S, p6			; get PCE
+	blbs	p6, sys__perr_second			; set => second error
+
+;
+; Recover the cbox error registers and log them.
+;
+; Current state:
+;	p5	base of crd logout frame
+;	p20	base of mchk logout frame
+;
+
+	hw_ldq/p p4, MCHK__DC1_SYNDROME(p20)		; get syn1
+	hw_ldq/p p7, MCHK__DC0_SYNDROME(p20)		; get syn0
+	hw_stq/p p4, MCHK_CRD__DC1_SYNDROME(p5)		; store syn1
+	hw_stq/p p7, MCHK_CRD__DC0_SYNDROME(p5)		; store syn1
+
+	hw_ldq/p p4, MCHK__C_STAT(p20)			; get stat
+	hw_ldq/p p7, MCHK__C_STS(p20)			; get sts
+	hw_stq/p p4, MCHK_CRD__C_STAT(p5)		; store stat
+	hw_stq/p p7, MCHK_CRD__C_STS(p5)		; store sts
+
+	hw_ldq/p p4, MCHK__C_ADDR(p20)			; get addr
+	hw_stq/p p4, MCHK_CRD__C_ADDR(p5)		; store addr
+
+	hw_stq/p r31, MCHK_CRD__MM_STAT(p5)		; store 0 for mm_stat
+
+	hw_ldq/p p4, MCHK__I_STAT(p20)			; get i_stat
+	hw_ldq/p p7, MCHK__DC_STAT(p20)			; get dc_stat
+	hw_stq/p p4, MCHK_CRD__I_STAT(p5)		; store i_stat
+	hw_stq/p p7, MCHK_CRD__DC_STAT(p5)		; store dc_stat
+
+	br	r31, sys__crd_header			; merge to finish
+
+;+
+; sys__double_machine_check
+;
+; A machine check was started, but mces <mchk> was already set.
+;
+; Current state:
+;	p23		exc_addr
+;-
+sys__double_machine_check:				; halt on double
+	lda	p20, HALT__DBL_MCHK(r31)		; halt code
+	hw_stq/p p20, PT__HALT_CODE(p_temp)		; store code (??)
+	br	r31, trap__update_pcb_and_halt		; update and halt
+;+
+; sys__machine_check_while_in_pal
+;
+; A machine check exception was taken and exc_addr was a PAL PC.
+; ?? This can only occur on istream machine checks, as dstream machine
+; checks are deferred ??
+;-
+sys__machine_check_while_in_pal:			; halt on in pal mode
+	lda	p20, HALT__MCHK_FROM_PAL(r31)		; halt code
+	hw_stq/p p20, PT__HALT_CODE(p_temp)		; store code (??)
+	br	r31, trap__update_pcb_and_halt		; update and halt
+;+
+; sys__dc_tag_perr_while_in_pal
+;
+; A dc_tag_perr exception was taken and exc_addr was a PAL PC.
+;-
+sys__dc_tag_perr_while_in_pal:			; halt on in pal mode
+	lda	p20, HALT__DC_TAG_PERR_FROM_PAL(r31)	; halt code
+	hw_stq/p p20, PT__HALT_CODE(p_temp)		; store code (??)
+	br	r31, trap__update_pcb_and_halt		; update and halt
+
+;+
+; sys__cbox
+;
+; Shift in cbox error register chain.
+;
+; External bus activity must be isolated from writes to the CBOX CSR.
+; This requires that all dstream and istream fills must be avoided until after
+; the MTPR update completes. An MB instruction can block dstream activity, but
+; blocking all istream fills including prefetches requires more extensive code.
+; Also, we assume that i_ctl<sbe>=3 in the normal case, and restore to that
+; value.
+;
+; The 'error' status is cleared when the first mfpr retires.
+;
+; We are going to shift 66 bits, even though the 4-bit cbox status field
+; is pass2 or later.
+;
+; Pass1
+; -----
+;  8	dc1_syndrome<7:0>	for the last fill scrubbed by dcache ECC checkers
+;  8	dc0_syndrome<7:0>	for the last fill scrubbed by dcache ECC checkers
+;  5	c_stat<4:0>		error status
+; 37	c_addr<6:42>		block address of last reported error (inverted!)
+;  2	raz<1:0>		padded zeros to get multiple of 6
+; --
+; 60 bits
+;
+; Pass2
+; -----
+;  8	dc1_syndrome<7:0>	for the last fill scrubbed by dcache ECC checkers
+;  8	dc0_syndrome<7:0>	for the last fill scrubbed by dcache ECC checkers
+;  5	c_stat<4:0>		error status
+;  4	c_sts<3:0>		captured status of bcache in init-mode
+; 37	c_addr<6:42>		block address of last reported error (inverted!)
+;  4	raz<3:0>		padded zeros to get multiple of 6
+; --
+; 66 bits
+;
+; Input:
+;	p5		return address
+;
+; Register Use:
+;	p4		scratch
+;	p6		scratch
+;	p20<59:52>	dc1_syndrome<7:0>
+;	   <51:44>	dc0_syndrome<7:0>
+;	   <43:39>	c_stat<4:0>
+;	   <38:35>	c_stst<3:0> (pass2 only)
+;
+;	pass1
+;	-----
+;	p7 <44:08>	c_addr<6:42>
+;	   <07:06>	raz
+;	   <05:00>	UNDEFINED
+;	pass2
+;	-----
+;	p7 <40:04>	c_addr<6:42>
+;	   <03:00>	raz
+;-
+	ALIGN_FETCH_BLOCK
+sys__cbox:
+	mb					; quiet the dstream
+	hw_mfpr	p6, EV6__I_CTL			; (4,0L) get i_ctl
+	lda	p4, ^xFCFF(r31)			; mask for clearing SBE bits
+	and	p6, p4, p4			; clear SBE bits
+
+sbe_off_offset = <sys__cbox_sbe_off_done - sys__cbox_sbe_off>
+
+	hw_mtpr	p4, EV6__I_CTL			; (4,0L) write new i_ctl
+	br	p6, sys__cbox_sbe_off
+sys__cbox_sbe_off:
+	addq	p6, #<sbe_off_offset+1>, p6	; past stall in palmode
+	bsr	r31, .				; 1.50 stack push
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; 1.41 align
+	hw_mtpr	r31, EV6__IC_FLUSH		; (4,0L) eliminate prefetches
+	bne	r31, .				; pvc #24
+	PVC_JSR sbe_off				; synch and flush
+	hw_ret_stall (p6)			; 1.50 use ret, pop stack
+	PVC_JSR sbe_off, dest=1			; 1.41 br stops predictor
+sys__cbox_sbe_off_done:
+	br	r31, sys__cbox_touch1		; now pull in the next block
+
+	ALIGN_CACHE_BLOCK
+sys__cbox_over1:				; block 1
+	addq	r31, #11, p6			; initialize shift count (11x)
+	addq	r31, r31, p7			; initialize shift data
+	br	r31, sys__cbox_over2		; go to block 2
+sys__cbox_touch1:				;
+	br	r31, sys__cbox_touch2		; touch block 2
+
+sys__cbox_over2:				; block 2
+	hw_mtpr	r31, EV6__SHIFT_CONTROL		; (6,0L) shift in 6 bits
+	subq	p6, #1, p6			; decrement shift count
+	br	r31, sys__cbox_over3		; go to block 3
+sys__cbox_touch2:				;
+	br	r31, sys__cbox_touch3		; touch block 3
+
+sys__cbox_over3:				; block 3
+	hw_mtpr	r31, <EV6__MM_STAT ! 64 >	; (6,0L) wait for shift
+	bis	p5, #1, p5			; return in pal mode
+	br	r31, sys__cbox_over4		; go to block 4
+sys__cbox_touch3:				;
+	br	r31, sys__cbox_touch4		; touch block 4
+
+sys__cbox_over4:				; block 4
+	hw_mfpr	p4, EV6__DATA			; (6,0L) read cbox data
+	bis	r31, r31, r31			; nop
+	br	r31, sys__cbox_over5		; go to block 5
+sys__cbox_touch4:				;
+	br	r31, sys__cbox_touch5		; touch block 5
+
+sys__cbox_over5:				; block 5
+	and	p4, #^x3F, p4			; clean to <5:0>
+	addq	p4, p7, p7			; accumulate shift data
+	br	r31, sys__cbox_over6		; go to block 6
+sys__cbox_touch5:				;
+	br	r31, sys__cbox_touch6		; touch block 6
+
+sys__cbox_over6:				; block 6
+	beq	p6, sys__cbox_over8		; branch if done
+	bis	r31, r31, r31			; nop
+	br	r31, sys__cbox_over7		; go to block 7
+sys__cbox_touch6:				;
+	br	r31, sys__cbox_touch7		; touch block 7
+
+sys__cbox_over7:				; block 7
+	bis	p7, r31, p20			; save before shifting
+	sll	p7, #6, p7			; shift data 6 bits left
+	br	r31, sys__cbox_over2		; do next shift
+sys__cbox_touch7:				;
+	br	r31, sys__cbox_touch8		; touch block 8
+
+sys__cbox_over8:				; block 8
+	beq	r31, sys__cbox_cbox_done	; predict not taken
+	PVC_VIOLATE <1006>
+	br	r31, .-4			; predict back into infinite loop
+	bis	r31, r31, r31			;
+sys__cbox_touch8:				;
+	br	r31, sys__cbox_over1		; now start executing the shifts
+
+sys__cbox_cbox_done:				; now restore i_ctl
+	hw_mfpr	p6, EV6__I_CTL			; (4,0L) get i_ctl
+	lda	p4, <3@EV6__I_CTL__SBE__S>(r31)	; sbe bits
+	or	p6, p4, p4			; set SBE bits
+	bis	r31, r31, r31
+
+	hw_mtpr	p4, EV6__I_CTL			; (4,0L) restore i_ctl
+
+    .if eq force_path				; 1.41
+	PVC_JSR cbox, bsr=1, dest=1
+	hw_ret_stall (p5)			; return to caller with stall
+    .iff
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; align
+	PVC_JSR cbox_hack
+	hw_jmp_stall (p5)			; return with jmp
+	br	r31, .-4			; stop predictor
+    .endc					; 1.41
+
+;+
+; sys__cserve
+;
+;-
+sys__cserve:
+
+.if eq reference_platform
+	hw_ret	(p23)
+
+.iff						; if eq reference_platform
+
+    .if eq srm_console
+
+;+
+; sys__cserve for non-srm_console
+;
+; Entry:
+;	r16 (a0)	function parameter
+;	r17 (a1)	function parameter
+;	r18 (a2)	function type
+;
+; Output parameters:
+;	r0 (v0)		result
+;
+;-
+	cmpeq	r18, #CSERVE__JTOPAL, r0
+	bne	r0, cfw__jtopal
+
+	cmpeq	r18, #CSERVE__RD_IMPURE, r0
+	bne	r0, cfw__rd_impure
+
+	cmpeq	r18, #CSERVE__START, r0
+	bne	r0, cfw__start
+
+      .if ne dbm_serial_io			; dbm serial io
+;
+; The cserves below and the supporting i/o routines are called in by the
+; SROM_CSERVES and SROM_IO_FUNCTIONS macros found at the end of this module.
+;
+	cmpeq	r18, #CSERVE_K_SROM_INIT, r0
+	bne	r0, Sys_Cserve_Srom_Init
+
+	cmpeq	r18, #CSERVE_K_SROM_PUTC, r0
+	bne	r0, Sys_Cserve_Srom_Putc
+
+	cmpeq	r18, #CSERVE_K_SROM_GETC, r0
+	bne	r0, Sys_Cserve_Srom_Getc
+
+      .endc					; if ne dbm_serial_io
+
+	hw_ret	(p23)				; return, nothing done
+
+
+;+
+; CSERVE__START
+;-
+cfw__start:
+	br	r31, sys__exit_console
+
+;+
+; CSERVE_JTOPAL
+;
+; Function:
+;	Transfer control to the specified address, passed in
+;	r16 (a0), in PALmode.
+;
+;	Write the signature
+;	Flush Icache
+;	Dispatch to new PALcode
+;
+; Current state:
+;	r16 (a0)	transfer address
+;
+; Exit state::
+;	r1		dc_ctl
+;	r15		srom_rev
+;	r16		proc_id
+;	r17		mem_size
+;	r18		cycle_cnt
+;	r19		signature in <31:16>
+;	r20		proc_mask (note: we are stepping on shadow!)
+;	r21		sysctx (note: we are stepping on shadow!)
+;	other registers UNPREDICTABLE
+;-
+	ALIGN_FETCH_BLOCK
+
+cfw__jtopal:
+	bis	r16, #1, r27			; insure PALmode
+
+	hw_ldq/p r21, PT__IMPURE(p_temp)	; get pt_impure base address
+
+	hw_ldq/p r1, CNS__DC_CTL(r21)		; get dc_ctl value
+	hw_ldq/p r2, CNS__WRITE_MANY(r21)	; get write many chain
+	sll	r2, #16, r2			; shift into place
+	bis	r1, r2, r1			; OR into dc_ctl parameter
+
+	hw_ldq/p r15, CNS__SROM_REV(r21)	; encoded srom.s RCS revision
+	hw_ldq/p r16, CNS__PROC_ID(r21)		; processor identification
+						; (a la SRM)
+	hw_ldq/p r17, CNS__MEM_SIZE(r21)	; size of contiguous,
+						; good memory in bytes
+	hw_ldq/p r18, CNS__CYCLE_CNT(r21)	; cycle count in picoseconds
+	hw_ldq/p r19, CNS__SIGNATURE(r21)	; signature (0xDECB) in <31:16>
+						; system revision ID in <15:0>
+	hw_ldq/p r20, CNS__PROC_MASK(r21)	; active processor mask
+;
+; The following load trashes p_temp, but we don't need it any more.
+;
+	hw_ldq/p r21, CNS__SYSCTX(r21)		; system context value
+
+	mb
+
+	bsr	r31, .				; push prediction stack
+	hw_mtpr	r31, EV6__IC_FLUSH		; (4,0L) flush icache
+	bne	r31, .				; pvc #24
+	PVC_VIOLATE <1007>
+	hw_ret_stall (r27)			; pop prediction stack
+						; go off to new PALcode
+
+;+
+; CSERVE_RD_IMPURE
+;
+; Function:
+;	Return impure pointer.
+;
+; Exit state:
+;	r0 (v0)		impure pointer
+;-
+
+	ALIGN_FETCH_BLOCK
+cfw__rd_impure:
+	hw_ldq/p r0, PT__IMPURE(p_temp)		; get impure pointer
+	hw_ret	(p23)
+
+
+    .iff					; if eq srm_console
+;+
+; SRM console cserve
+;
+; Entry:
+;	r16	option selector
+;	r17...	arguments
+;-
+	cmpeq	r16, #CSERVE__START, r0
+	bne	r0, cfw__start
+	cmpeq	r16, #CSERVE__CALLBACK, r0
+	bne	r0, cfw__callback
+	hw_ret	(p23)				; return, nothing done
+;
+; CSERVE__START
+;
+cfw__start:
+	br	r31, sys__exit_console
+;
+; CSERVE__CALLBACK
+;
+; Question: Do we need to update the PCB? Some implementations do, some
+; don't, so it's probably a don't care. For now, update the pcb
+;
+; Note that previous implementations restore r16 from r1. Is this
+; a console requirement???
+;
+cfw__callback:
+	bis	r1, r31, r16			; restore r16 (for console??)
+	lda	p20, HALT__CALLBACK(r31)	; reason for halt
+	hw_stq/p p20, PT__HALT_CODE(p_temp)	; store code (??)
+
+	br	r31, trap__update_pcb_and_halt	; update pcb and enter console
+
+    .endc					; if eq srm_console
+.endc						; if eq reference_platform
+
+
+;+
+; sys__switch_unknown
+;
+; Entry:
+;	PALcode must have done a jump through 0 somehow.
+;-
+sys__switch_unknown:
+	lda	p20, HALT__JUMP0(r31)		; halt code of jump0
+	hw_stq/p p20, PT__HALT_CODE(p_temp)	; store halt code
+	br	r31, sys__enter_console		; enter console
+
+;+
+; sys__enter_console
+;
+; Current state:
+;	p20	halt code
+;	p23	pc of halt or offending instruction
+;-
+	ALIGN_CACHE_BLOCK
+sys__enter_console:
+	PVC_JSR save_state, bsr=1
+	bsr	p7, pal__save_state		; save state
+
+	hw_mtpr	r31, EV6__ITB_IA		; (4,0L) flush itb
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+;
+; Clear IER_CM, turning off interrupts, and setting mode to kernel.
+; Don't bother for now with SIRR, ASTRR, HW_INT_CLR, etc.
+;
+	NOP					; pad fetch block
+	NOP
+	NOP
+	hw_mtpr	r31, EV6__IER_CM		; (4,0L) no interrupts
+	NOP
+	NOP
+	NOP					; pad fetch block
+;
+; Clear DTB_ASNx and ASN.
+;
+; There must be a scoreboard bit -> register dependency chain to prevent
+; hw_mtpr DTB_ASx from issuing while ANY of scoreboard bits <7:4> are set.
+;
+	hw_mfpr	r1, <EV6__PAL_BASE ! ^xF0>	; (4-7,0L)
+	xor	r1, r1, r1			; zap r1
+	NOP					; ensure different block
+	NOP					; ensure different block
+
+	hw_mtpr r1, EV6__DTB_ASN0		; (4,0L) clear ASN
+	hw_mtpr r1, EV6__DTB_ASN1		; (7,1L) clear ASN
+	NOP
+	NOP
+
+	hw_mtpr	r31, EV6__ASN			; (4,0L) clear ASN
+	NOP
+	NOP
+	NOP
+;
+; Clear out vptb. Switch us to 48-bit mode in VA_CTL so that the 1-1 console
+; can access I/O. Write I_CTL twice (pvc #31).
+;
+	hw_mfpr	r3, EV6__I_CTL				; (4,0L) get i_ctl
+	sll	r3, #<64 - EV6__I_CTL__VPTB__S>, r3	; clean
+	srl	r3, #<64 - EV6__I_CTL__VPTB__S>, r3	; move back
+	hw_stq/p r31, PT__VPTB(p_temp)			; clear pt__vptb
+
+	hw_mtpr	r3, EV6__I_CTL				; (4,0L) write i_ctl
+
+	hw_ldq/p r1, PT__VA_CTL(p_temp)			; fetch va_ctl part
+	bis	r1, #<1@EV6__VA_CTL__VA_48__S>, r1	; or in 48-bit mode!
+	hw_stq/p r1, PT__VA_CTL(p_temp)			; store va_ctl part
+	hw_mtpr	r1, EV6__VA_CTL				; (5,1L) write it
+
+	hw_mtpr r3, EV6__I_CTL				; (4,0L) pvc #31
+;
+; The rest of this code is very implementation dependent. It depends
+; on how we got here and who we are going back to.
+
+.if ne srm_console
+
+;
+; The following code assumes we have an srm_console, and we are heading
+; back to the vms palcode.
+;
+
+;
+; Build PS (IPL=31,CM=kernel,VMM=0,SW=0), and mark 1-1 mode for console.
+; Note we use OSF_P_MISC values where they match P_MISC values.
+;
+	lda	r3, ^x1f00(r31)				; ipl=^x1f, cm=0
+	bis	r3, r31, p_misc				; keep in shadow
+	bis	r31, #8, r1				; mces<dpc> = 1
+	sll	r1, #OSF_P_MISC__MCES__MCHK__S, r1	; move into position
+	bis	p_misc, r1, p_misc			; or new mces in
+	lda	p4, 1(r31)				; get a 1
+	sll	p4, #OSF_P_MISC__PHYS__S, p4		; shift into place
+	bis	p_misc, p4, p_misc			; indicate 1-1 mapping
+;
+; 1.41 Write EV6__IER to the platform dependent IPL31
+;
+	bis     r31, #^x1f, r1			; IPL = 31
+	hw_mfpr p4, EV6__PAL_BASE		; (4,0L) get pal base
+	s8addq  r1, p4, p4			; pal base + index
+	lda     p4, ipl_offset(p4)		; pal base + table base + index
+	hw_ldq/p p4, (p4)			; get new ier
+	hw_mtpr p4, EV6__IER			; (4,0L) write new ier
+;
+; Be neat, and set PCBB back to a nice kludge spot.
+; Set PAL_BASE back to the vms palcode.
+; Questions:
+;	The VMS palcode base constant is used directly. Is this a
+;		problem on multiprocessor systems?
+;	What about super page enable bits? Do we need to clear them?
+;
+	br	r1, sys__enter_console_get_pal_base
+sys__enter_console_get_pal_base:
+	GET_32ADDR r1, <trap__pal_base - sys__enter_console_get_pal_base>, r1
+	GET_16ADDR r1, <INITIAL_PCBB - trap__pal_base>, r1
+	hw_stq/p r1, PT__PCBB(p_temp)			; write pcbb
+
+	GET_32ADDR r0, <PAL__PAL_BASE>, r31
+	hw_mtpr	r0, EV6__PAL_BASE			; (4,0L) write pal base
+;
+; Finish all IPR writes.
+;
+	bis	r31, r31, r31				; 1.41
+	bis	r31, r31, r31				; 1.41
+	bis	r31, r31, r31				; 1.41
+	hw_mtpr	r31, <EV6__MM_STAT ! ^xF0>		; finish everything
+	bis	r31, r31, r31				; 1.41
+	bis	r31, r31, r31				; 1.41
+	bis	r31, r31, r31				; 1.41
+
+;
+; Use an implementation dependent way to get address of console base.
+; Also, depending on the console, we may need to write r30, the stack pointer!
+;
+	GET_32CONS 	p23, <PAL__CONSOLE_BASE>, r31	; hw_jmp_stall address
+	NOP						; separate ipr writes
+	bsr	r31, .					; push prediction stack
+	hw_mtpr	r31, EV6__IC_FLUSH			; (4,0L) flush icache
+	bne	r31, .					; pvc #24
+	PVC_VIOLATE <1007>
+	hw_ret_stall (p23)				; pop prediction stack
+							; go off to console
+
+.endc							; if ne srm_console
+
+.if eq srm_console
+
+;
+; The following code assumes we have some other kind of console
+; that continues to use the osf palcode.
+;
+
+;
+; Build PS (IPL=7,CM=kernel), and mark 1-1 mode for console.
+;
+	bis	r31, #7, p_misc				; ipl=7, cm=0	
+	bis	r31, #8, r1				; mces<dpc> = 1
+	sll	r1, #OSF_P_MISC__MCES__MCHK__S, r1	; move into position
+	bis	p_misc, r1, p_misc			; or new mces in
+	lda	p4, 1(r31)				; get a 1
+	sll	p4, #OSF_P_MISC__PHYS__S, p4		; shift into place
+	bis	p_misc, p4, p_misc			; indicate 1-1 mapping
+;
+; Be neat, and set PCBB back to a nice kludge spot.
+;
+	br	r1, sys__enter_console_get_pal_base
+sys__enter_console_get_pal_base:
+	GET_32ADDR r1, <trap__pal_base - sys__enter_console_get_pal_base>, r1
+	GET_16ADDR r1, <INITIAL_PCBB - trap__pal_base>, r1
+	hw_stq/p r1, PT__PCBB(p_temp)			; write pcbb
+;
+; The debug monitor likes the halt code in r1.
+;
+	bis	p20, r31, r1				; halt code
+;
+; Use an implementation dependent way to get address of console base.
+; Also, depending on the console, we may need to write r30, the stack pointer!
+;
+	GET_32CONS 	p23, <PAL__CONSOLE_BASE>, r31	; hw_jmp_stall address
+	bsr	r31, .					; push prediction stack
+	hw_mtpr	r31, EV6__IC_FLUSH			; (4,0L) flush icache
+	bne	r31, .					; pvc #24
+	PVC_VIOLATE <1007>
+	hw_ret_stall (p23)				; pop prediction stack
+							; go off to console
+
+.endc							; if eq srm_console
+
+
+;+
+; sys__exit_console
+;
+;	restore_state (will put return address in p23)
+;	clear lock and interrupt flags
+;	turn off 1-1 mapping
+;	flush TBs
+;-
+	ALIGN_CACHE_BLOCK
+sys__exit_console:
+	PVC_JSR restore_state, bsr=1
+	bsr	p7, pal__restore_state		; restore state
+	hw_mtpr	r31, EV6__ITB_IA		; (4,0L) flush itb
+	hw_mtpr	r31, EV6__DTB_IA		; (7,1L) flush dtb
+	bis	r31, r31, r31
+;
+; Clear the lock and interrupt flags. The load should issue only after
+; the scoreboard bits clear.
+;
+	ASSUME_FETCH_BLOCK
+	hw_mtpr	r31, <EV6__MM_STAT ! ^xF0>	; (4-7,0L) wait for retire
+	rc	r31				; clear int flag
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mfpr	p20, EV6__PAL_BASE		; (4,0L) get pal base
+	sll	p20, #<32-13>, p5		; shift into position
+	lda	p4, ^x3301(r31)			; set WE, RE
+	or	p5, p4, p5			; produce pte
+
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; Edit 1.36
+
+	PVC_VIOLATE <2>				; ignore scoreboard violation
+	hw_mtpr	p20, EV6__DTB_TAG0		; (2&6,0L) write tag0
+	hw_mtpr p20, EV6__DTB_TAG1		; (1&5,1L) write tag1
+	hw_mtpr	p5, <EV6__DTB_PTE0 ! ^x44>	; (0,4,2,6) (0L) write pte0
+	hw_mtpr	p5, <EV6__DTB_PTE1 ! ^x22>	; (3,7,1,5) (1L) write pte1
+;
+; Turn off 1-to-1 mapping
+;
+	lda	p4, 1(r31)			; get a 1
+	sll	p4, #OSF_P_MISC__PHYS__S, p4	; shift into physical position
+	bic	p_misc, p4, p_misc		; clear 1-1 mapping
+;
+; The load will be held up until all these instructions issue.
+; Do the unlock
+;
+	ldq	r31, <trap__lock_cell - trap__pal_base>(p20)
+;
+; Clear the DTB again. The stall at the end will synch us.
+;
+	hw_mtpr	r31, EV6__DTB_IA		; (7,0L)
+;
+; Back to user
+;
+	bsr	r31, .				; push prediction stack
+	hw_mtpr	r31, EV6__IC_FLUSH		; (4,0L) flush icache
+	bne	r31, .				; pvc #24
+	PVC_VIOLATE <1007>
+	hw_ret_stall (p23)			; pop prediction stack
+						; go off to user
+
+
+.if eq srm_console
+
+;+
+; System Reset code for non-srm systems.
+;
+; This code starts off as implementation dependent, because it must rely
+; on a signature to determine whether it came from the SROM. If it came
+; from the SROM, it does the normal initialization. If it didn't come from
+; the SROM, it needs to differentiate between a swap and a jump through 0.
+;
+; Check for signature. R19<31:16> contains the signature 0xDEC<letter>,
+; So just check <31:20> for 0xDEC.
+;
+; Assume also the absence of the signature says that we ABSOLUTELY
+;	did not come from a power up. Then I can check p_misc for
+;	a swap request.
+;
+; Entry:
+;	r1		dc_ctl
+;
+;	r15		srom_rev
+;	r16		proc_id
+;	r17		mem_size
+;	r18		cycle_cnt
+;	r19		signature in <31:16>
+;	r20		proc_mask (note: we are stepping on shadow!)
+;	r21		sysctx (note: we are stepping on p_temp shadow!)
+;
+;	r26		pc+4 of pal base
+;-
+	ALIGN_CACHE_BLOCK
+
+sys__reset:
+	zapnot	r19, #^xC, r4			; clear all but <31:16>
+	srl	r4, #20, r4			; get signature <31:20>
+	GET_32CONS r5, <^xDEC>, r31		; load validation pattern
+	cmpeq	r4, r5, r6			; valid pattern?
+
+	beq	r6, sys__reset_check_switch	; either swap or jump through 0
+
+	bis	r1, r31, r27			; save off dc_ctl value
+	bis	r20, r31, r28			; save off proc_mask
+	bis	r21, r31, r29			; save off sysctx
+
+	br	r31, sys__reset_init
+;
+; Init and w1c values
+;
+	EV6__DC_STAT__W1C = -
+		<<1@EV6__DC_STAT__TPERR_P0__S> ! -
+		<1@EV6__DC_STAT__TPERR_P1__S> ! -
+		<1@EV6__DC_STAT__ECC_ERR_ST__S> ! -
+		<1@EV6__DC_STAT__ECC_ERR_LD__S> ! -
+		<1@EV6__DC_STAT__SEO__S>>
+
+;
+; The ev6_p2 definition will still work for ev6_p3. Bit ^x1e becomes
+; a RO bit for the new performance counter implementation.
+;
+.if ne ev6_p3
+	EV6__I_STAT__PAR__S = ^x1d
+	EV6__I_STAT__W1C = -
+		<<1@EV6__I_STAT__PAR__S>>
+.iff
+	EV6__I_STAT__TPE__S = ^x1d
+	EV6__I_STAT__DPE__S = ^x1e
+	EV6__I_STAT__W1C = -
+		<<1@EV6__I_STAT__TPE__S> ! -
+		<1@EV6__I_STAT__DPE__S>>
+.endc
+
+;
+; On the reference platform, we get DC_CTL from the srom. These
+; init values are left for the convenience of other system partners.
+;
+  .if eq reference_platform
+    .if ne ev6_p1
+	EV6__DC_CTL__INIT = -
+		<<dcache_set_en@EV6__DC_CTL__SET_EN__S> ! -
+		 <0@EV6__DC_CTL__DCTAG_PAR_EN__S> ! -
+		 <0@EV6__DC_CTL__DCDAT_ERR_EN__S>>
+    .iff
+	EV6__DC_CTL__INIT = -
+		<<dcache_set_en@EV6__DC_CTL__SET_EN__S> ! -
+		 <1@EV6__DC_CTL__DCTAG_PAR_EN__S> ! -
+		 <1@EV6__DC_CTL__DCDAT_ERR_EN__S>>
+    .endc
+  .endc
+
+	EV6__IER__INIT = 0
+
+	EV6__PCTX__INIT = -
+		<1@EV6__PROCESS_CONTEXT__FPE__S>
+
+	ASSUME EV6__HW_INT_CLR__MCHK_D__S lt EV6__HW_INT_CLR__PC__S 
+	ASSUME EV6__HW_INT_CLR__MCHK_D__S lt EV6__HW_INT_CLR__CR__S 
+	ASSUME EV6__HW_INT_CLR__MCHK_D__S lt EV6__HW_INT_CLR__SL__S 
+
+	EV6__HW_INT_CLR__INIT = -
+	    <<1@<EV6__HW_INT_CLR__MCHK_D__S - EV6__HW_INT_CLR__MCHK_D__S>> ! -
+	     <3@<EV6__HW_INT_CLR__PC__S - EV6__HW_INT_CLR__MCHK_D__S>> ! -
+	     <1@<EV6__HW_INT_CLR__CR__S - EV6__HW_INT_CLR__MCHK_D__S>> ! -
+	     <1@<EV6__HW_INT_CLR__SL__S - EV6__HW_INT_CLR__MCHK_D__S>>>
+
+	EV6__VA_CTL__INIT = <va_48@EV6__VA_CTL__VA_48__S>
+
+.if ne kseg_hack				; kseg hack
+	EV6__M_CTL__INIT = 0
+.iff
+	EV6__M_CTL__INIT = <2@<EV6__M_CTL__SPE__S+va_48>>
+.endc
+
+	EV6__I_CTL__INIT = -
+		<<3@EV6__I_CTL__IC_EN__S> ! -
+		<2@<EV6__I_CTL__SPE__S+va_48>> ! -
+		<2@EV6__I_CTL__SDE__S> ! -
+		<3@EV6__I_CTL__SBE__S> ! -
+		<va_48@EV6__I_CTL__VA_48__S> ! -
+		<1@EV6__I_CTL__CALL_PAL_R23__S> ! -
+		<mchk_en@EV6__I_CTL__MCHK_EN__S> ! -
+		<tb_mb_en@EV6__I_CTL__TB_MB_EN__S>>
+
+;
+; Do the initialization. We rely on fetch blocks to separate scoreboard bits!!!
+;
+; Input:
+;	r26	pc+4 of pal base
+;
+	ALIGN_FETCH_BLOCK <^x47FF041F>			; pad with NOPs
+
+	ASSUME_FETCH_BLOCK
+	
+sys__reset_init:
+	hw_mtpr	r31, EV6__ITB_IA			; (4,0L) flush ITB
+	hw_mtpr	r31, EV6__DTB_IA			; (7,0L) flush DTB
+	srl	r26, #EV6__PAL_BASE__PAL_BASE__S, r1	; clean pal base
+	sll	r1, #EV6__PAL_BASE__PAL_BASE__S, r1	; get into position
+
+	hw_mtpr	r1, EV6__PAL_BASE			; (4,0L) write pal base
+	GET_32CONS 	r1, EV6__I_STAT__W1C, r31	; get i_stat clr value
+	GET_16CONS	r3, EV6__DC_STAT__W1C, r31	; get dc_stat clr value
+
+	hw_mtpr	r1, EV6__I_STAT				; (4,0L) w1c I_STAT
+	hw_mtpr r3, EV6__DC_STAT			; (6,0L) w1c DC_STAT
+	GET_32CONS 	r1, EV6__I_CTL__INIT, r31	; get i_ctl init value
+
+	hw_mtpr	r1, EV6__I_CTL				; (4,0L) init I_CTL
+	rc	r31					; clear intr_flag
+	bis	r31, r31, r31				; fetch block
+	bis	r31, r31, r31				; fetch block
+
+	GET_16CONS 	r1, EV6__PCTX__INIT , r31	; get pctx init value
+	GET_16CONS	r3, EV6__M_CTL__INIT, r31	; get m_ctl init value
+	hw_mtpr	r1, EV6__PROCESS_CONTEXT		; (4,0L) write pctx
+	hw_mtpr r3, EV6__M_CTL				; (6,0L) write M_CTL
+
+	GET_32CONS	r1, EV6__IER__INIT, r31 	; get ier_cm init value
+	hw_mtpr	r1, EV6__IER_CM				; (4,0L) clear int en
+	hw_mtpr r31, EV6__CC				; (5,1L) clear offset
+
+	bis	r31, #1, r1				; get a 1
+	sll	r1, #32, r1				; get into position
+	hw_mtpr	r31, EV6__SIRR				; (4,0L) clear int req
+	hw_mtpr r1, EV6__CC_CTL				; (5,1L) clr/ena ctr
+
+	GET_16CONS	r1, EV6__HW_INT_CLR__INIT, r31	; get w1c mask
+	sll	r1, #EV6__HW_INT_CLR__MCHK_D__S, r1	; move into position
+	PVC_VIOLATE <35>
+	hw_mtpr	r1, EV6__HW_INT_CLR			; (4,0L)
+	hw_mtpr	r31, EV6__DTB_ALT_MODE			; (6,0L) clear alt_mode
+
+	hw_mtpr	r31, EV6__PCTR_CTL			; (4,0L) clear pctr
+	GET_16CONS	r1, EV6__VA_CTL__INIT, r31	; get va_ctl value
+	hw_mtpr	r1, EV6__VA_CTL				; (5,1L) init va_ctl
+	NOP						; pad fetch block
+;
+; In normal operation, there must be a scoreboard bit -> register dependency
+; chain to prevent hw_mtpr DTB_ASx from issuing while ANY of scoreboard
+; bits <7:4> are set. Since we know there are no dstream operations going on,
+; we really don't need that here.
+;
+	PVC_VIOLATE <21>
+	hw_mtpr r31, EV6__DTB_ASN0			; (4,0L)
+	hw_mtpr r31, EV6__DTB_ASN1			; (7,1L)
+	NOP						; pad fetch block
+	NOP						; pad fetch block
+;
+; We need to write pctr_ctl again to clear the 2nd stage overflow flag.
+; And force other mtpr to retire while we are at it.
+;
+	hw_mtpr	r31, <EV6__PCTR_CTL ! ^xF0>		; (4,0L) clr ovr flag
+	NOP						; pad fetch block
+	NOP
+	NOP
+;
+; We need to write HW_INT_CLR to avoid a interrupt that can occur when
+; the counters come up in an unpredictable state near overflow.
+;
+	lda	p7, 3(r31)			; 1.41 get a 3
+	sll	p7, #EV6__HW_INT_CLR__PC__S, p7	; 1.41 move into position
+	hw_mtpr	p7, EV6__HW_INT_CLR		; 1.41(4,0L) ack the int
+	bis	r31, r31, r31			; 1.41
+	bis	r31, r31, r31			; 1.41
+	bis	r31, r31, r31			; 1.41
+	PVC_VIOLATE <35>
+	hw_mtpr	p7, EV6__HW_INT_CLR		; 1.41 (4,0L) ack the int
+
+;
+; FPCR is unpredictable, possibly set by the srom. Should we do anything here?
+;
+  .if ne 0
+	mt_fpcr	f31					; clear the fpcr
+  .endc							; (in separate block)
+
+;
+; 1.41 move cbox error read down below the virtual (clear lock) operation.
+;
+
+; Hardcode the whami for behavorial and
+; for not behavorial but not reference_platform.
+; the system.
+;
+
+  .if ne beh_model
+PAL__WHAMI = 0
+	GET_16CONS	r0, PAL__WHAMI, r31		; set whami
+  .iff
+    .if eq reference_platform
+	GET_16CONS	r0, PAL__WHAMI, r31		; set whami
+    .iff
+;
+; Read the MISC<CPUID> bit for this cpu.
+; The MISC CSR is at 801.A000.0080.
+; This defines the value for PT__WHAMI.
+;
+	lda	p4, ^x801A(r31)			; generate 801.A000.0000
+	zap	p4, #^xFC, p4			; zap extension
+	sll	p4, #28, p4			; move into place
+	hw_ldq/p r0, ^x80(p4)			; Read CPUID from 801.A000.0080
+	and	r0, #^xF, r0			; Zap other bits.
+    .endc					; if eq reference_platform
+  .endc						; if ne beh_model
+
+;
+; Initialize p_temp to base of specific pal temp area.
+; Store whami in pal temp area.
+; Compute base of specific impure area and store in pal temp area.
+;
+	GET_32CONS	p_temp, PAL__TEMPS_BASE, r31		; pal_temps base
+	GET_32CONS	r1, PAL__TEMPS_SPECIFIC_SIZE, r31	; specific size
+	mulq	r0, r1, r1					; whami * size
+	addq	p_temp, r1, p_temp				; cpu base
+
+	GET_32CONS	r2, <PAL__IMPURE_BASE>, r31	    ; impure area base
+	GET_16CONS	r1, <PAL__IMPURE_SPECIFIC_SIZE>, r31; specific size
+	GET_16CONS	r3, <PAL__IMPURE_COMMON_SIZE>, r31  ; common size
+
+	mulq	r0, r1, r1			; whami * specific
+	addq	r1, r3, r1			; add in common
+	addq	r2, r1, r2			; add to impure base
+	hw_stq/p r0, PT__WHAMI(p_temp)		; store whami value
+	hw_stq/p r2, PT__IMPURE(p_temp)		; store pt_impure base address
+;
+; Now store M_CTL.
+;
+	GET_16CONS	r3, EV6__M_CTL__INIT, r31
+	hw_stq/p r3, PT__M_CTL(p_temp)		; store m_ctl value
+;
+; For reference platform, store passed up parameters.
+; For non-reference platform, store CNS__DC_CTL from an init value.
+;	NOTE: WE DON'T WRITE DC_CTL!! This is just here so we have
+;	a sane dc_ctl value.
+;
+; Current state for reference platform:
+;	r27	dc_ctl
+;		write_many chain in <51:16>
+;	r28	proc_mask
+;	r29	sysctx
+;
+  .if ne reference_platform
+	srl	r27, #16, r1			; get write-many chain
+	hw_stq/p r1, CNS__WRITE_MANY(r2)	; store it
+	and	r27, #^xFF, r27			; clean dc_ctl
+	hw_stq/p r27, CNS__DC_CTL(r2)		; store dc_ctl value
+
+	hw_stq/p r15, CNS__SROM_REV(r2)		; encoded srom.s RCS revision
+	hw_stq/p r16, CNS__PROC_ID(r2)		; processor identification
+						; 	(a la SRM)
+	hw_stq/p r17, CNS__MEM_SIZE(r2)		; size of contiguous,
+						;	good memory in bytes
+	hw_stq/p r18, CNS__CYCLE_CNT(r2)	; cycle count in picoseconds
+	hw_stq/p r19, CNS__SIGNATURE(r2)	; signature (0xDECB) in <31:16>
+						;	and sys rev ID in <15:0>
+	bis	r31, r31, r19			; zap the signature
+	hw_stq/p r28, CNS__PROC_MASK(r2)	; active processor mask
+	hw_stq/p r29, CNS__SYSCTX(r2)		; system context value
+  .iff
+	GET_16CONS	r27, EV6__DC_CTL__INIT, r31
+	hw_stq/p r27, CNS__DC_CTL(r2)		; store dc_ctl value
+  .endc						; if ne reference_platform
+;
+; For pass1, store CNS__FPE_STATE = 1.
+;
+  .if ne ev6_p1
+	bis	r31, #1, r1			; get a 1
+	hw_stq/p r1, CNS__FPE_STATE(r2)		; start with fpe state = 1
+	hw_stq/p r31, CNS__R31_EMUL(r2)		; zap r31
+	hw_stq/p r31, CNS__F31_EMUL(r2)		; zap f31
+	hw_stq/p r31, CNS__FPCR(r2)		; zap fpcr
+    .if ne fp_count
+	hw_stq/p r31, PT__RSV_FOR_PAL(p_temp)	; clear counter
+    .endc
+  .endc
+
+;
+; Write ps into a shadow register IPL=7,CM=0.
+; Write mces to pal temp area, with dpc set.
+;	
+	bis	r31, #7, p_misc				; ipl=7, cm=0
+	bis	r31, #8, r1				; mces<dpc> = 1
+	sll	r1, #OSF_P_MISC__MCES__MCHK__S, r1	; move into position
+	bis	p_misc, r1, p_misc			; or new mces in
+
+;
+; Store lower portion in PT__VA_CTL in pal temps area.
+; Store VPTB in PT__VPTB in pal temps area.
+; Store DTB_ALT_MODE in pal temps area.
+;
+	GET_16CONS	r1, EV6__VA_CTL__INIT, r31
+	hw_stq/p r1, PT__VA_CTL(p_temp)		; store control part
+	hw_stq/p r31, PT__VPTB(p_temp)		; store vptb base part
+	hw_stq/p r31, PT__DTB_ALT_MODE(p_temp)	; clear alt_mode temp
+;
+; Miscellaneous pal temps
+;
+	hw_stq/p r31, PT__SCC(p_temp)		; clear SCC
+	hw_stq/p r31, PT__SCBB(p_temp)		; clear scb
+	hw_stq/p r31, PT__PTBR(p_temp)		; clear ptbr
+;
+; Set up PT__PCBB to point to kludge PCB.
+;
+	hw_mfpr	r1, EV6__PAL_BASE		; (4,0L) get pal base back
+	GET_16ADDR 	r2, <INITIAL_PCBB - TRAP__START>, r1
+	hw_stq/p r2, PT__PCBB(p_temp)		; write pcbb
+;
+; Now we need to clear the lock flag, which must be done with a LDQ.
+; So we need to set up the DTB, do the write, and re-clear the DTB.
+;
+; Currently r1=pal base That's good enough to use for our translation.
+; Write the dtb, do the reference, clear the dtb and synch up.
+;
+
+	sll	r1, #<32-13>, r2		; shift into position
+	lda	r3, ^x1101(r31)			; set KWE, KRE
+	or	r2, r3, r2			; produce pte
+
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; Edit 1.36
+
+	PVC_VIOLATE <2>				; ignore scoreboard violation
+	hw_mtpr	r1, EV6__DTB_TAG0		; (2&6,0L) write tag0
+	hw_mtpr r1, EV6__DTB_TAG1		; (1&5,1L) write tag1
+	hw_mtpr	r2, <EV6__DTB_PTE0 ! ^x44>	; (0,4,2,6) (0L) write pte0
+	hw_mtpr	r2, <EV6__DTB_PTE1 ! ^x22>	; (3,7,1,5) (1L) write pte1
+;
+; Do the unlock. Then clear the dtb.
+;
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; align with NOPs
+	mb					; pvc restriction 28
+	ldq	r31, <trap__lock_cell - trap__pal_base>(r1)
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, EV6__DTB_IA		; (7,0L)
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x80>	; 1.41 (7,0L) wait for dtb_ia
+	bis	r31, r31, r31			; 1.41
+	bis	r31, r31, r31			; 1.41
+	bis	r31, r31, r31			; 1.41
+;
+; Clear out the cbox error read chain
+; 1.41 Move here from above
+;
+; Register use:
+;	p4-p7	trashed
+;	p20	trashed
+;
+    .if eq force_path			; 1.41
+	PVC_JSR cbox, bsr=1
+	bsr	p5, sys__cbox
+    .iff
+	PVC_VIOLATE <1008>		; 1.42 tell pvc to skip routine
+	br	p5, sys__cbox
+    .endc				; 1.41
+;
+; Set up for the console
+;
+
+;
+; 1.41 Write EV6__IER to the platform dependent IPL31
+;
+	bis     r31, #^x1f, r1			; IPL = 31
+	hw_mfpr p4, EV6__PAL_BASE		; (4,0L) get pal base
+	s8addq  r1, p4, p4			; pal base + index
+	lda     p4, ipl_offset(p4)		; pal base + table base + index
+	hw_ldq/p p4, (p4)			; get new ier
+	hw_mtpr p4, EV6__IER			; (4,0L) write new ier
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	hw_mtpr r31, <EV6__MM_STAT ! ^x10>	; wait for it
+
+	bis	r31, r31, p20			; halt code in p20
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	hw_stq/p r31, PT__HALT_CODE(p_temp)	; store halt code
+	br	r31, sys__enter_console		; enter console
+
+
+;+
+; The signature was not valid, so we DID NOT COME FROM THE SROM. So
+; check for swap or jump through zero.
+;-
+
+sys__reset_check_switch:
+	srl	p_misc, #OSF_P_MISC__SWITCH__S, r1	; check the switch bit
+	blbc	r1, sys__reset_noswitch			; jumped through 0
+;
+; Looks like a swppal. Do initialization, relying on fetch blocks for
+; scoreboard bit separation.
+;
+
+	ALIGN_FETCH_BLOCK <^x47FF041F>			; pad with NOPs
+
+	ASSUME_FETCH_BLOCK
+
+sys__switch_base:
+	br	r1, sys__switch_get_pal_base
+sys__switch_get_pal_base:
+	GET_32ADDR r1, <trap__pal_base - sys__switch_get_pal_base>, r1
+	hw_mtpr	r1, EV6__PAL_BASE			; (4,0L) pal base
+
+	hw_mtpr	r31, EV6__ITB_IA			; (4,0L)
+	hw_mtpr	r31, EV6__DTB_IA			; (7,0L) flush DTB
+	GET_32CONS 	r1, EV6__I_STAT__W1C, r31	; get i_stat clr value
+
+	GET_16CONS	R3, EV6__DC_STAT__W1C, R31	; get dc_stat clr value
+	hw_mtpr	r1, EV6__I_STAT				; (4,0L) w1c I_STAT
+	hw_mtpr r3, EV6__DC_STAT			; (6,0L) w1c DC_STAT
+	rc	r31					; clear intr_flag
+
+	GET_32CONS	r1, EV6__IER__INIT, r31 
+	hw_mtpr	r1, EV6__IER_CM				; (4,0L) clear ier_cm
+	hw_mtpr	r31, EV6__DTB_ALT_MODE			; (6,0L) clear alt_mode
+
+	hw_stq/p r31, PT__DTB_ALT_MODE(p_temp)		; clear alt_mode temp
+	zapnot	p_misc, #4, p_misc			; zap all but mces
+	bis	p_misc, #7, p_misc			; cm=0,ipl=7
+	hw_mtpr	r31, EV6__SIRR				; (4,0L) Clear int req
+	
+	GET_16CONS	r1, EV6__HW_INT_CLR__INIT, r31
+	sll	r1, #EV6__HW_INT_CLR__MCHK_D__S, r1	; move into position
+	PVC_VIOLATE <35>
+	hw_mtpr	r1, EV6__HW_INT_CLR			; (4,0L) Clear int req
+	NOP						; pad fetch block
+;
+; Current state:
+;	r17 (a1)	new PC
+;	r18 (a2)	new PCBB
+;	r19 (a3)	new VPTB
+;
+	hw_ldq/p p4, OSF_PCB__FEN(r18)		; get new fen/pme
+	hw_ldl/p p5, OSF_PCB__CPC(r18)		; get charged cycle counter
+	hw_ldl/p p6, OSF_PCB__ASN(r18)		; get new asn
+	hw_ldq/p p7, OSF_PCB__PTBR(r18)		; get new ptbr
+
+	sll	p7, #page_offset_size_bits, p7	; convert pfn to pa
+	hw_stq/p p7, PT__PTBR(p_temp)		; store PTBR
+	hw_stq/p r18, PT__PCBB(p_temp)		; store PCBB
+	bic	r17, #3, p23			; clean PC to p23
+;
+; Get VPTB and write it to VA_CTL and I_CTL. At the same time, initialize
+; VA_CTL, M_CTL, and I_CTL.
+;
+; Store lower portion in PT__VA_CTL in pal temps area.
+; Store VPTB in PT__VPTB in pal temps area.
+;
+; Initialize M_CTL  a write-only register, and save it away.
+;
+; Initialize I_CTL.
+; Write I_CTL twice (pvc #31).
+;
+
+	GET_16CONS	r1, EV6__VA_CTL__INIT, r31
+	hw_stq/p r1, PT__VA_CTL(p_temp)		; store control part
+	hw_stq/p r19, PT__VPTB(p_temp)		; store vptb base part
+	bis	r1, r19, r1			; or in vptb part
+
+	hw_mtpr	r1, EV6__VA_CTL			; (5,1L)
+	GET_16CONS	r1, EV6__M_CTL__INIT, r31
+	hw_mtpr r1, EV6__M_CTL			; (6,0L)
+	hw_stq/p r1, PT__M_CTL(p_temp)		; save it away
+
+	GET_32CONS 	r1, EV6__I_CTL__INIT, r31
+	bis	r1, r19, r1			; or in vptb
+
+	hw_mtpr	r1, EV6__I_CTL				; (4,0L) write I_CTL
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+
+	hw_mtpr	r1, EV6__I_CTL				; (4,0L) write I_CTL
+;
+; Do USP and KSP
+;
+	hw_ldq/p r30, OSF_PCB__USP(r18)		; get new USP
+	hw_stq/p r30, PT__USP(p_temp)		; save it away
+	hw_ldq/p r30, OSF_PCB__KSP(r18)		; get KSP
+;
+; Now do DTB_ASNx.
+;
+; There must be a scoreboard bit -> register dependency chain to prevent
+; hw_mtpr DTB_ASx from issuing while ANY of scoreboard bits <7:4> are set.
+;
+; Current state:
+;	p6	ASN
+;
+ASSUME OSF_PCB__ASN__M eq ^xFF
+
+	and	p6, #OSF_PCB__ASN__M, p6	; clean ASN quadword
+	sll	p6, #EV6__DTB_ASN0__ASN__S, p20	; ASN into mbox spot
+
+	hw_mfpr	p7, <EV6__PAL_BASE ! ^xF0>	; (4-7, 0L)
+	xor	p7, p7, p7			; zap p7
+	bis	p7, p20, p20			; force register dependency
+	bis	r31, r31, r31
+	hw_mtpr	p20, EV6__DTB_ASN0		; (4,0L)
+	hw_mtpr	p20, EV6__DTB_ASN1		; (7,1L)
+
+;
+; Create Ibox Process Context IPR.
+; Fill in ASN, FPE, clearing ASTEN, ASTRR, PPCE.
+;
+; Current state:
+;	p4	fen/pme quadword
+;	p6	asn
+;
+	sll	p6, #EV6__PROCESS_CONTEXT__ASN__S, p6	; shift asn into place
+	and	p4, #1, p4				; get just the fen bit
+	sll	p4, #EV6__PROCESS_CONTEXT__FPE__S, p7	; shift fpe into place
+	bis	p7, p6, p7				; or together
+	hw_mtpr	p7, EV6__PROCESS_CONTEXT		; (4,0L) write them
+
+  .if ne ev6_p1
+	hw_ldq/p p7, PT__IMPURE(p_temp)			; get impure pointer
+	hw_stq/p p7, CNS__FPE_STATE(p7)			; write FPE_STATE
+    .if ne fp_count
+	hw_stq/p r31, PT__RSV_FOR_PAL(p_temp)		; clear counter
+    .endc
+  .endc
+
+;
+; Do the cycle counter.
+; Not sure we need this, but ensure 4-7 clear before any dtb writes.
+; Current state:
+;
+;	p5		CPC from PCB
+
+	rpcc	r1				; get cycle counter
+	subl	p5, r1, r1			; gen new offset
+	insll	r1, #4, r1			; shift left 32
+	hw_mtpr r1, <EV6__CC ! ^xF0>		; (4-7,1L) write it
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+;
+; Now we need to clear the lock flag, which must be done with a LDQ.
+; So we need to set up the DTB, do the write, and re-clear the DTB.
+;
+	hw_mfpr	r1, EV6__PAL_BASE		; (4,0L) get pal base back
+	sll	r1, #<32-13>, r2		; shift into position
+	lda	r3, ^x1101(r31)			; set KWE, KRE
+	or	r2, r3, r2			; produce pte
+
+	ALIGN_FETCH_BLOCK <^x47FF041F>		; Edit 1.36
+
+	PVC_VIOLATE <2>				; ignore scoreboard violation
+	hw_mtpr	r1, EV6__DTB_TAG0		; (2&6,0L) write tag0
+	hw_mtpr r1, EV6__DTB_TAG1		; (1&5,1L) write tag1
+	hw_mtpr	r2, <EV6__DTB_PTE0 ! ^x44>	; (0,4,2,6) (0L) write pte0
+	hw_mtpr	r2, <EV6__DTB_PTE1 ! ^x22>	; (3,7,1,5) (1L) write pte1
+;
+; Do the unlock.
+;
+	ALIGN_FETCH_BLOCK <^x47FF041F>
+	ldq	r31, <trap__lock_cell - trap__pal_base>(r1)
+;
+; Now clear the dtb again.
+;
+	hw_mtpr	r31, EV6__DTB_IA		; (7,0L)
+;
+; Mark success, and hw_ret_stall to pc.
+;
+	or	r31, r31, r0			; success
+	hw_mtpr	r31, EV6__IC_FLUSH		; flush icache
+	bne	r31, .				; pvc #24
+	hw_ret_stall (p23)			; switch complete
+
+;+
+; We must have jumped through 0. What should we do here?
+; Hey, how about doing an enter_console?
+;-
+sys__reset_noswitch:
+	lda	p20, HALT__JUMP0(r31)		; halt code of jump0
+	hw_stq/p p20, PT__HALT_CODE(p_temp)	; store halt code
+	br	r31, sys__enter_console		; enter console
+
+.endc						; if eq srm_console
+
+
+;+
+; sys__wakeup
+;
+; Entry:
+;	A continuation of the wakup code.
+;
+; Current state:
+;	Retirator initialized.
+;	Registers mapped.
+;	shadow registers mapped.
+;	EV6__I_CTL = <<3@EV6__I_CTL__IC_EN__S> ! -
+;			<2@EV6__I_CTL__SDE__S> ! -
+;			<1@EV6__I_CTL__CALL_PAL_R23__S>>
+;	EV6__SIRR<28:14>	cpu number
+;	EV6__PAL_BASE		PAL base
+;-
+
+.if ne reference_platform
+
+	ALIGN_CACHE_BLOCK <^x43FF0400>		; pad with addq r31, r31, r0
+
+sys__wakeup:
+
+;+
+; Now write the correct write-many chain, enabling the bcache.
+; First pull the code into the icache.
+;
+; Current state:
+;	SBE	off
+;	Bcache	off
+;-
+
+sys__wakeup_write_many_chain:
+	hw_mfpr	p5, EV6__SIRR			; (4,0L) get cpu number
+	srl 	p5, #EV6__SIRR__SIR__S, p5	; shift down
+
+	GET_32CONS	p_temp, PAL__TEMPS_BASE, r31		; pal_temps base
+	GET_32CONS	p4, PAL__TEMPS_SPECIFIC_SIZE, r31	; specific size
+	mulq	p5, p4, p4					; whami * size
+	addq	p_temp, p4, p_temp				; cpu base
+
+	hw_ldq/p p6, PT__IMPURE(p_temp)		; get base of impure area
+	hw_ldq/p r2, CNS__WRITE_MANY(p6)	; get write-many chain value
+
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+
+sys__wakeup_touch1:
+	mb					; (1)
+	br	r31, sys__wakeup_touch2		; (2)
+	bis	r31, r31, r31			; (3)
+	bis	r31, r31, r31			; (4)				
+
+sys__wakeup_bc_on:
+	bis	r31, r31, r31			; (4)				
+	addq	r31, #6, r0			; (6) shift in 6x 6-bits
+sys__wakeup_bc_on_loop::
+	PVC_VIOLATE<30>				;
+	hw_mtpr	r2, EV6__DATA			; (7) (6,0L) shift in 6 bits
+	subq	r0, #1, r0			; (8) decrement R0
+
+	beq	r0, sys__wakeup_bc_on_done	; (9) done if R0 is zero
+	srl	r2, #6, r2			; (10) align next 6 bits
+	br	r31, sys__wakeup_bc_on_loop	; (11) continue shifting
+sys__wakeup_bc_on_done:
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x40>	; (12) IPR write - sets SCBD 6
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x40>	; (13) stalls until write retires
+	beq	r31, sys__wakeup_probe		; (14) predicts fall thru
+	PVC_VIOLATE <1006>
+	br	r31, .-4			; (15) predict infinite loop
+	addq	r31, r31, r2			; (16) nop
+
+	ALIGN_CACHE_BLOCK <^x47FF041F>		; align with nops
+;+
+; Now write the Cchip PRBEN, to renable probes.
+;-
+sys__wakeup_touch2:
+	mb
+	br	r31, sys__wakeup_bc_on
+
+sys__wakeup_probe:
+	lda	p4, ^x801A(r31)			; start to generate csr addr
+	zapnot	p4, #3, p4			; zap extension
+	sll	p4, #28, p4			; now have 801.A000.0000
+	hw_stq/p r31, ^x340(p4)			; write to PRBEN
+;+
+; Get the proper IICx register.
+; 
+; Current state:
+;	p5	cpu number
+;-
+
+sys__wakeup_get_ticks:
+
+;
+; Get address of IICx register.
+;
+; IICx	cpu 0	380	00 => 0011 1000 0000
+;	cpu 1	3c0	01 => 0011 1100 0000
+;	cpu 2	700	10 => 0111 0000 0000
+;	cpu 3	740	11 => 0111 0100 0000
+;
+;So we start with ^b0011 0000 0000
+;Then OR the whami into <10:9>
+;Then we XOR whami with ^b10 and OR it into <7:6>
+;
+	lda	p4, ^x801A(r31)			; start to generate csr addr
+	zapnot	p4, #3, p4			; zap extension
+	sll	p4, #28, p4			; now have 801.A000.0000
+	lda	p4, ^x300(p4)			; now have 801.A000.0300
+
+	sll	p5, #9, p6			; move whami to <10:9>
+	xor	p5, #^b10, p7			; xor
+	sll	p7, #6, p7			; move to <7:6>
+
+	bis	p4, p6, p4			; OR into <10:9>
+	bis	p4, p7, p4			; OR into <7:6> to get IICx
+
+	hw_ldq/p  p20, (p4)			; get remaining ticks
+
+;+
+; Now restore state.
+;
+; Current state:
+;	p20<24>		overflow bit
+;	p20<23:0>	remaining ticks
+;	p_temp		valid
+;
+;	PT__IMPURE	valid
+;-
+
+	PVC_JSR	restore_state, bsr=1
+	bsr	p7, pal__restore_state		; restore state
+
+;+
+; Now calculate ticks skipped. The counter keeps decrementing. Should the return
+; count max out at requested ticks? Or should be add in any additional? Right
+; now we max out at requested ticks.
+;
+; Current state:
+;	p20<24>		overflow bit
+;	p20<23:0>	remaining ticks
+;	p23		return address
+;
+;	r16	number of ticks to skip
+;-
+
+	srl	p20, #24, p4			; overflow bit
+	zapnot	p20, #7, p20			; ticks remaining
+
+	zapnot	r16, #7, p5			; clean original number of ticks
+	subq	p5, p20, r0			; get ticks skipped
+	cmovlbs	p4, p5, r0			; if overflow => all
+
+;+
+; Now we are done!
+;-
+	hw_ret (p23)				; we are done!
+
+.endc
+
+
+;+
+; Routines for non-srm console on reference platform to do
+; i/o on the serial port.
+;-
+
+.if ne reference_platform
+  .if eq srm_console
+    .if ne dbm_serial_io
+
+	SROM_CSERVES
+
+	SROM_IO_FUNCTIONS
+
+    .endc
+  .endc
+.endc
+
+.align 6
+
+	END_FREE_CODE

@@ -1,0 +1,16 @@
+CONFIG_DIR=../../..
+include $(CONFIG_DIR)/sdkmake.conf
+
+SROM_ASM_FILES=ev6_defs.mar ev6_redefine_defs.mar ev6_p2.mar srom_macros.mar srom.mar
+
+SROMP1_ASM_FILES=ev6_defs.mar ev6_redefine_defs.mar ev6_p1.mar srom_macros.mar srom.mar
+
+srom:
+	hal -o srom.exe -l srom.lis -h EV6 -e ".SHOW MEB" $(SROM_ASM_FILES)
+
+	hal -o sromp1.exe -l sromp1.lis -h EV6 -e ".SHOW MEB" $(SROMP1_ASM_FILES)
+
+clean:
+	rm -f core
+	rm -f srom.exe sromp1.exe srom.lis sromp1.lis
+

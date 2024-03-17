@@ -1,0 +1,11 @@
+EXEDIR = ..\..\..\ntalpha
+
+SRCS = cat.c
+
+$(EXEDIR)\cat.exe:	$(SRCS)
+	CL /Fe$@ $(SRCS)
+
+clean:
+	-del /q /f cat.obj
+
+depend:

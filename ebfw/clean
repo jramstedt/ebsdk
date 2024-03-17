@@ -1,0 +1,68 @@
+#! /bin/sh
+
+cd `dirname $0`
+ebfwdir=`pwd`
+echo Building in $ebfwdir
+
+if [ ! -f ../sdkshell.conf ] ; then
+    echo -n "EBSDK not yet configured; do so now? [Y/N] <Y> "
+    read answer
+    if [ "$answer" = "Y" -o "$answer" = "y" -o "$answer" = "" ] ; then
+	cd $ebfwdir/..
+	if [ ! -x ./configure ] ; then
+	    echo "The EBSDK configuration script `pwd`/configure"
+	    echo "does not exist or is not executable.  Re-check your"
+	    echo "installation and try again"
+	    exit -1
+	else
+	    ./configure
+	fi
+    else
+	echo "Build cancelled"
+	exit 0
+    fi
+fi
+
+cd $ebfwdir
+. ../sdkshell.conf
+export EB_BASE EB_TOOLBOX EB_BOOTDIR EB_TARGETS EB_MAKE
+
+if [ $# -gt 0 ] ; then
+    EB_TARGETS=$*
+fi
+
+EB_SUBDIRS="h srom palcode lib stubs ieee ether ladebug dbm demo dhry"
+
+TASK=
+TASKNAME=Building
+
+if [ $0 = "clean" ] ; then
+    TASK=clean
+    TASKNAME=Cleaning
+fi
+
+echo "EB_TARGETS is ${EB_TARGETS}"
+echo "EB_SUBDIRS is ${EB_SUBDIRS}"
+
+for target in ${EB_TARGETS} ; do
+    echo "===== ${TASKNAME} target $target ====="
+    for subdir in ${EB_SUBDIRS} ; do
+	if [ -d ./$subdir ] ; then
+	    echo "===== ${TASKNAME} $subdir for target $target ====="
+	    if [ -f $subdir/makefile ] ; then
+		MF=makefile
+	    elif [ -f $subdir/Makefile ] ; then
+		MF=Makefile
+	    else
+		echo "Cannot find $subdir/Makefile or $subdir/makefile"
+		exit -1
+	    fi
+	    (cd ./$subdir ; ${EB_MAKE} MAKEFILE=$MF TARGET=$target $TASK)
+	fi
+    done
+    if [ "$TASK" = "clean" ] ; then
+	rm -f ${EB_BOOTDIR}/${target}/*
+    fi
+done
+
+    

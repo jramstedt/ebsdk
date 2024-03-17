@@ -1,0 +1,29 @@
+#
+# Make file to build strip tools on NT
+#
+!INCLUDE ..\nt.inc
+#
+ALL:    $(EXEDIR)\astrip.exe $(EXEDIR)\cstrip.exe
+
+$(OBJDIR)\astrip.obj:   $(INCDIR)\a_out.h $(SRCDIR)\astrip.c
+
+$(EXEDIR)\astrip.exe:   $(OBJDIR)\astrip.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\astrip.obj $(conlibs) \
+		/map:$(OBJDIR)\astrip.map
+
+
+$(OBJDIR)\cstrip.obj:   $(INCDIR)\coff.h $(SRCDIR)\cstrip.c
+
+$(EXEDIR)\cstrip.exe:   $(OBJDIR)\cstrip.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		$(OBJDIR)\cstrip.obj $(conlibs) \
+		/map:$(OBJDIR)\cstrip.map
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\astrip.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\astrip.exe
+	-del $(CLEANFLAGS) $(OBJDIR)\astrip.map
+	-del $(CLEANFLAGS) $(OBJDIR)\cstrip.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\cstrip.exe
+	-del $(CLEANFLAGS) $(OBJDIR)\cstrip.map

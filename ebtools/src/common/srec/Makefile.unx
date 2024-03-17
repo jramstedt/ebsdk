@@ -1,0 +1,25 @@
+CC		= cc
+CFLAGS		= -g -I. -I../include -DCROSS_COMPILE_32_TO_64_BITS
+LFLAGS		= -lc
+INCLUDE 	= ../include
+COMMON		= ../common
+TOOLBOX	    	= ../../toolbox
+COMMONLIB	= $(COMMON)/commlib.a
+OFILES		= srec.o $(COMMONLIB)
+
+tools:	    	srec
+
+srec:		$(OFILES)
+		$(CC) $(CFLAGS) -o srec $(OFILES) $(LFLAGS)
+
+srec.o:	    	srec.c
+		$(CC) $(CFLAGS) -c srec.c
+
+install:    	srec
+		cp srec $(TOOLBOX)/.
+
+clean:
+		rm -f *.o *~ core srec
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+

@@ -1,0 +1,104 @@
+		LINK EDITOR MEMORY MAP
+
+
+output		input		virtual
+section		section		address		    size
+
+.text   			   10000	    a460
+		.text   	   10000	     120 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/crt0.o
+		.text   	   10120	     160 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbmain.o
+		.text   	   10280	     5f0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/file.o
+		.text   	   10870	     4a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
+		.text   	   10d10	     6a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/rtc.o
+		.text   	   113b0	     e80 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+		.text   	   12230	     3a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+		.text   	   125d0	     330 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
+		.text   	   12900	     270 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+		.text   	   12b70	     850 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+		.text   	   133c0	     230 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+		.text   	   135f0	     100 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+		.text   	   136f0	     860 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+		.text   	   13f50	     2b0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+		.text   	   14200	     a90 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+		.text   	   14c90	     300 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+		.text   	   14f90	    2b20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+		.text   	   17ab0	     cf0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+		.text   	   187a0	     2a0 /usr/ccs/lib/libc.a(memmove.o)
+		.text   	   18a40	     900 /usr/ccs/lib/libc.a(ots_div_alpha.o)
+		.text   	   19340	     1a0 /usr/ccs/lib/libc.a(strcpy.o)
+		.text   	   194e0	     1f0 /usr/ccs/lib/libc.a(strcat.o)
+		.text   	   196d0	     110 /usr/ccs/lib/libc.a(strncpy.o)
+		.text   	   197e0	     180 /usr/ccs/lib/libc.a(strcmp.o)
+		.text   	   19960	      f0 /usr/ccs/lib/libc.a(strncmp.o)
+		.text   	   19a50	     180 /usr/ccs/lib/libc.a(strncat.o)
+		.text   	   19bd0	      f0 /usr/ccs/lib/libc.a(strchr.o)
+		.text   	   19cc0	     100 /usr/ccs/lib/libc.a(strrchr.o)
+		.text   	   19dc0	     1c0 /usr/ccs/lib/libc.a(memcpy.o)
+		.text   	   19f80	     4e0 /usr/ccs/lib/libc.a(ots_move_alpha.o)
+
+.rdata  			   1c720	      00
+
+.rconst 			   1a460	    22c0
+		.rconst 	   1a460	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+		.rconst 	   1a490	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+		.rconst 	   1a4d0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+		.rconst 	   1a4e0	     100 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+		.rconst 	   1a5e0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+		.rconst 	   1a5f0	      60 /usr/ccs/lib/libc.a(strncpy.o)
+		.rconst 	   1a650	      60 /usr/ccs/lib/libc.a(strncmp.o)
+		.rconst 	   1a6b0	      60 /usr/ccs/lib/libc.a(strncat.o)
+		.rconst 	   1a710	    2010 /usr/ccs/lib/libc.a(ots_div_data_alpha.o)
+
+.data   			   1c720	    1800
+		.data   	   1c720	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/crt0.o
+		.data   	   1c760	      50 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbmain.o
+		.data   	   1c7b0	     2f0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/file.o
+		.data   	   1caa0	     130 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
+		.data   	   1cbd0	      a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/rtc.o
+		.data   	   1cc70	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbver.o
+		.data   	   1ccd0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+		.data   	   1cd10	     150 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+		.data   	   1ce60	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
+		.data   	   1cea0	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+		.data   	   1cf00	     140 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+		.data   	   1d040	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+		.data   	   1d080	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+		.data   	   1d0c0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+		.data   	   1d100	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+		.data   	   1d140	     740 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+		.data   	   1d880	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+		.data   	   1d8c0	     4a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+		.data   	   1dd60	     1c0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+
+.sdata  			   1e5d0	     4f0
+		.sdata  	   1e5d0	      20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbmain.o
+		.sdata  	   1e5f0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/file.o
+		.sdata  	   1e630	      20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
+		.sdata  	   1e650	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/rtc.o
+		.sdata  	   1e690	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbver.o
+		.sdata  	   1e6a0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+		.sdata  	   1e6b0	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+		.sdata  	   1e6e0	     190 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+		.sdata  	   1e870	      50 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+		.sdata  	   1e8c0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+		.sdata  	   1e8d0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+		.sdata  	   1e8e0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+		.sdata  	   1e8f0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+		.sdata  	   1e900	     140 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+		.sdata  	   1ea40	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+		.sdata  	   1ea50	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+		.sdata  	   1eab0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+
+.sbss   			   1eac0	      b0
+		.sbss   	   1eac0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
+		.sbss   	   1ead0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+		.sbss   	   1eae0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+		.sbss   	   1eaf0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+		.sbss   	   1eb00	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+		.sbss   	   1eb10	      58 (scommon)
+
+.bss    			   1eb70	     5f0
+		.bss    	   1eb70	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
+		.bss    	   1eb80	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+		.bss    	   1ebb0	     380 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+		.bss    	   1ef30	     21c (common)

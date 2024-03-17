@@ -1,0 +1,15 @@
+New things in zip 2.2
+
+- BEOS port by Chris Herborth
+- QDOS port by Jonathan Hudson
+- TANDEM port by Dave Smith
+- WINDLL port (16-bit Win 3.x and 32-bit WinNT/Win95) by Mike White
+- SYSV packages support by John Bush
+- zip -P SeCrEt encrypts entries in the zip file with password SeCrEt
+  (WARNING: THIS IS INSECURE, use at your own risk)
+- zip -R recurses into subdirectories of current dir like "PKZIP -rP"
+- zip -x@exclude.lst excludes files specified in the file exclude.lst
+- zip -i@include.lst includes files specified in the file include.lst
+- zip -@ only handles one filename per line, but supports whitespace in names
+- zip -t ddmmyyyy, 4 digit year number for uniqueness of years beyond 2000
+- zip -tt ddmmyyyy only includes files before a specified date

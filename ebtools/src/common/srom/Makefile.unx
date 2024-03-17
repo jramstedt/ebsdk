@@ -1,0 +1,23 @@
+CC= cc
+CFLAGS= -g
+LFLAGS= -lc
+TOOLBOX=../../toolbox
+OFILES= \
+	srom.o
+
+TOUCH = /usr/bin/touch
+#
+srom:		$(OFILES)
+		$(CC) $(CFLAGS) -o srom $(OFILES) $(LFLAGS)
+
+srom.o:		srom.c
+		$(CC) $(CFLAGS) -c srom.c
+
+install:    	srom
+		cp srom $(TOOLBOX)/.
+
+clean:
+		rm -f *.o *~ core srom
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+

@@ -1,0 +1,11 @@
+UnZip requires the host computer to have proper timezone information in
+order to handle certain tasks correctly (see unzip.doc).  To set the
+timezone on the Macintosh, go to the Map Control Panel and enter the
+correct number of hours (and, in a few locales, minutes) offset from
+Universal Time/Greenwich Mean Time.  For example, the US Pacific timezone
+is -8 hours from UTC/GMT during standard (winter) time and -7 hours from
+UTC/GMT during Daylight Savings Time.  The US Eastern timezone is -5 hours
+during the winter and -4 hours during the summer.
+
+(Corrections welcome...description is loosely based on information from
+Johnny Lee.)

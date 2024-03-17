@@ -1,0 +1,116 @@
+EXEDIR=..\..\..\ntalpha
+
+OBJDIR=.
+
+OBJFILES=$(OBJDIR)\variable.obj $(OBJDIR)\rule.obj $(OBJDIR)\remote-stub.obj \
+    $(OBJDIR)\commands.obj $(OBJDIR)\file.obj $(OBJDIR)\getloadavg.obj \
+    $(OBJDIR)\default.obj $(OBJDIR)\signame.obj $(OBJDIR)\expand.obj \
+    $(OBJDIR)\dir.obj $(OBJDIR)\main.obj $(OBJDIR)\getopt1.obj \
+    $(OBJDIR)\job.obj $(OBJDIR)\read.obj $(OBJDIR)\version.obj \
+    $(OBJDIR)\getopt.obj $(OBJDIR)\arscan.obj $(OBJDIR)\remake.obj \
+    $(OBJDIR)\misc.obj $(OBJDIR)\ar.obj $(OBJDIR)\function.obj \
+    $(OBJDIR)\vpath.obj $(OBJDIR)\implicit.obj $(OBJDIR)\dirent.obj \
+    $(OBJDIR)\glob.obj $(OBJDIR)\fnmatch.obj $(OBJDIR)\pathstuff.obj
+
+SUBPROC_LIB=.\w32\subproc\winrel\subproc.lib
+
+LIBS=kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib \
+    shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib \
+    $(SUBPROC_LIB)
+
+CFLAGS=/nologo /MT /W3 /GX /YX /O2 /I. /Iglob /Iw32/include /DNDEBUG /DWINDOWS32 /DWIN32 /D_CONSOLE /DHAVE_CONFIG_H /DNO_ARCHIVES /DTIVOLI 
+
+
+$(EXEDIR)\gnumake.exe: $(OBJFILES) $(SUBPROC_LIB)
+	link  /NOLOGO /SUBSYSTEM:console /INCREMENTAL:no /MACHINE:ALPHA /OUT:$(EXEDIR)\gnumake.exe  $(OBJFILES) $(LIBS)
+
+$(SUBPROC_LIB):
+	cd .\w32\subproc & nmake -f makefile.nt
+
+clean:
+	-del /f /q $(OBJDIR)\*.obj
+	cd .\w32\subproc & nmake -f makefile.nt clean
+	-del /f /q $(EXEDIR)\gnumake.exe
+
+$(OBJDIR)\variable.obj: variable.c
+	CL /c $(CFLAGS) variable.c /Fo$@
+
+$(OBJDIR)\rule.obj: rule.c
+	CL /c $(CFLAGS) rule.c /Fo$@
+
+$(OBJDIR)\remote-stub.obj: remote-stub.c
+	CL /c $(CFLAGS) remote-stub.c /Fo$@
+
+$(OBJDIR)\commands.obj: commands.c
+	CL /c $(CFLAGS) commands.c /Fo$@
+
+$(OBJDIR)\file.obj: file.c
+	CL /c $(CFLAGS) file.c /Fo$@
+
+$(OBJDIR)\getloadavg.obj: getloadavg.c
+	CL /c $(CFLAGS) getloadavg.c /Fo$@
+
+$(OBJDIR)\default.obj: default.c
+	CL /c $(CFLAGS) default.c /Fo$@
+
+$(OBJDIR)\signame.obj: signame.c
+	CL /c $(CFLAGS) signame.c /Fo$@
+
+$(OBJDIR)\expand.obj: expand.c
+	CL /c $(CFLAGS) expand.c /Fo$@
+
+$(OBJDIR)\dir.obj: dir.c
+	CL /c $(CFLAGS) dir.c /Fo$@
+
+$(OBJDIR)\main.obj: main.c
+	CL /c $(CFLAGS) main.c /Fo$@
+
+$(OBJDIR)\getopt1.obj: getopt1.c
+	CL /c $(CFLAGS) getopt1.c /Fo$@
+
+$(OBJDIR)\job.obj: job.c
+	CL /c $(CFLAGS) job.c /Fo$@
+
+$(OBJDIR)\read.obj: read.c
+	CL /c $(CFLAGS) read.c /Fo$@
+
+$(OBJDIR)\version.obj: version.c
+	CL /c $(CFLAGS) version.c /Fo$@
+
+$(OBJDIR)\getopt.obj: getopt.c
+	CL /c $(CFLAGS) getopt.c /Fo$@
+
+$(OBJDIR)\arscan.obj: arscan.c
+	CL /c $(CFLAGS) arscan.c /Fo$@
+
+$(OBJDIR)\remake.obj: remake.c
+	CL /c $(CFLAGS) remake.c /Fo$@
+
+$(OBJDIR)\misc.obj: misc.c
+	CL /c $(CFLAGS) misc.c /Fo$@
+
+$(OBJDIR)\ar.obj: ar.c
+	CL /c $(CFLAGS) ar.c /Fo$@
+
+$(OBJDIR)\function.obj: function.c
+	CL /c $(CFLAGS) function.c /Fo$@
+
+$(OBJDIR)\vpath.obj: vpath.c
+	CL /c $(CFLAGS) vpath.c /Fo$@
+
+$(OBJDIR)\implicit.obj: implicit.c
+	CL /c $(CFLAGS) implicit.c /Fo$@
+
+$(OBJDIR)\dirent.obj: w32\compat\dirent.c
+	CL /c $(CFLAGS) w32\compat\dirent.c /Fo$@
+
+$(OBJDIR)\glob.obj: glob\glob.c
+	CL /c $(CFLAGS) glob\glob.c /Fo$@
+
+$(OBJDIR)\fnmatch.obj: glob\fnmatch.c
+	CL /c $(CFLAGS) glob\fnmatch.c /Fo$@
+
+$(OBJDIR)\pathstuff.obj: w32\pathstuff.c
+	CL /c $(CFLAGS) w32\pathstuff.c /Fo$@
+
+

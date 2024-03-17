@@ -1,0 +1,107 @@
+Thank you for trying this first port of ZIP for VM/CMS and MVS!
+
+-----------------------------------------------------------------------
+Additional notes from Greg Hartwig (7/96):
+
+The ZIP MODULE has been packed to preserve CMS line ends
+and is shipped as ZIP.MOD.
+To restore it to an executable module on CMS, do the following:
+1. Upload it to CMS as a Fixed file with LRECL 1024.
+   Example, from a DOS or OS/2 window, type this:
+      SEND zip.mod A:zip module a (RECFM F LRECL 1024
+
+2. Use COPYFILE to unpack the file.
+   Example, in CMS type this:
+      COPYFILE ZIP MODULE A (UNPACK REPLACE OLDDATE
+
+'+' and '-' are valid characters in CMS file names, so the code
+to remove them is no longer done for CMS (MVS only).
+
+I don't have access to an MVS system, so my changes to the code
+have only been tested on CMS.  AD/Cycle C/370 V1R2.0 was used
+to compile the code.
+
+Greg Hartwig
+e-mail: ghartwig@ix.netcom.com
+        ghartwig@vnet.ibm.com
+-----------------------------------------------------------------------
+
+                        Using under VM/CMS:
+                    ---------------------------
+
+1. To use the Info-ZIP's ZIP under VM/CMS you need:
+
+   - C/370 ver 2.1 compiler or another compatible compiler supporting
+     long names for function/variable names.
+
+   - that the disk where the compiler is on is accessed
+
+   - at least the following nucleus extensions (display of NUCXMAP):
+
+     NAME      ENTRY    USERWORD ORIGIN   BYTES   AMODE (Attributes)
+     EDCX24    0038B000 00000000 0038B000 00002FD8  ANY  SYSTEM
+     EDCXV     001D1000 00000000 001D1000 000824C8   31  SYSTEM
+
+2. To compile the program under VM/CMS do :
+
+   - unzip all the files from zip22.zip file. They are stored as
+     ASCII format so you have to unzip them first on PC or other
+     system that already have UNZIP, and then upload them to the
+     mainframe with ASCII to EBCDIC conversion.
+
+   - execute ZIPVMC to compile and link all the sources.
+
+   - if everything is ok you will get an ZIP MODULE
+
+   - the warnings about the duplicated ASCII and EBCDIC symbols
+     are OK :-)
+
+3. Using ZIP
+
+   - Just read MANUAL
+
+   - A few exceptions concerning VM/CMS
+
+     3.1. use always filename.filetype.mdisk format to specify
+          vm/cms files
+
+     3.2. if you want to make a portable zip file that is to be unzipped
+          on ASCII based systems use the -a option
+
+     3.3. If you want to zip the input files as binary ebcdic files
+          use the -B (capital letter) option
+
+     3.4. The date/end the time of the input files is set in the zip's
+          dir to the current system date/time
+
+     3.5. Without specifying the "-a" or "-B" option, the ZIP program
+          defaults to "native" (EBCDIC) mode and tries to preserve the
+          file information (LRECL,BLKSIZE..)
+          So when you UNZIP a file zipped with ZIP under VM/MVS it
+          restores the file info.
+
+          There currently some problems with file with RECFM=V*
+          I don't save the length of each record yet :-)
+
+     3.6. No wildcards are supported as input file names:
+
+          So you CAN'T use things like: zip myzip *.c
+
+     3.7. If you have CMS PIPELINES installed you can use the MC EXEC
+           as a MAKE utility to conditional compile all the sources
+           using as input ZIP MAKEFILE.
+
+     3.8. NO SFS is supported if you are using VM/ESA
+
+     3.9. You can use DD names for zipfilename for example:
+          'filedef input disk myzip zip'
+          'zip dd:input file1.txt file2.txt ...'
+
+Please report all bugs and problems to :
+     zip-bugs@lists.wku.edu
+
+That's all for now.
+
+Have fun!
+
+George Petrov

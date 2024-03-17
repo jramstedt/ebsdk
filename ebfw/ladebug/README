@@ -1,0 +1,180 @@
+	Writting debuggable code on the EBxx range of evaluation boards
+	===============================================================
+
+Introduction
+============
+
+The EBxx monitor supports the remote debugging of programs running on
+the EBxx range of boards by the DECladebug debugger. This document
+describes what is required of the program being debugged for remote
+debug to work.
+
+Overview
+========
+
+The monitor's remote debug server (the part of the monitor that
+comunicates with DECladebug) uses both interrupts and an ethernet device
+(by default the on board ethernet device.). Interrupts are used by the
+monitor to poll the ethernet device for messages from DECladebug. Any
+program that either changes the interrupt handler or uses the
+same ethernet device must share these facilities with the debug server
+if it is to be debuggable using remote debug.  This document describes
+how this should be done.
+
+This document also describes the PAL code required by the debug
+server.  This section should be read by anybody hoping to debug a
+program that installs its own PAL code.
+
+The runtime environment
+=======================
+
+When a program is started by the monitor's GO command it starts with all
+interrupts enabled (IPL = 0). If the program does not install its own
+interrupt handler the monitor will handle all interrupts.  If a
+program does install its own interrupt handler, using the Write System
+Entry Address PAL call, then it must be prepared to handle all
+interrupts as described below.  When a program completes normally the
+monitor will re-install its own interrupt handler. 
+
+Types of programs
+=================
+
+For the purposes of this document programs may be clasified into 3
+types. These are:
+
+	Type 1 - Programs which neither use the ethernet nor include
+their own interrupt handler.
+
+	Type 2 - Programs which include thier own interrupt handler;
+but don't use the ethernet.
+
+	Type 3 - Programs that make use of the ethernet.
+
+Type 1 programs
+===============
+
+	There should be few problems with debugging programs that
+neither use the ethernet nor modify the monitor's interrupt handling.
+The only restriction on such programs is that they should not disable
+ethernet interrupts for long periods (more than about half a second)
+since this may cause DECLadebug to think that there is a problem with
+ethernet link to the target. Ethernet interrupts are enabled at IPLs
+of 2 or less. It is possible to set breakpoints in or to single step
+uninterruptable code; and once a breakpoint has been reached there is
+no restriction on the time that may be spent at the breakpoint.
+
+Type 2 programs
+===============
+
+Once a program has installed an interrupt handler of its own it must
+ensure that the monitor polls the ethernet device often enough to
+receive all the messages sent to it by DECLadebug. A program can tell
+the monitor to poll the ethernet device by calling the function
+"ladbx_poll".  When this function is called:
+
+	All frames that have been received on the ethernet device will
+be read.
+
+	All remote debug frames will be processed and acted upon.
+
+	Any ethernet interrupt will be cleared.
+
+The function is a void function taking no arguments.  It must be
+called within half a second of the arrival of any ethernet frame.  The
+easiest way to ensure this is to enable either ethernet or timer
+interrupts (or both) and to call it every time an interrupt occurs.
+
+Type 3 programs
+===============
+
+Type 3 programs are those that themselves use the monitor ethernet
+device.  This can often be avoided by installing a second ethernet
+device on an ISA or PCI card and either writing the program to use
+this device or using the monitor's 'netdevice' command to change which
+device is used by the monitor.
+
+If sharing of the device cannot be avoided then, once it has taken
+over the ethernet device, the program must ensure that all received
+ethernet frames relevent to the debug server are passed to it within
+half a second of receipt.  The frames that are relevent are ARP frames
+and DECladebug remote debug frames.  They can be passed to the debug
+server by calling 'ladbx_check_ether_packet'. The declaration of this
+function is:
+
+	void ladbx_check_ether_packet(unsigned char * packet, int size);
+
+The packet argument should point to start of the ethernet frame
+(including the ethernet header). The size argument should be set to
+the size of the frame including all headers but excluding the
+checksum.
+
+This function will not modify the received frame and will ignore
+frames that are not relevent to the debug server.  As such the easiest
+way of ensuring that it is called for every relevent frame is to call
+it every time any frame is received.
+
+The debug server must also be told what function to call when it has
+to send a frame.  This function must be provided by the program being
+debugged. The function should be declared as follows:
+
+	int send_function(unsigned char * packet, int size);
+
+The program should pass the debug server a pointer to this function
+before passing it any debug frames.  This pointer is passed to it by
+calling the function 'ladbx_set_send_function'.  The declaration of
+this function is:
+
+	void ladbx_set_send_function(
+		int (* send_function)(unsigned char * packet, int size));
+
+The arguments to the send function are the complete ethernet frame to
+be sent (except its CRC) and its size.  The result should be TRUE (non
+zero) if the frame is successfully sent or FALSE (zero) if the send
+fails.  The send function may corrupt the packet if neccessary but
+should not attempt to free or reuse the buffer containing the packet.
+
+When debugging operating systems an alternative to using the monitor's
+debug server is to write a special DECLadebug debug server that runs
+as part of the operating system.  A seperate document [still to be
+written] describes how to write such a server.
+
+PAL code enviroment
+===================
+
+This section describes how to allow the remote debugging of programs
+that install their own PAL code. Most programs will be able to use the
+OSF compatible PAL code included in the firmware; and will not need to
+install thier own PAL code.  This section can be ignored for such
+programs.
+
+The debug server uses the following OSF/1 PAL code calls:
+
+	IMB
+	RDUSP
+	RTI
+	SWPIPL
+	WRENT
+
+For remote debug to work these must be implemented to the interface
+described in the OSF/1 section of the Alpha Architecture Reference
+Manual. 
+
+The debug server also assumes that the interface to the system
+routines is as described in the OSF/1 section of the Alpha
+Architecture Reference Manual.
+	
+In addition the debug server uses the DBGSTOP PAL call to implement
+breakpoints.  This PAL call is used, rather than the BPT PAL call
+since complex programs (e.g. operating systems) are likely to reset
+the EntIF system entry point during initialisation.  For a program to
+be debuggable using the monitor's debug server it must either use the
+monitor's PAL code; or if it installs its own PAL code it must contain
+an identical implementation of the DBGSTOP PAL call.  
+
+When a program installs its own PAL code its reset PAL code routine
+must preserve the address of the debug entry point through the
+installation of the new PAL code.  In the EB64's PAL code this is held
+in the PAL temporary register with symbolic name ptEntDbg.  It must
+also either preserve the address of the interrupt entry point
+(ptEntInt) or set the IPL to a level that prevents all interrupts in
+the reset code.

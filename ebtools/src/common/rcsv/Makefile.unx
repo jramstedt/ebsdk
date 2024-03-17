@@ -1,0 +1,25 @@
+CC		= cc
+CFLAGS		= -g -I. -I../include
+LFLAGS		= -lc
+COMMON		= ../common
+INCLUDE		= ../include
+TOOLBOX	    	= ../../toolbox
+
+TOUCH = /usr/bin/touch
+#
+all		: rcsv
+
+rcsv:		rcsv.o 
+		$(CC) $(CFLAGS) -g -o rcsv rcsv.o $(COMMONLIB) $(LFLAGS)
+
+rcsv.o:	    	rcsv.c
+		$(CC) $(CFLAGS) -c rcsv.c
+
+install:    	rcsv
+		cp rcsv $(TOOLBOX)/.
+
+clean:
+		rm -f *.o *~ core rcsv 
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+

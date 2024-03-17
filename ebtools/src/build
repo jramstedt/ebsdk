@@ -1,0 +1,67 @@
+#!/bin/sh
+#
+#  Simple utility to make every tool for this host.
+#  Run as:
+#	build [target]
+
+export PATH || (echo "OOPS, this isn't sh.  Desperation time."; sh $0 $argv; kill $$)
+
+if [ ! -f ../../sdkshell.conf ] ; then
+    echo -n "EBSDK not yet configured; do so now? [Y/N] <Y> "
+    read answer
+    if [ "$answer" = "Y" -o "$answer" = "y" -o "$answer" = "" ] ; then
+	olddir=`pwd`
+	cd ../..
+	if [ ! -x ./configure ] ; then
+            echo "The EBSDK configuration script `pwd`/configure"
+            echo "does not exist or is not executable.  Re-check your"
+            echo "installation and try again"
+            exit -1
+        else
+            ./configure
+        fi
+	cd $olddir
+    else
+        echo "Build cancelled"
+        exit 0
+    fi
+fi
+
+. ../../sdkshell.conf
+
+common_subdirs="include common gnumake bit pvc list strip ic4mat srec srom repeat objtest makerom mapcvt uload sysgen rcsv hex32 hexpad zip-2.2 unzip-5.32 zlib-1.1.3"
+
+unix_subdirs="gas gld"
+
+gnumake_subdirs="hfcomp mini_dbg hal"
+
+# Build the bulk of the utilities
+
+for dir in $common_subdirs ; do
+    if [ ! -f common/$dir/Makefile ] ; then
+	echo "***** No Makefile in common/$dir"
+    else
+	echo "##### Building common/$dir #####"
+        (cd common/$dir ; make -f Makefile ; make -f Makefile install)
+    fi
+done
+
+# Build those that need gnumake
+for dir in $unix_subdirs ; do
+    if [ ! -f unix/$dir/Makefile ] ; then
+	echo "***** No Makefile in unix/$dir"
+    else
+	echo "##### Building unix/$dir #####"
+        (cd unix/$dir ; $EB_TOOLBOX/gnumake -f Makefile ; $EB_TOOLBOX/gnumake -f Makefile install)
+    fi
+done
+
+for dir in $gnumake_subdirs ; do
+    if [ ! -f common/$dir/Makefile ] ; then
+	echo "***** No Makefile in common/$dir"
+    else
+	echo "##### Building common/$dir #####"
+        (cd common/$dir ; $EB_TOOLBOX/gnumake -f Makefile ; $EB_TOOLBOX/gnumake -f Makefile install)
+    fi
+done
+

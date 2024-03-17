@@ -1,0 +1,22 @@
+#
+# Make file to build COMMON on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+OBJECTS	= $(OBJDIR)\disassm.obj $(OBJDIR)\c_32_64.obj $(OBJDIR)\romhead.obj
+
+ALL: $(COMMONLIB)
+
+$(COMMONLIB):	$(OBJECTS)
+	$(implib) /OUT:$(COMMONLIB) $(OBJECTS)
+
+$(OBJDIR)\c_32_64.obj:	$(INCDIR)\a_out.h $(SRCDIR)\c_32_64.c
+$(OBJDIR)\disassm.obj:	$(INCDIR)\a_out.h $(SRCDIR)\disassm.c
+$(OBJDIR)\romhead.obj:	$(INCDIR)\a_out.h $(SRCDIR)\romhead.c
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\c_32_64.obj
+	-del $(CLEANFLAGS) $(OBJDIR)\disassm.obj
+	-del $(CLEANFLAGS) $(OBJDIR)\romhead.obj
+	-del $(CLEANFLAGS) $(COMMONLIB)

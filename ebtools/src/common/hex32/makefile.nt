@@ -1,0 +1,17 @@
+#
+# Make file to build hex32 on NT
+#
+!INCLUDE ..\nt.inc
+#
+ALL:	$(EXEDIR)\hex32.exe
+
+$(OBJDIR)\hex32.obj:	$(SRCDIR)\hex32.c
+
+$(EXEDIR)\hex32.exe:	$(OBJDIR)\hex32.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		 $(OBJDIR)\hex32.obj $(conlibs) 
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\hex32.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\hex32.exe
+

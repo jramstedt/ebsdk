@@ -1,0 +1,79 @@
+#
+# $log$
+
+TOOLBOX	    	= $(EB_TOOLBOX?$(EB_TOOLBOX):../../../osf)
+
+CFLAGS		= -DEV6 -g3
+
+LINT		= /usr/bin/lint
+LINTFLAGS 	=  -1 -wp -av -Xdollar -n -I. -I../include
+
+
+SFILES		= pvc.c body.c common.c memory.c rest.c sched.c ev4.c ev5.c  ev6.c ev6_rest.c
+
+OBJS		= $(SFILES:.c=.o)
+
+tools:		pvc
+
+pvc:		$(OBJS)
+		$(CC) -DEV6 -o pvc $(OBJS)
+
+lint:	
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SFILES)
+
+install:	pvc
+		cp -fp pvc $(TOOLBOX)
+		chmod 775 $(TOOLBOX)/pvc
+
+depend: $(SFILES)
+		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- $(SFILES)
+
+clean:
+		rm -f *~ \#*\# *.bak *.a core\
+		$(OBJS) pvc
+		rcsclean
+
+# DO NOT DELETE THIS LINE -- make depend depends on it.
+
+pvc.o: /usr/include/signal.h /usr/include/standards.h /usr/include/ctype.h
+pvc.o: types.h /usr/include/stdio.h /usr/include/stdlib.h
+pvc.o: /usr/include/stdarg.h /usr/include/string.h /usr/include/sys/types.h
+pvc.o: evstruct.h list.h /usr/include/stddef.h pvc.h
+body.o: /usr/include/sys/types.h /usr/include/standards.h
+body.o: /usr/include/sys/stat.h /usr/include/sys/mode.h /usr/include/ctype.h
+body.o: types.h /usr/include/stdio.h /usr/include/stdlib.h
+body.o: /usr/include/stdarg.h /usr/include/string.h evstruct.h list.h
+body.o: /usr/include/stddef.h body.h memory.h
+common.o: /usr/include/stdio.h /usr/include/standards.h ispdef.h
+common.o: /usr/include/ctype.h types.h /usr/include/stdlib.h
+common.o: /usr/include/stdarg.h /usr/include/string.h
+common.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+common.o: opcode.h
+memory.o: memory.h types.h /usr/include/stdio.h /usr/include/standards.h
+memory.o: /usr/include/stdlib.h /usr/include/stdarg.h /usr/include/string.h
+memory.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+rest.o: types.h /usr/include/stdio.h /usr/include/standards.h
+rest.o: /usr/include/stdlib.h /usr/include/stdarg.h /usr/include/string.h
+rest.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+rest.o: rest.h memory.h /usr/include/ctype.h
+sched.o: types.h /usr/include/stdio.h /usr/include/standards.h
+sched.o: /usr/include/stdlib.h /usr/include/stdarg.h /usr/include/string.h
+sched.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+sched.o: ispdef.h sched.h memory.h
+ev4.o: types.h /usr/include/stdio.h /usr/include/standards.h
+ev4.o: /usr/include/stdlib.h /usr/include/stdarg.h /usr/include/string.h
+ev4.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+ev4.o: ispdef.h rest.h sched.h memory.h ev4.h
+ev5.o: types.h /usr/include/stdio.h /usr/include/standards.h
+ev5.o: /usr/include/stdlib.h /usr/include/stdarg.h /usr/include/string.h
+ev5.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+ev5.o: ispdef.h rest.h sched.h memory.h ev5.h body.h
+ev6.o: types.h /usr/include/stdio.h /usr/include/standards.h
+ev6.o: /usr/include/stdlib.h /usr/include/stdarg.h /usr/include/string.h
+ev6.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+ev6.o: ispdef.h rest.h sched.h memory.h ev6.h body.h
+ev6_rest.o: types.h /usr/include/stdio.h /usr/include/standards.h
+ev6_rest.o: /usr/include/stdlib.h /usr/include/stdarg.h /usr/include/string.h
+ev6_rest.o: /usr/include/sys/types.h evstruct.h list.h /usr/include/stddef.h
+ev6_rest.o: ispdef.h rest.h sched.h memory.h ev6.h body.h
+

@@ -1,0 +1,60 @@
+#!/bin/sh
+# Info-ZIP script tandem/rename.unix for UnZip 5.32 and later
+#
+# This script should be run on a Unix system in order to rename appropriately
+# the source files required for the Tandem port.  Note that the source files
+# should have DOS-style line-endings (CR/LF), which can be accomplished by
+# archiving them with "zip -l" and unarchiving with "unzip -b", or by ftp'ing
+# them to the Tandem system in ASCII mode.
+
+MV="/bin/mv"
+#MV="/bin/cp -p"
+
+if [ -d tandem ]; then
+    cd tandem
+fi
+
+if [ -f tandemc ]; then
+    echo "error:  tandemc already exists"
+    exit 1
+fi
+
+if [ ! -f tandem.c ]; then
+    echo "error:  can't find tandem.c"
+    echo "  (either files are already renamed or else we're not in UnZip directory)"
+    exit 2
+fi
+
+echo "Renaming source files for Tandem (command = $MV) ..."
+$MV tandem.c tandemc
+$MV tandem.h tandemh
+
+$MV ../consts.h constsh
+$MV ../crc32.c crc32c
+$MV ../crctab.c crctabc
+$MV ../crypt.c cryptc
+$MV ../crypt.h crypth
+$MV ../ebcdic.h ebcdich
+$MV ../envargs.c envargsc
+$MV ../explode.c explodec
+$MV ../extract.c extractc
+$MV ../fileio.c fileioc
+$MV ../globals.c globalsc
+$MV ../globals.h globalsh
+$MV ../inflate.c inflatec
+$MV ../inflate.h inflateh
+$MV ../list.c listc
+$MV ../match.c matchc
+$MV ../process.c processc
+$MV ../tables.h tablesh
+$MV ../ttyio.c ttyioc
+$MV ../ttyio.h ttyioh
+$MV ../unshrink.c unshrinc
+$MV ../unzip.c unzipc
+$MV ../unzip.h unziph
+$MV ../unzpriv.h unzprivh
+$MV ../version.h versionh
+$MV ../zip.h ziph
+$MV ../zipinfo.c zipinfoc
+
+echo "Done."

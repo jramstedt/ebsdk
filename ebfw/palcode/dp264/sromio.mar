@@ -1,0 +1,411 @@
+; FDH....
+; Modified register usage to use only volatile registers
+; as defined by the calling standards.  Usage of r15 was
+; replaced by r24. This file was originally sromio.s which
+; is shared with the SROM mini-debugger. The register usage
+; in the mini-debugger should be changed to comply with the
+; register usage here so that these files can be merged again.
+; At that point this file can be removed.  The following
+; mini-debugger register usages changes should be made.
+;
+; 	r15 -> r24
+; 	r16 -> r15
+; 	r17 -> r16
+; 	r18 -> r17
+; 	r19 -> r18
+; 	r20 -> r19
+; 	r21 -> r20
+; 	r22 -> r21
+;
+
+.macro	SROM_IO_FUNCTIONS func
+;
+; the following bits definitions are flags for the mini-debugger
+;
+
+mc_v_qw			= 0		; qw output mode flag 			
+mc_v_display		= 1		; Display on/off flag.			
+mc_v_loop		= 2		; infinite loop flag 			
+mc_v_writeaddr		= 3		; A fill with address command.		
+mc_v_notdata		= 4		; Negate data written.                  
+mc_v_base		= 5		; base address flag 			
+mc_v_follow_w_rd	= 6		; Follow command with a read.		
+mc_v_follow_w_wr	= 7		; Follow command with a write.		
+mc_v_echo		= 8		; echo output flag 			
+mc_v_write		= 9		; write/not_read flag 			
+mc_v_xm			= 10		; An XM command has been executed.	
+mc_v_block		= 11		; block read/write flag 		
+mc_v_cmp		= 12		; A CoMpare command.			
+mc_v_cp			= 13		; A Copy command.			
+mc_v_mt			= 14		; A memory test command.		
+
+mc_m_qw			= ^x0001	; (1 << mc_v_qw)
+mc_m_display		= ^x0002	; (1 << mc_v_display)
+mc_m_loop		= ^x0004	; (1 << mc_v_loop)
+mc_m_writeaddr		= ^x0008	; (1 << mc_v_writeaddr)
+mc_m_notdata		= ^x0010	; (1 << mc_v_notdata)  
+mc_m_base		= ^x0020	; (1 << mc_v_base)	
+mc_m_follow_w_rd	= ^x0040	; (1 << mc_v_follow_w_rd)
+mc_m_follow_w_wr	= ^x0080	; (1 << mc_v_follow_w_wr)
+mc_m_echo		= ^x0100	; (1 << mc_v_echo)
+mc_m_write		= ^x0200	; (1 << mc_v_write)
+mc_m_xm			= ^x0400	; (1 << mc_v_xm)
+mc_m_block		= ^x0800	; (1 << mc_v_block)
+mc_m_cmp		= ^x1000	; (1 << mc_v_cmp)
+mc_m_cp			= ^x2000	; (1 << mc_v_cp)
+mc_m_mt			= ^x4000	; (1 << mc_v_mt)
+
+ascii_X			= ^x58
+
+
+; ======================================================================
+; = keypressed - detect if user pressed a key				=
+; ======================================================================
+; OVERVIEW:
+;       Returns a 1 if a key has been pressed, 0 if not.
+;       check the serial line interrupt bit, if it's set, clear it
+;       and return 1, otherwise, return 0
+;
+; FORM_OF_CALL:
+;       bsr r20, keypressed
+;  
+; RETURNS:
+;       R0  - 1 if keypressed, else 0
+; 
+; SIDE EFFECTS:
+;       The Serial Line Interrupt bit is cleared.
+;
+; ARGUMENTS:
+;       none
+;
+; REGISTERS:
+;       R0  - scratch & return value
+;       R20 - return address 
+;       
+; CALLS:
+;       none
+;
+ 
+keypressed:
+	hw_mfpr	r0, ev6__isum 			; read Interrupt Summary Register 
+	srl	r0, #ev6__isum__sl__s, r0	; r0<0> <- Serial Line Intrpt bit 
+	and	r0, #ev6__isum__sl__m, r0	; :				 
+	sll	r0, #ev6__hw_int_clr__sl__s, r0	; put into position		 
+	PVC_VIOLATE <11>			; EJS -- ignore lack of stall
+	PVC_VIOLATE <35>			; EJS -- ignore not writing twice
+	hw_mtpr	r0, ev6__hw_int_clr		; Clear any serial line intrpt 
+	cmovne	r0, #1, r0			; Return 1 if a key was pressed  
+
+	PVC_VIOLATE <29>
+	PVC_JSR	key, bsr=1, dest=1
+	ret	r31, (r20)
+
+
+; ======================================================================
+; = getChar -- routine to receive a character from the serial line	=
+; ======================================================================
+; OVERVIEW:
+;       Once the start bit of '0' is detected we wait 1 1/2 bit times 
+;       before reading the first data bit.  The data bit is packed into a 
+;       register and shifted left.  After the first bit we only wait 
+;       whole bit times.  After 8 bits have been read the routine is exited.
+;
+; FORM OF CALL:
+;       bsr	p7, getChar
+; 
+; RETURNS:
+;       R0  - Character returned after user input
+;       
+; CALLS:
+;       waitBitHalf
+;       waitBitTime
+;       
+; REGISTERS:
+;       R1  - Scratch.
+;       R2  - Bit counter AND character acumulator.
+;             Bits <0:7> is the bit counter (with an extra value of 8)
+;             Bits <8:15> is the character typed in.
+;       R20 - return address for the call to waitBitTime()
+;
+ 
+getChar:
+	lda	r2, <0+8>(r31)			; Set the bit count to 0.	 
+
+	bis	r31, #<20*8>, r3		; Character timeout 20 characters
+;
+; Wait for the start bits (sl_rcv bit will go low)		 
+;
+char_start:
+	hw_mfpr	r0, ev6__i_ctl			; Poll the serial line		 
+        srl     r0, #ev6__i_ctl__sl_rcv__s, r0	;
+	blbc	r0, start_bit			; until low -> start bit is '0'
+
+	PVC_JSR	wait, bsr=1
+	bsr	r20, waitBitEighth		; Wait for a Eighth bit time	 
+
+	subq	r3, 1, r3			; decrement timout
+	PVC_VIOLATE <1008>			; EJS -- don't follow branch
+	bne	r3, char_start			; branch until timeout reached
+	lda	r0, -1(r31)			; Return failure code
+
+	PVC_VIOLATE <29>
+	PVC_JSR	getchar, bsr=1, dest=1
+	ret	r31, (p7)			; return to caller		 
+
+start_bit:
+	PVC_JSR	wait, bsr=1
+	bsr	r20, waitBitHalf		; Wait for a half bit time	 
+
+get_bits:					; DO				 
+	PVC_JSR wait, bsr=1
+	bsr	r20, waitBitTime		; : wait for one bit time	 
+
+	hw_mfpr	r0, ev6__i_ctl			; : Get the current data bit.	 
+	srl 	r0, #ev6__i_ctl__sl_rcv__s, r0	; : r0<0> <- current data bit	 
+        and     r0, #1, r0			; :
+	sll	r0, r2, r0			; : r0<r2> <- current data bit  
+	bis	r0, r2, r2			; : r2 <- r2 .bit_or. r0	 
+	lda	r2, 1(r2)			; : Increment bit countr.	 
+	and	r2, #^xFF, r0			; : Ignore character in comp.	 
+	cmpult	r0, #16, r1			; : Do we have a byte now?
+	PVC_VIOLATE <1008>			; EJS -- don't follow branch
+	bne	r1, get_bits			; WHILE bit count .NE. 8	 
+
+	PVC_JSR wait, bsr=1
+	bsr	r20, waitBitTime		; Wait for the middle of the 	 
+						; stop bit.
+	PVC_JSR	key, bsr=1
+	bsr	r20, keypressed			; Clear serial line interrupts	 
+
+	extbl	r2, #1, r0			; Place character in R0.	 
+	srl	r24, #mc_v_echo, r1		; IF echo_flag set		 
+	blbc	r1, exit_getchar		; THEN				 
+	xor	r0, #ascii_X, r1		; : IF user sent 'X'		 
+	bne	r1, exit_getchar		; : THEN			 
+	lda	r1, mc_m_echo(r31)
+	bic	r24, r1, r24			; : : clear the echo flag	 
+						; : ENDIF			 
+exit_getchar:					; ENDIF			 
+	PVC_VIOLATE <29>
+	PVC_JSR	getchar, bsr=1, dest=1
+	ret	r31, (p7)			; return to caller		 
+
+
+; ======================================================================
+; = putChar - routine to send a character over the serial line		=
+; ======================================================================
+; OVERVIEW:
+;  	This routine is used to transmit a character over the serial line.  
+; 	First a start bit of '0' is sent.  This is followed by eight data 
+;       bits.  The data bits are passed to the routine through a gpr.  The 
+; 	data is transmitted one bit at a time and the gpr is shifted once 
+;       to the right after each bit.  After the last data bit is transmitted
+;       a stop bit of '1' is added to the end of the character.  Extra
+;      stop bits are added to make sure that we don't overflow the
+;      receiving terminal's buffer. 
+;       We make sure that the transmit is initially high so that the
+;       receiver can detect the start bit.
+;
+; FORM OF CALL:
+;       R17	<- the character to be sent. 
+;       bsr	p7, putChar
+;       
+; RETURNS:
+;      none
+;       
+; ARGUMENTS:
+;       R17 - the character which is to be sent to the SROM port.
+;
+; REGISTERS:
+;	r1  - scratch
+;       r2  - scratch, bit count
+;       r3  - scratch, I_CTL value
+;       r17 - character to output through the SROM port
+;       r20 - return address for the call to waitBitTime()
+;
+ 
+putChar:
+	srl	r24, #mc_v_echo, r2		; IF echo flag is clear THEN	 
+	blbc	r2, exit_putChar		; Output is disabled, exit	 
+;
+; Initialize routine variables	 
+;
+	lda	r2, 16(r31)			; 1 high + 1 start + 8 data + 	 
+						; 6 stop (5 extra for delay).   
+	lda	r17, ^x3F00(r17)		; add stop bits at the end and	 
+	s4addq	r17, #1, r17			; then add start and high bit	 
+
+data_bit:					; REPEAT			
+	hw_mfpr	r0, ev6__i_ctl			; get current I_CTL value	
+	lda	r1, 1(r31)			; r1 = mask for sl_xmit bit	
+	sll	r1, #ev6__i_ctl__sl_xmit__s, r1 ; move to correct position 
+	bic	r0, r1, r0			; clear sl_xmit bit in old I_CTL value 
+	blbc	r17, send_bit			; check the new sl_xmit bit	
+	bis	r0, r1, r0			; set sl_xmit bit in old I_CTL value 
+send_bit:					; continue			
+	hw_mtpr	r0, ev6__i_ctl			; EV6 Send the data bit.	
+
+	srl	r17, #1, r17			; Shift right, to the next bit. 
+	subq	r2, #1, r2			; Decrement the bit count.
+
+	PVC_JSR	wait, bsr=1
+	bsr	r20, waitBitTime		; wait for a bit time	   	 
+
+	PVC_VIOLATE <1008>			; EJS -- don't follow branch
+	bne	r2, data_bit			; UNTIL all data sent		 
+
+exit_putChar:
+	PVC_JSR	putchar, bsr=1, dest=1
+	PVC_VIOLATE <29>
+	ret	r31, (p7)			; return to caller		 
+
+
+; ======================================================================
+; = waitBitTime - (waitBitHalf) - wait a bit time (wait 0.5 bit-time)	=
+; ======================================================================
+;
+; OVERVIEW:
+;       Waits a bit-time or half-bit time, depending on the entry point.
+;
+; FORM OF CALL:
+;       bsr r20, waitBittime
+;       bsr r20, waitBithalf
+;       
+; RETURNS:
+;       none
+;
+; ARGUMENTS:
+;       R24	- Upper 32 bits contain CPU cycles per bit.
+;
+; REGISTERS:
+;       R0	- CPU cycle counts per bit
+;       R1	- scratch
+;
+ 
+waitBitTime:
+	srl	r24, #32, r0			; Get the timing info.		 
+	br	r31, waitBitCont
+waitBitHalf:
+	srl	r24, #<32+1>, r0		; Divide timing info by 2.	 
+	br	r31, waitBitCont
+waitBitQuarter:
+	srl	r24, #<32+2>, r0		; Divide timing info by 4.	 
+	br	r31, waitBitCont
+waitBitEighth:
+	srl	r24, #<32+3>, r0		; Divide timing info by 8.
+waitBitCont:
+
+wait_init:
+	lda	r1, 1(r31)			;  				 
+	sll	r1, #ev6__cc_ctl__cc_ena__s, r1	; Move the cc_ena bit into correct position
+	hw_mtpr	r1, ev6__cc_ctl			; clear and enable cycle counter
+	addq	r31, r31, r31			; nop
+	addq	r31, r31, r31			; nop
+	addq	r31, r31, r31			; nop
+        hw_mtpr r31, <ev6__mm_stat ! 32> 	; dummy IPR write
+						;   sets SCBD bit 5
+						;   (to stall untill cc_ctl gets written)
+
+wait:						; REPEAT 			 
+	rpcc	r1				; : read the cycle count 	 
+	zapnot	r1, #^x0f, r1			; : clear the high longword 	 
+	cmplt	r0, r1, r1			; :  				 
+	PVC_VIOLATE <1008>			; EJS -- don't take branch
+	beq	r1, wait			; UNTIL we have waited time 	 
+						; specified	
+	PVC_VIOLATE <29>
+	PVC_JSR wait, bsr=1, dest=1
+	ret	r31, (r20)			; RETURN 			 
+
+
+
+; ======================================================================
+; = autobaud_sync -- routine used for synchronizing with the serial line=
+; ======================================================================
+; OVERVIEW:
+;       The serial line is polled until the a start bit is seen.  We then
+;       time from then until the stop bit is detected.  This happens when
+;       the line goes high and stays high for longer than 8 times the 
+;       previous time.
+;
+;      1->0  - is the start bit
+;      0->1  - is bit 0 of "55"h
+;      1->0  - is bit 1 of "55"h
+;      0->1  - is bit 2 of "55"h
+;      1->0  - is bit 3 of "55"h
+;      0->1  - is bit 4 of "55"h
+;      1->0  - is bit 5 of "55"h
+;      0->1  - is bit 6 of "55"h
+;      1->0  - is bit 7 of "55"h
+;      0->1  - is the stop bit
+;  
+; FORM OF CALL:
+;       bsr p7, autobaud_sync
+;
+; REGISTERS:
+;       R0:R2 - Scratch.
+;
+; RETURNS:	
+;       R24  - Timing info for using srom port is saved here.
+;
+ 
+autobaud_sync:
+	lda	r1, 1(r31)			; r1 <- cc_ctl enable bit 	 
+	sll	r1, #ev6__cc_ctl__cc_ena__s, r1	; Move the cc_ena bit into correct position
+
+	PVC_JSR	key, bsr=1
+	bsr	r20, keypressed			; Clear serial line interrupts	 
+;
+; Wait for the start bit. Line will transition from high to low 
+;
+poll_start:					; DO 				 
+	hw_mfpr	r0, ev6__i_ctl			; : r0 <- sl_rcv 		 
+	srl 	r0, #ev6__i_ctl__sl_rcv__s, r0	; : r0<0> <- current data bit	 
+	PVC_VIOLATE <1008>			; EJS -- do not follow branch
+    	blbs	r0, poll_start			; WHILE sl_rcv remains high
+	hw_mtpr	r1, ev6__cc_ctl			; Enable/clear the cycle counter.  
+;
+; Wait for a low to high transition (or the stop bit)  
+;
+poll_h:                   			; : REPEAT 			 
+	hw_mfpr	r0, ev6__i_ctl			; : r0 <- sl_rcv 		 
+	srl 	r0, #ev6__i_ctl__sl_rcv__s, r0	; : r0<0> <- current data bit
+	PVC_VIOLATE <1008>			; EJS -- do not follow branch	 
+        blbc	r0, poll_h			; : UNTIL sl_rcv goes HI 	 
+
+	rpcc	r1				; Record low-to-hi transition.  
+	zap	r1, #^xF0, r1			; blow off the high longword	 
+;	
+; Wait for a high to low transition or time out  
+;
+poll_l:						; : REPEAT 			 
+	rpcc	r0
+	zap	r0, #^xF0, r0			; blow off the high longword	 
+	sll	r1, #3, r2			; 8 times low-to-high time.	 
+	cmpult  r2, r0, r0			; Have reached stop bit?	 
+	bne	r0, end_sync
+	hw_mfpr	r0, ev6__i_ctl			; : r0 <- sl_rcv 		 
+	srl 	r0, #ev6__i_ctl__sl_rcv__s, r0	; : r0<0> <- current data bit
+	PVC_VIOLATE <1008>			; EJS -- do not follow branch	 
+        blbs	r0, poll_l			; : UNTIL sl_rcv goes LO 	
+	PVC_VIOLATE <1008> 
+	br	r31, poll_h			; Wait for next low-to-hi trans
+
+end_sync:
+	lda	r0, 0(r31)			; Divide total cycle count (r1) 
+simple_div:
+	mulq	r0, #9, r2			; by 9 (8 data + 1 start bit)	 
+	cmpult	r2, r1, r2			; This is a simple divide.
+	beq	r2, set_baud			; R0 = R1/9
+	addq	r0, #1, r0
+	br	r31, simple_div
+
+set_baud:
+	sll	r0,  #32, r0			; move to hi longword 		 
+	lda	r24, mc_m_echo(r0)		; r24 <- cycles-per-bit  	 
+
+	PVC_JSR	auto, bsr=1, dest=1
+	PVC_VIOLATE <29>
+	ret	r31, (p7)
+
+.endm	SROM_IO_FUNCTIONS

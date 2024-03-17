@@ -1,0 +1,17 @@
+#
+# Make file to build srom on NT
+#
+!INCLUDE ..\nt.inc
+#
+ALL:	$(EXEDIR)\srom.exe
+
+$(OBJDIR)\srom.obj:	$(SRCDIR)\srom.c
+
+$(EXEDIR)\srom.exe:	$(OBJDIR)\srom.obj
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+		 $(OBJDIR)\srom.obj $(conlibs) 
+
+CLEAN:
+	-del $(CLEANFLAGS) $(OBJDIR)\srom.obj
+	-del $(CLEANFLAGS) $(EXEDIR)\srom.exe
+

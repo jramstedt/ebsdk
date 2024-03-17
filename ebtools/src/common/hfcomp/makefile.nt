@@ -1,0 +1,225 @@
+#
+# Make file to build hfcomp on NT
+#
+!INCLUDE ..\nt.inc
+#!INCLUDE $(EB_BASE)\rules.nt
+
+TOOLOBJ = .
+TOOLBOX = $(EB_TOOLBOX)
+GAS     = $(TOOLBOX)\gas
+ASTRIP  = $(TOOLBOX)\astrip
+STRIP   = $(TOOLBOX)\strip
+SYSGEN  = $(TOOLBOX)\sysgen
+ALIST   = $(TOOLBOX)\alist
+LINK    = LINK
+
+# Hex values to represent the Base of PALcode
+# used in the decompressor and the entry point
+# used for the decompressor.  The DECOMP_COMPRESSED
+# variable represents the base of the compressed
+# image. When these values are changed the hfcomp
+# tool should be rebuilt.
+DECOMP_PALBASE          = 300000
+DECOMP_BASE             = 300B00
+DECOMP_COMPRESSED       = 304000
+
+HEADER_DEFS =   -DDECOMP_PALBASE=0x$(DECOMP_PALBASE) \
+		-DDECOMP_BASE=0x$(DECOMP_BASE) \
+		-DDECOMP_COMPRESSED=0x$(DECOMP_COMPRESSED)
+
+# -------------------------------------------------------
+# Determine which decompression code to use based on CPU.
+# -------------------------------------------------------
+!IF "$(CPUTYPE)" == "21064"
+DECOMP          = $(TOOLBOX)\decmp64.img
+!ENDIF
+
+!IF "$(CPUTYPE)" == "21066"
+DECOMP          = $(TOOLBOX)\decmp64.img
+!ENDIF
+
+!IF "$(CPUTYPE)" == "21164"
+DECOMP          = $(TOOLBOX)\decmp164.img
+!ENDIF
+
+!IF "$(CPUTYPE)" == "21264"
+DECOMP          = $(TOOLBOX)\decmp264.img
+!ENDIF
+
+ASFLAGS         = -nologo /Zi $(cvars)
+CCFLAGS         = -nologo /Zi $(cflags) $(cvars) \
+		  $(HEADER_DEFS) -DROM -DNT_UP
+LINKFLAGS       = -MACHINE:ALPHA -ROM -FIXED -ALIGN:0X100 -DEBUG:FULL \
+		  -DEBUGTYPE:COFF -ENTRY:__start -nodefaultlib:oldnames
+STRIPFLAGS      = $(STRIPFLAGS) $(STRIPFLAGS_GLOBAL) 
+ASFLAGS         = $(ASFLAGS) $(ASFLAGS_GLOBAL)
+CPPFLAGS        = -I. -I..\include $(CPPFLAGS)
+#
+#
+
+
+CFILES  = bits.c \
+	  deflate.c \
+	  hfcomp.c \
+	  inflate.c \
+	  trees.c
+
+CMPOBJ  = $(CFILES:.c=.obj)
+
+DCMPOBJ = \
+	$(TOOLOBJ)\cstartup.obj \
+	$(TOOLOBJ)\dbmmain.obj  \
+	$(TOOLOBJ)\decomp.obj   \
+	$(TOOLOBJ)\inflates.obj
+
+HFILES  = compress.h \
+	  decomp.h
+
+
+all:    $(EXEDIR)\hfcomp.exe \
+	$(EXEDIR)\decmp164.img \
+	$(EXEDIR)\decmp264.img \
+	$(TOOLOBJ)\upal164.lis \
+	$(TOOLOBJ)\upal264.lis
+
+
+
+#-----------------------------------------------------------
+# Object files
+#-----------------------------------------------------------
+
+$(TOOLOBJ)\decomp.obj:  $(SRCDIR)\decomp.c $(SRCDIR)\decomp.h
+	$(cc) $(cdebug) $(cflags) $(EXTRA_CFLAGS) $(cvars) \
+	$(CCFLAGS) /Fo$*.obj $(SRCDIR)\decomp.c 
+
+
+$(TOOLOBJ)\inflates.obj:        $(SRCDIR)\inflate.c $(SRCDIR)\decomp.h
+	$(cc) $(cdebug) $(cflags) $(EXTRA_CFLAGS) $(cvars) \
+	$(CCFLAGS) /Fo$*.obj $(SRCDIR)\inflate.c 
+
+$(TOOLOBJ)\dbmmain.obj:         $(SRCDIR)\dbmmain.c $(SRCDIR)\decomp.h
+	$(cc) $(cdebug) $(cflags) $(EXTRA_CFLAGS) $(cvars) \
+	$(CCFLAGS) /Fo$*.obj $(SRCDIR)\dbmmain.c
+ 
+$(TOOLOBJ)\cstartup.obj: $(EB_BASE)\lib\cstartup.s
+	$(AS) -DNO_INITDATA -DNO_EXITDATA $(ASFLAGS) -I$(INCDIR) \
+	-o $(TOOLOBJ)\cstartup.obj $(EB_BASE)\lib\cstartup.s
+
+$(TOOLOBJ)\decomp.out: $(DCMPOBJ)
+	$(LINK) $(LINKFLAGS)  -BASE:0x$(DECOMP_BASE) \
+	-MAP:$(TOOLOBJ)\decomp.map $(DCMPOBJ)  \
+	-OUT:$@ 
+
+$(TOOLOBJ)\decomp.nh: $(TOOLOBJ)\decomp.out
+	$(STRIP) $(STRIPFLAGS) -o $@ $(TOOLOBJ)\decomp.out 
+
+
+cmpobj.lst: $(CMPOBJ)
+	@echo creating cmpobj.lst
+	type <<cmpobj.lst
+	$(CMPOBJ: = ^
+	)
+<<
+
+#-----------------------------------------------------------
+#  HFCOMP.EXE
+#-----------------------------------------------------------
+$(EXEDIR)\hfcomp.exe:   cmpobj.lst
+	$(link) $(linkdebug) $(conflags) /out:$@ \
+	@cmpobj.lst $(conlibs) 
+
+$(TOOLOBJ)\hfcomp.obj:  $(TOOLOBJ)\hfcomp.c
+	$(cc) $(HEADER_DEFS) $(cdebug) $(cflags) $(EXTRA_CFLAGS) $(cvars) $*.c
+#-----------------------------------------------------------
+# DECMP64
+#-----------------------------------------------------------
+#$(EXEDIR)\decmp64.img: $(TOOLOBJ)\upal64.nh $(TOOLOBJ)\decomp.nh
+#       $(SYSGEN) -v -e0   -s $(TOOLOBJ)\upal64.nh \
+#                    -eb00 -s $(TOOLOBJ)\decomp.nh \
+#                    -o $@
+#
+#$(TOOLOBJ)\upal64.nh:   $(TOOLOBJ)\upal64.obj
+#       $(ASTRIP) -a $(TOOLOBJ)\upal64.obj $@
+#
+#$(TOOLOBJ)\upal64.obj:  $(TOOLOBJ)\upal64.cpp
+#       $(GAS) -21064 -o $@ $(TOOLOBJ)\upal64.cpp
+#
+#$(TOOLOBJ)\upal64.cpp: $(SRCDIR)\micropal.s ..\include\dc21064.h
+#       $(CC) /E $(CPPFLAGS) -DDC21064 -DASSEMBLY_CODE \
+#       $(HEADER_DEFS) $(SRCDIR)\micropal.s > $@
+#
+#$(TOOLOBJ)\upal64.lis: $(TOOLOBJ)\upal64.obj
+#       $(ALIST) $(TOOLOBJ)\upal64.obj > $(TOOLOBJ)\upal64.lis
+
+#-----------------------------------------------------------
+# DECMP164
+#-----------------------------------------------------------
+$(EXEDIR)\decmp164.img: $(TOOLOBJ)\upal164.nh $(TOOLOBJ)\decomp.nh
+	$(SYSGEN) -v -e0   -s $(TOOLOBJ)\upal164.nh \
+		     -eb00 -s $(TOOLOBJ)\decomp.nh \
+		     -o $@
+
+$(TOOLOBJ)\upal164.nh:  $(TOOLOBJ)\upal164.obj
+	$(ASTRIP) -a $(TOOLOBJ)\upal164.obj $@
+
+$(TOOLOBJ)\upal164.obj: $(TOOLOBJ)\upal164.cpp
+	$(GAS) -21164 -o $@ $(TOOLOBJ)\upal164.cpp
+
+$(TOOLOBJ)\upal164.cpp: $(SRCDIR)\micropal.s ..\include\dc21164.h
+	$(CC) /E $(CPPFLAGS) -DDC21164 -DASSEMBLY_CODE \
+	$(HEADER_DEFS) $(SRCDIR)\micropal.s > $@
+
+$(TOOLOBJ)\upal164.lis: $(TOOLOBJ)\upal164.obj
+	$(ALIST) $(TOOLOBJ)\upal164.obj > $(TOOLOBJ)\upal164.lis
+
+#-----------------------------------------------------------
+# DECMP264
+#-----------------------------------------------------------
+$(EXEDIR)\decmp264.img: $(TOOLOBJ)\upal264.nh $(TOOLOBJ)\decomp.nh
+	$(SYSGEN) -v -e0   -s $(TOOLOBJ)\upal264.nh \
+		     -eb00 -s $(TOOLOBJ)\decomp.nh \
+		     -o $@
+
+$(TOOLOBJ)\upal264.nh:  $(TOOLOBJ)\upal264.obj
+	$(ASTRIP) -a $(TOOLOBJ)\upal264.obj $@
+
+$(TOOLOBJ)\upal264.obj: $(TOOLOBJ)\upal264.cpp
+	$(GAS) -21264 -o $@ $(TOOLOBJ)\upal264.cpp
+
+$(TOOLOBJ)\upal264.cpp: $(SRCDIR)\micropal.s ..\include\dc21264.h
+	$(CC) /E $(CPPFLAGS) -DDC21264 -DASSEMBLY_CODE \
+	$(HEADER_DEFS) $(SRCDIR)\micropal.s > $@
+
+$(TOOLOBJ)\upal264.lis: $(TOOLOBJ)\upal264.obj
+	$(ALIST) $(TOOLOBJ)\upal264.obj > $(TOOLOBJ)\upal264.lis
+
+
+#-----------------------------------------------------------
+# CLEAN
+#-----------------------------------------------------------
+CLEAN:
+	-del $(CLEANFLAGS) $(TOOLOBJ)\bits.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\deflate.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\hfcomp.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\inflate.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\trees.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\dbmmain.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\inflates.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\cmpobj.lst
+	-del $(CLEANFLAGS) $(TOOLOBJ)\decomp.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\cstartup.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\decomp.map
+	-del $(CLEANFLAGS) $(TOOLOBJ)\decomp.nh
+	-del $(CLEANFLAGS) $(TOOLOBJ)\decomp.out
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal164.cpp
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal164.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal164.nh
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal164.lis
+	-del $(CLEANFLAGS) $(EXEDIR)\decmp164.img
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal264.cpp
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal264.obj
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal264.nh
+	-del $(CLEANFLAGS) $(TOOLOBJ)\upal264.lis
+	-del $(CLEANFLAGS) $(EXEDIR)\decmp264.img
+	-del $(CLEANFLAGS) $(EXEDIR)\hfcomp.exe
+ 

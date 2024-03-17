@@ -1,0 +1,18 @@
+#
+# Make file to build sysgen on NT
+#
+!INCLUDE ..\nt.inc
+#
+#
+ALL:    $(EXEDIR)\uload.exe $(EXEDIR)\xload.exe
+
+$(EXEDIR)\uload.exe:    $(SRCDIR)\uload.c
+	cl $(SRCDIR)\uload.c /Fe$(EXEDIR)\uload.exe
+
+$(EXEDIR)\xload.exe:    $(SRCDIR)\uload.c
+	cl $(SRCDIR)\uload.c /Fe$(EXEDIR)\xload.exe
+
+CLEAN:
+	-del $(CLEANFLAGS) $(EXEDIR)\uload.exe
+	-del $(CLEANFLAGS) $(OBJDIR)\xload.exe
+

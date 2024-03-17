@@ -1,0 +1,66 @@
+?tacl routine
+#FRAME
+load /keep 1/ $DATA9.DAVESZIP.commacs
+
+#PUSH file prev options OK model unzip accel
+#PUSH #DEFAULTS
+
+load /keep 1/ $DATA9.DAVESZIP.macros
+VOLUME $DATA9.DAVESZIP
+
+
+#SET OK -1
+
+#SET options [#REST]
+[#IF NOT [#EMPTYV options] |THEN| #CHARINSV options 1 ","]
+#OUTPUT Compiler Options: [options]
+
+[#IF [#MATCH *WIDE* [options]]
+|THEN|
+  #SET model WIDE
+  #SET unzip UNZIPW
+|ELSE|
+  #SET model LARGE
+  #SET unzip UNZIPL
+]
+#SET accel $DATA9.DAVES.UNZIP
+
+#OUTPUT Making UNZIP using [model] memory model
+
+#SET file [#FILENAMES /MAXIMUM 1/ *C]
+[#loop |while| NOT [#EMPTYV file]
+|do|
+  #SETV prev file
+  CC [file] $T.#UNZIP [options]
+  [#IF [tacl^completioncode] > 1 |THEN| #set OK 0 ]
+  #SET file [#FILENAMES /MAXIMUM 1, PREVIOUS [prev]/ *C]
+]
+
+[#IF OK |THEN|
+  BBUNZIPLIB
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+
+#PUSH #PROCESSFILESECURITY
+VOLUME ,"NUNU"
+
+[#IF OK |THEN|
+  BBUNZIP [unzip] [model]
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+
+[#IF OK |THEN|
+  secure^file [accel] "UUUU" SUPER.DAVES
+  accel^file [unzip] [accel]
+  [#IF [tacl^completioncode] > 0 |THEN| #SET OK 0]
+]
+
+[#IF OK
+  |THEN| #OUTPUT Successfully produced Accelerated Object [accel]
+         secure^file [accel] "UUUU" SUPER.DAVES
+  |ELSE| #OUTPUT Failed to produce Accelerated Object [accel]
+]
+
+#OUTPUT Finished
+
+#UNFRAME

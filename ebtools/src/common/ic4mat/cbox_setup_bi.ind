@@ -1,0 +1,104 @@
+# 8x Cbox Configuration for Burn-In
+#
+###################################
+#  Set up pll
+#  Y=4, F=8
+#
+deposit -silent c_reg_csr->cfr_frmclk_delay_a = 1
+deposit -silent c_reg_csr->cfr_ev6clk_delay_a = 6
+deposit -silent c_reg_csr->cfr_gclk_delay_a = 2
+#
+###################################
+#  Set up system clock csrs
+#  8X sysclock
+#
+deposit -silent c_reg_csr->sys_clk_ratio_a = 0x4000
+deposit -silent c_reg_csr->sys_rcv_mux_cnt_preset_a = 2
+deposit -silent c_reg_csr->sysdc_delay_a = 6
+deposit -silent c_reg_csr->sys_clk_ld_vector_a = 0x00FF
+deposit -silent c_reg_csr->sys_cf_double_clk_a = 1
+deposit -silent c_reg_csr->jitter_cmd_a = 0
+deposit -silent c_reg_csr->data_valid_dly_a = 0
+deposit -silent c_reg_csr->sys_fdbk_en_a = 1
+deposit -silent c_reg_csr->sys_bphase_ld_vector_a = 0x0
+deposit -silent c_reg_csr->frame_select_a = 2
+deposit -silent c_reg_csr->sys_frame_ld_vector_a = 0x15
+deposit -silent c_reg_csr->sys_ddm_fall_en_a = 1
+deposit -silent c_reg_csr->sys_ddm_rise_en_a = 1
+deposit -silent c_reg_csr->sys_cpu_clk_delay_a = 0
+deposit -silent c_reg_csr->sys_clk_delay_a = 1
+deposit -silent c_reg_csr->sys_ddmf_enable_a = 1
+deposit -silent c_reg_csr->sys_ddmr_enable_a = 1
+deposit -silent c_reg_csr->sys_clkfwd_enable_a = 1
+deposit -silent c_reg_csr->sys_ddm_rd_fall_en_a = 1
+deposit -silent c_reg_csr->sys_ddm_rd_rise_en_a = 1
+#
+###################################
+#  Set up bcache rd/wrt clock csrs
+#  8X clocking Latency = 1
+#
+deposit -silent c_reg_csr->bc_clk_ratio_a = 0x4000
+deposit -silent c_reg_csr->bc_rcv_mux_cnt_preset_a = 2
+deposit -silent c_reg_csr->bc_clk_ld_vector_a = 0x00FF
+deposit -silent c_reg_csr->bc_cf_double_clk_a = 1
+deposit -silent c_reg_csr->bc_lat_data_pattern_a = 0x8080808
+deposit -silent c_reg_csr->bc_lat_tag_pattern_a = 0x8
+deposit -silent c_reg_csr->bc_fdbk_en_a = 1
+deposit -silent c_reg_csr->bc_bphase_ld_vector_a = 0x0
+deposit -silent c_reg_csr->bc_ddm_fall_en_a = 1
+deposit -silent c_reg_csr->bc_ddm_rise_en_a = 1
+deposit -silent c_reg_csr->bc_cpu_clk_delay_a = 1
+deposit -silent c_reg_csr->bc_clk_delay_a = 1
+deposit -silent c_reg_csr->bc_ddmf_enable_a = 1
+deposit -silent c_reg_csr->bc_ddmr_enable_a = 1
+deposit -silent c_reg_csr->bc_clkfwd_enable_a = 1
+deposit -silent c_reg_csr->bc_ddm_rd_fall_en_a = 1
+deposit -silent c_reg_csr->bc_ddm_rd_rise_en_a = 1
+deposit -silent c_reg_csr->bc_tag_ddm_fall_en_a = 0
+deposit -silent c_reg_csr->bc_tag_ddm_rise_en_a = 1
+deposit -silent c_reg_csr->bc_tag_ddm_rd_fall_en_a = 0
+deposit -silent c_reg_csr->bc_tag_ddm_rd_rise_en_a = 1
+deposit -silent c_reg_csr->bc_pentium_mode_a = 0
+deposit -silent c_reg_csr->bc_burst_mode_enable_a = 1
+#
+###################################
+#  Enable cbox functions
+#
+deposit -silent c_reg_csr->fast_mode_disable_a = 1
+deposit -silent c_reg_csr->bc_wr_rd_bubbles_a = 0
+deposit -silent c_reg_csr->bc_cpu_late_write_num_a = 1
+deposit -silent c_reg_csr->bc_late_write_num_a = 0
+deposit -silent c_reg_csr->bc_late_write_upper_a = 0
+deposit -silent c_reg_csr->mbox_bc_prb_stall_a = 1
+deposit -silent c_reg_csr->bc_rd_wr_bubbles_a = 35
+#
+# try to stop stuff from going off-chip
+#
+deposit -silent c_reg_csr->bc_clean_victim_a = 0
+deposit -silent c_reg_csr->spec_read_enable_a = 0
+deposit -silent c_reg_csr->bc_rdvictim_a = 0
+deposit -silent c_reg_csr->sys_bus_size_a = 0
+deposit -silent c_reg_csr->sysbus_format_a = 0
+deposit -silent c_reg_csr->sysbus_mb_enable_a = 0
+deposit -silent c_reg_csr->sysbus_ack_limit_a = 0
+deposit -silent c_reg_csr->sysbus_vic_limit_a = 0
+deposit -silent c_reg_csr->dcvic_threshold_a = 0x80
+deposit -silent c_reg_csr->enable_stc_command_a = 0
+deposit -silent c_reg_csr->tlaser_stio_mode_a = 0
+deposit -silent c_reg_csr->dup_tag_enable_a = 0
+#
+###################################
+#  Enable mbox functions
+#  c_reg_csr->bc_enable_a = 0
+#  c_reg_csr->init_mode_a = 1
+#  c_reg_csr->bc_size_a = 0
+#  c_reg_csr->zeroblk_enable_a = 1
+#  c_reg_csr->enable_evict_a = 0
+#  c_reg_csr->set_dirty_enable_a = 0
+#  c_reg_csr->bc_bank_enable_a = 0
+#  c_reg_csr->bc_wrt_sts_a = 0
+#
+# ****** LOADED IN RESET PAL CODE *****
+#deposit -silent c_reg_ipr->write_many_* = 0x080840002
+#deposit -silent c_mtv_cfg->write_many_val_* = 0xFFFFFFFFF
+#

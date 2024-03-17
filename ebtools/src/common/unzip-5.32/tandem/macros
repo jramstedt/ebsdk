@@ -1,0 +1,232 @@
+?section ADD^LIST routine
+[#IF [#ARGUMENT /VALUE item/ WORD/SPACE/]]
+#APPEND bin ADD * FROM [item]
+#SET itime [#FILEINFO /MODIFICATION/ [item]]
+[#IF itime > ntime |THEN| #SETV ntime itime]
+
+?section BBZIPLIB MACRO
+#FRAME
+#push bin item ntime itime libtime
+#SET ntime 0
+
+#OUTPUT Building ZIPLIB
+#APPEND bin CLEAR
+add^list BITSO
+add^list CRC32O
+add^list CRCTABO
+add^list DEFLATEO
+add^list FILEIOO
+add^list GLOBALSO
+add^list MKTIMEO
+add^list TANDEMO
+add^list TREESO
+add^list TTYIOO
+add^list UTILO
+add^list ZIPFILEO
+add^list ZIPUPO
+#APPEND bin INFO UNRESOLVED *
+#APPEND bin BUILD ZIPLIB ! , LIST * OFF
+
+#SET libtime [#FILEINFO /MODIFICATION/ ZIPLIB]
+[#IF libtime < ntime
+|THEN|
+  #OUTPUT ZIPLIB needs re-building
+  BIND /NAME,INV BIN/
+  [#CASE [tacl^completioncode]
+  | 0         | #OUTPUT Bound ZIPLIB OK
+  | 1         | #OUTPUT ZIPLIB: BIND Failed with Warnings
+  | OTHERWISE | #OUTPUT ZIPLIB: BIND Failed with ERRORS !
+  ]
+|ELSE|
+  #OUTPUT ZIPLIB is up to date
+]
+
+#UNFRAME
+
+?section BBZIP MACRO
+#FRAME
+#push bin ziptime build
+#SET build 0
+#OUTPUT Building %1% with %2% memory model
+#APPEND bin CLEAR
+#APPEND bin ADD * FROM ZIPO
+#APPEND bin select search ($system.system.c%2%, ZIPLIB)
+#APPEND bin select runnable object on
+#APPEND bin select list * off
+#APPEND bin set heap 20 pages
+#APPEND bin set symbols on
+#APPEND bin set saveabend on
+#APPEND bin set inspect on
+#APPEND bin info unresolved *
+#APPEND bin BUILD %1%   !
+
+#SET ziptime [#FILEINFO /MODIFICATION/ %1%]
+[#IF ziptime < [#FILEINFO /MODIFICATION/ ZIPO] |THEN|
+  #OUTPUT %1% is older than ZIPO
+  #SET build -1
+]
+[#IF ziptime < [#FILEINFO /MODIFICATION/ ZIPLIB] |THEN|
+  #OUTPUT %1% is older than ZIPLIB
+  #SET build -1
+]
+[#IF build
+|THEN|
+  #OUTPUT %1% is out of date, re-building
+  BIND /NAME,INV BIN/
+  [#CASE [tacl^completioncode]
+  | 0         | #OUTPUT Bound %1% OK
+  | 1         | #OUTPUT %1%: BIND Failed with Warnings
+  | OTHERWISE | #OUTPUT %1%: BIND Failed with ERRORS !
+  ]
+|ELSE|
+  #OUTPUT %1% is up to date, no re-build required
+]
+
+#UNFRAME
+
+?section BBANY MACRO
+#FRAME
+#push bin memory anytime build
+#SET build 0
+#SETMANY memory, %2% LARGE
+#OUTPUT Building %1% with [memory] memory model
+#APPEND bin CLEAR
+#APPEND bin ADD * FROM %1%O
+#APPEND bin select search ($system.system.c[memory],ZIPLIB)
+#APPEND bin select runnable object on
+#APPEND bin select list * off
+#APPEND bin set heap 20 pages
+#APPEND bin set symbols on
+#APPEND bin set saveabend on
+#APPEND bin set inspect on
+#APPEND bin info unresolved *
+#APPEND bin BUILD %1%   !
+
+#SET anytime [#FILEINFO /MODIFICATION/ %1%]
+[#IF anytime < [#FILEINFO /MODIFICATION/ %1%O] |THEN|
+  #OUTPUT %1% is older than %1%O
+  #SET build -1
+]
+[#IF anytime < [#FILEINFO /MODIFICATION/ ZIPLIB] |THEN|
+  #OUTPUT %1% is older than ZIPLIB
+  #SET build -1
+]
+[#IF build
+|THEN|
+  #OUTPUT %1% is out of date, re-building
+  BIND /NAME,INV BIN/
+  [#CASE [tacl^completioncode]
+  | 0         | #OUTPUT Bound %1% OK
+  | 1         | #OUTPUT %1%: BIND Failed with Warnings
+  | OTHERWISE | #OUTPUT %1%: BIND Failed with ERRORS !
+  ]
+|ELSE|
+  #OUTPUT %1% is up to date, no re-build required
+]
+
+#UNFRAME
+
+
+?section BBUNZIPLIB MACRO
+#FRAME
+#push bin item ntime itime libtime
+#SET ntime 0
+
+#OUTPUT Building UNZIPLIB
+#APPEND bin CLEAR
+add^list CRC32O
+add^list CRCTABO
+add^list ENVARGSO
+add^list EXPLODEO
+add^list EXTRACTO
+add^list FILEIOO
+add^list GLOBALSO
+add^list INFLATEO
+add^list LISTO
+add^list MATCHO
+add^list PROCESSO
+add^list TANDEMO
+add^list TTYIOO
+==add^list UNREDUCO
+add^list UNSHRINO
+add^list ZIPINFOO
+#APPEND bin INFO UNRESOLVED *
+#APPEND bin BUILD UNZIPLIB ! , LIST * OFF
+
+#SET libtime [#FILEINFO /MODIFICATION/ UNZIPLIB]
+[#IF libtime < ntime
+|THEN|
+  #OUTPUT UNZIPLIB needs re-building
+  BIND /NAME,INV BIN/
+  [#CASE [tacl^completioncode]
+  | 0         | #OUTPUT Bound UNZIPLIB OK
+  | 1         | #OUTPUT UNZIPLIB: BIND Failed with Warnings
+  | OTHERWISE | #OUTPUT UNZIPLIB: BIND Failed with ERRORS !
+  ]
+|ELSE|
+  #OUTPUT UNZIPLIB is up to date
+]
+
+#UNFRAME
+
+?section BBUNZIP MACRO
+#FRAME
+#push bin ziptime build
+#SET build 0
+#OUTPUT Building %1% with %2% memory model
+#APPEND bin CLEAR
+#APPEND bin ADD * FROM UNZIPO
+#APPEND bin select search ($system.system.c%2%,UNZIPLIB)
+#APPEND bin select runnable object on
+#APPEND bin select list * off
+#APPEND bin set heap 20 pages
+#APPEND bin set symbols on
+#APPEND bin set saveabend on
+#APPEND bin set inspect on
+#APPEND bin info unresolved *
+#APPEND bin BUILD %1%   !
+
+#SET ziptime [#FILEINFO /MODIFICATION/ %1%]
+[#IF ziptime < [#FILEINFO /MODIFICATION/ UNZIPO] |THEN|
+  #OUTPUT %1% is older than UNZIPO
+  #SET build -1
+]
+[#IF ziptime < [#FILEINFO /MODIFICATION/ UNZIPLIB] |THEN|
+  #OUTPUT %1% is older than UNZIPLIB
+  #SET build -1
+]
+[#IF build
+|THEN|
+  #OUTPUT %1% is out of date, re-building
+  BIND /NAME,INV BIN/
+  [#CASE [tacl^completioncode]
+  | 0         | #OUTPUT Bound %1% OK
+  | 1         | #OUTPUT %1%: BIND Failed with Warnings
+  | OTHERWISE | #OUTPUT %1%: BIND Failed with ERRORS !
+  ]
+|ELSE|
+  #OUTPUT %1% is up to date, no re-build required
+]
+
+#UNFRAME
+
+?section accel^file MACRO
+#FRAME
+#PUSH buf
+[#IF [#FILEINFO /MODIFICATION/ %1%]
+   > [#FILEINFO /MODIFICATION/ %2%]
+|THEN|
+  #OUTPUT %2% is older than %1%
+  #OUTPUT Accelerating %1% to %2%
+  AXCEL /IN [general_seg_subvol].DUMMY, OUTV buf/ %1%,%2%
+  #OUTPUTV buf
+  [#CASE [tacl^completioncode]
+  | 0         | #OUTPUT Accelerated %2% OK
+  | 1         | #OUTPUT %2%: AXCEL Failed with Warnings
+  | OTHERWISE | #OUTPUT %2%: AXCEL Failed with ERRORS !
+  ]
+|ELSE|
+  #OUTPUT %2% is up to date
+]
+
+#UNFRAME
