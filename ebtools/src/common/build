@@ -13,7 +13,7 @@ export PATH || (echo "OOPS, this isn't sh.  Desperation time."; sh $0 $argv; kil
 
 . ../../../sdkshell.conf
 
-subdirs="include common gnumake bit pvc list strip ic4mat srec srom repeat objtest makerom uload sysgen rcsv hex32 hexpad"
+subdirs="include common bit pvc list strip ic4mat srec srom repeat objtest makerom uload sysgen rcsv hex32 hexpad"
 
 gnumakesubdirs="hfcomp mini_dbg"
 
