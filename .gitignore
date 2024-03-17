@@ -57,3 +57,24 @@ dkms.conf
 # EBSDK configuration
 sdkmake.conf
 sdkshell.conf
+
+# Built binaries
+ebtools/src/common/bit/bit
+ebtools/src/common/hex32/hex32
+ebtools/src/common/hexpad/hexpad
+ebtools/src/common/ic4mat/ic4mat
+ebtools/src/common/list/alist
+ebtools/src/common/list/clist
+ebtools/src/common/makerom/makerom
+ebtools/src/common/objtest/ccheck
+ebtools/src/common/objtest/newstrip
+ebtools/src/common/pvc/pvc
+ebtools/src/common/rcsv/rcsv
+ebtools/src/common/repeat/rpp
+ebtools/src/common/srec/srec
+ebtools/src/common/srom/srom
+ebtools/src/common/strip/astrip
+ebtools/src/common/strip/cstrip
+ebtools/src/common/sysgen/sysgen
+ebtools/src/common/uload/uload
+ebtools/src/common/uload/xload
