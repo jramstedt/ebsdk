@@ -1,48 +1,44 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC		= cc
+CC				= cc
 CFLAGS		= -g -I. -I../include
 LFLAGS		= -lc
-COMMON		= ../common
-INCLUDE		= ../include
-TOOLBOX	    	= $(EB_TOOLBOX)
 LINT		= /usr/bin/lint
 LINTFLAGS 	=  -1 -wp -av -n -I. -I../include
 
-TOUCH = /usr/bin/touch
-#
-tools:		rpp
+COMMONLIB	= ../common/commlib.a
 
-rpp:		rpp.o 
-		$(CC) $(CFLAGS) -g -o rpp rpp.o $(COMMONLIB) $(LFLAGS)
+SRCS = rpp.c
 
-rpp.o:	    	rpp.c
-		$(CC) $(CFLAGS) -c rpp.c
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-install:    	rpp
-		cp -fp rpp $(TOOLBOX)/.
-		chmod 775 $(TOOLBOX)/rpp
+tools : rpp
 
-lint:	
-	$(LINT) $(LINTFLAGS) $(INCLUDES) rpp.c
+rpp : $(SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-depend: rpp.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- rpp.c
+install : rpp
+		cp -fp $< $(EB_TOOLBOX)/.
+		chmod 775 $(EB_TOOLBOX)/$<
 
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
+
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
 		rpp
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-rpp.o: /usr/include/stdio.h /usr/include/standards.h /usr/include/sys/seek.h
-rpp.o: /usr/include/va_list.h /usr/include/sys/types.h
-rpp.o: /usr/include/mach/machine/vm_types.h /usr/include/sys/select.h
-rpp.o: /usr/include/getopt.h /usr/include/sys/limits.h
-rpp.o: /usr/include/sys/machine/machlimits.h /usr/include/sys/syslimits.h
-rpp.o: /usr/include/sys/machine/machtime.h /usr/include/sys/rt_limits.h
-rpp.o: /usr/include/ctype.h /usr/include/sys/localedef.h
-rpp.o: /usr/include/sys/lc_core.h /usr/include/locale.h
-rpp.o: /usr/include/nl_types.h /usr/include/mesg.h /usr/include/limits.h
-rpp.o: /usr/include/string.h /usr/include/strings.h /usr/include/stdlib.h
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))

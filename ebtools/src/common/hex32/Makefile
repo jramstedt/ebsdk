@@ -1,50 +1,42 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC= cc
+CC				= cc
 CFLAGS		= -g -I. -I../include
-LFLAGS= -lc
-TOOLBOX	    	= $(EB_TOOLBOX)
-OFILES= \
-	hex32.o
+LFLAGS		= -lc
+LINT			= /usr/bin/lint
+LINTFLAGS	=  -1 -wp -av -n -I. -I../include
 
-TOUCH = /usr/bin/touch
-LINT		= /usr/bin/lint
-LINTFLAGS 	=  -1 -wp -a -n -I. -I../include
+SRCS = hex32.c
 
-#
-tools:		hex32
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-hex32:		$(OFILES)
-		$(CC) $(CFLAGS) -o hex32 $(OFILES) $(LFLAGS)
+tools :	hex32
 
-hex32.o:	hex32.c
-		$(CC) $(CFLAGS) -c hex32.c
+hex32 : $(SRCS:.c=.o)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-install:    	hex32
-		cp -fp hex32 $(TOOLBOX)/.
-		chmod 775  $(TOOLBOX)/hex32
+install : hex32
+		cp -fp $^ $(EB_TOOLBOX)/.
+		chmod 775 $(addprefix $(EB_TOOLBOX)/, $^)
 
-lint:	
-	$(LINT) $(LINTFLAGS) $(INCLUDES) hex32.c
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
 
-depend: hex32.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- hex32.c
-
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
 		hex32
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-hex32.o: /usr/include/stdio.h /usr/include/standards.h
-hex32.o: /usr/include/sys/seek.h /usr/include/va_list.h
-hex32.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-hex32.o: /usr/include/sys/select.h /usr/include/getopt.h
-hex32.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-hex32.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-hex32.o: /usr/include/sys/rt_limits.h /usr/include/ctype.h
-hex32.o: /usr/include/sys/localedef.h /usr/include/sys/lc_core.h
-hex32.o: /usr/include/locale.h /usr/include/nl_types.h /usr/include/mesg.h
-hex32.o: /usr/include/limits.h /usr/include/string.h /usr/include/strings.h
-hex32.o: /usr/include/stdlib.h
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))

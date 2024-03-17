@@ -1,53 +1,44 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC		= cc
+CC				= cc
 CFLAGS		= -g -I. -I../include
 LFLAGS		= -lc
-INCLUDE 	= ../include
-COMMON		= ../common
-COMMONLIB	= $(COMMON)/commlib.a
-TOOLBOX	    	= $(EB_TOOLBOX)
-OFILES		= srec.o $(COMMONLIB)
 LINT		= /usr/bin/lint
-LINTFLAGS 	=  -1 -wp -a -n -I. -I../include
+LINTFLAGS 	=  -1 -wp -av -n -I. -I../include
 
-tools:	    	srec
+COMMONLIB	= ../common/commlib.a
 
-srec:		$(OFILES)
-		$(CC) $(CFLAGS) -o srec $(OFILES) $(LFLAGS)
+SRCS = srec.c
 
-srec.o:	    	srec.c
-		$(CC) $(CFLAGS) -c srec.c
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-lint:	
-	$(LINT) $(LINTFLAGS) $(INCLUDES) srec.c
+tools :	srec
 
-install:    	srec
-		cp -fp srec $(TOOLBOX)/.
-		chmod 775  $(TOOLBOX)/srec
+srec : $(SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-depend: srec.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- srec.c
+install : srec
+		cp -fp $< $(EB_TOOLBOX)/.
+		chmod 775 $(EB_TOOLBOX)/$<
 
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
+
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
 		srec
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-srec.o: /usr/include/stdio.h /usr/include/standards.h /usr/include/sys/seek.h
-srec.o: /usr/include/va_list.h /usr/include/sys/types.h
-srec.o: /usr/include/mach/machine/vm_types.h /usr/include/sys/select.h
-srec.o: /usr/include/getopt.h /usr/include/sys/limits.h
-srec.o: /usr/include/sys/machine/machlimits.h /usr/include/sys/syslimits.h
-srec.o: /usr/include/sys/machine/machtime.h /usr/include/sys/rt_limits.h
-srec.o: /usr/include/ctype.h /usr/include/sys/localedef.h
-srec.o: /usr/include/sys/lc_core.h /usr/include/locale.h
-srec.o: /usr/include/nl_types.h /usr/include/mesg.h /usr/include/limits.h
-srec.o: /usr/include/string.h /usr/include/strings.h /usr/include/stdlib.h
-srec.o: /usr/include/sys/stat.h /usr/include/sys/mode.h ../include/a_out.h
-srec.o: /usr/include/mach/std_types.h /usr/include/mach/boolean.h
-srec.o: /usr/include/mach/machine/boolean.h /usr/include/mach/kern_return.h
-srec.o: /usr/include/mach/machine/kern_return.h /usr/include/mach/port.h
-srec.o: ../include/c_32_64.h
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))

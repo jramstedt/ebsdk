@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -55,8 +55,8 @@ your own risk.
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include "a_out.h"
-#include "c_32_64.h"
+#include "stdc.h"
+#include "aout.h"
 
 /*
  *  Macros

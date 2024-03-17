@@ -77,6 +77,7 @@
 #include "alpha_op.h"		/*v3.26 */
 #include "opcode.h"
 
+DIRTY reg_dirty[MAX_EREG+MAX_FREG];
 
 int force_fail_lock_ev6;		/*V3.24 for restriction_27*/
 int first_fetch_block_ev6;

@@ -1,64 +1,49 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC		= cc
-CFLAGS		= -g -I. -I../include
+CC				= cc
+CFLAGS		= -g -I. -I../include -DLANGUAGE_C
 LFLAGS		= -lc
-COMMON		= ../common
-INCLUDE		= ../include
-COMMONLIB	= $(COMMON)/commlib.a
+LINT			= /usr/bin/lint
+LINTFLAGS	=  -1 -wp -av -n -I. -I../include
 
-TOUCH = /usr/bin/touch
-#
-tools:		ccheck newstrip
+COMMONLIB	= ../common/commlib.a
 
-ccheck:		ccheck.o \
-    	    	$(COMMONLIB)
-		$(CC) $(CFLAGS) -o ccheck ccheck.o $(COMMONLIB) $(LFLAGS)
+CCHECK_SRCS = ccheck.c
+NEWSTRIP_SRCS = newstrip.c
+SRCS = $(CCHECK_SRCS) $(NEWSTRIP_SRCS)
 
-newstrip:	newstrip.o\
-    	    	$(COMMONLIB)
-		$(CC) $(CFLAGS) -o newstrip newstrip.o $(COMMONLIB) $(LFLAGS)
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-preloc:		preloc.c
-		$(CC) $(CFLAGS) -o preloc preloc.c $(LFLAGS)
+tools :	ccheck newstrip
 
-ccheck.o:	ccheck.c
-		$(CC) $(CFLAGS) -c ccheck.c
+ccheck : $(CCHECK_SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-newstrip.o:	newstrip.c
-		$(CC) $(CFLAGS) -c newstrip.c
+newstrip : $(NEWSTRIP_SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-install:	tools
+install : ccheck newstrip
+#		cp -fp $^ $(EB_TOOLBOX)/.
+#		chmod 775 $(addprefix $(EB_TOOLBOX)/, $^)
 
-depend: ccheck.c newstrip.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- ccheck.c newstrip.c
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
 
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
-		ccheck newstrip preloc
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
+		ccheck newstrip
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-ccheck.o: /usr/include/stdio.h /usr/include/standards.h
-ccheck.o: /usr/include/sys/seek.h /usr/include/va_list.h
-ccheck.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-ccheck.o: /usr/include/sys/select.h /usr/include/getopt.h
-ccheck.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-ccheck.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-ccheck.o: /usr/include/sys/rt_limits.h /usr/include/ctype.h
-ccheck.o: /usr/include/sys/localedef.h /usr/include/sys/lc_core.h
-ccheck.o: /usr/include/locale.h /usr/include/nl_types.h /usr/include/mesg.h
-ccheck.o: /usr/include/limits.h ../include/coff.h ../include/syms.h
-ccheck.o: ../include/reloc.h
-newstrip.o: /usr/include/stdio.h /usr/include/standards.h
-newstrip.o: /usr/include/sys/seek.h /usr/include/va_list.h
-newstrip.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-newstrip.o: /usr/include/sys/select.h /usr/include/getopt.h
-newstrip.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-newstrip.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-newstrip.o: /usr/include/sys/rt_limits.h /usr/include/ctype.h
-newstrip.o: /usr/include/sys/localedef.h /usr/include/sys/lc_core.h
-newstrip.o: /usr/include/locale.h /usr/include/nl_types.h /usr/include/mesg.h
-newstrip.o: /usr/include/limits.h ../include/coff.h ../include/syms.h
-newstrip.o: ../include/reloc.h
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))

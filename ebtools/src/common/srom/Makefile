@@ -1,49 +1,43 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC= cc
-CFLAGS= -g
-LFLAGS= -lc
-TOOLBOX	    	= $(EB_TOOLBOX)
-OFILES= \
-	srom.o
+CC				= cc
+# uses -std=c89 to allow "asm" keyword in variable name.
+CFLAGS		= -g -I. -I../include -std=c89 -DSROM_ADVANCED_OPTIONS
+LFLAGS		= -lc
+LINT			= /usr/bin/lint
+LINTFLAGS	=  -1 -wp -av -n -I. -I../include
 
-TOUCH = /usr/bin/touch
-LINT		= /usr/bin/lint
-LINTFLAGS 	=  -1 -wp -a -n -I. -I../include
+SRCS = srom.c
 
-#
-tools:		srom
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-srom:		$(OFILES)
-		$(CC) $(CFLAGS) -o srom $(OFILES) $(LFLAGS)
+tools : srom
 
-srom.o:		srom.c
-		$(CC) $(CFLAGS) -c srom.c
+srom : $(SRCS:.c=.o)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-install:    	srom
-		cp -fp srom $(TOOLBOX)/.
-		chmod 775  $(TOOLBOX)/srom
+install : srom
+		cp -fp $< $(EB_TOOLBOX)/.
+		chmod 775 $(EB_TOOLBOX)/$<
 
-lint:	
-	$(LINT) $(LINTFLAGS) $(INCLUDES) srom.c
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
 
-depend: srom.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- srom.c
-
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
 		srom
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-srom.o: /usr/include/stdio.h /usr/include/standards.h /usr/include/sys/seek.h
-srom.o: /usr/include/va_list.h /usr/include/sys/types.h
-srom.o: /usr/include/mach/machine/vm_types.h /usr/include/sys/select.h
-srom.o: /usr/include/getopt.h /usr/include/sys/limits.h
-srom.o: /usr/include/sys/machine/machlimits.h /usr/include/sys/syslimits.h
-srom.o: /usr/include/sys/machine/machtime.h /usr/include/sys/rt_limits.h
-srom.o: /usr/include/ctype.h /usr/include/sys/localedef.h
-srom.o: /usr/include/sys/lc_core.h /usr/include/locale.h
-srom.o: /usr/include/nl_types.h /usr/include/mesg.h /usr/include/limits.h
-srom.o: /usr/include/string.h /usr/include/strings.h /usr/include/stdlib.h
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))

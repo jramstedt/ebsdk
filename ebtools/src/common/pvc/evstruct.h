@@ -223,13 +223,13 @@ typedef union squad B64;
 /* V3.24 char  *inst_name_table_by_func[DO_ZZZMAXZZZ];	*/ 
 
 /* define table to hold textual names for all the GPR's */
-char reg_name_table[MAX_SREG][8];
-char freg_name_table[MAX_SREG][8];
+extern char reg_name_table[MAX_SREG][8];
+extern char freg_name_table[MAX_SREG][8];
 
 /* define table to hold textual names for all the GPS's */
-char ipr_name_table[MAX_IPR][32];				/* v3.25 */
-char adu_ipr_name_table[MAX_ADU_IPR][16];
-char pax_ipr_name_table[25][16];
+extern char ipr_name_table[MAX_IPR][32];				/* v3.25 */
+extern char adu_ipr_name_table[MAX_ADU_IPR][16];
+extern char pax_ipr_name_table[25][16];
 
 
 /* note, the following tables, all have 4 longs's per entry even */
@@ -248,22 +248,22 @@ struct disp_struct
 
 typedef struct disp_struct disp_table;
 
-disp_table	opcode_table[MAX_OPCODE];
+extern disp_table	opcode_table[MAX_OPCODE];
 
 /* define tables for second level address dispatch for decode */
-disp_table	epi_func_table[MAX_EPI_SUBFUN];
-disp_table	sync_func_table[MAX_SUBFUN];
-disp_table	fpieee_func_table[MAX_FPU_SUBFUN];
-disp_table	fpdec_func_table[MAX_FPU_SUBFUN];
-disp_table	fpaux_func_table[MAX_FPU_SUBFUN];
-disp_table	sqrt_func_table[MAX_FPU_SUBFUN];		/* V3.24 */
+extern disp_table	epi_func_table[MAX_EPI_SUBFUN];
+extern disp_table	sync_func_table[MAX_SUBFUN];
+extern disp_table	fpieee_func_table[MAX_FPU_SUBFUN];
+extern disp_table	fpdec_func_table[MAX_FPU_SUBFUN];
+extern disp_table	fpaux_func_table[MAX_FPU_SUBFUN];
+extern disp_table	sqrt_func_table[MAX_FPU_SUBFUN];		/* V3.24 */
 
-disp_table	addi_func_table[MAX_SUBFUN];
-disp_table	logi_func_table[MAX_SUBFUN];
-disp_table	sext_func_table[MAX_SUBFUN];			/* V3.24 */
-disp_table	shfi_func_table[MAX_SUBFUN];
-disp_table	muli_func_table[MAX_SUBFUN];
-disp_table	itof_func_table[MAX_SUBFUN];			/* V3.24 */
+extern disp_table	addi_func_table[MAX_SUBFUN];
+extern disp_table	logi_func_table[MAX_SUBFUN];
+extern disp_table	sext_func_table[MAX_SUBFUN];			/* V3.24 */
+extern disp_table	shfi_func_table[MAX_SUBFUN];
+extern disp_table	muli_func_table[MAX_SUBFUN];
+extern disp_table	itof_func_table[MAX_SUBFUN];			/* V3.24 */
 
 
 #endif

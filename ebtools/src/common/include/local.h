@@ -2,7 +2,7 @@
 #define __LOCAL_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -58,33 +58,17 @@ your own risk.
  * those common files in the ebtools source tree. 
  */
 
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
-#include "c_32_64.h"
 
-#define ub unsigned char
-#define uw unsigned short int
+#define ub uint8_t
+#define uw int16_t
 
-#ifdef	CROSS_COMPILE_32_TO_64_BITS
-
-#define ui unsigned int
-#define sl int64
-#define ul int64
-
-#else	/* CROSS_COMPILE_32_TO_64_BITS */
-
-#ifdef _WIN32
-#define ul unsigned __int64
-#define sl __int64
-#define ui unsigned long
-#else
-#define ul unsigned long
-#define sl long
-#define ui unsigned int
-#endif
-
-#endif	/* CROSS_COMPILE_32_TO_64_BITS */
+#define ui uint32_t
+#define sl int64_t
+#define ul uint64_t
 
 #ifndef TRUE
 #define TRUE 1

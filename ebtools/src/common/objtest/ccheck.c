@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -93,6 +93,7 @@ typedef IMAGE_SECTION_HEADER scnhdr_t;
 #define N_TXTOFF(f, a) ((sizeof(filehdr_t) + (f).f_opthdr + (f).f_nscns * SHDR_SIZE + 511) & ~511)
 #else
 
+#include "stdc.h"
 #include "coff.h"
 #include "syms.h"
 #include "reloc.h"

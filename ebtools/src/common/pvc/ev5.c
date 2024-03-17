@@ -171,7 +171,7 @@ static void init_pipe_use (void);
 static void init_latencies (void);
 static void init_classes(void);
 static void init_decode_tables (void);
-void do_nothing(void);
+static void do_nothing(void);
 
 
 

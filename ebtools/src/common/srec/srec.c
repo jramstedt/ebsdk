@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -46,8 +46,8 @@ srec.c  - generate a Moto file on stdout
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include "a_out.h"
-#include "c_32_64.h"
+#include "stdc.h"
+#include "aout.h"
 #endif
 
 

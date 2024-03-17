@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -84,6 +84,7 @@ typedef long vm_offset_t;
 #include <ctype.h>
 #include <string.h>
 
+#include "stdc.h"
 #include "coff.h"
 #include "syms.h"
 #include "reloc.h"

@@ -66,6 +66,28 @@ void decode_hw_memory(disp_table *);
 void decode_ipr(disp_table *);
 void decode_jsrm();
 
+/* tables */
+char reg_name_table[MAX_SREG][8];
+char freg_name_table[MAX_SREG][8];
+
+char ipr_name_table[MAX_IPR][32];				/* v3.25 */
+char adu_ipr_name_table[MAX_ADU_IPR][16];
+char pax_ipr_name_table[25][16];
+
+disp_table	opcode_table[MAX_OPCODE];
+disp_table	epi_func_table[MAX_EPI_SUBFUN];
+disp_table	sync_func_table[MAX_SUBFUN];
+disp_table	fpieee_func_table[MAX_FPU_SUBFUN];
+disp_table	fpdec_func_table[MAX_FPU_SUBFUN];
+disp_table	fpaux_func_table[MAX_FPU_SUBFUN];
+disp_table	sqrt_func_table[MAX_FPU_SUBFUN];		/* V3.24 */
+
+disp_table	addi_func_table[MAX_SUBFUN];
+disp_table	logi_func_table[MAX_SUBFUN];
+disp_table	sext_func_table[MAX_SUBFUN];			/* V3.24 */
+disp_table	shfi_func_table[MAX_SUBFUN];
+disp_table	muli_func_table[MAX_SUBFUN];
+disp_table	itof_func_table[MAX_SUBFUN];			/* V3.24 */
 
 /*---------------------------------------------------------------------------*/
 /* Local Variables for this module:					     */

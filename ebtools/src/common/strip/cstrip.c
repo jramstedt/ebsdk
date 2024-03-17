@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
 		       Maynard, Massachusetts.
 
 			All Rights Reserved
@@ -55,12 +55,9 @@ static char *rcsid = "$Id: cstrip.c,v 1.2 1999/04/09 17:39:29 paradis Exp $";
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef _WIN32
 #include <string.h>
-typedef unsigned long  vm_offset_t;
-#else
-#include <strings.h>
-#endif
+
+#include "stdc.h"
 #include "coff.h"
 #include "syms.h"
 #include "reloc.h"

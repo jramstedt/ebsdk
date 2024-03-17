@@ -1,48 +1,46 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC= cc
-CFLAGS= -g -I. -I../include
-LFLAGS=
-OFILES= \
-	uload.o
-TOOLBOX         = $(EB_TOOLBOX)
+CC				= cc
+CFLAGS		= -g -I. -I../include
+LFLAGS		= 
+LINT			= /usr/bin/lint
+LINTFLAGS	=  -1 -wp -av -n -I. -I../include
 
-TOUCH = /usr/bin/touch
-LINT            = /usr/bin/lint
-LINTFLAGS       =  -1 -wp -a -n -I. -I../include
+SRCS = uload.c
 
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-#
-tools:          uload xload
+tools : uload xload
 
-uload:         $(OFILES)
-		$(CC) $(CFLAGS) -o uload $(OFILES) $(LFLAGS)
+uload : $(SRCS:.c=.o)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-uload.o:               uload.c
-		$(CC) $(CFLAGS) -c uload.c
+# same as uload
+xload : $(SRCS:.c=.o)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-xload:         $(OFILES)
-		$(CC) $(CFLAGS) -o xload $(OFILES) $(LFLAGS)
+install : uload xload
+		cp -fp $^ $(EB_TOOLBOX)/.
+		chmod 775 $(addprefix $(EB_TOOLBOX)/, $^)
 
-xload.o:               xload.c
-		$(CC) $(CFLAGS) -c xload.c
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
 
-
-install:        uload xload
-		cp -fp uload $(TOOLBOX)/.
-		chmod 775 $(TOOLBOX)/uload
-		cp -fp xload $(TOOLBOX)/.
-		chmod 775 $(TOOLBOX)/xload
-
-depend: uload.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- uload.c
-lint:   
-	$(LINT) $(LINTFLAGS) $(INCLUDES) uload.c
-
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
 		uload xload
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))

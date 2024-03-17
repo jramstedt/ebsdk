@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-Copyright © 1994, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright ï¿½ 1994, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 
@@ -149,7 +149,7 @@ static char *RCSid =
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
-#include "c_32_64.h"
+#include "stdc.h"
 #include "romhead.h"
 
 /*

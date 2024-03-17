@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
 		       Maynard, Massachusetts.
 
 			All Rights Reserved
@@ -986,7 +986,7 @@ void printmode(const char * label, struct termios *m)
 	    case TAB1:  printf("TAB1 "); break;
 	    case TAB2:  printf("TAB2 "); break;
 	    case TAB3:  printf("TAB3 "); break;
-	    case XTABS: printf("XTABS "); break;
+	    // case XTABS: printf("XTABS "); break;
 	}
     }
     if(m->c_oflag & BSDLY) {

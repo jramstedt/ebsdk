@@ -1,80 +1,49 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC		= cc 
-CFLAGS		= -g -I. -I../include
+CC				= cc
+CFLAGS		= -g -I. -I../include -DLANGUAGE_C
 LFLAGS		= -lc
-COMMON		= ../common
-INCLUDE		= ../include
-TOOLBOX	    	= $(EB_TOOLBOX)
 LINT		= /usr/bin/lint
-LINTFLAGS 	=  -1 -wp -a -n -I. -I../include
+LINTFLAGS 	=  -1 -wp -av -n -I. -I../include
 
-AOFILES= \
-	astrip.o
+COMMONLIB	= ../common/commlib.a
 
-COFILES= \
-	cstrip.o
+CSTRIP_SRCS = cstrip.c
+ASTRIP_SRCS = astrip.c
+SRCS = $(CSTRIP_SRCS) $(ASTRIP_SRCS)
 
-TOUCH = /usr/bin/touch
-#
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-tools:		astrip\
-		cstrip
+tools :	cstrip astrip
 
-astrip:		$(AOFILES)
-		$(CC) $(CFLAGS) -o astrip $(AOFILES) $(LFLAGS)
+cstrip : $(CSTRIP_SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-astrip.o:	astrip.c
-		$(CC) $(CFLAGS) -c astrip.c
+astrip : $(ASTRIP_SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-cstrip:		$(COFILES)
-		$(CC) $(CFLAGS) -o cstrip $(COFILES) $(LFLAGS)
+install : cstrip astrip
+		cp -fp $^ $(EB_TOOLBOX)/.
+		chmod 775 $(addprefix $(EB_TOOLBOX)/, $^)
 
-cstrip.o:	cstrip.c
-		$(CC) $(CFLAGS) -c cstrip.c
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
 
-install:    	astrip cstrip
-		cp -fp astrip cstrip $(TOOLBOX)/.
-		chmod 775 $(TOOLBOX)/astrip $(TOOLBOX)/cstrip
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
+		cstrip astrip
 
-depend: cstrip.c astrip.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- cstrip.c astrip.c
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-lint:	
-	$(LINT) $(LINTFLAGS) $(INCLUDES) cstrip.c
-	$(LINT) $(LINTFLAGS) $(INCLUDES) astrip.c
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
 
-clean:		
-		rm -f *.o *~ \#*\# *.bak *.a core\
-		astrip cstrip
+$(DEPDIR): ; @mkdir -p $@
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
 
-cstrip.o: /usr/include/stdio.h /usr/include/standards.h
-cstrip.o: /usr/include/sys/seek.h /usr/include/va_list.h
-cstrip.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-cstrip.o: /usr/include/sys/select.h /usr/include/getopt.h
-cstrip.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-cstrip.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-cstrip.o: /usr/include/sys/rt_limits.h /usr/include/stdlib.h
-cstrip.o: /usr/include/ctype.h /usr/include/sys/localedef.h
-cstrip.o: /usr/include/sys/lc_core.h /usr/include/locale.h
-cstrip.o: /usr/include/nl_types.h /usr/include/mesg.h /usr/include/limits.h
-cstrip.o: /usr/include/strings.h /usr/include/string.h ../include/coff.h
-cstrip.o: ../include/syms.h ../include/reloc.h
-astrip.o: /usr/include/stdio.h /usr/include/standards.h
-astrip.o: /usr/include/sys/seek.h /usr/include/va_list.h
-astrip.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-astrip.o: /usr/include/sys/select.h /usr/include/getopt.h
-astrip.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-astrip.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-astrip.o: /usr/include/sys/rt_limits.h /usr/include/ctype.h
-astrip.o: /usr/include/sys/localedef.h /usr/include/sys/lc_core.h
-astrip.o: /usr/include/locale.h /usr/include/nl_types.h /usr/include/mesg.h
-astrip.o: /usr/include/limits.h /usr/include/string.h /usr/include/strings.h
-astrip.o: /usr/include/stdlib.h ../include/a_out.h
-astrip.o: /usr/include/mach/std_types.h /usr/include/mach/boolean.h
-astrip.o: /usr/include/mach/machine/boolean.h /usr/include/mach/kern_return.h
-astrip.o: /usr/include/mach/machine/kern_return.h /usr/include/mach/port.h
-astrip.o: ../include/c_32_64.h
+include $(wildcard $(DEPFILES))

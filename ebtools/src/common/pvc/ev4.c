@@ -150,7 +150,7 @@ static int update_scoreboard (INSTR *this_inst, int cycle, CLASS_INFO *class_def
 static int schedule_code (INSTR *raw_code[], int delay_flag, int *length);
 static int check_scoreboard (INSTR *this_inst, int cycle, CLASS_INFO *class_def);
 static void init_ev4 (void);
-void do_nothing(void);
+static void do_nothing(void);
 
 
 

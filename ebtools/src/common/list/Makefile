@@ -1,79 +1,52 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC		= cc
-CFLAGS		= -g -I. -I../include
+CC				= cc
+CFLAGS		= -g -I. -I../include -DLANGUAGE_C
 LFLAGS		= -lc
-COMMON		= ../common
-INCLUDE		= ../include
-COMMONLIB	= $(COMMON)/commlib.a
-TOOLBOX	    	= $(EB_TOOLBOX)
 LINT		= /usr/bin/lint
 LINTFLAGS 	=  -1 -wp -av -n -I. -I../include
 
-TOUCH = /usr/bin/touch
-#
-tools:		clist\
-    	        alist
+COMMONLIB	= ../common/commlib.a
 
-clist:		clist.o \
-    	    	$(COMMONLIB)
-		$(CC) $(CFLAGS) -o clist clist.o $(COMMONLIB) $(LFLAGS)
+CLIST_SRCS = clist.c
+ALIST_SRCS = alist.c
+SRCS = $(CLIST_SRCS) $(ALIST_SRCS)
 
-alist:		alist.o \
-    	    	$(COMMONLIB)
-		$(CC) $(CFLAGS) -o alist alist.o $(COMMONLIB) $(LFLAGS)
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-preloc:		preloc.c
-		$(CC) $(CFLAGS) -o preloc preloc.c $(LFLAGS)
+tools :	clist alist
 
-clist.o:	clist.c
-		$(CC) $(CFLAGS) -c clist.c
+clist : $(CLIST_SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-alist.o:	alist.c
-		$(CC) $(CFLAGS) -c alist.c
+alist : $(ALIST_SRCS:.c=.o) $(COMMONLIB)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-lint:	
-	$(LINT) $(LINTFLAGS) $(INCLUDES) clist.c   
-	$(LINT) $(LINTFLAGS) $(INCLUDES) alist.c   
+preloc : preloc.c
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-install:	alist clist
-		cp -fp alist clist $(TOOLBOX)/.
-		chmod 775 $(TOOLBOX)/alist $(TOOLBOX)/clist
-    	    	
-depend: clist.c alist.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- clist.c alist.c
+install : clist alist
+		cp -fp $^ $(EB_TOOLBOX)/.
+		chmod 775 $(addprefix $(EB_TOOLBOX)/, $^)
 
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
-		clist alist
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
+		clist alist preloc
 
-clist.o: /usr/include/stdio.h /usr/include/standards.h
-clist.o: /usr/include/sys/seek.h /usr/include/va_list.h
-clist.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-clist.o: /usr/include/sys/select.h /usr/include/getopt.h
-clist.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-clist.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-clist.o: /usr/include/sys/rt_limits.h /usr/include/stdlib.h
-clist.o: /usr/include/ctype.h /usr/include/sys/localedef.h
-clist.o: /usr/include/sys/lc_core.h /usr/include/locale.h
-clist.o: /usr/include/nl_types.h /usr/include/mesg.h /usr/include/limits.h
-clist.o: /usr/include/string.h /usr/include/strings.h ../include/coff.h
-clist.o: ../include/syms.h ../include/reloc.h
-alist.o: /usr/include/stdio.h /usr/include/standards.h
-alist.o: /usr/include/sys/seek.h /usr/include/va_list.h
-alist.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-alist.o: /usr/include/sys/select.h /usr/include/getopt.h
-alist.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-alist.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-alist.o: /usr/include/sys/rt_limits.h /usr/include/ctype.h
-alist.o: /usr/include/sys/localedef.h /usr/include/sys/lc_core.h
-alist.o: /usr/include/locale.h /usr/include/nl_types.h /usr/include/mesg.h
-alist.o: /usr/include/limits.h /usr/include/string.h /usr/include/strings.h
-alist.o: /usr/include/stdlib.h ../include/a_out.h
-alist.o: /usr/include/mach/std_types.h /usr/include/mach/boolean.h
-alist.o: /usr/include/mach/machine/boolean.h /usr/include/mach/kern_return.h
-alist.o: /usr/include/mach/machine/kern_return.h /usr/include/mach/port.h
-alist.o: ../include/c_32_64.h
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))

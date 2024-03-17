@@ -198,7 +198,7 @@ typedef struct reg_dirty {
   long spec_end;
   int  free_when_clean;
 } DIRTY;
-DIRTY reg_dirty[MAX_EREG+MAX_FREG];
+extern DIRTY reg_dirty[MAX_EREG+MAX_FREG];
 
 
 

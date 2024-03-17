@@ -86,7 +86,7 @@ typedef short		MTV_int16;
 typedef unsigned int	MTV_uint32;
 typedef int		MTV_int32;
 
-#ifdef __alpha
+#if defined(__alpha) || defined(__alpha__) || defined(__x86_64)
 
 #define HAS_QW_ARITH
 
@@ -100,6 +100,18 @@ typedef unsigned __int64	MTV_uint64;
 typedef __int64			MTV_int64;
 
 #define NO_LANGUAGE_EXCEPTIONS
+#endif
+
+#ifdef __gnu_linux__
+#include <stdint.h>
+typedef uint8_t     MTV_uint8;
+//typedef int8_t	    MTV_int8;
+typedef uint16_t	MTV_uint16;
+typedef int16_t		MTV_int16;
+typedef uint32_t	MTV_uint32;
+typedef int32_t     MTV_int32;
+typedef uint64_t	MTV_uint64;
+typedef int64_t		MTV_int64;
 #endif
 
 #else 

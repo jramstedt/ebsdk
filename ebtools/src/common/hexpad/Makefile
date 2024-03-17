@@ -1,60 +1,42 @@
-# $Id: Makefile,v 1.1.1.1 1998/12/29 21:36:22 paradis Exp $
-# $Log: Makefile,v $
-# Revision 1.1.1.1  1998/12/29 21:36:22  paradis
-# Initial CVS checkin
-#
-# Revision 1.2  1995/11/14  20:38:15  cruz
-# Added rule for lint.
-#
-# Revision 1.1  1995/03/07  13:49:26  fdh
-# Initial revision
-#
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
+CC				= cc
+CFLAGS		= -g -I. -I../include
+LFLAGS		= -lc
+LINT			= /usr/bin/lint
+LINTFLAGS	=  -1 -wp -av -n -I. -I../include
 
-CC= cc
-CFLAGS= -g
-LFLAGS=
-TOOLBOX	    	= $(EB_TOOLBOX)
-OFILES= \
-	hexpad.o
+SRCS = hexpad.c
 
-TOUCH = /usr/bin/touch
-LINT		= /usr/bin/lint
-LINTFLAGS 	=  -1 -wp -av -n -I. -I../include
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-#
-tools:		hexpad
+tools :	hexpad
 
-hexpad:		$(OFILES)
-		$(CC) $(CFLAGS) -o hexpad $(OFILES) $(LFLAGS)
+hexpad : $(SRCS:.c=.o)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-hexpad.o:		hexpad.c
-		$(CC) $(CFLAGS) -c hexpad.c
+install : hexpad
+		cp -fp $^ $(EB_TOOLBOX)/.
+		chmod 775 $(addprefix $(EB_TOOLBOX)/, $^)
 
-install:    	hexpad
-		cp -fp hexpad $(TOOLBOX)/.
-lint:	
-	$(LINT) $(LINTFLAGS) $(INCLUDES) hexpad.c
+lint :
+	$(LINT) $(LINTFLAGS) $(INCLUDES) $(SRCS)
 
-depend: hexpad.c
-		makedepend -f $(MAKEFILE) -- $(CFLAGS) -- hexpad.c
-
-clean:
-		rm -f *.o *~ \#*\# *.bak *.a core\
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
 		hexpad
 
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-hexpad.o: /usr/include/stdio.h /usr/include/standards.h
-hexpad.o: /usr/include/sys/seek.h /usr/include/va_list.h
-hexpad.o: /usr/include/sys/types.h /usr/include/mach/machine/vm_types.h
-hexpad.o: /usr/include/sys/select.h /usr/include/getopt.h
-hexpad.o: /usr/include/sys/limits.h /usr/include/sys/machine/machlimits.h
-hexpad.o: /usr/include/sys/syslimits.h /usr/include/sys/machine/machtime.h
-hexpad.o: /usr/include/sys/rt_limits.h /usr/include/ctype.h
-hexpad.o: /usr/include/sys/localedef.h /usr/include/sys/lc_core.h
-hexpad.o: /usr/include/locale.h /usr/include/nl_types.h /usr/include/mesg.h
-hexpad.o: /usr/include/limits.h /usr/include/string.h /usr/include/strings.h
-hexpad.o: /usr/include/stdlib.h
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))
