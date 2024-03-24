@@ -36,10 +36,7 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include <ctype.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-/* we do need this regardless */
-#ifndef	CROSS_COMPILE_32_TO_64_BITS
-#include "cross_32_to_64.h"
-#endif
+
 #include "as.h"
 #include "read.h"
 #include "md.h"
@@ -50,6 +47,8 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include "struc-symbol.h"
 #include "expr.h"
 #include "symbols.h"
+
+#include "../../common/include/stdc.h"
 
 char *	input_line_pointer;	/* -> next char of source file to parse. */
 

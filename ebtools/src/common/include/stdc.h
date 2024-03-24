@@ -4,6 +4,7 @@
 /* For Linux */
 #ifdef __STDC__
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef uint64_t vm_offset_t;
 typedef uint64_t vm_size_t;
@@ -12,6 +13,7 @@ typedef uint64_t integer_t;
 #define int16 uint16_t
 #define int32 uint32_t
 #define int64 uint64_t
+typedef bool boolean_t;
 
 #define	low32(x)	x
 #define high32(x)	0

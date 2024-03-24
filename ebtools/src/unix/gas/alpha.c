@@ -25,10 +25,7 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include <stdio.h>
 #include <ctype.h>
 #include <stab.h>
-/* we do need this regardless */
-#ifndef CROSS_COMPILE_32_TO_64_BITS
-#include "cross_32_to_64.h"
-#endif
+
 #include "alpha-opcode.h"
 #include "as.h"
 #include "frags.h"
@@ -40,6 +37,8 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include "write.h"
 #include "read.h"
 #include "symbols.h"
+
+#include "../../common/include/stdc.h"
 
 void md_begin();
 void md_end();

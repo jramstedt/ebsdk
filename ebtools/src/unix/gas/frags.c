@@ -25,36 +25,36 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 struct obstack  frags;	/* All, and only, frags live here. */
 
-fragS zero_address_frag = {
-	0,			/* fr_address */
-	NULL,			/* fr_next */
-	0,			/* fr_fix */
-	0,			/* fr_var */
-	0,			/* fr_symbol */
-	0,			/* fr_offset */
-	NULL,			/* fr_opcode */
-	rs_fill,		/* fr_type */
-	0,			/* fr_subtype */
-	0,			/* fr_pcrel_adjust */
-	0,			/* fr_bsr */
-	0			/* fr_literal [0] */
-};
-
-fragS bss_address_frag = {
-	0,			/* fr_address. Gets filled in to make up
-				   sy_value-s. */
-	NULL,			/* fr_next */
-	0,			/* fr_fix */
-	0,			/* fr_var */
-	0,			/* fr_symbol */
-	0,			/* fr_offset */
-	NULL,			/* fr_opcode */
-	rs_fill,		/* fr_type */
-	0,			/* fr_subtype */
-	0,			/* fr_pcrel_adjust */
-	0,			/* fr_bsr */
-	0			/* fr_literal [0] */
-};
+// fragS zero_address_frag = {
+// 	0,			/* fr_address */
+// 	NULL,			/* fr_next */
+// 	0,			/* fr_fix */
+// 	0,			/* fr_var */
+// 	0,			/* fr_symbol */
+// 	0,			/* fr_offset */
+// 	NULL,			/* fr_opcode */
+// 	rs_fill,		/* fr_type */
+// 	0,			/* fr_subtype */
+// 	0,			/* fr_pcrel_adjust */
+// 	0,			/* fr_bsr */
+// 	0			/* fr_literal [0] */
+// };
+// 
+// fragS bss_address_frag = {
+// 	0,			/* fr_address. Gets filled in to make up
+// 				   sy_value-s. */
+// 	NULL,			/* fr_next */
+// 	0,			/* fr_fix */
+// 	0,			/* fr_var */
+// 	0,			/* fr_symbol */
+// 	0,			/* fr_offset */
+// 	NULL,			/* fr_opcode */
+// 	rs_fill,		/* fr_type */
+// 	0,			/* fr_subtype */
+// 	0,			/* fr_pcrel_adjust */
+// 	0,			/* fr_bsr */
+// 	0			/* fr_literal [0] */
+// };
 
 /*
  *			frag_grow()

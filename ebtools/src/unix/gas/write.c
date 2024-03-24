@@ -45,10 +45,6 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
    trouble.
  */
 
-/* we do need this regardless */
-#ifndef	CROSS_COMPILE_32_TO_64_BITS
-#include "cross_32_to_64.h"
-#endif
 #include "as.h"
 #include "md.h"
 #include "subsegs.h"
@@ -56,6 +52,8 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include "struc-symbol.h"
 #include "write.h"
 #include "symbols.h"
+
+#include "../../common/include/stdc.h"
 
 #if defined(SPARC)
 #include "sparc.h"

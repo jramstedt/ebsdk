@@ -20,12 +20,19 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include <stdio.h>		/* define stderr */
 #include "as.h"
 #ifndef NO_VARARGS
+
 #ifdef	MIPS_HOST
 #define	mips
 #define	__mips
 #undef	alpha
 #endif
+
+#ifdef __STDC__
+#include <stdarg.h>
+#else
 #include <varargs.h>
+#endif
+
 #endif
 
 /*
@@ -76,6 +83,22 @@ char *Format;
       _doprnt (Format, &args, stderr);
       (void)putc ('\n', stderr);
       as_where();
+    }
+}
+#elif defined __STDC__
+void as_warn(char * Format, ...)
+{
+  va_list args;
+  
+  if( ! flagseen['W'])
+    {
+      as_where();
+
+      va_start(args, Format);
+      vfprintf(stderr, Format, args);
+      va_end(args);
+
+      (void) putc('\n', stderr);
     }
 }
 #else
@@ -129,6 +152,19 @@ char *Format;
   (void)putc ('\n', stderr);
   /* as_where(); */
 }
+#elif defined __STDC__
+void as_bad(char * Format, ...)
+{
+  va_list args;
+  
+  bad_error=1;
+  as_where();
+  va_start(args, Format);
+  vfprintf(stderr, Format, args);
+  va_end(args);
+
+  (void) putc('\n', stderr);
+}
 #else
 void
 as_bad(Format,va_alist)
@@ -176,6 +212,21 @@ char *Format;
   (void)putc ('\n', stderr);
   /* as_where(); */
   exit(42);			/* What is a good exit status? */
+}
+#elif defined __STDC__
+void as_fatal(char * Format, ...)
+{
+  va_list args;
+  
+  as_where();
+  va_start(args, Format);
+  fprintf (stderr, "FATAL:");
+  vfprintf(stderr, Format, args);
+  va_end(args);
+
+  (void) putc('\n', stderr);
+  
+  exit(42);
 }
 #else
 void

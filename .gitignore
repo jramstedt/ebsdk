@@ -25,3 +25,4 @@ ebtools/src/common/strip/cstrip
 ebtools/src/common/sysgen/sysgen
 ebtools/src/common/uload/uload
 ebtools/src/common/uload/xload
+ebtools/src/unix/gas/gas

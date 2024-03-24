@@ -38,14 +38,14 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #ifdef CROSS_COMPILE_32_TO_64_BITS
 #include "cross_32_to_64.h"
 typedef int32 boolean_t;
-#else
-#include <mach/std_types.h>
 #endif
 
 #if __osf__
+#include <mach/std_types.h>
 typedef long integer_t;
 #endif
 
+#include "../../common/include/stdc.h"
 
 struct exec {
 	integer_t a_magic;	/* Use macros N_MAGIC, etc for access */

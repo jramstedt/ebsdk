@@ -25,10 +25,7 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
  */
 
 #include <ctype.h>
-/* we do need this regardless */
-#ifndef	CROSS_COMPILE_32_TO_64_BITS
-#include "cross_32_to_64.h"
-#endif
+
 #include "as.h"
 #include "flonum.h"
 #include "read.h"
@@ -36,6 +33,8 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include "expr.h"
 #include "obstack.h"
 #include "symbols.h"
+
+#include "../../common/include/stdc.h"
 
 static void clean_up_expression();	/* Internal. */
 extern char EXP_CHARS[];	/* JF hide MD floating pt stuff all the same place */

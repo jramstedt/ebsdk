@@ -25,6 +25,11 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #include <perror.h>	/* Need this to make sys_errlist/sys_nerr right */
 #endif /* VMS */
 
+#ifdef __linux__ 
+#include <stdio.h>
+#include <errno.h>
+#endif
+
 /*
  * O/S independent module to supply buffers of sanitised source code
  * to rest of assembler. We get raw input data of some length.
@@ -336,13 +341,19 @@ as_perror(gripe, filename)
      char *	gripe;		/* Unpunctuated error theme. */
      char *	filename;
 {
-  extern int errno;		/* See perror(3) for details. */
-  extern int sys_nerr;
-  extern char * sys_errlist[];
+
 
   fprintf (stderr,"as:file(%s) %s! ",
 	   filename, gripe
 	   );
+
+#ifdef __STDC__
+  fprintf (stderr, "%s.", strerror(errno));
+#else
+  extern int errno;		/* See perror(3) for details. */
+  extern int sys_nerr;
+  extern char * sys_errlist[];
+
   if (errno > sys_nerr)
     {
       fprintf (stderr, "Unknown error #%d.", errno);
@@ -351,6 +362,8 @@ as_perror(gripe, filename)
     {
       fprintf (stderr, "%s.", sys_errlist [errno]);
     }
+#endif
+
   (void)putc('\n', stderr);
   errno = 0;			/* After reporting, clear it. */
   if (input_file_is_open())	/* RMS says don't mention line # if not needed. */

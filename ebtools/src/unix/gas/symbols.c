@@ -18,10 +18,6 @@ along with GAS; see the file COPYING.  If not, write to
 the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 
 
-/* we do need this regardless */
-#ifndef	CROSS_COMPILE_32_TO_64_BITS
-#include "cross_32_to_64.h"
-#endif
 #include "as.h"
 #include "hash.h"
 #include "obstack.h"		/* For "symbols.h" */
@@ -32,6 +28,8 @@ the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.  */
 #ifndef WORKING_DOT_WORD
 extern int new_broken_words;
 #endif
+
+#include "../../common/include/stdc.h"
 
 static
 struct hash_control *
