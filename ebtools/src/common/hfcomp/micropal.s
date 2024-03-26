@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
 		       Maynard, Massachusetts.
 
 			All Rights Reserved
@@ -171,7 +171,7 @@ your own risk.
 #include "header.h"
 
 /*
-** Define DEBUG if LED output is reqired
+** Define DEBUG if LED output is required
 ** #define DEBUG
 */
 
@@ -421,10 +421,10 @@ pvc$huf16$1002:
 	bis     r17, r31, r27           // Save r17 into scratch r27
 
 #define PAL_FUNC_CSERVE         (9)
-#define cserve$jump_to_arc      (69)
+#define cserve_jump_to_arc      (69)
 
 	bis     r30, 1, r17
-	lda     r16, cserve$jump_to_arc(r31)
+	lda     r16, cserve_jump_to_arc(r31)
 pvc$huf15$1002:
 	call_pal PAL_FUNC_CSERVE        // Load the new EXC_ADDR, return in PAL
 	bis     r28, r31, r16           // restore r16 from scratch r28
@@ -482,7 +482,7 @@ trap__d1to1:
 	mtpr    r4, EV6__DTB_PTE0               /* (0&4,0L) write pte0          */
 	mtpr    r4, EV6__DTB_PTE1               /* (3&7,1L) write pte1          */
 pvc$huf20$1007:
-	hw_rets/jmp     (r23)                   /* (0L) return                  */
+	hw_jmp/stall    (r23)                   /* (0L) return                  */
 #endif /* DC21264 */
 
 PALContinue:
@@ -503,8 +503,8 @@ PALContinue:
 	bis     r31, 8, r28             // 47 bit Kseg
 	mtpr    r28, EV6__M_CTL         /* Turn on 47 bit Kseg */
 
-	ldah    r28, 0x8000(r31)         /* Kseg = 0xffff8000.00000000   */
-	sll     r28, 16, r28              /* Shift into place             */
+	ldah    r28, -32768(r31)        /* Kseg = 0xffff8000.00000000   */
+	sll     r28, 16, r28            /* Shift into place             */
 	bis     r28, r27, r27
 
 GetCpuNumber:
@@ -512,7 +512,7 @@ GetCpuNumber:
 GetCpuNumberwait:
 	subq    r28, 1, r28
 	bne     r28, GetCpuNumberwait
-	ecb     r27
+	ecb     (r27)
 	mb
 	ldl_l r28, 0(r27)           // See if we're the first CPU here
 	addl     r28, 1, r29            // increament processor id
@@ -658,7 +658,7 @@ Not_primary:
 	bis     r31, r31, r31
 Not_primary_1:
 	LEDWRITE(0xc8,r28,r30)
-	ecb     r27
+	ecb     (r27)
 	ldq     r28, 0xf0(r27)
 	mb
 	beq     r28, Not_primary_1
@@ -677,7 +677,7 @@ ParkLoop:
 	bne     r31, Parkret_flush              // pvc #24
 Parkret_flush:
 pvc$huf24$1007:
-	hw_rets/jmp     (r29)           // return with stall
+	hw_jmp/stall    (r29)           // return with stall
 #endif /* DC21264 */
 Fillicache:
 	br      r31, ParkLoop
@@ -838,7 +838,7 @@ FlushIcache:
 	bne     r31, ret_flush          // pvc #24
 ret_flush:
 pvc$huf21$1007:
-	hw_rets/jmp     (r29)           // return with stall
+	hw_jmp/stall    (r29)           // return with stall
 #endif /* DC21264 */
 
 #ifdef PVCCHECK

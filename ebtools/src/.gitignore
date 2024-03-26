@@ -50,3 +50,14 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+# Stripped sections
+*.nh
+
+# preprocessed .s files
+*.sp
+
+# pvc
+*.pvc
+*.lis
+*.ent

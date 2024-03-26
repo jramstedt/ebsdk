@@ -275,7 +275,7 @@ static  void check_match (UINT start, IPos match, int length);
 
 #define INSERT_STRING(s, match_head) \
    (UPDATE_HASH(ins_h, window[(s) + MIN_MATCH-1]), \
-    prev[(s) & WMASK] = (Pos)match_head = head[ins_h], \
+    prev[(s) & WMASK] = (Pos)(match_head = head[ins_h]), \
     head[ins_h] = (s))
 
 /* ===========================================================================
