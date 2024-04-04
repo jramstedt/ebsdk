@@ -25,9 +25,13 @@ ebtools/src/common/strip/cstrip
 ebtools/src/common/sysgen/sysgen
 ebtools/src/common/uload/uload
 ebtools/src/common/uload/xload
+
 ebtools/src/common/hfcomp/hfcomp
-ebtools/src/common/hfcomp/decmp64.img
-ebtools/src/common/hfcomp/decmp164.img
-ebtools/src/common/hfcomp/decmp264.img
+ebtools/src/common/hfcomp/*.img
+
+ebtools/src/common/mini_dbg/mini_rcs.h
+ebtools/src/common/mini_dbg/ic4mat.log
+ebtools/src/common/mini_dbg/*.sr
+ebtools/src/common/mini_dbg/*.ic
 
 ebtools/src/unix/gas/gas
