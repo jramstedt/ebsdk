@@ -3,67 +3,64 @@ include $(CONFIG_DIR)/sdkmake.conf
 
 include $(EB_BASE)/rules.gnu
 
-AS				= as
-LD				= ld
-CC				= gcc
-CPP				= cpp
-ALIST			= $(TOOLBOX)/alist
-ASTRIP		= $(TOOLBOX)/astrip
+AS		= as
+LD		= ld
+CC		= gcc
+CPP		= cpp
+OBJCOPY		= objcopy
+OBJDUMP		= objdump
 SYSGEN		= $(TOOLBOX)/sysgen
 
-ALPHA_TOOLS = \
+ALPHA_TOOLS 	= \
 	AS=alpha-linux-gnu-as \
 	LD=alpha-linux-gnu-ld \
 	CC=alpha-linux-gnu-gcc \
-	CPP=alpha-linux-gnu-cpp
+	CPP=alpha-linux-gnu-cpp \
+	OBJCOPY=alpha-linux-gnu-objcopy \
+	OBJDUMP=alpha-linux-gnu-objdump
 
 INCLUDES	= -I. -I../include
 
 CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -mtune=$(CPU) -Os
-ASFLAGS		= -g $(INCLUDES) -mcpu=$(CPU) -mtune=native -x assembler-with-cpp
 CFLAGS		= -g $(INCLUDES)
-ASFLAGS		= # -P
-LINT			= /usr/bin/lint
+ASFLAGS		=
+LINT		= /usr/bin/lint
 LINTFLAGS	=  -1 -wp -av -n $(INCLUDES)
 
-HEADER_DEFS = \
+HEADER_DEFS 	= \
 	-DDECOMP_PALBASE=0x$(DECOMP_PALBASE) \
 	-DDECOMP_BASE=0x$(DECOMP_BASE)
 #	-DDECOMP_COMPRESSED=0x$(DECOMP_COMPRESSED)
 
-SRCS  = bits.c deflate.c hfcomp.c inflate.c trees.c
+SRCS  		= bits.c deflate.c hfcomp.c inflate.c trees.c
 
-DEPDIR := .deps
-DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+DEPDIR 		:= .deps
+DEPFLAGS	= -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-INSTALL_TARGETS = hfcomp decmp64.img decmp164.img decmp264.img
+INSTALL_TARGETS	= hfcomp decmp64.img decmp164.img decmp264.img
 
-all : hfcomp decomp64 decomp164 decomp264
+all : hfcomp decomp064 decomp164 decomp264
 
 hfcomp : $(SRCS:.c=.o)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(HEADER_DEFS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
 ### Decompressor image
-MAKEFILE = Makefile
+MAKEFILE	= Makefile
 
-CPU_64          = 21064
-CPU_164         = 21164
-CPU_264         = 21264
-CPU             = $(CPU_$(TYPE))
+CPU_064		= 21064
+CPU_164		= 21164
+CPU_264		= 21264
+CPU		= $(CPU_$(TYPE))
 
-CPU_DTBMISS_64  = 9E0
-CPU_DTBMISS_164 = 200
-CPU_DTBMISS_264 = 300
-CPU_DTBMISS     = $(CPU_DTBMISS_$(TYPE))
+CPU_DTBMISS_064	= 9E0
+CPU_DTBMISS_164	= 200
+CPU_DTBMISS_264	= 300
+CPU_DTBMISS	= $(CPU_DTBMISS_$(TYPE))
 
-decomp64 :
-	$(MAKE) -f $(MAKEFILE) $(ALPHA_TOOLS) TYPE=64 decomp_target
+decomp% :
+	$(MAKE) -f $(MAKEFILE) $(ALPHA_TOOLS) TYPE=$* decmpimg
 
-decomp164 :
-	$(MAKE) -f $(MAKEFILE) $(ALPHA_TOOLS) TYPE=164 decomp_target
-
-decomp264 :
-	$(MAKE) -f $(MAKEFILE) $(ALPHA_TOOLS) TYPE=264 decomp_target
+decmpimg : decmp$(TYPE).img upal$(TYPE).lis
 
 ### Decompressor
 
@@ -99,7 +96,7 @@ upal$(TYPE).o : upal$(TYPE).sp
 
 # Strip all header sections (text and data)
 upal$(TYPE).nh : upal$(TYPE).o
-	/usr/alpha-linux-gnu/bin/objcopy --dump-section .text=$@ $<
+	$(OBJCOPY) --dump-section .text=$@ $<
 #	$(ASTRIP) -a -v $< $@
 
 upal$(TYPE).ent :
@@ -108,20 +105,20 @@ upal$(TYPE).ent :
 
 upal$(TYPE).lis : upal$(TYPE).o
 #	$(ALIST) $< > $@
-	/usr/alpha-linux-gnu/bin/objdump -x $< > $@
+	$(OBJDUMP) -x $< > $@
 
 upal$(TYPE).map : upal$(TYPE).o
 #	$(ALIST) -m $< > $@
-	/usr/alpha-linux-gnu/bin/objdump -x $< | grep -i "pvc\\$$" > $@
+	$(OBJDUMP) -x $< | grep -i "pvc\\$$" > $@
 
 ### decmp
 
 decmp$(TYPE).nh : decmp$(TYPE).out
-	/usr/alpha-linux-gnu/bin/objcopy --dump-section .text=$@ $<
+	$(OBJCOPY) --dump-section .text=$@ $<
 
 decmp$(TYPE).img : upal$(TYPE).nh decmp$(TYPE).nh pvc$(TYPE).pvc
 	$(SYSGEN) -v \
-		-e0		-s upal$(TYPE).nh \
+		-e0	-s upal$(TYPE).nh \
 		-eb00	-s decmp$(TYPE).nh \
 		-o $@
 #	$(PVC) < pvc$(TYPE).pvc
@@ -133,10 +130,6 @@ pvc$(TYPE).pvc : upal$(TYPE).nh upal$(TYPE).ent upal$(TYPE).map
 	echo set cpu $(CPU) >> $@
 	echo go >> $@
 	echo quit >> $@
-
-### Image and listing
-decomp_target : decmp$(TYPE).img upal$(TYPE).lis
-
 
 install : all
 	cp -fp $(INSTALL_TARGETS) $(EB_TOOLBOX)/.
