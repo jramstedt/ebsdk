@@ -3,7 +3,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1994							    *
+**  Copyright ï¿½ 1994							    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -100,6 +100,8 @@
 #include "wm.h"	
 #endif
 
+#define SEXT(val) ((val ^ 0x8000) - 0x8000)
+
 /*
  * the following bits definitions are flags for the mini-debugger
  */
@@ -115,7 +117,7 @@
 
 
 #ifdef DC21264
-#define EV6_GPR_BASE 0x1000
+#define EV6_GPR_BASE 0x700 // Was 0x1000, but displacement is only 12-bits.
 
 #define MTPT(gpr,pt) \
      stq_p    gpr,   EV6_GPR_BASE+(pt<<3)(r24)
@@ -124,7 +126,7 @@
      ldq_p    gpr,    EV6_GPR_BASE+(pt<<3)(r24)
 #define MFPT2(gpr,pt) MFPT(gpr,pt)
 
-#define KSEG_PREFIX	0x8000
+#define KSEG_PREFIX	SEXT(0x8000)
 
 #else /* prior to DC21264 */
 
@@ -136,7 +138,7 @@
 #define MFPT2(gpr,ptnum) \
     bis  r##ptnum, r##ptnum, gpr
 
-#define KSEG_PREFIX	0xFC00
+#define KSEG_PREFIX	SEXT(0xFC00)
 #endif
 
 
@@ -203,7 +205,7 @@
 #ifndef LDLI
 #define LDLI(reg,val) \
 lda reg, (val&0xffff)(r31)		; /* Mask off upper word	*/ \
-ldah reg, ((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
+ldah reg, SEXT((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
 					  /* remove its sign-extension	*/
 #endif
 

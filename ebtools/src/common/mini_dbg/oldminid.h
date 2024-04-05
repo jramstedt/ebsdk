@@ -3,7 +3,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1994							    *
+**  Copyright ï¿½ 1994							    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -84,6 +84,10 @@
  *
  * --------------------------------------------------------------------*/
 
+#ifndef SEXT
+#define SEXT(val) ((val ^ 0x8000) - 0x8000)
+#endif
+
 /*
  * the following bits definitions are flags for the mini-debugger
  */
@@ -141,7 +145,7 @@
 #ifndef LDLI
 #define LDLI(reg,val) \
 lda reg, (val&0xffff)(r31)		; /* Mask off upper word	*/ \
-ldah reg, ((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
+ldah reg, SEXT((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
 					  /* remove its sign-extension	*/
 #endif
 

@@ -592,8 +592,8 @@ bccnxt:	addq	r31,4,r0		/* load PCTX.....*/
 	bis	r31,1,r0		/* set up value for demon write*/
 	mulq	r31,r31,r0		/* nop*/
 
-	lda    r0,0x780(r31)            /*this is new initialization stuff to prevent*/
-	whint  r0                       /* ld/st below from going off-chip */
+	lda	r0,0x780(r31)           /* this is new initialization stuff to prevent */
+	wh64	(r0)                    /* ld/st below from going off-chip */
 	mb
 	bis	r31,1,r0		/* set up value for demon write*/
 
@@ -659,7 +659,7 @@ br60:	lda	r1, (EntryPoint-br60)(r0) /* r1 <- location of codebase */
 
 	br	r0, jmp0
 jmp0:	addq	r0, (jmp1-jmp0+1), r0
-	hw_rets/jmp	(r0)
+	hw_jmp/stall	(r0)
 jmp1:	
 	
 	
@@ -673,7 +673,7 @@ sweep_dcache:
 	ldah	r0, 1(r0)		/* r0 = 0xffff8000.00010000	*/
 sweep_dcache0:
 	subq	r0, 64, r0
-	whint	r0
+	wh64	(r0)
 	zap	r0, 0xf0, r1
 	bne	r1, sweep_dcache0
 	mb
@@ -916,13 +916,13 @@ pvc$mini_getdaddr_2$5001:
 /* This block had 21264 as the controlling def and therefore never 
    actually generated any code.  If it is needed for some reason change
    the def and doccument why */
-/* use whint to allocate the blocks in the dcache */
+/* use wh64 to allocate the blocks in the dcache */
 xm_264_0:
 	bic	r7,0xf,r0       /* create a 64-byte address by zapping the low 4 bits of address */
 	addq	r12,64,r9       /* add an extra 64 bytes to the byte-count */
 	srl	r9,4,r9         /* shift the byte count to get a 64-byte count */
 xm_264_1:
-	whint	r0              /* allocate the first 64-byte qty */
+	wh64	(r0)            /* allocate the first 64-byte qty */
 	addq	r0,0x40,r0      /* bump the address pointer */
 	subq	r9,1,r9         /* decrement the 64-byte count */
 	bne	r9,xm_264_1     /* keep doing this until all 64-byte chunks have been allocated */
@@ -1173,7 +1173,11 @@ case_xb:
 pvc$mini_addicflush_100$5003:
 	bsr	r23, AddICFlush		/* Add IC flush code to image.	*/
 
+#ifdef DC21264
 	MTPT	(r12, 25)		/* Save the address code in R0.	*/
+#else
+	MTPT	(r12, 0)		/* Save the address code in R0.	*/
+#endif /* DC21264 */
 	br	r31, RestoreState	/* Restore & jump to xloaded image*/
 
 case_wm:
@@ -1198,9 +1202,9 @@ case_tb:
 	CASE_ON( a_T,a_B, case_b1)	/* If match, do the following;	*/
 					/* otherwise, skip to next case	*/
 	lda     r0,0x4000(r31)           /* allocate some space at 0x4000 */
-	whint   r0
+	wh64	(r0)
 	addq r0,64,r0
-	whint  r0
+	wh64	(r0)
 	mb
 	lda	r12,0x4000(r31)
 	sll	r12,32,r12
@@ -1276,7 +1280,11 @@ case_st:
 					/* otherwise, skip to next case	*/
 pvc$mini_getdaddr_4$5001:
 	bsr	r19, getAddress		/* Get starting address in R0.	*/
+#ifdef DC21264
 	MTPT	(r0, 25)		/* Write addr to jump to.	*/
+#else
+	MTPT	(r0, 0)			/* Write addr to jump to.	*/
+#endif /* DC21264 */
 	bis	r30, 8, r30		/* set Primary CPU Flag		*/
 	br	r31, RestoreState
 
@@ -1427,7 +1435,7 @@ pvc$stop_checking_4$2003:
  * = Machine Check Handler for stand alone case.			=
  * ======================================================================
 */
-.= 0x400
+.= 0x480	/* Was 0x400 */
 mchk_start:
 	br	r31, print_pal_exception
 #endif /* DEBUG */
@@ -1441,8 +1449,10 @@ mchk_start:
  *==========================================================================*/
 
 common_ex_dep:
+#ifdef DC21264
 	lda	r19, 3(r31)		/* load DC_CTL			*/
         mtpr    r19, EV6__DC_CTL	/* SET_EN=3 			*/
+#endif /* DC21264 */
 pvc$mini_getdaddr_5$5001:
 	bsr	r19, getAddress		/* r0 <- start address		*/
 	bis	r0, r0, r7		/* r7 <- start address 		*/
@@ -1752,7 +1762,7 @@ SkipWriteKseg:
 	and	r0, r15, r0
 	beq	r0,  SkipWHint
 WHint:
-	whint	r18
+	wh64	(r18)
 	br	r31, WriteDone
 SkipWHint:
 #endif
@@ -1817,7 +1827,7 @@ SkipReadKseg:
 	and	r0, r15, r0
 	beq	r0,  SkipEvictCB
 EvictCB:
-	ecb	r18
+	ecb	(r18)
 	br	r31, ExamineDone
 SkipEvictCB:
 #endif
@@ -2252,12 +2262,12 @@ InitCPU:
 					/* and exc_mask 		*/
 	mfpr	r31, va			/* unlock faulting va, mmstat 	*/
 
-#define icp$stat_init (ICPERR_M_DPE | ICPERR_M_TPE  | ICPERR_M_TMR)
-	lda	r2, icp$stat_init(r31)	/* Clear Icache data and tag 	*/
+#define icp_stat_init (ICPERR_M_DPE | ICPERR_M_TPE  | ICPERR_M_TMR)
+	lda	r2, icp_stat_init(r31)	/* Clear Icache data and tag 	*/
 	mtpr	r2, icPerr		/* parity error, & timeout error*/
 
-#define dcp$stat_init (DCPERR_M_LOCK | DCPERR_M_SEO)
-	lda	r2, dcp$stat_init(r31)	/* Clear Dcache parity error 	*/
+#define dcp_stat_init (DCPERR_M_LOCK | DCPERR_M_SEO)
+	lda	r2, dcp_stat_init(r31)	/* Clear Dcache parity error 	*/
 	mtpr	r2, dcPerr		/* status		 	*/
 
 /* ======================================================================
@@ -2269,7 +2279,7 @@ palbase_init:
 br60:	lda	r1, (EntryPoint-br60)(r0) /* r1 <- location of codebase */
 	mtpr	r1, palBase		/* set up pal_base register */
 
-	ldah	r0, 0xfff0(r31)		/* r1 <- CBOX base pointer 	*/
+	ldah	r0, SEXT(0xfff0)(r31)	/* r1 <- CBOX base pointer 	*/
 	zap	r0, 0xE0, r1		/* R1 = 0000.00FF.FFF0.0000	*/
 
 #ifndef DC21164PC
@@ -2479,7 +2489,7 @@ noploop:				/* for i = 1 to instCnt 	*/
 #endif
 
 	/* Load up signature here for now. */
-	ldah	r19, 0xdecb(r31)
+	ldah	r19, SEXT(0xdecb)(r31)
 	zap	r19, 0xf0, r19
 
 pvc$mini_addicflush_ret$5003.1:
@@ -2996,7 +3006,7 @@ case_dc_stat:
 #endif /* DC21264 */
 
 #ifdef DC21164
-	ldah	r2, 0xfff0(r31)		/* r2 <- CBOX base pointer 	*/
+	ldah	r2, SEXT(0xfff0)(r31)	/* r2 <- CBOX base pointer 	*/
 	zap	r2, 0xE0, r2		/* R2 = 0000.00FF.FFF0.0000	*/
 	mb
 case_bctl:
@@ -3049,7 +3059,7 @@ case_ipl:
 
 
 #ifdef DC21164PC
-	ldah	r2, 0xfff0(r31)		/* r2 <- CBOX base pointer 	*/
+	ldah	r2, SEXT(0xfff0)(r31)	/* r2 <- CBOX base pointer 	*/
 	zap	r2, 0xE0, r2		/* R2 = 0000.00FF.FFF0.0000	*/
 	mb
 case_bcfg2:
@@ -3701,9 +3711,8 @@ SINGLE_ISSUE bit (17)	*/
 */
 hwstall:
 
-	addq	r0, (rw_setup-hwstall+1), r0/* finish computing dest address 
-(rw_setup:) for hwstall	*/
-	hw_rets/jmp	(r0)		/* hw_jmp_stall (rw_setup:) to wait 
+	addq	r0, (rw_setup-hwstall+1), r0 /* finish computing dest address (rw_setup:) for hwstall	*/
+	hw_jmp/stall	(r0)		/* hw_jmp_stall (rw_setup:) to wait 
 for update of I_CTL	*/
 hwstall0:
 	br	r31, hwstall0		/* hang here until hw_jmp_stall 
@@ -3959,10 +3968,8 @@ SINGLE_ISSUE bit (17)	*/
 */
 hwstall1:
 
-	addq	r0, (rw_setup1-hwstall1+1), r0/* finish computing dest 
-address (rw_setup:) for hwstall1	*/
-	hw_rets/jmp	(r0)		/* hw_jmp_stall (rw_setup:) to wait 
-for update of I_CTL	*/
+	addq	r0, (rw_setup1-hwstall1+1), r0 /* finish computing dest address (rw_setup:) for hwstall1 */
+	hw_jmp/stall	(r0)		/* hw_jmp_stall (rw_setup:) to wait for update of I_CTL	*/
 hwstall2:
 	br	r31, hwstall2		/* hang here until hw_jmp_stall 
 retires	*/
@@ -4308,7 +4315,7 @@ BcInit2:
 
         lda     r21, 0x8400(r31)        /* (2MB bcache + 64k dcache)/64 byte cache lines*/
         zap     r21, 0xfc, r21          /* clear sign extension from lda*/
-whline: whint   r20                     /* init cache line*/
+whline: wh64	(r20)                   /* init cache line*/
         lda     r20, 64(r20)            /* add 64 for next cache line*/
 
         subq    r21, 1, r21             /* decrement line counter*/
@@ -4323,7 +4330,7 @@ whdone:	mb                              /* memory barrier*/
         ldah    r20, 0x10(r20)          /* start at VA 1MB*/
         lda     r21, 0x0400(r31)        /* (64k dcache)/64 byte cache lines*/
 
-evline: ecb     r20                     /* evict cache line*/
+evline: ecb     (r20)                   /* evict cache line*/
         lda     r20, 64(r20)            /* add 64 for next cache line*/
         subq    r21, 1, r21             /* decrement line counter*/
         beq     r21, evdone             /* done evict?*/
