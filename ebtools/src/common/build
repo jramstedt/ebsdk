@@ -13,9 +13,7 @@ export PATH || (echo "OOPS, this isn't sh.  Desperation time."; sh $0 $argv; kil
 
 . ../../../sdkshell.conf
 
-subdirs="include common bit pvc list strip ic4mat srec srom repeat objtest makerom uload sysgen rcsv hex32 hexpad"
-
-gnumakesubdirs="hfcomp mini_dbg"
+subdirs="include common bit pvc list strip ic4mat srec srom repeat objtest makerom uload sysgen rcsv hex32 hexpad hfcomp mini_dbg"
 
 # Build the bulk of the utilities
 
@@ -27,15 +25,3 @@ for dir in $subdirs ; do
         (cd $dir ; make -f Makefile ; make -f Makefile install)
     fi
 done
-
-
-# Build those that need gnumake
-for dir in $gnumakesubdirs ; do
-    if [ ! -f $dir/Makefile ] ; then
-	echo "***** No Makefile in $dir"
-    else
-	echo "##### Building $dir #####"
-        (cd $dir ; $EB_TOOLBOX/gnumake -f Makefile ; $EB_TOOLBOX/gnumake -f Makefile install)
-    fi
-done
-

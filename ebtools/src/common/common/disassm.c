@@ -1,9 +1,9 @@
 #ifndef lint
-static char *RCSid = "$Id: disassm.c,v 1.1.1.1 1998/12/29 21:36:20 paradis Exp $";
+__attribute__((unused)) static const char *RCSid = "$Id: disassm.c,v 1.1.1.1 1998/12/29 21:36:20 paradis Exp $";
 #endif
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -298,7 +298,7 @@ struct alpha_opcode *find_opcode(unsigned int instruction)
 void print_instruction(int instruction, FILE *stream)
 {
     struct alpha_opcode *opcodedata;
-    char *argptr;
+    const char *argptr;
     int duplicate_reg_bad = FALSE;
     int bad_reg_id;
     char bad_reg_name;

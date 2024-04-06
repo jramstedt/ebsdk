@@ -11,7 +11,7 @@
 
 export PATH || (echo "OOPS, this isn't sh.  Desperation time."; sh $0 $argv; kill $$)
 
-subdirs="include common gnumake bit pvc list strip ic4mat srec srom repeat objtest makerom uload sysgen rcsv hfcomp mini_dbg hex32 hexpad"
+subdirs="include common bit pvc list strip ic4mat srec srom repeat objtest makerom uload sysgen rcsv hex32 hexpad hfcomp mini_dbg"
 
 for dir in $subdirs ; do
     if [ ! -f $dir/Makefile ] ; then
