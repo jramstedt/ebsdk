@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -25,7 +25,7 @@ your own risk.
 ******************************************************************************/
 
 #ifndef LINT
-static char *rcsid = "$Id: rcsv.c,v 1.2 1999/02/09 19:56:07 gries Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: rcsv.c,v 1.2 1999/02/09 19:56:07 gries Exp $";
 #endif
 
 /*
@@ -62,6 +62,8 @@ static char *rcsid = "$Id: rcsv.c,v 1.2 1999/02/09 19:56:07 gries Exp $";
 #include <ctype.h>
 #include <string.h>
 #include <stdlib.h>
+#include <limits.h>
+#include <assert.h>
 
 char *strRCS(char *input, char *id);
 
@@ -93,7 +95,7 @@ char seen[SEEN_SIZE];			/* upper and lower case */
 #define RCS_LOCK_SIGNATURE 0x58	/* Ascii X - Experimental */
 #define RCS_UNLOCK_SIGNATURE 0x56 /* Ascii V - Released */
 #define RCS_REV_LEVELS 8
-int rev[RCS_REV_LEVELS];
+char rev[RCS_REV_LEVELS];
 
 /*
  *  Forward routine descriptions.  These have to come before the directives
@@ -123,7 +125,7 @@ int main(int argc, char **argv)
  * This is a -xyz style options list.  Work out the options specified.
  */
 	    arg++;			/* skip the '-' */
-	    while (option = *arg++) {	/* until we reach the '0' string
+	    while ((option = *arg++)) {	/* until we reach the '0' string
 					 * terminator */
 		option = tolower(option);
 		switch (option) {
@@ -246,9 +248,12 @@ void process_file(char *ifname, char *ofname)
   
   rcs_encoded_rev_l = 0;
   rcs_encoded_rev_h = 0;
-  for (i=0; i<RCS_REV_LEVELS; ++i) {
-    rcs_encoded_rev_l |= (rev[i]&0xff)<<(8*i);
-    rcs_encoded_rev_h |= (rev[i+(RCS_REV_LEVELS/2)]&0xff)<<(8*i);
+
+  assert((RCS_REV_LEVELS >> 1) <= sizeof(rcs_encoded_rev_l));
+
+  for (i = 0; i < (RCS_REV_LEVELS >> 1); ++i) {
+    rcs_encoded_rev_l |= rev[i] << (CHAR_BIT * i);
+    rcs_encoded_rev_h |= rev[i + (RCS_REV_LEVELS >> 1)] << (CHAR_BIT * i);
   }
 
   if (_OPTION('v'))
@@ -285,9 +290,9 @@ char *strRCS(char *input, char *id)
 
     status = sscanf(p, "%*s %*s %*s %*s %*s %*s %s", revstr);
     if (_OPTION('x')) 
-      rev[RCS_REV_LEVELS-1] = RCS_LOCK_SIGNATURE&0xff;
+      rev[RCS_REV_LEVELS-1] = RCS_LOCK_SIGNATURE;
     else
-      rev[RCS_REV_LEVELS-1] = RCS_UNLOCK_SIGNATURE&0xff;
+      rev[RCS_REV_LEVELS-1] = RCS_UNLOCK_SIGNATURE;
   }
   return(p);
 }
@@ -310,7 +315,7 @@ void encode_rev(char * v)
     ++p;
     if ((*p == '.') || (*p == 0)) {
       *p = 0;
-      rev[i] = atoi(v);
+      rev[i] = atoi(v) & 0xff;
       ++i;
       v = p + 1;
     }

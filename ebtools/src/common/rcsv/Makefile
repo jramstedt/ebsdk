@@ -1,8 +1,8 @@
 CONFIG_DIR=../../../..
 include $(CONFIG_DIR)/sdkmake.conf
 
-CC				= cc
-CFLAGS		= -g -I. -I../include
+CC		= cc
+CFLAGS		= -g -I. -I../include -Wall
 LFLAGS		= -lc
 LINT			= /usr/bin/lint
 LINTFLAGS	=  -1 -wp -av -n -I. -I../include
