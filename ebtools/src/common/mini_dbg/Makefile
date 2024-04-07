@@ -29,7 +29,9 @@ LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
 ASFLAGS		= # -acdlnm="$@.lst"
 
 CPU_064		= 21064
+CPU_064A	= 21064A
 CPU_066		= 21066
+CPU_068		= 21068
 CPU_164		= 21164
 CPU_164PC	= 21164PC
 CPU_264		= 21264

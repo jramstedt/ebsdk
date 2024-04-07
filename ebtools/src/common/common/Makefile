@@ -3,7 +3,7 @@ include $(CONFIG_DIR)/sdkmake.conf
 
 CC		= cc
 AR		= ar
-CFLAGS		= -g -I. -I../include -Wall -fsanitize=undefined
+CFLAGS		= -g -I. -I../include -Wall
 LFLAGS		= -lc
 LINT		= /usr/bin/lint
 LINTFLAGS	=  -1 -wp -av -n -I. -I../include

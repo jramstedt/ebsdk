@@ -369,7 +369,7 @@ void *malloc(size_t size)
     //
     */
 
-    if (newBase & 7 != 0) {
+    if ((newBase & 7) != 0) {
         newBase = (newBase & 7) + 8;
     }
 

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-Copyright © 1994, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright ï¿½ 1994, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 
@@ -41,7 +41,7 @@ your own risk.
 ** 
 */
 #ifndef lint
-static char *RCSid = 
+__attribute__((used)) static const char *RCSid = 
   "$Id: dbmmain.c,v 1.1.1.1 1998/12/29 21:36:25 paradis Exp $";
 #endif
 
@@ -67,8 +67,7 @@ static char *RCSid =
 
 extern unsigned int decompress();
 
-unsigned int
-main()
+unsigned int main()
 {
   unsigned int target_address;
 

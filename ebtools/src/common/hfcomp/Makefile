@@ -21,7 +21,7 @@ ALPHA_TOOLS 	= \
 
 INCLUDES	= -I. -I../include
 
-CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -mtune=$(CPU) -Os
+CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -mtune=$(CPU) -Os -Wall -Wno-builtin-declaration-mismatch
 CFLAGS		= -g $(INCLUDES)
 ASFLAGS		=
 LINT		= /usr/bin/lint
@@ -37,7 +37,7 @@ SRCS  		= bits.c deflate.c hfcomp.c inflate.c trees.c
 DEPDIR 		:= .deps
 DEPFLAGS	= -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-INSTALL_TARGETS	= hfcomp decmp64.img decmp164.img decmp264.img
+INSTALL_TARGETS	= hfcomp decmp064.img decmp164.img decmp264.img
 
 all : hfcomp decomp064 decomp164 decomp264
 
@@ -80,7 +80,7 @@ dbmmn$(TYPE).o : dbmmain.c
 	$(CC) $(CCFLAGS) -o $@ -c $^
 
 decmp$(TYPE).out : cstartup.o decmp$(TYPE).o inf_s$(TYPE).o dbmmn$(TYPE).o
-	$(LD) -N -Ttext=$(DECOMP_BASE) -z noexecstack -e __start -o $@ $^
+	$(LD) -N -Ttext=$(DECOMP_BASE) -s -z noexecstack -e __start -o $@ $^
 #	$(LD) -N -segment_page 16 -T $(DECOMP_BASE) -non_shared -o $@ $^
 # https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
 
@@ -91,12 +91,12 @@ upal$(TYPE).sp : micropal.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) -DPVCCHECK -DASSEMBLY_CODE $(HEADER_DEFS) $^ > $@
 
 upal$(TYPE).o : upal$(TYPE).sp
-	$(AS) $(ASFLAGS) -m$(CPU) -o $@ $^
+	$(AS) $(ASFLAGS) -R -m$(CPU) -o $@ $^
 #	$(AS) $(ASFLAGS) -$(CPU) -o $@ $^
 
 # Strip all header sections (text and data)
 upal$(TYPE).nh : upal$(TYPE).o
-	$(OBJCOPY) --dump-section .text=$@ $<
+	$(OBJCOPY) -O binary $< $@
 #	$(ASTRIP) -a -v $< $@
 
 upal$(TYPE).ent :
@@ -114,7 +114,7 @@ upal$(TYPE).map : upal$(TYPE).o
 ### decmp
 
 decmp$(TYPE).nh : decmp$(TYPE).out
-	$(OBJCOPY) --dump-section .text=$@ $<
+	$(OBJCOPY) -O binary $< $@
 
 decmp$(TYPE).img : upal$(TYPE).nh decmp$(TYPE).nh pvc$(TYPE).pvc
 	$(SYSGEN) -v \

@@ -61,7 +61,7 @@
  *
 */
 #ifndef LINT
-static char *rcsid = "$Id: hfcomp.c,v 1.1.1.1 1998/12/29 21:36:25 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: hfcomp.c,v 1.1.1.1 1998/12/29 21:36:25 paradis Exp $";
 #endif
 
 #include <stdio.h>
@@ -200,7 +200,7 @@ void decompress_stop (FILE *fdout, UCHAR *out_ptr, int dsize)
 **  
 */	 
 
-decompress_start(FILE *fdin)
+int decompress_start(FILE *fdin)
 {
     int	status = SUCCESS;
     int	count = 0;
