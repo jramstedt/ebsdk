@@ -1,0 +1,645 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:24:17 by OpenVMS SDL EV1-33     
+;  Source:   6-MAR-1997 19:27:02 AFW_USER$:[CONSOLE.V58.COMMON.SRC]EV5_DEFS.SDL; 
+; ********************************************************************************************************************************
+ 
+	.MACRO	$EV5DEF,..EQU=<=>,..COL=<:>
+EV5$K_REVISION'..equ'47                 ;  Revision number of this file
+;  In the definitions below, registers are annotated with one of the following
+;  symbols:
+; 
+;       RW - The register may be read and written
+;   	RO - The register may only be read
+;   	WO - The register may only be written
+; 
+;  For RO and WO registers, all bits and fields within the register are also
+;  read-only or write-only.  For RW registers, each bit or field within
+;  the register is annotated with one of the following:
+; 
+;   	RW - The bit/field may be read and written
+;   	RO - The bit/field may be read; writes are ignored
+;   	WO - The bit/field may be written; reads return an UNPREDICTABLE result.
+;   	WZ - The bit/field may be written; reads return a 0
+;   	WC - The bit/field may be read; writes cause state to clear
+;   	RC - The bit/field may be read, which also causes state to clear; writes are ignored
+;  Architecturally-defined (SRM) registers for EVMS
+PT0'..equ'320                           ;  PALtemp0
+PT1'..equ'321                           ;  PALtemp1
+PT2'..equ'322                           ;  PALtemp2
+PT3'..equ'323                           ;  PALtemp3
+PT4'..equ'324                           ;  PALtemp4
+PT5'..equ'325                           ;  PALtemp5
+PT6'..equ'326                           ;  PALtemp6
+PT7'..equ'327                           ;  PALtemp7
+PT8'..equ'328                           ;  PALtemp8
+PT9'..equ'329                           ;  PALtemp9
+PT10'..equ'330                          ;  PALtemp10
+PT11'..equ'331                          ;  PALtemp11
+PT12'..equ'332                          ;  PALtemp12
+PT13'..equ'333                          ;  PALtemp13
+PT14'..equ'334                          ;  PALtemp14
+PT15'..equ'335                          ;  PALtemp15
+PT16'..equ'336                          ;  PALtemp16
+PT17'..equ'337                          ;  PALtemp17
+PT18'..equ'338                          ;  PALtemp18
+PT19'..equ'339                          ;  PALtemp19
+PT20'..equ'340                          ;  PALtemp20
+PT21'..equ'341                          ;  PALtemp21
+PT22'..equ'342                          ;  PALtemp22
+PT23'..equ'343                          ;  PALtemp23
+CBOX_IPR_OFFSET'..equ'16777200          ;  IPR offset for Cbox IPRs - must still be shifted left 16
+SC_CTL'..equ'168                        ;  Scache Control register (RW)
+SC_STAT'..equ'232                       ;  Scache Status register (RO)
+SC_ADDR'..equ'392                       ;  Scache address registor (RO)
+SC_ADDR_NM'..equ'392                    ;  Scache address registor (RO)
+SC_ADDR_FHM'..equ'392                   ;  Scache address registor (RO)
+BC_CTL'..equ'296                        ;  Bcache Control register (WO)
+BC_CONFIG'..equ'456                     ;  Bcache Configuration register (WO)
+EI_STAT'..equ'360                       ;  External Interface Status Register (RO)
+EI_ADDR'..equ'328                       ;  External Interface Address Register (RO)
+FILL_SYN'..equ'104                      ;  Fill_Syndrome register (RO)
+BC_TAG_ADDR'..equ'264                   ;  Bcache Tag Address Register (RO)
+LD_LOCK'..equ'488                       ;  Load Lock address register (RO)
+ASTER'..equ'266                         ;  Aync System Trap Enable (RW)
+ASTRR'..equ'265                         ;  Aync System Trap Request (RW)
+EXC_ADDR'..equ'267                      ;  Exception Address register (RW)
+EXC_SUM'..equ'268                       ;  Exception Summary register (RW)
+EXC_MASK'..equ'269                      ;  Exception Mask register (RW)
+HWINT_CLR'..equ'277                     ;  HW Interrupt Clear register (W)
+IC_FLUSH_CTL'..equ'281                  ;  Flushes entire Icache (WO)
+ICPERR_STAT'..equ'282                   ;  Icache Parity Error status register (RW)
+IC_PERR_STAT'..equ'282                  ;  Icache Parity Error status register (RW)
+IC_ROW_MAP'..equ'283                    ;  Bad Icache Mapping Data (RO)
+ICSR'..equ'280                          ;  Ibox control and status register (RW)
+IFAULT_VA_FORM'..equ'274                ;  Formatted Faulting Virtual Address (R)
+INTID'..equ'273                         ;  Interrupt ID register (R)
+IPL'..equ'272                           ;  Interrupt Priority Level (RW)
+ISR'..equ'256                           ;  Interrupt Summary Register (R)
+ITB_IS'..equ'263                        ;  Istream TB Invalidate Single (W)
+ITB_ASN'..equ'259                       ;  Address Space Number (RW)
+ITB_IA'..equ'261                        ;  Istream TB Invalidate All (W)
+ITB_IAP'..equ'262                       ;  Istream TB Invalidate All Process (W)
+ITB_PTE'..equ'258                       ;  Istream TB PTE (RW)
+ITB_PTE_TEMP'..equ'260                  ;  Istream TB PTE Temp (R)
+ITB_TAG'..equ'257                       ;  Istream TB Tag (W)
+IVPTBR'..equ'275                        ;  Virtual Page Table Base Register (RW)
+PAL_BASE'..equ'270                      ;  PAL base register (RW)
+PMCTR'..equ'284                         ;  Performance counter register (RW)
+PS'..equ'271                            ;  Processor Status Register (RW)
+SIRR'..equ'264                          ;  SW Interrupt Request Register (W)
+SL_TXMIT'..equ'278                      ;  Serial Line Transmit (W)
+SL_RCV'..equ'279                        ;  Serial Line Transmit (W)
+ALT_MODE'..equ'524                      ;  Alternate Mode (W)
+CC'..equ'525                            ;  Cycle Counter (R)
+CC_CTL'..equ'526                        ;  Cycle Counter Control (W)
+DC_FLUSH'..equ'528                      ;  Dcache Flush Register (W)
+DCPERR_STAT'..equ'530                   ;  Dcache Parity Error status register (RW)
+DC_TEST_CTL'..equ'531                   ;  Dcache Test Tag Control Register (RW)
+DC_TEST_TAG'..equ'532                   ;  Dcache Test TAG Register (RW)
+DC_TEST_TAG_TEMP'..equ'533              ;  Dcache Test TAG Register (RW)
+DTB_ASN'..equ'512                       ;  Address Space Number (W)
+DTB_CM'..equ'513                        ;  Dstream TB Current Mode (W)
+DTB_IA'..equ'522                        ;  Dstream TB Invalidate All (W)
+DTB_IAP'..equ'521                       ;  Dstream TB Invalidate All Process (W)
+DTB_IS'..equ'523                        ;  Dstream TB Invalidate Single (W)
+DTB_PTE'..equ'515                       ;  Dstream TB PTE (RW)
+DTB_PTE_TEMP'..equ'516                  ;  Istream TB PTE Temp (R)
+DTB_TAG'..equ'514                       ;  Dstream TB Tag (W)
+MCSR'..equ'527                          ;  Mbox control and status register (RW)
+DC_MODE'..equ'534                       ;  Dcache Mode register (RW)
+MAF_MODE'..equ'535                      ;  MAF Mode register (RW)
+MM_STAT'..equ'517                       ;  Dstream MM Fault Register
+MVPTBR'..equ'520                        ;  Mbox Virtual Page Table Base Register (W)
+VA'..equ'518                            ;  Faulting Virtual Address (R)
+VA_FORM'..equ'519                       ;  Formatted Virtual Address (R)
+EV5_SRM$_PS'..equ'0                     ;  Processor Status (RW)
+EV5_SRM$_PC'..equ'0                     ;  Program Counter
+EV5_SRM$_ASTEN'..equ'0                  ;  AST Enable (RW)
+EV5_SRM$_ASTSR'..equ'0                  ;  AST Summary (RW)
+EV5_SRM$_IPIR'..equ'0                   ;  Interproc. Interrupt (W)
+EV5_SRM$_IPL'..equ'0                    ;  Interrupt Priority Level (RW)
+EV5_SRM$_MCES'..equ'0                   ;  Machine Check Error Summary (RW)
+EV5_SRM$_PCBB'..equ'0                   ;  Privileged Context Block Bsse (R)
+EV5_SRM$_PRBR'..equ'0                   ;  Processor Base Register (RW)
+EV5_SRM$_PTBR'..equ'0                   ;  Page Table Bsse Register (R)
+EV5_SRM$_SCBB'..equ'0                   ;  Sys Control Block Base Register (RW)
+EV5_SRM$_SIRR'..equ'0                   ;  SW Interrupt Request Register (W)
+EV5_SRM$_SISR'..equ'0                   ;  SW Interrupt Summary Register (R)
+EV5_SRM$_TBCHK'..equ'0                  ;  TB Check (R)
+EV5_SRM$_TB1A'..equ'0                   ;  TB Invalidate All (W)
+EV5_SRM$_TB1AP'..equ'0                  ;  TB Invalidate All Process (W)
+EV5_SRM$_TB1AD'..equ'0                  ;  TB Invalidate All Dstream (W)
+EV5_SRM$_TB1AI'..equ'0                  ;  TB Invalidate All Istream (W)
+EV5_SRM$_TBIS'..equ'0                   ;  TB Invalidate Single (W)
+EV5_SRM$_KSP'..equ'0                    ;  Kernel Stack Pointer
+EV5_SRM$_ESP'..equ'0                    ;  Executive Stack Pointer (RW)
+EV5_SRM$_SSP'..equ'0                    ;  Supervisor Stack Pointer (RW)
+EV5_SRM$_USP'..equ'0                    ;  User Stack Pointer (RW)
+EV5_SRM$_VPTB'..equ'0                   ;  Virtual Page Table Base (RW)
+EV5_SRM$_WHAMI'..equ'0                  ;  Who Am I (R)
+EV5_SRM$_CC'..equ'0                     ;  Cycle Counter (RW)
+EV5_SRM$_UNQ'..equ'0                    ;  Unique (RW)
+;  Processor-specific IPRS.
+EV5$_SC_CTL'..equ'168                   ;  Scache Control register (RW)
+EV5$_SC_STAT'..equ'232                  ;  Scache Status register (RO)
+EV5$_SC_ADDR'..equ'392                  ;  Scache address registor (RO)
+EV5$_BC_CTL'..equ'296                   ;  Bcache Control register (WO)
+EV5$_BC_CONFIG'..equ'456                ;  Bcache Configuration register (WO)
+BC_CONFIG$K_SIZE_1MB'..equ'1            ;  Select 1MB Bcache
+BC_CONFIG$K_SIZE_2MB'..equ'2            ;  Select 2MB Bcache
+BC_CONFIG$K_SIZE_4MB'..equ'3            ;  Select 4MB Bcache
+BC_CONFIG$K_SIZE_8MB'..equ'4            ;  Select 8MB Bcache
+BC_CONFIG$K_SIZE_16MB'..equ'5           ;  Select 16MB Bcache
+BC_CONFIG$K_SIZE_32MB'..equ'6           ;  Select 32MB Bcache
+BC_CONFIG$K_SIZE_64MB'..equ'7           ;  Select 64MB Bcache
+EV5$_EI_STAT'..equ'360                  ;  External Interface Status Register (RO)
+EV5$_EI_ADDR'..equ'328                  ;  External Interface Address Register (RO)
+EV5$_FILL_SYN'..equ'104                 ;  Fill_Syndrome register (RO)
+EV5$_BC_TAG_ADDR'..equ'264              ;  Bcache Tag Address Register (RO)
+EV5$_ASTER'..equ'266                    ;  Aync System Trap Enable (RW)
+EV5$_ASTRR'..equ'265                    ;  Aync System Trap Request (RW)
+EV5$_EXC_ADDR'..equ'267                 ;  Exception Address register (RW)
+EXC_ADDR$V_PA'..equ'2
+EXC_ADDR$S_PA'..equ'62
+EV5$_EXC_SUM'..equ'268                  ;  Exception Summary register (RW)
+EV5$_EXC_MASK'..equ'269                 ;  Exception Mask register (RW)
+EV5$_HWINT_CLR'..equ'277                ;  HW Interrupt Clear register (W)
+EV5$_IC_FLUSH_CTL'..equ'281             ;  Flushes entire Icache (WO)
+EV5$_ICPERR_STAT'..equ'282              ;  Icache Parity Error status register (RW)
+EV5$_IC_PERR_STAT'..equ'282             ;  Icache Parity Error status register (RW)
+EV5$_IC_ROW_MAP'..equ'283               ;  Bad Icache Mapping Data (RO)
+EV5$_ICSR'..equ'280                     ;  Ibox control and status register (RW)
+EV5$_IFAULT_VA_FORM'..equ'274           ;  Formatted Faulting Virtual Address (R)
+EV5$_IFAULT_VA_FORM_NT'..equ'274        ;  Formatted Faulting Virtual Address - NT mode(R)
+IFAULT_VA_FORM_NT$V_VPTB'..equ'30
+IFAULT_VA_FORM_NT$S_VPTB'..equ'34
+EV5$_INTID'..equ'273                    ;  Interrupt ID register (R)
+EV5$_IPL'..equ'272                      ;  Interrupt Priority Level (RW)
+EV5$_ITB_IS'..equ'263                   ;  Istream TB Invalidate Single (W)
+EV5$_ITB_ASN'..equ'259                  ;  Address Space Number (RW)
+EV5$_ITB_IA'..equ'261                   ;  Istream TB Invalidate All (W)
+EV5$_ITB_IAP'..equ'262                  ;  Istream TB Invalidate All Process (W)
+EV5$_ITB_PTE'..equ'258                  ;  Istream TB PTE (RW)
+EV5$_ITB_PTE_TEMP'..equ'260             ;  Istream TB PTE Temp (R)
+EV5$_ITB_TAG'..equ'257                  ;  Istream TB Tag (W)
+EV5$_IVPTBR'..equ'275                   ;  Virtual Page Table Base Register (RW)
+IVPTBR$V_VPTB'..equ'30
+IVPTBR$S_VPTB'..equ'34
+EV5$_PAL_BASE'..equ'270                 ;  PAL base register (RW)
+EV5$_PMCTR'..equ'284                    ;  performance counter register
+EV5$_PS'..equ'271                       ;  Processor Status Register (RW)
+EV5$_ISR'..equ'256                      ;  Interrupt Summary Register (R)
+EV5$_SIRR'..equ'264                     ;  SW Interrupt Request Register (RW)
+EV5$_SL_TXMIT'..equ'278                 ;  Serial Line Transmit (W)
+EV5$_SL_RCV'..equ'279                   ;  Serial Line Transmit (W)
+EV5$_ALT_MODE'..equ'524                 ;  Alternate Mode (W)
+EV5$_CC'..equ'525                       ;  Cycle Counter (R)
+EV5$_CC_CTL'..equ'526                   ;  Cycle Counter Control (W)
+EV5$_DC_FLUSH'..equ'528                 ;  Dcache Flush Register (W)
+EV5$_DCPERR_STAT'..equ'530              ;  Dcache Parity Error status register (RW)
+EV5$_DC_TEST_CTL'..equ'531              ;  Dcache Test TAG Control Register (RW)
+EV5$_DC_TEST_TAG'..equ'532              ;  Dcache Test TAG Register (RW)
+EV5$_DC_TEST_TAG_TEMP'..equ'533         ;  Dcache Test TAG Temp Register (RW)
+EV5$_DTB_ASN'..equ'512                  ;  Address Space Number (W)
+EV5$_DTB_CM'..equ'513                   ;  Dstream TB Current Mode (W)
+EV5$_DTB_IA'..equ'522                   ;  Dstream TB Invalidate All (W)
+EV5$_DTB_IAP'..equ'521                  ;  Dstream TB Invalidate All Process (W)
+EV5$_DTB_IS'..equ'523                   ;  Dstream TB Invalidate Single (W)
+EV5$_DTB_PTE'..equ'515                  ;  Dstream TB PTE (RW)
+EV5$_DTB_PTE_TEMP'..equ'516             ;  Dstream TB PTE Temp (R)
+EV5$_DTB_TAG'..equ'514                  ;  Dstream TB Tag (W)
+EV5$_MCSR'..equ'527                     ;  Mbox control and status register (RW)
+EV5$_DC_MODE'..equ'534                  ;  Dcache mode register (RW)
+EV5$_MAF_MODE'..equ'535                 ;  Mbox MAF Mode register (RW)
+EV5$_MM_STAT'..equ'517                  ;  Dstream MM Fault Register
+EV5$_MVPTBR'..equ'520                   ;  Mbox Virtual Page Table Base Register (W)
+EV5$_VA'..equ'518                       ;  Faulting Virtual Address (R)
+EV5$_VA_FORM'..equ'519                  ;  Formatted Virtual Address (R)
+EV5$_VA_FORM_NT'..equ'519               ;  Formatted Virtual Address (R)
+VA_FORM_NT$S_VA'..equ'19
+VA_FORM_NT$V_VPTB'..equ'30
+VA_FORM_NT$S_VPTB'..equ'34
+EV5S_EV5_DEF'..equ'10
+EV5_DEF'..equ'0
+;  Cbox registers.
+SC_CTL$V_SC_FHIT'..equ'0                ;  Force Scache hits (RW,0)
+SC_CTL$V_SC_FLUSH'..equ'1               ;  Invalidates Scache tag store (RW,0)
+SC_CTL$S_SC_TAG_STAT'..equ'6
+SC_CTL$V_SC_TAG_STAT'..equ'2            ;  Value of tag status to write in forced mode (RW,0)
+SC_CTL$S_SC_FB_DP'..equ'4
+SC_CTL$V_SC_FB_DP'..equ'8               ;  Bad Scache Data Parity (RW,0)
+SC_CTL$V_SC_BLK_SIZE'..equ'12           ;  Scache/Bcache Block size 32 or 64 byte (RW)
+SC_CTL$S_SC_SET_EN'..equ'3
+SC_CTL$V_SC_SET_EN'..equ'13             ;  Scache Set Enable (RW)
+SC_CTL$S_SC_SOFT_REPAIR'..equ'3
+SC_CTL$V_SC_SOFT_REPAIR'..equ'16        ;  Soft SCache Tag repair bits
+SC_STAT$S_SC_TPERR'..equ'3
+SC_STAT$V_SC_TPERR'..equ'0              ;  Tag Lookup Error
+SC_STAT$S_SC_DPERR'..equ'8
+SC_STAT$V_SC_DPERR'..equ'3              ;  Data Read Error
+SC_STAT$S_CBOX_CMD'..equ'5
+SC_STAT$V_CBOX_CMD'..equ'11             ;  Cbox Command that resulted in Error
+SC_STAT$V_SC_SCND_ERR'..equ'16          ;  Scache Second Error Occurred
+SC_ADDR_FHM$V_SC_TAG_PARITY'..equ'4     ;  Tag Parity
+SC_ADDR_FHM$S_TAG_STAT_SB0'..equ'3
+SC_ADDR_FHM$V_TAG_STAT_SB0'..equ'5      ;  Tag Status for Sub-block 0
+SC_ADDR_FHM$S_TAG_STAT_SB1'..equ'3
+SC_ADDR_FHM$V_TAG_STAT_SB1'..equ'8      ;  Tag Status for Sub-block 1
+SC_ADDR_FHM$S_OW_MOD0'..equ'2
+SC_ADDR_FHM$V_OW_MOD0'..equ'11          ;  Octaword modified bits for sublock 0
+SC_ADDR_FHM$S_OW_MOD1'..equ'2
+SC_ADDR_FHM$V_OW_MOD1'..equ'13          ;  Octaword modified bits for sublock 1
+SC_ADDR_FHM$S_TAG_LO'..equ'17
+SC_ADDR_FHM$V_TAG_LO'..equ'15           ;  Lo half of Tag
+SC_ADDR_FHM$S_TAG_HI'..equ'7
+SC_ADDR_FHM$V_TAG_HI'..equ'32           ;  Hi half of Tag
+BC_CTL$V_BC_ENABLED'..equ'0             ;  External Bcache enabled (WO,0)
+BC_CTL$V_ALLOC_CYC'..equ'1              ;  Allocate cycle for IPR  (WO,1)
+BC_CTL$V_EI_OPT_CMD'..equ'2             ;  optional command group (WO,0)
+BC_CTL$V_EI_OPT_CMD_MB'..equ'3          ;  optional command group for MB  (WO,0)
+BC_CTL$V_CORR_FILL_DAT'..equ'4          ;  Correct fill data from bcache/memory (WO,1)
+BC_CTL$V_VTM_FIRST'..equ'5              ;  Victim Buffer Present (WO,1)
+BC_CTL$V_EI_ECC_OR_PARITY'..equ'6       ;  External Interface ECC/parity enable (WO)
+BC_CTL$V_BC_FHIT'..equ'7                ;  Bcache Force Hit (WO,0)
+BC_CTL$S_BC_TAG_STAT'..equ'5
+BC_CTL$V_BC_TAG_STAT'..equ'8            ;  Tag Status to be written in BC Force Hit mode (WO)
+BC_CTL$S_BC_BAD_DAT'..equ'2
+BC_CTL$V_BC_BAD_DAT'..equ'13            ;  Force Bad data to be written (WO,0)
+BC_CTL$V_EI_DIS_ERR'..equ'15            ;  Error enable (WO,0)
+BC_CTL$V_TL_PIPE_LATCH'..equ'16         ;  EV5 pipe control pins  (WO,0)
+BC_CTL$S_BC_WAVE_PIPE'..equ'2
+BC_CTL$V_BC_WAVE_PIPE'..equ'17          ;  wave pipelining value (WO,0)
+BC_CTL$S_PM_MUX_SEL'..equ'6
+BC_CTL$V_PM_MUX_SEL'..equ'19            ;  select BIU parameters for perf.mon.  (WO,0)
+BC_CTL$V_DBG_MUX_SEL'..equ'25           ;  Select cbox signals driven to mbox (WO,0)
+BC_CTL$V_DIS_BAF_BYP'..equ'26           ;  disables specualtive bcache reads  (WO,0)
+BC_CTL$V_DIS_SC_VIC_BUF'..equ'27        ;  disables scache victim buffer (WO,0)
+BC_CTL$V_DIS_SYS_ADDR_PAR'..equ'28      ;  Disable system cmd/addr parity checking
+BC_CTL$V_READ_DIRTY_CLN_SHR'..equ'29    ;  Enable EV56 read dirty -> shared clean
+BC_CTL$V_WRITE_READ_BUBBLE'..equ'30     ;  Enable EV56 write_read_bubble
+BC_CTL$V_BC_WAVE_PIPE_2'..equ'31        ;  Bit <2> of BC_WAVE_PIPE
+BC_CTL$V_AUTO_DACK'..equ'32             ;  Enable EV56 auto dack
+BC_CTL$V_DIS_BYTE_WORD'..equ'33         ;  CBox Byte/Word disable
+BC_CTL$V_STCLK_DELAY'..equ'34           ;  Enable STCLK delay
+BC_CTL$V_WRITE_UNDER_MISS'..equ'35      ;  Enable EV56 victim writes under misses
+BC_CONFIG$S_BC_SIZE'..equ'3
+BC_CONFIG$V_BC_SIZE'..equ'0             ;  Bcache size (WO)
+BC_CONFIG$S_BC_RD_SPD'..equ'4
+BC_CONFIG$V_BC_RD_SPD'..equ'4           ;  Bcache Read access speed (WO)
+BC_CONFIG$S_BC_WR_SPD'..equ'4
+BC_CONFIG$V_BC_WR_SPD'..equ'8           ;  Bcache Write access speed (WO)
+BC_CONFIG$S_BC_RD_WR_SPC'..equ'3
+BC_CONFIG$V_BC_RD_WR_SPC'..equ'12       ;  Read/Write switch speed (WO)
+BC_CONFIG$S_FILL_WE_OFFSET'..equ'3
+BC_CONFIG$V_FILL_WE_OFFSET'..equ'16     ;  Bcache Write Enable Pulse Offset (WO)
+BC_CONFIG$S_BC_WE_CTL'..equ'9
+BC_CONFIG$V_BC_WE_CTL'..equ'20          ;  Bcache Write enable control (WO)
+;  Cbox registers, continued
+EI_STAT$S_SYS_ID'..equ'4
+EI_STAT$V_SYS_ID'..equ'24               ;  Hardwired chip revision number (pass2 = 2)
+EI_STAT$V_BC_TPERR'..equ'28             ;  Tag Address Parity Error (RO)
+EI_STAT$V_BC_TC_PERR'..equ'29           ;  Tag Control Parity Error Mode (WO)
+EI_STAT$V_EI_ES'..equ'30                ;  External interface error source (RO)
+EI_STAT$V_COR_ECC_ERR'..equ'31          ;  Correctable ECC Error (RO)
+EI_STAT$V_UNC_ECC_ERR'..equ'32          ;  Uncorrectable ECC Error (RO)
+EI_STAT$V_EI_PAR_ERR'..equ'33           ;  Fill Parity Error (RO)
+EI_STAT$V_FIL_IRD'..equ'34              ;  Fill Error in Icache or Dcache (RO)
+EI_STAT$V_SEO_HRD_ERR'..equ'35          ;  Second External Interface Hard Error (RO)
+; 
+BC_TAG_ADDR$V_HIT'..equ'12              ;  Tag Address Parity Error (RO)
+BC_TAG_ADDR$V_TAGCTL_P'..equ'13         ;  Tag Control 		(RO)
+BC_TAG_ADDR$V_TAGCTL_D'..equ'14         ;  Tag Control 		(RO)
+BC_TAG_ADDR$V_TAGCTL_S'..equ'15         ;  Tag Control  	(RO)
+BC_TAG_ADDR$V_TAGCTL_V'..equ'16         ;  Tag Control  	(RO)
+BC_TAG_ADDR$V_TAG_P'..equ'17            ; 
+BC_TAG_ADDR$S_BC_TAG'..equ'19
+BC_TAG_ADDR$V_BC_TAG'..equ'20           ; 
+;  Ibox and Icache registers.
+ASTER$V_KAR'..equ'0                     ; 
+ASTER$V_EAR'..equ'1                     ; 
+ASTER$V_SAR'..equ'2                     ; 
+ASTER$V_UAR'..equ'3                     ; 
+ASTRR$V_KAR'..equ'0                     ; 
+ASTRR$V_EAR'..equ'1                     ; 
+ASTRR$V_SAR'..equ'2                     ; 
+ASTRR$V_UAR'..equ'3                     ; 
+EXC_ADDR$V_PAL'..equ'0                  ;  PAL mode indicator (RW)
+EXC_SUM$V_SWC'..equ'10                  ;  Software Completion Possible (WA)
+EXC_SUM$V_INV'..equ'11                  ;  Invalid Operation (WA)
+EXC_SUM$V_DZE'..equ'12                  ;  Divide by Zero (WA)
+EXC_SUM$V_FOV'..equ'13                  ;  FP Overflow (WA)
+EXC_SUM$V_UNF'..equ'14                  ;  FP Underflow (WA)
+EXC_SUM$V_INE'..equ'15                  ;  FP Inexact Error (WA)
+EXC_SUM$V_IOV'..equ'16                  ;  Integer Overflow (WA)
+HWINT_CLR$V_PC0C'..equ'27               ;  Clears Perf counter 0 interrupt (WO,0)
+HWINT_CLR$V_PC1C'..equ'28               ;  Clears Perf counter 1 interrupt (WO,0)
+HWINT_CLR$V_PC2C'..equ'29               ;  Clears Perf counter 2 interrupt (WO,0)
+HWINT_CLR$V_CRDC'..equ'32               ;  Clears correctable read interrupt
+HWINT_CLR$V_SLC'..equ'33                ;  Clears Serial Line Interrupts (WO,0)
+;  Ibox and Icache registers, continued
+ICPERR_STAT$V_DPE'..equ'11              ;  Data Parity Error (RW)
+ICPERR_STAT$V_TPE'..equ'12              ;  Tag Parity Error (RW)
+ICPERR_STAT$V_TMR'..equ'13              ;  timeout reset error 
+IC_PERR_STAT$V_DPE'..equ'11             ;  Data Parity Error (RW)
+IC_PERR_STAT$V_TPE'..equ'12             ;  Tag Parity Error (RW)
+IC_PERR_STAT$V_TMR'..equ'13             ;  timeout reset error 
+ICSR$V_PMA'..equ'8                      ;  Peformance Monitor All process enable
+ICSR$V_PMP'..equ'9                      ;  Performance Monitor Process enable
+ICSR$V_BYT'..equ'17                     ;  Byte Word ECO enable
+ICSR$V_FMP'..equ'18                     ;  Forced PC_Mispredict enable
+ICSR$V_MVE'..equ'19                     ;  Motion Video instruction set enable
+ICSR$V_IM0'..equ'20                     ;  IRQ 20 Mask
+ICSR$V_IM1'..equ'21                     ;  IRQ 21 Mask
+ICSR$V_IM2'..equ'22                     ;  IRQ 22 Mask
+ICSR$V_IM3'..equ'23                     ;  IRQ 23 Mask
+ICSR$V_TMM'..equ'24                     ;  Select timeout counter mode (short/long) (RW)
+ICSR$V_TMD'..equ'25                     ;  Disable timeout counter (RW)
+ICSR$V_FPE'..equ'26                     ;  Enable floating point instructions (RW)
+ICSR$V_HWE'..equ'27                     ;  Enable PALRES in kernel mode (RW,0)
+ICSR$S_SPE'..equ'2
+ICSR$V_SPE'..equ'28                     ;  Enable Istream super page mapping (RW,0)
+ICSR$V_SDE'..equ'30                     ;  Enable PAL shadow registers (RW,0)
+ICSR$V_CRDE'..equ'32                    ;  Correctable Read Error Enable 
+ICSR$V_SLE'..equ'33                     ;  Enable serial line interrupts (RW,0)
+ICSR$V_FMS'..equ'34                     ;  Force Icache miss (RW,0)
+ICSR$V_FBT'..equ'35                     ;  Force Bad Icache tag parity (RW,0)
+ICSR$V_FBD'..equ'36                     ;  Force Bad Icache data parity  (RW,0)
+ICSR$V_DBS'..equ'37                     ;  Debug Port Select 
+ICSR$V_ISTA'..equ'38
+ICSR$V_TST'..equ'39
+;  removed 17-jun-1992  register removed from design cjs
+;  constant IFAULT_VA equals %x108 tag $;			/* Faulting Virtual Address (R)
+;      EV5IFAULT_VA_BITS structure fill prefix IFAULT_VA$;
+;  	FILL_0 bitfield length 13 fill tag $$;
+;  	VA bitfield length 30 ;				/*
+;  	FILL_1 bitfield length 31 fill tag $$;
+;      end EV5IFAULT_VA_BITS;
+IFAULT_VA_FORM$S_VA'..equ'30
+IFAULT_VA_FORM$V_VA'..equ'3             ; 
+IFAULT_VA_FORM$S_VPTB'..equ'31
+IFAULT_VA_FORM$V_VPTB'..equ'33          ; 
+IFAULT_VA_FORM_NT$S_VA'..equ'19
+IFAULT_VA_FORM_NT$V_VA'..equ'3          ; 
+INTID$S_INTID'..equ'5
+INTID$V_INTID'..equ'0                   ;  Interrupt ID (R)
+;  Ibox and Icache registers, continued
+IPL$S_IPL'..equ'5
+IPL$V_IPL'..equ'0                       ;  Interrupt Priority Level
+ITB_IS$S_VA'..equ'30
+ITB_IS$V_VA'..equ'13                    ; 
+ITB_ASN$S_ASN'..equ'7
+ITB_ASN$V_ASN'..equ'4                   ;  Address Space Number
+ITB_PTE$V_ASM'..equ'4                   ; 
+ITB_PTE$S_GH'..equ'2
+ITB_PTE$V_GH'..equ'5                    ; 
+ITB_PTE$V_KRE'..equ'8                   ; 
+ITB_PTE$V_ERE'..equ'9                   ; 
+ITB_PTE$V_SRE'..equ'10                  ; 
+ITB_PTE$V_URE'..equ'11                  ; 
+ITB_PTE$S_PFN'..equ'27
+ITB_PTE$V_PFN'..equ'32                  ; 
+ITB_PTE_TEMP$V_ASM'..equ'13             ; 
+ITB_PTE_TEMP$V_KRE'..equ'18             ; 
+ITB_PTE_TEMP$V_ERE'..equ'19             ; 
+ITB_PTE_TEMP$V_SRE'..equ'20             ; 
+ITB_PTE_TEMP$V_URE'..equ'21             ; 
+ITB_PTE_TEMP$S_GH'..equ'3
+ITB_PTE_TEMP$V_GH'..equ'29              ; 
+ITB_PTE_TEMP$S_PFN'..equ'27
+ITB_PTE_TEMP$V_PFN'..equ'32             ; 
+;  Ibox and Icache registers, continued
+ITB_TAG$S_VA'..equ'30
+ITB_TAG$V_VA'..equ'13                   ;  Virtual Address
+PAL_BASE$S_PAL_BASE'..equ'26
+PAL_BASE$V_PAL_BASE'..equ'14            ;  Base Address of PALcode
+PMCTR$S_SEL2'..equ'4
+PMCTR$V_SEL2'..equ'0
+PMCTR$S_SEL1'..equ'4
+PMCTR$V_SEL1'..equ'4
+PMCTR$V_KILLK'..equ'8
+PMCTR$V_KILLP'..equ'9
+PMCTR$S_CTL2'..equ'2
+PMCTR$V_CTL2'..equ'10
+PMCTR$S_CTL1'..equ'2
+PMCTR$V_CTL1'..equ'12
+PMCTR$S_CTL0'..equ'2
+PMCTR$V_CTL0'..equ'14
+PMCTR$S_CTR2'..equ'14
+PMCTR$V_CTR2'..equ'16
+PMCTR$V_KILLU'..equ'30
+PMCTR$V_SEL0'..equ'31
+PMCTR$S_CTR1'..equ'16
+PMCTR$V_CTR1'..equ'32
+PMCTR$S_CTR0'..equ'16
+PMCTR$V_CTR0'..equ'48
+PS$V_CM0'..equ'3                        ; 
+PS$V_CM1'..equ'4                        ; 
+ISR$S_ASTRR'..equ'4
+ISR$V_ASTRR'..equ'0                     ;  AST request
+ISR$S_SISR'..equ'15
+ISR$V_SISR'..equ'4                      ;  Software Interrupt Summary requests
+ISR$V_ATR'..equ'19                      ;  AST request
+ISR$V_I20'..equ'20                      ;  External HW Interrupt at IPL20
+ISR$V_I21'..equ'21                      ;  External HW Interrupt at IPL21
+ISR$V_I22'..equ'22                      ;  External HW Interrupt at IPL22
+ISR$V_I23'..equ'23                      ;  External HW Interrupt at IPL23
+ISR$V_PC0'..equ'27                      ;  External HW Interrupt - Performance Counter 0
+ISR$V_PC1'..equ'28                      ;  External HW Interrupt - Performance Counter 1
+ISR$V_PC2'..equ'29                      ;  External HW Interrupt - Performance Counter 2
+ISR$V_PFL'..equ'30                      ;  External HW Interrupt - Power Fail
+ISR$V_MCK'..equ'31                      ;  External HW Interrupt - System Machine Check
+ISR$V_CRD'..equ'32                      ;   
+ISR$V_SLI'..equ'33                      ;  Serial Line interrupt 
+ISR$V_HLT'..equ'34                      ;  External HW Interrupt - Halt
+;  removed from spec - 5/1/93
+; constant SICR equals %x108 tag $;			/* SW Interrupt clear Register (W)
+;     EV5SICR_BITS structure fill prefix SICR$;
+; 	FILL_0 bitfield length 4 fill tag $$;
+; 	SICR bitfield length 15 ;				/* Software Interrupt request clears
+; 	FILL_1 bitfield length 13 fill tag $$;
+; 	FILL_2 bitfield length 32 fill tag $$;
+;     end EV5SICR_BITS;
+SIRR$S_SIRR'..equ'15
+SIRR$V_SIRR'..equ'4                     ;  Software Interrupt requests
+;  Ibox and Icache registers, continued
+SL_TXMIT$V_TMT'..equ'7                  ; 
+SL_RCV$V_RCV'..equ'6                    ; 
+;  Mbox and Dcache registers.
+ALT_MODE$V_AM0'..equ'3                  ; 
+ALT_MODE$V_AM1'..equ'4                  ; 
+CC_CTL$V_CC_ENA'..equ'32
+DCPERR_STAT$V_SEO'..equ'0               ;  Second Error after Register Locked  (W1C)
+DCPERR_STAT$V_LOCK'..equ'1              ;  Set when register is locked against updates (W1C)
+DCPERR_STAT$V_DP0'..equ'2               ;  Data Parity Error in Dcache Bank 0 (W1C)
+DCPERR_STAT$V_DP1'..equ'3               ;  Data Parity Error in Dcache Bank 1 (W1C)
+DCPERR_STAT$V_TP0'..equ'4               ;  Tag Parity Error in Dcache Bank 0 (W1C)
+DCPERR_STAT$V_TP1'..equ'5               ;  Tag Parity Error in Dcache Bank 1 (W1C)
+;  The following two registers are used exclusively for test and diagnostics.
+;  They should not be referenced in normal operation.
+DC_TEST_CTL$V_BANK0'..equ'0             ;  Enable Dcache Bank0 (RW)
+DC_TEST_CTL$V_BANK1'..equ'1             ;  Enable Dcache Bank1 (RW)
+DC_TEST_CTL$V_FILL_0'..equ'2            ;  Ignored bits
+DC_TEST_CTL$S_INDEX'..equ'10
+DC_TEST_CTL$V_INDEX'..equ'3             ;  Dcache Tag Index (RW)
+DC_TEST_CTL$V_DATA'..equ'13             ;  Data for Dcache soft repair (RW - PCA56 only)
+DC_TEST_CTL$V_SHIFT'..equ'14            ;  Shift signal for Dcache soft repair (RW/RAZ - PCA56 only)
+DC_TEST_CTL$V_LOAD'..equ'15             ;  Load signal for Dcache soft repair (RW,0 - PCA56 only)
+DC_TEST_CTL$S_FILL_1'..equ'16
+DC_TEST_CTL$V_FILL_1'..equ'16
+DC_TEST_CTL$S_FILL_2'..equ'32
+DC_TEST_CTL$V_FILL_2'..equ'32
+;  Mbox and Dcache registers, continued.
+DC_TEST_TAG$V_TAG_PAR'..equ'2           ;  Tag Parity
+DC_TEST_TAG$V_OW0'..equ'11              ;  Octaword valid bit 0
+DC_TEST_TAG$V_OW1'..equ'12              ;  Octaword valid bit 1
+DC_TEST_TAG$S_TAG'..equ'26
+DC_TEST_TAG$V_TAG'..equ'13              ;  Tag<38:13>
+DC_TEST_TAG_TEMP$V_TAG_PAR'..equ'2      ;  Tag Parity
+DC_TEST_TAG_TEMP$V_D0P0'..equ'3         ;  Data 0 parity bit 0
+DC_TEST_TAG_TEMP$V_D0P1'..equ'4         ;  Data 0 parity bit 1
+DC_TEST_TAG_TEMP$V_D1P0'..equ'5         ;  Data 1 parity bit 0
+DC_TEST_TAG_TEMP$V_D1P1'..equ'6         ;  Data 1 parity bit 1
+DC_TEST_TAG_TEMP$V_OW0'..equ'11         ;  Octaword valid bit 0
+DC_TEST_TAG_TEMP$V_OW1'..equ'12         ;  Octaword valid bit 1
+DC_TEST_TAG_TEMP$S_TAG'..equ'26
+DC_TEST_TAG_TEMP$V_TAG'..equ'13         ;  Tag<38:13>
+DTB_ASN$S_ASN'..equ'7
+DTB_ASN$V_ASN'..equ'57                  ;  Address Space Number
+DTB_CM$V_CM0'..equ'3                    ; 
+DTB_CM$V_CM1'..equ'4                    ; 
+DTBIS$S_VA0'..equ'30
+DTBIS$V_VA0'..equ'13                    ; 
+DTB_PTE$V_FOR'..equ'1                   ; 
+DTB_PTE$V_FOW'..equ'2                   ; 
+DTB_PTE$V_ASM'..equ'4                   ; 
+DTB_PTE$S_GH'..equ'2
+DTB_PTE$V_GH'..equ'5                    ; 
+DTB_PTE$V_KRE'..equ'8                   ; 
+DTB_PTE$V_ERE'..equ'9                   ; 
+DTB_PTE$V_SRE'..equ'10                  ; 
+DTB_PTE$V_URE'..equ'11                  ; 
+DTB_PTE$V_KWE'..equ'12                  ; 
+DTB_PTE$V_EWE'..equ'13                  ; 
+DTB_PTE$V_SWE'..equ'14                  ; 
+DTB_PTE$V_UWE'..equ'15                  ; 
+DTB_PTE$S_PFN'..equ'27
+DTB_PTE$V_PFN'..equ'32                  ; 
+;  Mbox and Dcache registers, continued.
+DTB_PTE_TEMP$V_FOR'..equ'0              ; 
+DTB_PTE_TEMP$V_FOW'..equ'1              ; 
+DTB_PTE_TEMP$V_KRE'..equ'2              ; 
+DTB_PTE_TEMP$V_ERE'..equ'3              ; 
+DTB_PTE_TEMP$V_SRE'..equ'4              ; 
+DTB_PTE_TEMP$V_URE'..equ'5              ; 
+DTB_PTE_TEMP$V_KWE'..equ'6              ; 
+DTB_PTE_TEMP$V_EWE'..equ'7              ; 
+DTB_PTE_TEMP$V_SWE'..equ'8              ; 
+DTB_PTE_TEMP$V_UWE'..equ'9              ; 
+DTB_PTE_TEMP$V_ASM'..equ'10             ; 
+DTB_PTE_TEMP$S_FILL_0'..equ'2
+DTB_PTE_TEMP$V_FILL_0'..equ'11          ; 
+DTB_PTE_TEMP$S_PFN'..equ'27
+DTB_PTE_TEMP$V_PFN'..equ'13             ; 
+DTB_TAG$S_VA'..equ'30
+DTB_TAG$V_VA'..equ'13                   ; 
+;  Most MCSR bits are used for testability and diagnostics only.
+;  For normal operation, they will be supported in the following configuration:
+;  SPLIT_DCACHE = 1, MAF_NOMERGE = 0, WB_FLUSH_ALWAYS = 0, WB_NOMERGE = 0,
+;  DC_ENA<1:0> = 1, DC_FHIT = 0, DC_BAD_PARITY = 0
+MCSR$V_BIG_ENDIAN'..equ'0               ;  Enable Big Endian Mode (RW,0)
+MCSR$V_SP0'..equ'1                      ;  Super Page Mode 1 Enable
+MCSR$V_SP1'..equ'2                      ;  Super Page Mode 2 Enable
+MCSR$V_MBOX_SEL'..equ'3                 ;  MBOX Test select (RW,0)
+MCSR$V_E_BIG_ENDIAN'..equ'4             ;  Ebox Enable Big Endian Mode (RW,0)
+MCSR$V_DBG_PACKET_SEL'..equ'5           ;  Parallel port select (RW,0)
+DC_MODE$V_DC_ENA'..equ'0                ;  Dcache Enable (RW,0)
+DC_MODE$V_DC_FHIT'..equ'1               ;  Dcache Force Hit (RW,0)
+DC_MODE$V_DC_BAD_PARITY'..equ'2         ;  Invert Dcache Parity (RW,0)
+DC_MODE$V_DC_PERR_DIS'..equ'3           ;  Disable Dcache parity error report (RW,0)
+DC_MODE$V_DC_DOA'..equ'4                ;  Hardware Dcache Disable (RO,0)
+MAF_MODE$V_MAF_NOMERGE'..equ'0          ;  MAF merge Disable (RW,0)
+MAF_MODE$V_WB_FLUSH_ALWAYS'..equ'1      ;  Flush Write Buffer (RW,0)
+MAF_MODE$V_WB_NOMERGE'..equ'2           ;  Disables Write Buffer Merging (RW,0)
+MAF_MODE$V_IO_NOMERGE'..equ'3           ;  Disable MAF merging of non-cached space loads (replaces maf_no_bypass)
+MAF_MODE$V_WB_CNT_DISABLE'..equ'4       ;  Disables 64-cycle WB counter in the MAF Arb (RW,0)
+MAF_MODE$V_MAF_ARB_DISABLE'..equ'5      ;  Disables all Dread and WB Req. in the MAF Arb (RW,0)
+MAF_MODE$V_DREAD_PENDING'..equ'6        ;  MAF Dread status (R,0)
+MAF_MODE$V_WB_PENDING'..equ'7           ;  MAF WB status (R,0)
+MAF_MODE$S_WB_SET_LO_THRESHOLD'..equ'2
+MAF_MODE$V_WB_SET_LO_THRESHOLD'..equ'8  ;  WB begin low priority arb threshold (RW,0 - PCA56 only)
+MAF_MODE$S_WB_CLR_LO_THRESHOLD'..equ'2
+MAF_MODE$V_WB_CLR_LO_THRESHOLD'..equ'10 ;  WB stop low priority arb threshold (RW,0 - PCA56 only)
+;  Mbox and Dcache registers, continued.
+MM_STAT$V_WR'..equ'0                    ;  Error caused by WRITE
+MM_STAT$V_ACV'..equ'1                   ;  Access Violation
+MM_STAT$V_FOR'..equ'2                   ;  PTE's FOR bit set
+MM_STAT$V_FOW'..equ'3                   ;  PTE's FOW bit set
+MM_STAT$V_DTB_MISS'..equ'4              ;  DTB miss
+MM_STAT$V_BAD_VA'..equ'5                ;  Bad VA trap
+MM_STAT$S_RA'..equ'5
+MM_STAT$V_RA'..equ'6                    ;  RA field of faulting address
+MM_STAT$S_OPCODE'..equ'6
+MM_STAT$V_OPCODE'..equ'11               ;  Opcode field of faulting instruction
+MVPTBR$S_VPTB'..equ'31
+MVPTBR$V_VPTB'..equ'33                  ;  Virtual Page Table Base
+VA_FORM$S_VA'..equ'30
+VA_FORM$V_VA'..equ'3                    ;  Virtual Address
+VA_FORM$S_VPTB'..equ'31
+VA_FORM$V_VPTB'..equ'33                 ;  Virtual Page Table Base
+VA_FORM_NT$S_VA'..equ'19
+VA_FORM_NT$V_VA'..equ'3                 ;  Virtual Address
+CBOX_CFG'..equ'8                        ;  Bcache Configuration Register (RW)
+CBOX_ADDR'..equ'136                     ;  Bcache/External Interface Address Register (RO)
+CBOX_STAT'..equ'264                     ;  Bcache/External Interface Status Register (RO)
+CBOX_CFG2'..equ'392                     ;  Bcache Configuration Register 2 (RW)
+PCA56$_CBOX_CFG'..equ'8                 ;  Bcache Configuration Register (RW)
+CBOX_CFG$K_SIZE_512KB'..equ'0           ;  Select 512 KB Bcache
+CBOX_CFG$K_SIZE_1MB'..equ'1             ;  Select 1 MB Bcache
+CBOX_CFG$K_SIZE_2MB'..equ'2             ;  Select 2 MB Bcache
+CBOX_CFG$K_SIZE_4MB'..equ'3             ;  Select 4 MB Bcache
+PCA56$_CBOX_ADDR'..equ'136              ;  Bcache/External Interface Address Register (RO)
+PCA56$_CBOX_STAT'..equ'264              ;  Bcache/External Interface Status Register (RO)
+PCA56$_CBOX_CFG2'..equ'392              ;  Bcache Configuration Register 2 (RW)
+PCA56S_PCA56_DEF'..equ'8
+PCA56_DEF'..equ'0
+;  PCA56 External Interface (CBU) Registers
+CBOX_CFG$S_BC_CLK_RATIO'..equ'4
+CBOX_CFG$V_BC_CLK_RATIO'..equ'4         ;  Bcache clock period in CPU cycles (RW,3)
+CBOX_CFG$S_BC_LATENCY_OFF'..equ'4
+CBOX_CFG$V_BC_LATENCY_OFF'..equ'8       ;  Bcache latency offset in CPU cycles (RW,0)
+CBOX_CFG$S_BC_SIZE'..equ'2
+CBOX_CFG$V_BC_SIZE'..equ'12             ;  Bcache size (RW,0)
+CBOX_CFG$S_BC_CLK_DELAY'..equ'2
+CBOX_CFG$V_BC_CLK_DELAY'..equ'14        ;  Bcache clock delay in CPU cycles (RW,1)
+CBOX_CFG$S_BC_RW_OFF'..equ'3
+CBOX_CFG$V_BC_RW_OFF'..equ'16           ;  Bcache read-to-write offset in CPU cycles (RW,0)
+CBOX_CFG$V_BC_PROBE_DURING_FILL'..equ'19 ;  Enables Bcache tag probes under fills (RW,0)
+CBOX_CFG$S_BC_FILL_DLY_OFF'..equ'3
+CBOX_CFG$V_BC_FILL_DLY_OFF'..equ'20     ;  Bcache fill delay offset in CPU cycles (RW,1)
+CBOX_CFG$V_IO_PARITY_ENABLE'..equ'23    ;  Enable parity checking on I/O reads (RW,0)
+CBOX_CFG$V_MEM_PARITY_ENABLE'..equ'24   ;  Enable parity checking on memory reads (RW,0)
+CBOX_CFG$V_BC_FORCE_HIT'..equ'25        ;  Force read/write hits in Bcache (RW,0)
+CBOX_CFG$V_BC_FORCE_ERR'..equ'26        ;  Force Bcache errors (RW,0)
+CBOX_CFG$V_BC_BIG_DRV'..equ'27          ;  Enable 50% more drive on selected pins (RW,0)
+CBOX_CFG$S_BC_TAG_DATA'..equ'3
+CBOX_CFG$V_BC_TAG_DATA'..equ'28         ;  Tag data to be written when BC_FORCE_HIT = 1 (RW,0)
+CBOX_CFG$V_BC_ENABLE'..equ'31           ;  External Bcache enabled (RW,0)
+CBOX_STAT$S_SYS_CLK_RATIO'..equ'4
+CBOX_STAT$V_SYS_CLK_RATIO'..equ'4       ;  System clock period in CPU Cycles (RO,0)
+CBOX_STAT$S_CHIP_REV'..equ'4
+CBOX_STAT$V_CHIP_REV'..equ'8            ;  Current revision of chip (RO,0)
+CBOX_STAT$S_DATA_PAR_ERR'..equ'4
+CBOX_STAT$V_DATA_PAR_ERR'..equ'12       ;  Data read parity error (RO,0)
+CBOX_STAT$V_TAG_PAR_ERR'..equ'16        ;  Bcache tag store parity error (RO,0)
+CBOX_STAT$V_TAG_DIRTY'..equ'17          ;  Bcache data modified and not written to memory (RO,0)
+CBOX_STAT$V_MEMORY'..equ'18             ;  Error on fill data from memory (RO,0)
+CBOX_STAT$V_MULTI_ERR'..equ'19          ;  Multiple errors detected (RO,0)
+CBOX_CFG2$V_BC_REG_REG'..equ'4          ;  Bcache is built from REG/REG SSRAM (RW,1)
+CBOX_CFG2$V_DBG_SEL'..equ'5             ;  Selects CBOX debug information (RW,0)
+CBOX_CFG2$V_BC_THREE_MISS'..equ'6       ;  Allow 3 read misses to be launched (RW,0)
+CBOX_CFG2$V_PUF_DELAY'..equ'7           ;  Used to determine tag_ram_output deassert (RW,0)
+CBOX_CFG2$S_PM0_MUX'..equ'3
+CBOX_CFG2$V_PM0_MUX'..equ'8             ;  Select parameter for performance counter 0 (RW,0)
+CBOX_CFG2$S_PM1_MUX'..equ'3
+CBOX_CFG2$V_PM1_MUX'..equ'11            ;  Select parameters for performance counter 1 (RW,0)
+	.ENDM

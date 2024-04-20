@@ -1,0 +1,673 @@
+; file: ev6_huf_decom - huffman decompression start up file for EV6
+;
+; Copyright (C) 1994 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;
+;-
+
+;+
+;
+; Abstract:
+;	This is the source file that determines which mode the code is
+;	executing in.  The program is entered either as the result of a
+;	bootstrap, in which case it is running virtual, or from having been
+;	loaded from the serial rom.
+;
+;	When running virtual, we drop back into pal mode by means of an
+;	undocumented cserve function.
+;
+;	If necessary we relocate so that as we decompress we don't step
+;	on ourselves.
+;
+;	After relocating, we then do the actual decompression.  The compressed
+;	image contains a header describing where the decompressed image
+;	wants to live.  This code relocates it's self up to 400000 which gives
+;	some amount of stack and plenty of room for expansion.  Actually it
+;	relocates itself up or down to where start is pointing.  Care must be
+;	taken not to over write ones self.  The code assumes a stack size of
+;	64k, a base heap of 32k, and a work area of 32k.
+;
+
+	$pal_def
+	$cserve_def
+	pal_func_defs
+
+.macro	cserve	p1, p2, p3, p4, p5, p6
+.if nb p1
+	load_reg	<'p1'>, r16
+.endc
+.if nb p2
+	load_reg	<'p2'>, r17
+.endc
+.if nb p3
+	load_reg	<'p3'>, r18
+.endc
+.if nb p4
+	load_reg	<'p4'>, r19
+.endc
+.if nb p5
+	load_reg	<'p5'>, r20
+.endc
+.if nb p6
+	load_reg	<'p6'>, r21
+.endc
+	PVC_VIOLATE <1002>
+	.long	pal_func__cserve
+.endm
+
+;+
+; The begining of the image starts at the first 512 byte boundary after the
+; decompression code.  At the begining of the image is a configuration block
+; indicating how big the compressed and decompressed images are.
+;-
+
+config_stamp	= <0*4>	; id stamp 
+config_dsize	= <1*4>	; size in bytes of decompressed image
+config_csize	= <2*4>	; size in bytes of compressed image, stack and dictionary
+config_stack	= <3*4>	; offset of top of stack and dictionary base
+config_target	= <4*4>	; where to put the code          
+
+config_size	= <5*4>
+
+	.psect	zzzz$last, 9, noexe
+config_image::
+
+	.psect $$first, 9,  mix
+
+; 
+; ev6 register definitions used here.  So taht I don't have to go outside the code.
+
+EV6__EXC_ADDR = <^x6@8> ! <0>		    ; no score boarding
+EV6__VA	= <^xc2@8> !<^xf0>		    ; 4,5,6,7
+EV6__DTB_TAG0 = <^x20@8> ! <^x44>	    ; 2, 6
+EV6__DTB_TAG1 = <^xa0@8> ! <^x22>	    ; 1, 5
+EV6__DTB_PTE0 = <^x21@8> ! <^x11>	    ; 0, 4
+EV6__DTB_PTE1 = <^xa1@8> ! <^x88>	    ; 3, 7
+EV6__MM_STAT = <^X27@8> ! <0>		    ; NO SCORE BOARDING.
+EV6__PAL_BASE = <^X10@8> ! <^X10>	    ; 4
+EV6__IC_FLUSH = <^X13@8> ! <^X10>	    ; 4
+EV6__ITB_IA = <^X3@8> ! <^X10>		    ; 4
+EV6__DTB_IA = <^XA3@8> ! <^X80>		    ; 7
+EV6__DTB_ASN0 = <^x25@8> ! <^x10>	    ; 4
+EV6__DTB_ASN1 = <^xa5@8> ! <^x80>	    ; 7
+EV6__PS = <^x09@8> ! <^x10>		    ; 4
+EV6__I_CTL = <^x11@8> ! <^x10>		    ; 4
+EV6__IER_CM = <^xb@8> ! <^x10>		    ; 4
+
+EV6__ITB_TAG = <^x0@8> ! <^x40>	    ; 6
+EV6__ITB_PTE = <^x1@8> ! <^x11>	    ; 0, 4
+EV6__IVA_FORM = <^x7@8> ! <0>	    ; no scoreboarding
+EV6__DTB_PTE0__PFN__S = ^x20
+EV6__ITB_PTE__PFN__S = ^xd
+
+.macro	hw_ret	src				; hw_ret, normal
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^xFFF>
+	assume  disp ge -<^x1000>
+
+	exp = <^X1f@21> ! <base@16> ! <disp&^x1fff>
+    	respal1e exp
+.endm
+
+.macro	hw_ret_stall	src				; hw_ret, normal
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^xFFF>
+	assume  disp ge -<^x1000>
+
+	exp = <^X1f@21> ! <base@16> ! <disp&^x1fff> ! <^x2000>
+    	respal1e exp
+.endm
+
+.macro hw_mfpr gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+    	exp = <^x1f@16> ! <%EXTRACT(1,reg_length,gpr)@21> ! <ipr_num>
+    	respal19 exp
+.endm
+
+.macro hw_mtpr gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+    	exp = <^x1f@21> ! <%EXTRACT(1,reg_length,gpr)@16> ! <ipr_num>
+    	respal1d exp
+.endm
+
+.macro ldqp dest, src				; hw_ld, quad, physical
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x7FF>
+	assume  disp ge -<^x800>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@12> ! <disp&^x7ff>
+	respal1b exp
+.endm
+
+.macro stqp data, addr				; hw_st, quad, physical
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %EXTRACT(1,data_reg_length,data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base   = %EXTRACT(sp_pos2,reg_length, addr)
+
+	disp = %EXTRACT(0, sp_pos, addr)
+	assume  disp le <^x7FF>
+	assume  disp ge -<^x800>
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@12> ! <disp&^x7ff>
+	respal1f exp
+.endm
+
+start:
+	;+
+	; If we've been booted, and therefore running virtual,
+	; we drop back into PAL mode.  Otherwise, we've been
+	; loaded from the serial ROM, and we assume that we're
+	; already in pal mode.
+	;
+	; If we're at any of the following addresses, we assume we're
+	; virtual.  All other addreses we assume we're physical:
+	;
+	;	00000000	virtual, loaded by APB
+	;	20000000	virtual, standard SRM boot
+	;	20000240	virtual, standard SRM boot; plus apu header
+	;	00008000	physical, loaded by Cobra serial rom
+	;	00010000	physical, loaded by hack jensen serial rom
+	;	all else	assume physical
+	;-
+	bis	r1, r31, r4
+	bis	r2, r31, r5
+	bis	r28, r31, r14
+	bsr	r2, 1$
+0$:	.quad	start			; link address
+
+offset = <0$-start>
+
+	;
+	; Allocate 9 quadwords for saving registers used to
+	; pass SROM parameters:
+	;
+	;	r16 - Processor Identification
+	;	r17 - Size of contiguous good memory (bytes)
+	;	r18 - Cycle count (picoseconds)
+	;	r19 - Signature and system revision identifier
+	;	r20 - Active processor mask
+	;	r21 - System context value
+	;
+	.quad	0			; R16
+	.quad	0			; R17
+	.quad	0			; R18
+	.quad	0			; R19
+	.quad	0			; R20
+	.quad	0			; R21
+	.quad	0			; R30
+	.quad	0			; R1
+	.quad	0			; R2
+
+1$:	;
+	; If we've been loaded at 8000, 8240 or 900000, then there is no PALcode
+	; running, so don't try to reset secondaries.  Otherwise, do, since we
+	; are going to overwrite existing PALcode as we do the decompression.
+	;
+	lda	r1, -offset(r2)		; Compensate for .QUAD above
+	GET_32CONS r0, <-PAL$PAL_BASE>, r1 ; Check for 8000 by subtraction
+	beq	r0, 2$			; Skip this if so
+	GET_32CONS r0, <-<PAL$PAL_BASE+^x240>>, r1 ; Check for 8240 by subtraction
+	beq	r0, 2$			; Skip this if so
+	GET_32CONS r0, <-^x900000>, r1	; Check for 900000 by subtraction
+	beq	r0, 2$			; Skip this if so
+
+	.if gt	<max_processor_id - 1>
+	.if df	cserve$mp_work_request
+	.if df	mp$restart
+	bis	r31, r31, r3		; Start with CPU 0
+10$:	PVC_VIOLATE <1002>
+	cserve	cserve$mp_work_request, r3, mp$restart ; Restart this CPU
+	addq	r3, #1, r3		; Do the next CPU
+	cmpeq	r3, #max_processor_id, r0 ; Are there more to do?
+	blbc	r0, 10$			; Branch if so
+	ldah	r0, 64(r31)		; Delay for 5 to 10 milliseconds
+20$:	subq	r0, #1, r0		;
+	bne	r0, 20$			;
+	.endc
+	.endc
+	.endc
+
+2$:	lda	r1, offset(r31)
+	subq	r2, r1, r0		; check for 00000000 + offset
+	beq	r0, running_virtual
+	ldah	r1, ^x2000(r1)		; check for 20000000 + offset
+	subq	r2, r1, r0
+	beq	r0, running_virtual
+	lda	r1, ^x240(r1)		; check for 20000240 + offset
+	subq	r2, r1, r0
+	beq	r0, running_virtual
+
+	sra	r2, #41, r0		; check for fffffc0000000000 (43-bit kseg)
+	addq	r0, #2, r0
+	bne	r0, in_pal_mode
+	sll	r2, #64-41, r0
+	srl	r0, #64-41, r0
+	br	r31, switch
+
+running_virtual:
+	PVC_VIOLATE <1002>
+	mfpr_vptb     			; virtual page table base address.  This
+					; has to be valid or the cod doesn't
+					; work
+	PVC_VIOLATE <1002>
+	ldq	r4, (r2)		; get the link address.  We can do it
+					; this way because we are still virtual
+					; 
+
+	sll	r2, <64-43>,r1		; get rid of sign extension
+	srl	r1, <<64-43>+10>, r1	; make bits 32:0 of va of pte
+	bic	r1, 7, r1		; quad word align
+	bis	r1, r0, r0		; make the real address
+
+	ldq	r0, (r0)		; pick up the pte.
+
+	srl	r0,#32,r0		; Convert PTE to PFN
+	sll	r0,#13,r0		;  and then to PA
+
+	sll	r2,<64-13>,r2		;  get offset from page base
+	srl	r2,<64-13>,r2
+	addq	r0, r2, r0		; add it to our physical address.
+
+switch:
+	lda	r17,<10$-start>-offset+1(r0)	;
+	PVC_VIOLATE <1002>
+	cserve	cserve$mtpr_exc_addr, r17		; Load the new EXC_ADDR, return in PAL
+
+10$:	;
+	; Flush the Icache.
+	;
+	hw_mtpr	r31, ev6__ic_flush	; Icache flush
+	bne	r31, 11$		; serves two purposes - fixes both
+					; palcode violations.
+PVC_VIOLATE <1006>
+	br	r31, 11$
+
+.align	5
+
+11$:	hw_mtpr	r31, ev6__itb_ia	; flush the tlbs
+	hw_mtpr	r31, ev6__dtb_ia	;
+PVC_VIOLATE <1006>
+	bsr	r2, 20$
+20$:	lda	r2, <start-20$>+offset(r2)
+	bsr	r0, 21$
+21$:	lda	r0, <<in_pal_mode-21$>+1>(r0)
+	hw_ret_stall 0(r0)
+
+.align	quad
+
+;
+; Entry registers.
+;
+;	r2 = base physical address of this code + offset.
+;	
+
+in_pal_mode:
+
+	;
+	; Save registers used to pass SROM parameters
+	;
+	PVC_JSR	save_reg, bsr=1
+	bsr	r6, save_reg
+
+	ldqp	r26, 0(r2)		; where we want to be
+	subq	r2, #offset, r2		; where we are
+	cmpeq	r2, r26, r0		; are we where we want to be
+
+	;+
+	; We relocate only if the starting address is not equal to the link
+	; address.  When we get to here we are alrady in pal mode so all we need
+	; to do is move the code where it was linked at.
+	; 
+
+	bne	r0, 400$		; if non-zero then we are where we want
+					; to be.  Must have been a vitual
+					; transfer.
+	;
+	; Do the copy to where we want to be.  We copy 4 meg starting at the
+	; address in r2 to what is pointed to be r26
+	;
+	; We must decide how to move the data.  If the source is less than
+	; destination then we need to move source+400000 to dest+400000 down.
+	; Gets rid of over lap.  If it's theother way then nothing has to
+	; change.
+
+	bis	r26, r31, r0		; starting address
+.if df two_meg
+	ldah	r1, ^x20(r31)		; counter (200000)
+.iff
+	ldah	r1, ^x40(r31)		; counter (400000)
+.endc
+
+	subq	r26, r2, r3		; find out who is where
+	blt	r3, 300$		; if r2 greater then it says the source
+					; is above the destination and can
+					; simply copy source-destination
+	addq	r1, r26, r26		; destination + 4meg
+	addq	r1, r2, r2		; destination + 4meg
+
+200$:	lda	r26, -8(r26)		; backup the address to start with
+					; (compensates for first time)
+	lda	r2, -8(r2)
+	ldqp	r3, 0(r2)
+	subq	r1, 8, r1		; decrement count
+	stqp	r3, 0(r26)
+	bne	r1, 200$
+	br	r31, 400$		; done
+					;  
+300$:
+	ldqp	r3, 0(r2)		; data
+	lda	r2, 8(r2)
+	subq	r1, 8, r1
+	stqp	r3, 0(r0)
+	addq	r0, 8, r0		; update destination
+	bne	r1, 300$
+
+	;+
+	; Transfer control to the cloned copy
+	;-
+400$:
+
+	lda	r0, <relocated-start>(r26)
+
+	PVC_VIOLATE <1007>
+	jsr	r31, (r0)
+
+.align	quad
+BASE_OF_HEAP::
+	.quad	start - <<64+32+32>*1024>	
+
+;=========================================================================
+;+
+; DTBM_SINGLE trap entry - offset 0x300
+;
+; Description:
+;	Hardware trap on Dstream single
+;	translation buffer miss.
+;	Read and disply registers: 
+;
+; Note on scoreboarding and register dependencies: Having (4-7) on the
+; VA/VA_FORM register reads ensures that they don't issue until all of the
+; previous dtb miss's tag/pte writes have retired. The register dependency
+; between the VA/VA_FORM read and the tag/pte writes ensures that none
+; of the tag/pte issue until all of the previous tag/pte writes from
+; a previous miss have retired.
+;-
+
+. = ^x300
+
+	hw_mfpr	r23, EV6__EXC_ADDR		; (0L,1) get exception address
+	hw_mfpr	r6, EV6__VA			; (4-7,1L,3) get original va
+
+; Current state:
+;	r6	va
+;	r23	exc_addr
+
+; We don't need a MB to hold up loads that may affect VA, etc.
+; The writes to DTB_TAGx and DTB_PTE0 hold up loads.
+;
+; We are adding a scoreboard interlock for to avoid speculative reads
+; during powerup. This way, we don't return until we have committed th
+; DTB write.
+;-
+	lda	r5, ^xFF01(r31)			; all r/w enable
+	zapnot	r5, #3, r5			; clean mask up
+	srl	r6, #13, r4			; shift out the byte offset
+	sll	r4, #EV6__DTB_PTE0__PFN__S, r4	; get pfn into position
+	bis	r4, r5, r4			; produce the pte
+; this aligns to a 32byte value.
+
+	bis	r31, r31, r31
+
+	hw_mtpr	r6, EV6__DTB_TAG0		; (2&6,0L) write tag0
+	hw_mtpr r6, EV6__DTB_TAG1		; (1&5,1L) write tag1
+	hw_mtpr	r4, EV6__DTB_PTE0		; (0&4,0L) write pte0
+	hw_mtpr	r4, EV6__DTB_PTE1		; (3&7,1L) write pte1
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^xF0>	; (4-7,0L) stall outside IQ
+	PVC_VIOLATE <1007>
+	hw_ret	0(r23)				; (0L) return after TB write.
+
+. = ^x580
+; 1 to 1 i stream mapping.
+
+	hw_mfpr	r20, EV6__IVA_FORM		; (0L,1) get vpte address
+	hw_mfpr	r23, EV6__EXC_ADDR		; (0L) get exception address
+	lda	r21, ^x0FFF(r31)			; (xU) create mask for prot
+	bis	r31, r31, r31			; (xU) fill out fetch block
+	srl	r23, #13, r22			; shift out the byte offset
+	lda	r21, ^x0F01(r31)			; all read enable
+	sll	r22, #EV6__ITB_PTE__PFN__S, r22	; get pfn into position
+	bis	r22, r21, r22			; produce the pte
+	hw_mtpr	r23, EV6__ITB_TAG		; (6,0L) write tag
+	hw_mtpr	r22, EV6__ITB_PTE		; (0&4,0L) write PTE
+	PVC_VIOLATE <1007>
+	hw_ret_stall 0(r23)			; (0L)
+
+
+.align	quad
+
+relocated::
+	bis	r31, r26, r30			; make data structures start at code base down
+
+	br	r26, 1$				; get base pointer of image
+	.quad	decompress
+	.quad	config_image
+
+	ALIGN_FETCH_BLOCK
+
+1$:
+	hw_mtpr	r30,  EV6__PAL_BASE
+	ldqp	r27, 0(r26)
+	ldqp	r16, 8(r26)
+	ldqp	r26, 8(r27)		; code address
+
+	hw_mfpr	r2, EV6__I_CTL		; (4,0L) read I_CTL
+	bis	r2, #^x80, r1		; turn on sde<1>
+	bic	r1, #^x40, r1		; turn off sde<0>
+	lda	r1, ^x1000(r1)		; turn on hwe
+	
+	hw_mtpr	r1, EV6__I_CTL		; (4,0L) write I_CTL
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+	hw_mtpr	r1, EV6__I_CTL		; (4,0L) write I_CTL
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+	hw_mtpr	r31, EV6__IER_CM	; (4,0L) create stall outside IQ
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+;
+; We need 3 buffer fetch blocks to get the correct SDE bit for the
+; next fetch block. One for IMAP stall, one for FMAP stall, one more to allow
+; for the retire to proprogate for the fetch.
+;
+	addq	r31, r31, r0		; 1st buffer fetch block. IMAP stall.
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+	addq	r31, r31, r0		; 2nd buffer fetch block. FMAP stall.
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+	addq	r31, r31, r0		; 3rd buffer fetch block. Propagate.
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+;
+; Now map the shadow registers
+;
+	addq	r31, r31, r4
+	addq	r31, r31, r5
+	addq	r31, r31, r6
+	addq	r31, r31, r7
+
+	addq	r31, r31, r20
+	addq	r31, r31, r21
+	addq	r31, r31, r22
+	addq	r31, r31, r23
+
+	bis	r26, r31, r1
+	br	r31, 2$
+
+	ALIGN_FETCH_BLOCK
+
+2$:	
+	bsr	r26, 3$
+3$:	addq	r26, #4$-3$, r26
+	bis	r31, r31, r31
+	hw_ret_stall	0(r26)
+4$:	
+	bsr	r26, 5$
+5$:	addq	r26, #6$-5$, r26
+	bis	r31, r31, r31
+	hw_ret_stall	0(r1)
+6$:
+	bsr	r26, 7$
+7$:	addq	r26, #8$-7$, r26
+	bis	r26, #1, r26
+	hw_ret_stall	0(r26)
+8$:
+
+; restore the i_ctl prior to all of this.
+
+	hw_mtpr	r2, EV6__I_CTL		; (4,0L) write I_CTL
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+
+	hw_mtpr	r2, EV6__I_CTL		; (4,0L) write I_CTL
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+
+;
+; We need 3 buffer fetch blocks to get the correct SDE bit for the
+; next fetch block. One for IMAP stall, one for FMAP stall, one more to allow
+; for the retire to proprogate for the fetch.
+;
+	addq	r31, r31, r1		; 1st buffer fetch block. IMAP stall.
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+
+	addq	r31, r31, r1		; 2nd buffer fetch block. FMAP stall.
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+
+	addq	r31, r31, r1		; 3rd buffer fetch block. Propagate.
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+	addq	r31, r31, r1		; nop
+
+	;
+	; Restore the base physical address of this code + offset
+	;
+	hw_mfpr	r2, ev6__pal_base
+	addl	r2, #offset, r2
+
+10$:	;
+	; Flush the Icache.
+	;
+	hw_mtpr	r31, ev6__ic_flush	; Icache flush
+	bne	r31, 11$		; serves two purposes - fixes both
+					; palcode violations.
+	br	r31, 11$
+
+.align	5
+
+11$:	hw_mtpr	r31, ev6__itb_ia	; flush the tlbs
+	hw_mtpr	r31, ev6__dtb_ia	;
+
+	;
+	; Restore registers used to pass SROM parameters
+	;
+	PVC_JSR restore_reg, bsr=1
+	bsr	r6, restore_reg
+	bis	r14, r31, r28
+
+	;+
+	; transfer control to the target address
+	;-
+	bis	r0, #1, r0
+	hw_ret_stall	0(r0)
+	halt
+
+save_reg:
+	stqp	r16,  8(r2)		; Save R16
+	stqp	r17, 16(r2)		; Save R17
+	stqp	r18, 24(r2)		; Save R18
+	stqp	r19, 32(r2)		; Save R19
+	stqp	r20, 40(r2)		; Save R20
+	stqp	r21, 48(r2)		; Save R21
+	stqp	r30, 56(r2)		; Save R30
+	stqp	r4,  64(r2)		; Save R1
+	stqp	r5,  72(r2)		; Save R2
+	mb
+	mb
+	PVC_JSR	save_reg, bsr=1, dest=1
+	PVC_VIOLATE <29>
+	ret	r31, (r6)
+
+restore_reg:
+	ldqp	r16,  8(r2)		; Restore R16
+	ldqp	r17, 16(r2)		; Restore R17
+	ldqp	r18, 24(r2)		; Restore R18
+	ldqp	r19, 32(r2)		; Restore R19
+	ldqp	r20, 40(r2)		; Restore R20
+	ldqp	r21, 48(r2)		; Restore R21
+	ldqp	r30, 56(r2)		; Restore R30
+	ldqp	r1,  64(r2)		; Restore R1
+	ldqp	r2,  72(r2)		; Restore R2
+	mb
+	mb
+	PVC_JSR	restore_reg, bsr=1, dest=1
+	PVC_VIOLATE <29>
+	ret	r31, (r6)
+
+	.end

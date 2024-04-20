@@ -1,0 +1,389 @@
+#
+# file: pc264_files.bld --  build file for DECchip 21264 PCI motherboard.
+#
+#
+include cp$src:options.bld
+
+platform PC264
+architecture ALPHA
+romoffset 60000
+
+option EV6 1
+option APC_PLATFORM 1
+option SECURE           
+option BOOTP_SUPPORT
+option DIAG_SUPPORT
+option SYMBOLS 0
+option XDELTA_ON 0
+option HIGH_BOOT_PTEPAGES 1
+option DRIVERSHUT 0
+option FRU5 1
+option MSCP
+option IO_BUS_RESET
+option FIBRE_CHANNEL
+option BACKING_STORE
+option NT_ONLY_SUPPORT
+
+value MAX_PROCESSOR_ID		2
+value MAX_MEMORY_ARRAY		4
+value MAX_MEMORY_CHUNK		2
+value HEAP_SIZE			0x100000		# 1 Meg.
+value EEROM_BASE		65536
+value EEROM_LENGTH		65536
+value DEFAULT_PSEC_PER_CYCLE	2000
+                                                                       
+file 	alphamm.c		 group base
+file	ansi.c			 group base
+file	aputchar.c		 group base                         
+file	atoi.c			 group base
+#
+# There are two shells available, a full featured Bourne shell (blex.c),
+# and a minimal command line tokeninzer (ash.c).  Pick only one.
+#
+file	blex.c			 group command
+file	bshell.c		 group command
+file	bshell_cmd.c		 group command
+#
+file	boot.c			 group command
+file	builtins.c		 group command
+file	build_fru.c		 group command
+file	call_backs.c		 group base
+file	callbacks_alpha.mar	
+file	dynamic.c           	 group base
+file	entry.c			 group base
+file	ev_action.c		 group base
+file	exdep.c			 group command
+file	externdata.c		 group base
+file	filesys.c   		 group base
+file	hwrpb.c			 group base
+file	hwrpbtt_driver.c	 group driver
+file	ie.c			 group base
+file	iobq_cmd.c		 group command
+file	isacfg.c		 group command
+file	isp1020_edit.c		 group command
+file	kernel.c		 group base
+file	kernel_support.c	 group base
+file	kernel_alpha.mar
+file	memset.c		 group base
+file	mopdl_driver.c		 group driver
+file	moplp_driver.c		 group driver
+file	msgtxt.c		 group data
+file	ni_datalink.c		 group driver
+file	printf.c		 group base
+file	probe_io.c		 group base
+file	process.c		 group base
+file	powerup.c    		 group base
+file	qscan.c			 group base
+file	queue.c			 group base
+file	random.c		 group base
+file	readline.c		 group command
+file	regexp.c      		 group base
+file	scsi.c 			 group base
+file	scs.c 			 group base
+file	semaphore.c		 group base
+file	show_hwrpb.c		 group command
+file	show_map.c		 group command
+file	setshow.c	    	 group command
+file	shellsort.c	    	 group base
+file	startstop.c	    	 group command
+file	strfunc.c	    	 group base
+file	timer.c		    	 group base
+file	tr.c			 group command
+file	uptime.c		 group command
+file	xlate.c		    	 group command
+#                           
+# Platform-specific files   
+#                           
+file 	pc264.c		    	 group base
+file	pc264_init.c		 group base
+file	tsunami_io.c		 group base
+file	pc264_io.c		 group base
+file	pc264_mcheck.c		 group base
+file	pc264_util.mar      
+file	memconfig_pc264.c	 group base
+file	show_config_pc264.c	 group base
+file    amdflash_support.c	 group base
+file	dp264_info.c		 group command
+file	dp264_fru.c		 group command
+file	api_debug.c              group base command
+#
+# Files needed for the extended command set
+#
+file	allocfree.c              group command
+file	bpt.c			 group command
+file	cat.c			 group command
+file	check.c			 group command
+file	chmod.c			 group command
+file	cmp.c			 group command
+file	decode_alpha.c		 group base
+file	diag_support.c		 group base
+file	diag_evs.c		 group base
+file	element.c		 group command
+file	echo.c			 group command
+file	edit.c			 group command
+file	eval.c			 group command
+file	exer.c			 group command
+file	find_field.c		 group command
+file	grep.c			 group command
+
+file    galaxy.c		group command   ; Galaxy console file
+file    galaxy_pc264.c		group command   ; Galaxy console file
+file    galaxy_config_tree.c	group command 	; Galaxy console file
+
+file	hd.c			 group command
+file	help.c			 group command
+file	inst_alpha.mar
+file	line.c			 group command
+file	login_cmd.c		 group command
+file	ls.c			 group command
+file	moprc_driver.c		 group driver
+file	moprctt_driver.c	 group driver
+file	more.c			 group command
+file	net.c			 group command
+file	prcache.c		 group command
+file	prcache_pci.c		 group command
+file	ps.c			 group command
+file	rm.c			 group command
+file	secure.c		 group base
+
+file	sem_cmd.c		 group command
+file	simport.c		 group driver
+file	sleep.c			 group command
+file	sort.c			 group command
+file	sound.c			 group command
+file 	symbols.c		 group base
+#file	tms380fw.c		 group command
+file	truefalse.c		 group command
+file	validate.c		 group command
+file	wc.c			 group command
+#
+# Option Files 
+#
+
+#
+# Xdelta Debugger
+#
+#file	xdelta.mar
+#file	xdelta_isrs.mar
+#
+# Memory and Network Diagnostics
+#                               
+file	memtest.c		 group base
+file	memtest_gray_lw.c	 group base
+file	memtest_alpha.mar
+file	memtest_march.c		 group base
+file	memtest_random.c	 group base
+file	memtest_victim.c	 group base
+file	nettest.c		 group base
+#
+# LFU
+#
+file    lfu.c			group command
+file    lfu_support_apc.c	group base
+#
+# Driver Initialization
+#
+# Lines that have a name in column 0 and a value as the second
+# field are entered into the Driver Startup Table (dst).  The 
+# second field indicates what phase the driver is started in.
+#
+# Start up the phase 0 drivers.
+# Initialize the toy drivers and low level stuff that must be 
+# started at this point.
+#
+driver	nl_driver.c		0	 group driver
+driver	rd_driver.c		0	 group driver
+driver 	toy_driver.c		0	 group driver
+#
+# Start up the phase 1 drivers.
+#              
+driver	pci_driver.c		1	 group driver
+driver	from_driver.c		1	 group driver
+driver	nvram_driver.c     	1	 group driver
+driver  iic_driver.c		1	 group driver
+#
+# Phase 2 drivers
+#                                
+driver  sable_ocp_driver.c 	2	group driver
+#
+# Start up the phase 3 drivers.
+# Terminal class driver must start before the terminal port drivers.
+# kbd_driver MUST be started after graphics drivers & before serial port driver
+#
+driver	tt_driver.c     	3	 group driver
+# Floppy disk driver for the Intel 82077AA chip
+#                         
+driver	dv_driver.c	  	3	 group driver
+driver	vga_bios_driver.c	3	 group driver
+driver  kbd_driver.c		3	 group driver
+driver	combo_driver.c		3	 group driver
+#
+# Start up the phase 4 drivers.
+#
+driver	ev_driver.c     	4	 group driver
+driver	el_driver.c		4	 group driver
+driver	pmem_driver.c		4	 group driver
+driver	vmem_driver.c		4	 group driver
+driver	examine_driver.c	4	 group driver
+driver	ev6_ipr_driver.c	4	 group driver
+driver	gpr_driver.c    	4	 group driver
+driver	ps_driver.c     	4	 group driver
+driver	ndbr_driver.c		4	 group driver
+driver	mop_driver.c		4	 group driver
+driver	fpr_driver.c    	4	 group driver
+driver  pi_driver.c		4	 group driver
+driver	decode_driver.c		4	 group driver
+driver  tee_driver.c		4	 group driver
+driver  dup.c                   4       group base
+#
+# Start up the phase 5 drivers.
+#
+driver	para_driver.c		5	 group driver
+driver	inet_driver.c		5	 group driver
+driver	fat_driver.c		5	 group driver
+driver	smcc669_driver.c	5	 group driver
+#
+# IDE/ATAPI driver
+#
+driver	dq_driver.c		5	group driver
+#
+# ISA ethernet driver for adapter with the LEMAC chip
+#
+driver	de205_driver.c 		5	group driver
+#                         
+# SCSI bus poller for NCR/Symbios 810/875 controllers
+#                         
+driver	n810_driver.c	  	5	group driver
+file	pke_driver.c	  		group driver
+file	pke_script.mar    
+#                         
+# PCI NVRAM Driver
+#
+driver  pci_nvram_driver.c      5       group driver
+#
+# PCI FDDI driver for the DEFPA adapter
+#
+driver  pdq_driver.c            5       group driver
+#
+# PCI Token ring driver
+#
+#driver  dw_driver.c             5       group driver
+#
+# PCI SCSI RAID driver for the Mylex DAC960 adapter
+#
+driver dac960_driver.c          5       group driver
+#
+# PCI SCSI driver for the KZPSA adapter
+#
+driver pks_driver.c             5       group driver
+#
+# SCSI driver for adapters employing Qlogic ISP1020 chips
+#
+driver isp1020_driver.c		5       group driver
+#
+# PCI ethernet driver for the DECchip 2104x/2114x adapters
+#                       
+driver ew_driver.c		5       group driver
+#
+# Intel 82558 ethernet adapter
+#
+driver	ei_driver.c		5	group driver
+#
+# CIPCA - PCI to CI driver
+#
+file	nport_q.c			group driver
+file	cipca_common.c			group driver
+file	cipca_response.c		group driver
+file	cipca_support.c			group driver
+file	cipca_io.c			group driver
+driver 	mscp.c			5	group driver
+driver	cipca_driver.c		5	group driver
+#
+# KGPSA - Fibre Channel driver
+#
+driver kgpsa_driver.c		5	group driver
+file	wwidmgr.c			group driver
+#
+# KFPSA - PCI DSSI driver
+#
+driver pue_driver.c		5	group driver
+file	pue_script.mar
+#
+# Memory Channel driver
+#
+driver mc_driver.c		5	group driver
+#
+# PCI I2O driver
+#
+driver	i2o_driver.c		5	group driver
+file	i2oexec.c			group driver
+file	i2omsg.c			group driver
+file	i2outil.c			group driver
+file	i2o_bsa.c			group driver
+file	i2o_bsa_osm.c			group driver
+file	i2o_scsi_osm.c			group driver
+# 
+# ISO 9660 CDROM driver
+#
+driver	iso9660_driver.c	 5	 group driver
+#
+# SCSI driver for Adaptec AIC78xx adapters
+#
+driver	aic78xx_driver.c	5	group driver
+file	aic78xx_him_hwm.c		group driver
+file	aic78xx_him_rsm.c		group driver
+file	aic78xx_him_xlm.c		group driver
+#
+# LFU drivers
+#
+driver	lfu_pc264_driver.c	 7	 group driver
+driver	lfu_kzpsa_driver.c	 7	 group driver
+driver	lfu_defpa_defea_driver.c 7	 group driver
+driver  lfu_cipca_driver.c	 7	 group driver
+driver  lfu_mc2_driver.c	 7	 group driver
+#
+# The built in file system.
+#
+# Encapsulated files are taken from their VMS sources and put 
+# directly into the firmware's file system as a named file.  
+# To add a new file, use the keyword "encapsulate", the VMS 
+# filename, and the name you want the file to have in the 
+# firmware.
+#
+# ISA configuration scripts to facilitate adding known devices
+#
+encapsulate	cp$src:isacfg_de205	 add_de205	 ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+#
+# Diagnostic scripts
+#
+encapsulate	cp$src:memexer_dp264	memexer		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:testmem_dp264	testmem		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:sys_exer_eb164	sys_exer	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:show_status	show_status	ATTR$M_READ|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:kill_diags_eb164 kill_diags	ATTR$M_READ|ATTR$M_EXECUTE	-script
+encapsulate     cp$src:showit           showit          ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:pwrup_dp264	pwrup		ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:dp264_test	test		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:dp264_mfgtest	mfgtest		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:set_flag_apc	set_flag	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+#
+# LFU scripts
+#
+encapsulate	cp$src:dp_fwupdate		fwupdate	ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:pc264_readme		readme		ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:save_nvram_pc264		save_nvram	ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:restore_nvram_pc264	restore_nvram	ATTR$M_READ|ATTR$M_EXECUTE -script
+#
+# When you want the symbol table driver in your image, you have to have
+# the driver itself, the variable list (i.e. the symbol table), and
+# a list of symbols that you want included/excluded.  The inclusion
+# exclusion commands take as arguments regular expressions that are
+# applied to the symbol table.
+#
+# NOTE: regular expressions are AWK style regular expressions, which
+# are NOT the same as regular expressions in other contexts!
+#
+#driver	sym_driver.c		0
+#file	vlist.c
+#sym_include	[a-zA-Z0-9_\$]+
+#sym_exclude	vlist msg_.*

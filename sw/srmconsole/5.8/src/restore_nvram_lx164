@@ -1,0 +1,91 @@
+#+
+# =============================================================================
+# = restore_nvram - Restore NVRAM data to EEROM/TOY from a floppy file.       =
+# =============================================================================
+#
+# OVERVIEW:
+#
+#       Restore the system NVRAM data to 64KB EEROM and/or last 50 TOY RAM bytes
+#       from a floppy containing the NVRAM save file(s).  By default,
+#       if no script argument is specified, all NVRAM is restored from file
+#       ALLNVRAM.SAV.  
+#
+#   COMMAND FORM:
+#
+#       restore_nvram ( {all,arc,srm,toy} )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       group - Specifies the group of NVRAM data to be restored.  One of
+##o
+#               o all : All of the 64KB EEROM and 50 bytes of TOY RAM are
+#                       restored from file allnvram.sav.
+#                       This is the default, if no argument is specified.
+#               o arc : ARC (AlphaBIOS) data in first 32KB of the 64KB EEROM
+#                       is restored from file arcnvram.sav.
+#               o srm : SRM console data in last 2KB of the 64KB EEROM
+#                       is retored from file srmnvram.sav.
+#               o toy : TOY data in last 50 bytes of 64 bytes in TOY RAM
+#                       is retored from file toynvram.sav.
+##
+#
+#   COMMAND OPTION(S):
+#
+#       None
+#
+#   COMMAND EXAMPLE(S):
+#
+#	To copy this script from floppy:
+#~
+#	>>> cat fat:restore.txt/dva0 > restore_nvram 	
+#~
+#	To restore a previously saved ARC NVRAM image:
+#~
+#       >>>restore_nvram arc
+#       Restore arc NVRAM data from the file fat:arcnvram.sav/dva0.0.0.1000.0.
+#       Please insert the floppy containing this file...
+#       ...and enter "y" to continue.
+#       y
+#       Looking for file fat:arcnvram.sav/dva0.0.0.1000.0...
+#       ...Found it.
+#       Restoring system NVRAM data...
+#       ...Succeeded.
+#       >>>
+#~
+#-
+set flop `ls dva|find 0` 2>nl
+set sfile nvram 2>nl                          
+set grp all 2>nl
+case $1 in
+  "") ;;
+  arc) set grp arc;;
+  srm) set grp srm;;
+  toy) set grp toy;;
+  *) ;;
+esac
+set sfile fat:$grp$sfile.sav/$flop
+echo Restore $grp NVRAM data from the file $sfile.
+echo Please insert the floppy containing this file...
+echo ...and enter \"y\" to continue.
+if (line<tt|cat -l 1|grep -i "y">nl) then
+  echo Looking for file $sfile...
+  if (cat $sfile >pmem:300000 2>nl) then
+    echo ...Found it.
+    echo Restoring system NVRAM data...
+    case $grp in
+      arc) cat -l 8000 pmem:300000 >eerom:0 ;;
+      srm) cat -l 800 pmem:300000 >eerom:F800 ;;
+      toy) cat -l 32 pmem:300000 >toy:e ;;
+      all) cat -l 10000 pmem:300000 >eerom:0
+           cat -l 32 pmem:310000 >toy:e ;;
+    esac
+    echo ...Succeeded.
+  else
+    echo ...Not found.
+  fi
+else
+  echo RESTORE_NVRAM cancelled.
+fi
+clear sfile
+clear flop
+clear grp

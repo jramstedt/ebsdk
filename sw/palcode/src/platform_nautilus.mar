@@ -1,0 +1,36 @@
+;+
+; platform_nautilus_defs.mar - platform switches for API Nautils platform
+;-
+
+;+
+; Begun June 1999 by Stig Telfer, Alpha Processor Inc.
+;-
+
+        nautilus_platform = 1
+	debugging_irongate = 0
+        smp_platform = 0
+        smi_platform = 0		; STIG DEBUG - removed for now
+        check_interrupt_pending = 0
+
+	tb_mb_en = 0			; UP platform - no MB on TB miss
+
+	crd_en = 1			; always report CRD errors
+	mchk_en = 1
+
+        i_ctl__sbe = 3                  ; no prefetching of instructions 
+        i_ctl__sglissue = 0             ; issue only from bottom of queue
+
+; External interrupt routings for Nautilus:
+; These numbers are positions within EV6__ISUM__IE field
+
+IRQ_HLT = ^x00				; no halt interrupt on nautilus
+IRQ_IP  = ^x00				; IPIs not supported (uniprocessor)
+
+IRQ_ERR = ^x01				; system errors (NMI)
+IRQ_DEV = ^x02				; external device interrupt
+IRQ_SMI = ^x04				; power management from southbridge
+IRQ_CLK = ^x20				; direct coupling of clock connection
+
+
+IRQ_MASK= <IRQ_ERR ! IRQ_DEV ! IRQ_CLK ! IRQ_SMI>
+

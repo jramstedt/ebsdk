@@ -1,0 +1,55 @@
+/* file:	alpha_def.sdl
+/*
+/* Copyright (C) 1991 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Alpha specific data types and limits.
+/*
+/* Author:	JDS - Jim Sawin
+/*
+/* Revision History:
+/* 
+/*  4	by JDS, Mon Apr  8 13:30:46 1991
+/* 	Added RAZ_GPR, RAZ_FPR.
+/*
+/*  3	by JDS, Thu Mar 28 13:39:19 1991
+/*	Added MAX_PT.
+/* 
+/*  2	by JDS, Thu Mar 14 13:47:40 1991
+/*	Removed MAX_IPR (now in aprdef.sdl) and PS_REG (not needed).
+/*
+/*  1	by JDS, Wed Mar  6 16:11:12 1991
+/*	Initial entry.
+/*
+module alpha_def;
+
+constant
+    SP_REG equals 30,				/* SP is R30
+    RAZ_GPR equals 31,				/* This GPR is Read-As-Zero
+    RAZ_FPR equals 31,				/* This FPR is Read-As-Zero
+    MAX_GPR equals 31,				/* Max GPR number
+    MAX_FPR equals 31,				/* Max FPR number
+    MAX_PT equals 31;				/* Max PALtemp number
+
+/* item ADDRESS quadword unsigned typedef;		/* Data type for an address
+item ADDRESS longword unsigned typedef;		/* Data type for an address
+item REGNUM byte unsigned typedef;		/* Data type for a register number
+item REGDATA quadword unsigned typedef;		/* Data type for a register
+
+end_module alpha_def;

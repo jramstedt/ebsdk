@@ -1,0 +1,54 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:24:18 by OpenVMS SDL EV1-33     
+;  Source:  20-NOV-1996 12:07:29 AFW_USER$:[CONSOLE.V58.COMMON.SRC]EV5_LX164_PAL 
+; ********************************************************************************************************************************
+;  file:	ev5_lx164_pal_def.sdl
+; 
+;  Abstract:	Platform specific PALcode definitions and Cserve defintions 
+; 		for the AlphaPC 164/LX.
+; 
+ 
+	.MACRO	$pal_def,..EQU=<=>,..COL=<:>
+PAL$PAL_BASE'..equ'49152
+PAL$PAL_SIZE'..equ'49152
+PAL$OSFPAL_BASE'..equ'98304
+PAL$OSFPAL_SIZE'..equ'32768
+PAL$IPL_TABLE_BASE'..equ'0
+PAL$HWRPB_BASE'..equ'8192
+PAL$HWRPB_SIZE'..equ'16384
+PAL$IMPURE_BASE'..equ'20480
+PAL$IMPURE_COMMON_SIZE'..equ'512
+PAL$IMPURE_SPECIFIC_SIZE'..equ'1536
+PAL$LOGOUT_BASE'..equ'24576
+PAL$CONSOLE_BASE'..equ'131072
+PAL$ENTER_CONSOLE_PTR'..equ'20800
+PAL$ENTER_OSF'..equ'20864
+SLOT$_PAL_LOGOUT'..equ'24576
+SLOT$_PAL_LOGOUT_LEN'..equ'1536
+IMPURE$PCB_OFFSET'..equ'16
+IMPURE$PROF_OFFSET'..equ'64
+IMPURE$QUILT_OFFSET'..equ'64
+IMPURE$UART_OFFSET'..equ'112
+IMPURE$CPU_TYPE_OFFSET'..equ'128
+MP$RESTART'..equ'1
+MP$HALT'..equ'2
+MP$CONTROL_P'..equ'3
+MP$BREAK'..equ'4
+MP$BLOCK_INTERRUPTS'..equ'5
+MP$UNBLOCK_INTERRUPTS'..equ'6
+	.ENDM
+ 
+	.MACRO	$cserve_def,..EQU=<=>,..COL=<:>
+CSERVE$SET_HWE'..equ'8
+CSERVE$CLEAR_HWE'..equ'9
+CSERVE$LDLP'..equ'16
+CSERVE$STLP'..equ'17
+CSERVE$PCI_INTR_ENABLE'..equ'52
+CSERVE$PCI_INTR_DISABLE'..equ'53
+CSERVE$HALT'..equ'64
+CSERVE$WHAMI'..equ'65
+CSERVE$START'..equ'66
+CSERVE$CALLBACK'..equ'67
+CSERVE$MTPR_EXC_ADDR'..equ'68
+CSERVE$JUMP_TO_ARC'..equ'69
+	.ENDM

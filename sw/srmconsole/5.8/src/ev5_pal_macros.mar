@@ -1,0 +1,1195 @@
+	.title	EV5 - ALPHA PALcode MACROS
+	.ident	/V1.14/
+;
+;****************************************************************************
+;*									    *
+;*  Copyright (c) 1989, 1990, 1991, 1992				    *
+;*  by DIGITAL Equipment Corporation, Maynard, Mass.			    *
+;* 									    *
+;*  This software is furnished under a license and may be used and  copied  *
+;*  only  in  accordance  with  the  terms  of  such  license and with the  *
+;*  inclusion of the above copyright notice.  This software or  any  other  *
+;*  copies  thereof may not be provided or otherwise made available to any  *
+;*  other person.  No title to and ownership of  the  software  is  hereby  *
+;*  transferred.							    *
+;* 									    *
+;*  The information in this software is subject to change  without  notice  *
+;*  and  should  not  be  construed  as  a commitment by DIGITAL Equipment  *
+;*  Corporation.							    *
+;* 									    *
+;*  DIGITAL assumes no responsibility for the use or  reliability  of  its  *
+;*  software on equipment which is not supplied by DIGITAL.		    *
+;*									    *
+;****************************************************************************
+
+.sbttl	"Edit History"
+;+
+; Who		Rev	When		What	
+; ------------	---	-----------	--------------------------------
+; DB		1.0	10-Mar-1992	Start
+; JM		1.1	 3-Aug-1993	change macros for storing cns$ and mchk$ regs
+;					add mp_debug_queue macro
+; JM		1.2	14-oct-1993	delete bogus vfy,safe conditions from get_addr macro
+; JM		1.3	24-nov-1993	subtract x200 from store/restore_reg macros for 10-bit addressing
+; JM		1.4	07-dec-1993	fix debug_mp_queue macro to use fewer instructions
+; JM		1.5	17-dec-1993	add stqca - hw_st quad conditional w/alt_mode checks
+; JM		1.6	 3-jan-1994	add debug_mp_store - sometimes fail stx_c's in amov instructions (test only)
+; JM		1.7	18-jan-1994	add fix_impure, restore_impure, restore_reg1, store_reg1
+; JM		1.8	 3-feb-1994	move ldqp/stqp here from source files
+; JM		1.9	 4-feb-1994	add get_impure macro; move align_page here; change align macros to pad w/ 0's instead 
+;						of nops (except align_branch); add wr_impure_ptr, update_bc_ctl_shadow, 
+; JM		1.10	17-feb-1994	add macros to manipulate debug_ptr; add align_128_bytes macro
+; JM		1.11	19-feb-1994	play more games with fix/restore_impure and store/restore_reg macros to handle
+;						bigger impure area
+; JM		1.12	22-apr-1994	put impure pointer back into paltemp.  put bc_control shadow & pm_ctr_ctl into impure area.
+; JM		1.13	28-jun-1994	Add workaround for PASS1 LDX_L bug to store_unaligned macros
+; JM		1.14	19-aug-1994	ld/st macro displacement checks fixed (thanks to S. Shirron!).  added pass1/pass2 macros
+;-
+
+
+.sbttl	Macros	- Define local macros
+
+
+; The following macros are fillers which are used to align PAL entry points to the correct address.
+
+.macro align_trap_entry				; 
+	current_location = . - pal$base
+	check = <current_location - current_block_base>
+	assume <check - ^x80> le 0		; Check for more than 32 longword instructions in trap block.
+      	.repeat 32				; 
+      	    offset = . - pal$base		; 
+      	    t1 = <offset & < ^c<128-1>>>	; Mask off lower 7 bits
+      	    .iif eq, <offset-t1>, .mexit 	; Quit if aligned
+      	    .long 0
+      	.endr
+	current_block_base = . - pal$base	; Save for next call to this macro
+.endm align_trap_entry
+
+.macro align_call_pal_entry			;
+	current_location = . - pal$base
+	check = <current_location - current_block_base>
+	assume <check - ^x40> le 0		; Check for more than 16 longword instructions in call_pal block.
+      	.repeat 16				; 
+      	    offset = . - pal$base 		; 
+      	    t1 = <offset & < ^c<64-1>>>		; mask off lower 6 bits
+      	    .iif eq, <offset-t1>, .mexit 	; Quit if aligned
+      	    .long 0
+      	.endr
+	current_block_base = . - pal$base	; Save for next call to this macro
+.endm align_call_pal_entry
+
+.macro align_to_call_pal_section		; Align to first call_pal entry point, address is 2000(hex)
+    	offset = . - pal$base	 		; 
+	t0 = <offset - <^X2000>>		; Check that PC is not already in call_pal area
+	assume t0 lt 0
+      	.repeat 2000
+    	    offset = . - pal$base 		; 
+      	    t1 = <offset & < ^c<^x2000-1>>>	; mask off lower 13 bits
+      	    .iif eq, <offset-t1>, .mexit 	; Quit if aligned
+      	    .long 0
+      	.endr
+	current_block_base = . - pal$base	; Save for use by a future align macro.
+.endm align_to_call_pal_section
+
+.macro align_branch
+      	.repeat 2				; 
+      	    offset = . - pal$base		; 
+      	    t1 = <offset & < ^c<7>>>		; Mask off lower bits
+      	    .iif eq, <offset-t1>, .mexit 	; Quit if aligned
+      	    nop
+      	.endr
+.endm align_branch
+
+.macro align_block
+      	.repeat 8				; 
+      	    offset = . - pal$base		; 
+      	    t1 = <offset & < ^c<32-1>>>		; Mask off lower bits
+      	    .iif eq, <offset-t1>, .mexit 	; Quit if aligned
+      	    .long 0
+      	.endr
+.endm align_block
+
+.macro align_128_bytes
+      	.repeat 32				; 
+	    offset = . - pal$base		; 
+      	    t1 = <offset & < ^c<128-1>>>	; Mask off lower bits
+      	    .iif eq, <offset-t1>, .mexit 	; Quit if aligned
+      	    .long 0
+      	.endr
+.endm align_128_bytes
+
+; Not-so-simple macro to align to n bytes prior to the end of
+; a page.  (n must be a multiple of a longword)
+.macro align_page n=0
+        current_location = . - pal$base
+        .repeat <8*1024-n>/4
+            offset = <. - pal$base> & < <8*1024>-1>
+            t1 = <8*1024> - offset
+            .iif eq, <n-t1>, .mexit        ; Quit if aligned
+            .long 0
+        .endr
+.endm align_page
+
+; These are the macros that define the EV5 PAL reserved opcodes.
+
+.macro mfpr gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+    	exp = <%EXTRACT(1,reg_length,gpr)@21> ! <%EXTRACT(1,reg_length,gpr)@16> ! ipr_num
+    	respal19 exp
+.endm
+
+
+.macro mtpr gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+    	exp = <%EXTRACT(1,reg_length,gpr)@21> ! <%EXTRACT(1,reg_length,gpr)@16> ! ipr_num
+    	respal1d exp
+.endm
+
+.macro	hw_rei					; hw_rei, normal
+	exp = <^X1F@21> ! <^X1F@16> ! <2@14>
+    	respal1e exp
+.endm
+
+
+.macro	hw_rei_stall				; hw_rei, Ibox stall until issue
+	exp = <^X1F@21> ! <^X1F@16> ! <3@14>
+    	respal1e exp
+.endm
+
+
+.macro ldqp dest, src				; hw_ld, quad, physical
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+
+.macro ldlp dest, src				; hw_ld, long, physical
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+.macro ldqpl dest, src				; hw_ld, quad, physical, lock
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! <1@10> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+.macro ldlpl dest, src				; hw_ld, long, physical, lock
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> ! <1@10> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+.macro ldla dest, src				; hw_ld, long, alternate_mode
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+.macro ldlaw dest, src				; hw_ld, long, alternate_mode, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <1@13> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+.macro ldlw dest, src				; hw_ld, long, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	.if gt disp
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+	.endc
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@13> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+
+.macro ldqw dest, src				; hw_ld, quad, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@13> ! <1@12> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+.macro ld_vpte dest, src			; hw_ld, quad, alternate_mode, virtual PTE fetch
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %EXTRACT(1,dest_reg_length,dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base   = %EXTRACT(lp_pos2,reg_length, src)
+
+	disp = %EXTRACT(0, lp_pos, src)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <1@12> ! <1@11> ! <disp&^x3ff>
+	respal1b exp
+.endm
+
+
+
+.macro stlp data, addr				; hw_st, longword, physical
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %EXTRACT(1,data_reg_length,data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base   = %EXTRACT(sp_pos2,reg_length, addr)
+
+	disp = %EXTRACT(0, sp_pos, addr)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <disp&^x3ff>
+	respal1f exp
+.endm
+
+
+.macro stqa data, addr				; hw_st, quad, alternate_mode
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %EXTRACT(1,data_reg_length,data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base   = %EXTRACT(sp_pos2,reg_length, addr)
+
+	disp = %EXTRACT(0, sp_pos, addr)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@14> ! <1@12> ! <disp&^x3ff>
+	respal1f exp
+.endm
+
+.macro stqp data, addr				; hw_st, quad, physical
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %EXTRACT(1,data_reg_length,data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base   = %EXTRACT(sp_pos2,reg_length, addr)
+
+	disp = %EXTRACT(0, sp_pos, addr)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! <disp&^x3ff>
+	respal1f exp
+.endm
+
+.macro stqpc data, addr				; hw_st, quad, physical, conditional
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %EXTRACT(1,data_reg_length,data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base   = %EXTRACT(sp_pos2,reg_length, addr)
+
+	disp = %EXTRACT(0, sp_pos, addr)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! <1@10> ! <disp&^x3ff>
+	respal1f exp
+.endm
+
+.macro stlpc data, addr				; hw_st, long, physical, conditional
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %EXTRACT(1,data_reg_length,data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base   = %EXTRACT(sp_pos2,reg_length, addr)
+
+	disp = %EXTRACT(0, sp_pos, addr)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <1@10> ! <disp&^x3ff>
+	respal1f exp
+.endm
+
+.macro stqca data, addr				; hw_st, quad, conditional, alternate_mode
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %EXTRACT(1,data_reg_length,data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 2		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base   = %EXTRACT(sp_pos2,reg_length, addr)
+
+	disp = %EXTRACT(0, sp_pos, addr)
+	assume  disp le <^x1FF>
+	assume  disp ge -<^x200>
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@14> ! <1@12> ! <1@10> ! <disp&^x3ff>
+	respal1f exp
+.endm
+
+
+;+
+;
+; This macro is used to generate relative addresses
+; it generates the correct LDA, LDAH's to compute the address
+;
+; Inputs:
+;	dest 	= destination register
+;	offset	= offset from base register
+;	base	= base register (typically this codes base, i.e. pal$base) 
+;-
+
+	.macro	get_addr	dest,offset,base,verify=1
+	  .iif ne verify, assume <'offset'> le <^x7FFFFFFF>
+	  .iif ne verify, assume <'offset'> ge -<^x80000000>
+	  lda	'dest',<<'offset'> & ^xFFFF>('base') ; base+xxx<15:0>
+	  ldah	'dest',<<'offset'>+32768>@-16('dest'); + xxx<31:16>
+	.endm	get_addr
+
+
+        .macro  sget_addr       dest,offset,base,verify=1
+	  .iif ne verify, assume <'offset'> le <^x7FFF>
+	  .iif ne verify, assume <'offset'> ge -<^x8000>
+;	  temp = <<offset> - <^x8000> >
+;	  assume <temp> lt 0
+	  lda	'dest',<'offset'>('base') ; base+xxx<15:0>
+        .endm   sget_addr
+
+
+
+
+;+
+;
+; These macros are used to perform unaligned loads and stores
+;
+; Inputs:
+;	reg 	= source or destination register of data
+;	addr	= register address of possible unaligned data
+;	sr[n]	= scratch registers to use
+;
+; These macros may not be the most optimal way to perform there functions
+; as no code scheduling is performed, thus they should only be used in
+; non critical code sections.
+;
+;-
+
+	.macro	load_unaligned_long	reg, addr, sr1, sr2
+	  lda	sr2, addr
+	  ldq_u	reg, (sr2)
+
+	  ldq_u sr1, 3(sr2)
+	  extll	reg, sr2, reg
+
+	  extlh	sr1, sr2, sr1
+	  or	sr1, reg, reg
+
+	  addl	reg, r31, reg
+	  nop
+	.endm
+
+
+	.macro	load_unaligned_quad	reg, addr, sr1, sr2
+	  lda	sr2, addr
+	  ldq_u	reg, (sr2)
+
+	  ldq_u sr1, 7(sr2)
+	  extql	reg, sr2, reg
+
+	  extqh	sr1, sr2, sr1
+	  or	sr1, reg, reg
+	.endm
+
+
+	.macro	store_unaligned_word	reg, addr, sr1, sr2, sr3, lock=0, err,err1
+	  .if eq lock
+	    lda		sr3, addr
+	    ldq_u	sr1, (sr3)
+
+	    inswl	reg, sr3, sr2
+	    mskwl	sr1, sr3, sr1
+
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, (sr3)
+
+	    ldq_u	sr1, 1(sr3)
+	    inswh	reg, sr3, sr2
+
+	    mskwh	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+
+	    stq_u	sr1, 1(sr3)
+	    nop
+	  .iff
+	    .iif ne p1_ldx_l_fix, mb		; PASS1 LDX_L bug workaround
+	    bic		addr, #7, sr3
+	    ldq_l	sr1, (sr3)
+
+	    inswl	reg, addr, sr2
+	    mskwl	sr1, addr, sr1
+
+	    or		sr1, sr2, sr1
+	    stq_c	sr1, (sr3)
+
+	    .iif nb <err>, blbc sr1, err
+
+	    lda		sr3, 1(addr)
+	    bic		sr3, #7, sr3
+
+	    ldq_l	sr1, (sr3)
+	    inswh	reg, addr, sr2
+
+	    mskwh	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+
+	    stq_c	sr1, (sr3)
+	    .iif eq p1_ldx_l_fix, nop
+
+	    .iif nb <err>, blbc sr1, err1
+
+	  .endc
+	.endm
+
+	.macro	store_unaligned_long	reg, addr, sr1, sr2, sr3, lock=0, err,err1
+	  .if eq lock
+	    lda		sr3, addr
+	    ldq_u	sr1, (sr3)
+
+	    insll	reg, sr3, sr2
+	    mskll	sr1, sr3, sr1
+
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, (sr3)
+
+	    ldq_u	sr1, 3(sr3)
+	    inslh	reg, sr3, sr2
+
+	    msklh	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+
+	    stq_u	sr1, 3(sr3)
+	    nop
+	  .iff
+	    .iif ne p1_ldx_l_fix, mb		; PASS1 LDX_L bug workaround
+
+	    bic		addr, #7, sr3
+	    ldq_l	sr1, (sr3)
+
+	    insll	reg, addr, sr2
+	    mskll	sr1, addr, sr1
+
+	    or		sr1, sr2, sr1
+	    stq_c	sr1, (sr3)
+
+	    .iif nb <err>, blbc sr1, err
+
+	    lda		sr3, 3(addr)
+	    bic		sr3, #7, sr3
+
+	    ldq_l	sr1, (sr3)
+	    inslh	reg, addr, sr2
+
+	    msklh	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+
+	    stq_c	sr1, (sr3)
+	    .iif eq p1_ldx_l_fix, nop
+
+	    .iif nb <err>, blbc sr1, err1
+	  .endc
+	.endm
+
+	.macro	store_unaligned_quad	reg, addr, sr1, sr2, sr3, lock=0, err,err1
+	  .if eq lock
+	    lda		sr3, addr
+	    ldq_u	sr1, (sr3)
+
+	    insql	reg, sr3, sr2
+	    mskql	sr1, sr3, sr1
+
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, (sr3)
+
+	    ldq_u	sr1, 7(sr3)
+	    insqh	reg, sr3, sr2
+
+	    mskqh	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+
+	    stq_u	sr1, 7(sr3)
+	    nop
+	  .iff
+	    .iif ne p1_ldx_l_fix, mb		; PASS1 LDX_L bug workaround
+	    bic		addr, #7, sr3
+	    ldq_l	sr1, (sr3)
+
+	    insql	reg, addr, sr2
+	    mskql	sr1, addr, sr1
+
+	    or		sr1, sr2, sr1
+	    stq_c	sr1, (sr3)
+
+	    .iif nb <err>, blbc sr1, err
+
+	    lda		sr3, 7(addr)
+	    bic		sr3, #7, sr3
+
+	    ldq_l	sr1, (sr3)
+	    insqh	reg, addr, sr2
+
+	    mskqh	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+
+	    stq_c	sr1, (sr3)
+	    .iif eq p1_ldx_l_fix, nop
+
+	    .iif nb <err>, blbc sr1, err1
+	  .endc
+	.endm
+
+
+
+
+;+
+;
+; This macro is used to initiate machine check sequences
+;
+;-
+
+
+
+	.macro MCHK	reason, halt=0
+	  .if ne halt
+	    lda	r25,<hlt$c_'reason'>(r31)		; set halt code
+	    br	r31, pal$enter_console			; enter the console
+	  .endc
+	  .if eq halt
+	    lda	r25,<mchk$c_'reason'>(r31)		; set mchk code
+	    br	r31, mchk_log_known			; go log the mchk
+	  .endc
+	.endm
+
+
+;+
+; This macro moves an ipr to the machine check logout frame
+;-
+
+	.macro	mchk_logout ipr
+	    mfpr  r25, 'ipr'
+	    stqp  r25, mchk$'ipr'(r14)
+	.endm
+
+
+;+
+; This macro moves a PALtemp to the machine check logout frame
+;-
+
+	.macro	pt_mchk_logout n
+	    mfpr  r25, pt'n'
+	    stqp  r25, mchk$pt+<8*'n'>(r14)
+	.endm
+
+
+;+ 
+; This macro loads the impure area pointer into irn.   
+;-
+	.macro get_impure  irn
+		mfpr	irn, pt_impure
+	.endm
+
+;+
+; This macro writes a new value to the impure pointer
+;-
+	.macro wr_impure_ptr  srn, irn
+	; srn = source register
+	; irn = no longer needed
+		mtpr	srn, pt_impure
+	.endm
+
+;+
+; This macro increments the local impure pointer by x200 to point to center of area.
+; This is to get around the 10-bit offset limit on hw_ld/hw_st instructions
+;
+;-
+	.macro fix_impure_gpr  irn
+		lda irn, ^x200(irn)
+	.endm
+
+	.macro fix_impure_ipr  irn
+		lda irn, cns$ipr_offset(irn)
+	.endm
+;+
+; This macro subtracts off the x200 added in fix_impure
+;
+;-
+	.macro unfix_impure_gpr  irn
+		lda irn, -^x200(irn)
+	.endm
+
+	.macro unfix_impure_ipr  irn
+		lda irn, -cns$ipr_offset(irn)
+	.endm
+
+;+ 
+; This macro loads the debug area pointer into irn.   
+;-
+	.macro get_debug_ptr  irn
+		mfpr	irn, pal_base
+		lda     irn, <<pal$debug_ptr-pal$base>& ^xFFFF>(irn)
+;		ldah    irn, <<pal$debug_ptr-pal$base>+32768>@-16(irn)  ; needed?
+		ldqp	irn, 0(irn)		;register, irn, now contains debug pointer
+	.endm
+
+;+
+; This macro writes a new value to the impure pointer
+;-
+	.macro wr_debug_ptr  srn, irn
+	; srn = source register
+	; irn = register for debug_ptr calculation
+		mfpr	irn, pal_base
+		lda     irn, <<pal$debug_ptr-pal$base>& ^xFFFF>(irn)
+;		ldah    irn, <<pal$debug_ptr-pal$base>+32768>@-16(irn)  ; needed?
+		stqp	srn, 0(irn)		;update the debug pointer
+	.endm
+
+;+
+
+;+
+; These macros are used to load and store various reg's and IPR's into
+; and out of the console save are
+;-
+	.macro store_reg n, fpu=0, pal=0, ipr=0, unvirt=0, nodata=0, shadow=0
+	assume <fpu+pal+ipr+shadow> lt 2	; Only one of fpu, pal, ipr, shadow may be selected
+
+	.if eq fpu+pal+ipr+shadow
+	tmp = <cns$gpr+<8*'n'>-^x200>
+	    stqp r'n', tmp(r1)
+	.endc
+
+	.if ne fpu
+          tmp = <cns$fpr+<8*'n'>-^x200>
+	  stt	f'n', tmp(r1)
+	.endc
+
+	.if ne pal
+	  mfpr	r0, pt'n'
+          tmp = <cns$pt+<8*'n'>-cns$ipr_offset>
+	  stqp	r0, tmp(r1)
+	.endc
+
+	.if ne ipr
+	  .if lt <cns$'n'-cns$ipr_offset>
+		offset = ^x200
+	  .iff
+		offset = cns$ipr_offset
+	  .endc
+	  assume <cns$'n'-cns$ipr_offset-^x200> lt 0
+	  .iif eq nodata, mfpr	r0, 'n'
+	  .iif ne nodata, lda	r0, (r31)
+          tmp = <cns$'n'-offset>
+	  stqp	r0, tmp(r1)
+	.endc
+
+	.if ne shadow
+            tmp = <cns$shadow'n'-cns$ipr_offset>
+	    stqp r'n', tmp(r1)
+	.endc
+
+	.endm
+
+
+
+	.macro restore_reg n, fpu=0, pal=0, ipr=0, virt=0, shadow=0
+	assume <fpu+pal+ipr+shadow> lt 2	; Only one of fpu, pal, ipr, shadow may be selected
+
+	.if  eq fpu+pal+ipr+shadow
+	tmp = <cns$gpr+<8*'n'>-^x200>
+	  ldqp r'n', tmp(r1)
+	.endc
+
+	.if ne fpu
+          tmp = <cns$fpr+<8*'n'>-^x200>
+	  ldt	f'n', tmp(r1)
+	.endc
+
+	.if ne pal
+          tmp = <cns$pt+<8*'n'>-cns$ipr_offset>
+	  ldqp	r0, tmp(r1)
+	  mtpr	r0, pt'n'
+	.endc
+
+	.if ne ipr
+	  .if lt <cns$'n'-cns$ipr_offset>
+		offset = ^x200
+	  .iff
+		offset = cns$ipr_offset
+	  .endc
+	  assume <cns$'n'-cns$ipr_offset-^x200> lt 0
+          tmp = <cns$'n'-offset>
+	  ldqp	r0, tmp(r1)
+	  mtpr	r0, 'n'
+	.endc
+
+	.if ne shadow
+          tmp = <cns$shadow'n'-cns$ipr_offset>
+	  ldqp r'n', tmp(r1)
+	.endc
+	.endm
+
+	.macro store_reg1 n, srn, irn, pal=0, ipr=0, unvirt=0, nodata=0, shadow=0, fpu=0, fpcsr=0
+	; n = number of register or ipr name
+	; srn = source register
+	; irn = impure base register
+	assume <fpu+pal+ipr+shadow+fpcsr> lt 2	; Only one of pal, ipr, shadow may be selected
+
+	.if eq fpu+pal+ipr+shadow+fpcsr
+	tmp = <cns$gpr+<8*'n'>-^x200>
+	    stqp srn, tmp(irn)
+	.endc
+
+	.if ne fpu
+          tmp = <cns$fpr+<8*'n'>-^x200>
+	  stt	srn, tmp(irn)
+	.endc
+
+	.if ne fpcsr
+          tmp = <cns$fpcsr-cns$ipr_offset>
+	  stt	srn, tmp(irn)
+	.endc
+
+	.if ne pal
+          tmp = <cns$pt+<8*'n'>-cns$ipr_offset>
+	  stqp	srn, tmp(irn)
+	.endc
+
+	.if ne ipr
+	  .if lt <cns$'n'-cns$ipr_offset>
+		offset = ^x200
+	  .iff
+		offset = cns$ipr_offset
+	  .endc
+	  assume <cns$'n'-cns$ipr_offset-^x200> lt 0
+          tmp = <cns$'n'-offset>
+	  stqp	srn, tmp(irn)
+	.endc
+
+	.if ne shadow
+            tmp = <cns$shadow'n'-cns$ipr_offset>
+	    stqp srn, tmp(irn)
+	.endc
+
+	.endm
+
+	.macro restore_reg1 n, drn, irn, pal=0, ipr=0, virt=0, shadow=0, fpu=0, fpcsr=0
+	; n = number of register or ipr name
+	; drn = destination register
+	; irn = impure base register
+	assume <pal+ipr+shadow+fpu+fpcsr> lt 2	; Only one of pal, ipr, shadow may be selected
+
+	.if  eq fpu+pal+ipr+shadow+fpcsr
+	tmp = <cns$gpr+<8*'n'>-^x200>
+	  ldqp drn, tmp(irn)
+	.endc
+
+	.if ne fpu
+          tmp = <cns$fpr+<8*'n'>-^x200>
+	  ldt	drn, tmp(irn)
+	.endc
+
+	.if ne fpcsr
+          tmp = <cns$fpcsr-cns$ipr_offset>
+	  ldt	drn, tmp(irn)
+	.endc
+
+	.if ne pal
+          tmp = <cns$pt+<8*'n'>-cns$ipr_offset>
+	  ldqp	drn, tmp(irn)
+	.endc
+
+	.if ne ipr
+	  .if lt <cns$'n'-cns$ipr_offset>
+		offset = ^x200
+	  .iff
+		offset = cns$ipr_offset
+	  .endc
+	  assume <cns$'n'-cns$ipr_offset-^x200> lt 0
+          tmp = <cns$'n'-offset>
+	  ldqp	drn, tmp(irn)
+	.endc
+
+	.if ne shadow
+          tmp = <cns$shadow'n'-cns$ipr_offset>
+	  ldqp drn, tmp(irn)
+	.endc
+	.endm
+;+
+;This macro updates the bc_ctl shadow
+;-
+	.macro	update_bc_ctl_shadow  srn, trn1, trn2
+	; trn1 = scratch reg
+	; trn2 = no longer used
+	; srn = source reg	
+		mfpr	trn1, pt_impure		; get impure pointer
+		fix_impure_ipr	trn1		; adjust base for bc_ctl shadow
+		store_reg1	bc_ctl, srn, trn1, ipr=1 ; write out new value
+	.endm
+
+	.macro	get_bc_ctl_shadow  drn
+	; drn = returned bc_ctl shadow data in lower longword
+		mfpr	drn, pt_impure
+		fix_impure_ipr  drn		
+		restore_reg1	bc_ctl, drn, drn, ipr=1
+	.endm
+
+	.macro	get_bc_config_shadow  drn
+	; drn = returned bc_control shadow data in lower longword
+		mfpr	drn, pt_impure
+		fix_impure_ipr  drn		
+		restore_reg1	bc_config, drn, drn, ipr=1
+	.endm
+;+
+;This macro updates performance counter control "register"
+;-
+	.macro	update_pmctr_ctl srn, trn1
+	; trn1 = scratch reg
+	; srn = source reg	
+		mfpr	trn1, pt_impure		; get impure pointer
+		fix_impure_ipr	trn1		; adjust base for bc_ctl shadow
+		store_reg1	pmctr_ctl, srn, trn1, ipr=1 ; write out new value
+	.endm
+
+	.macro	get_pmctr_ctl  drn, trn1
+	; drn = returned pmctr_ctl shadow data in lower longword
+		mfpr	trn1, pt_impure
+		fix_impure_ipr  trn1		
+		restore_reg1	pmctr_ctl, drn, trn1, ipr=1
+	.endm
+
+
+;+
+;
+; This macro is for debugging only, and causes the dtb to be zapped.
+; It is used to test the multi-processor interractions to the queue
+; instructions. This is a PAL debugging feature only, and should not
+; be used or enabled on released code.
+;
+;-
+	.macro  debug_mp_queue
+	.if ne  enable_debug_mp
+	  mtpr    r31, EV5$_DTB_IA  	; no mbox instructions in following 3 cycles
+	  mfpr	  r31, pt0
+
+	  mfpr	  r31, pt0
+
+	  mfpr	  r31, pt0
+
+	  mfpr	  r31, pt0
+
+	  mfpr	  r31, pt0
+
+
+	.endc
+	.endm
+   
+;+
+; Macro used only for debugging/test 
+; Sometimes fails stx_c in AMOVxx instructions
+;-
+
+	.macro	debug_mp_store rg,sr,?ok, ?bad, ?fail
+	  .if ne enable_debug_mp
+
+	    mtpr   r'sr', pt'sr'	;save a work reg
+	    rpcc   r'sr'		; get the ticker
+	    and    r'sr', #^x3F,  r'sr'; get some low bits
+	    cmplt  r'sr', #7,  r'sr'	; failing? (give it a 8 in 64 chance to fail)
+	    cmovne r'sr', r31, rg	; set stx_c to failure
+	    bne    r'sr', bad	; br if failure
+
+	    mfpr   r'sr', pt'sr'	;restore work reg
+	    br   r31, ok	; br if success
+
+bad:	    mfpr   r'sr', pt'sr'  ;restore work reg
+	    br   r31, fail	; br if failure
+ok:
+	    .long 0 ; stx_c	; gets br over in the failure case
+fail:
+	    . = . - 4
+	  .endc
+	.endm
+
+;+
+; macro's to conditionally handle differences between ev5 pass1 and pass2
+;-
+        .macro  ev5_pass1 arg
+        .iif ne ev5_p1, arg
+        .endm
+
+        .macro  ev5_pass2 arg
+        .iif ne ev5_p2, arg
+        .endm
+
+        .macro  ev5_p1_or_p2    arg1, arg2
+          .iif ne ev5_p1, arg1
+          .iif ne ev5_p2, arg2
+        .endm
+
+
+;+
+; macro to tell the palcode violation checker (PVC) to "ignore" a rule here...
+;-
+
+
+	.macro	pvc$jsr	token, dest=0, bonus=0, bsr=0
+	  .iif gt bsr-1, pcv__'token' == bsr
+	  .if ndf osfpal
+	    .iif ndf pcv_jsr_index, pcv_jsr_index = 2100
+	  .iff
+	    .iif ndf pcv_jsr_index, pcv_jsr_index = 3100
+	  .endc
+	  .iif ndf pcv_index, pcv_index = 100
+	  tpcv_jsr_index = pcv_jsr_index
+	  .iif ne bsr, pcv_jsr_index = pcv_jsr_index + 2000
+	  .iif gt bsr-1, pcv_jsr_index = bsr
+	  .iif ndf pcv_jsr_'token''bonus', pcv_jsr_'token''bonus' == pcv_jsr_index
+	  .iif ndf pcv_jsr_'token''bonus'_inst, pcv_jsr_'token''bonus'_inst = 1
+
+	  .if eq dest
+	    .iif df osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', osf
+	    .iif ndf osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', vms
+	  .iff
+	    .iif df osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', osf, \pcv_jsr_'token''bonus'_inst
+	    .iif ndf osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', vms, \pcv_jsr_'token''bonus'_inst
+	    pcv_jsr_'token''bonus'_inst = pcv_jsr_'token''bonus'_inst +1
+	  .endc
+	  pcv_jsr_index = tpcv_jsr_index
+	  pcv_jsr_index = pcv_jsr_index + 1
+	  pcv_index = pcv_index + 1
+	.endm
+
+
+	.macro	pvc$violate	rule
+	  .iif ndf pcv_index, pcv_index = 0
+	  .iif nb <rule>, pcv$rule = rule
+	  .iif df osfpal, pvc_lbl \pcv_index, \pcv$rule, osf
+	  .iif ndf osfpal, pvc_lbl \pcv_index,\ pcv$rule, vms
+	  pcv_index = pcv_index +1
+	.endm
+
+
+	.macro	pvc_lbl indx, rule, os, inst=0, value
+	  .if nb <value>
+	    .iif eq inst, pvc$'os''indx'$'rule' == value
+	    .iif ne inst, pvc$'os''indx'$'rule'.'inst' == value
+	  .iff
+	    .iif eq inst, pvc$'os''indx'$'rule' == .
+	    .iif ne inst, pvc$'os''indx'$'rule'.'inst' == .
+	  .endc
+	.endm
+
+
+;+
+; Macros associated with Pass 4 fixups of PAL spe/chm workarounds
+;+
+	.macro	check_pass_4	r
+	ldah	'r', ^xfff0(r31)	; get CBOX IPR I/O Address
+	zapnot	'r', #^x1f, 'r'
+	ldqp	'r', ei_stat('r')	; read EI_STAT
+	srl	'r', #24, 'r'		; isolate revision field
+	and	'r', #15, 'r'
+					; Make Pass 3 behave as Pass 2
+	bic	'r', #1, 'r'		; placeholder for future
+	cmpeq	'r', #2, 'r'		; is this a Pass 2/3?
+	xor	'r', #1, 'r'		; flip result
+	.endm
+
+	.macro p4_fixup$label	count, stall=0
+	.iif eq stall,	$pal$chm_fix$'count' == .
+	.iif ne stall,	$pal$chm_fix_stall$'count' == .
+	.endm
+
+	.macro p4_fixup$hw_rei_stall
+	hw_rei_stall_chm_count = hw_rei_stall_chm_count + 1
+	p4_fixup$label \hw_rei_stall_chm_count, stall=1
+	.endm
+
+	.macro chm_table_entry	t, stall=0
+	.iif eq stall,	.long	$pal$chm_fix$'t'
+	.iif ne stall,	.long	$pal$chm_fix_stall$'t'
+	.endm
+
+	.macro create_fixup_table	count, stall_count
+p4_fixup$hw_rei_fixup_table:
+	t = 1
+	.repeat 'count'
+	chm_table_entry \t
+	t = t + 1
+	.endr
+	.long	0
+	t = 1
+	.repeat 'stall_count'
+	chm_table_entry \t, stall=1
+	t = t + 1
+	.endr
+	.long	0
+	.endm
+
+	.macro	p4_fixup$fixup_table
+	.if ne	enable_p4_fixups
+	create_fixup_table	\hw_rei_chm_count, \hw_rei_stall_chm_count
+	.endc
+	.endm
+
+	.macro 	p4_fixup$fixup_routine setup=1,subr=0,?lab1,?lab2,?lab3,?lab4,?lab5,?lab6,?lab7
+; r9 - PAL base - computed, or passed if setup = 0
+; r10 - table pointer - computed, or passed if setup=0
+; r12 - hw_rei instruction
+; r13 - fixup address location pointer
+; r14 - return address if subr=1
+	.if ne	enable_p4_fixups
+p4_fixup$fixup:
+	check_pass_4	r12		; test for EV5 Pass 4
+	beq	r12, lab7		; skip if not
+
+	br	r12, lab2
+	hw_rei				; First fix up the hw_rei's
+.if ne setup
+lab1:	.long	p4_fixup$hw_rei_fixup_table-lab1
+.endc
+
+lab2:
+.if ne	setup
+	mfpr	r9, pal_base		; get PAL base
+	ldlp	r10, 4(r12)		; get offset to table
+	addq	r10, r12, r10		; compute address of table
+        lda     r10, 4(r10)             ; compensate for offset to table addr
+.endc
+	ldlp	r12, 0(r12)		; get a 'hw_rei' instruction 
+
+lab3:	ldlp	r13, 0(r10)		; fetch fixup address
+	addq	r10, #4, r10		; point to next table entry
+	beq	r13, lab4		; 0 = end of table
+	addq	r13, r9, r13		; add offset to PAL base
+	stlp	r12, 0(r13)		; change the instruction to a hw_rei
+	br	lab3
+
+lab4:	br	r12, lab5 
+	hw_rei_stall			; Now fix up the hw_rei_stall's
+lab5:	ldlp	r12, 0(r12)		; get a 'hw_rei_stall' instruction 
+lab6:	ldlp	r13, 0(r10)		; fetch fixup address
+	addq	r10, #4, r10		; point to next table entry
+	beq	r13, lab7		; 0 = end of table
+	addq	r13, r9, r13		; add offset to PAL base
+	stlp	r12, 0(r13)		; change the instruction to a hw_rei_stall
+	br	lab6
+lab7:	mb
+.if ne	subr
+	pvc$jsr	fixup_call, bsr=1, dest=1
+	ret	r31, (r14)	; if desired, return to caller
+	.endc
+	.endc
+	.endm
+
+	.macro	p4_fixup$call_fixup_routine
+	pvc$jsr	fixup_call, bsr=1
+	bsr	r14, p4_fixup$fixup
+	.endm
+

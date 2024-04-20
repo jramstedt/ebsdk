@@ -1,0 +1,178 @@
+	.MACRO	PALDEFS
+	PALDEF_VER == 1		; Flag the version number of this file.
+	.ENDM
+
+
+	.MACRO	$HALT_CODES,$GBL
+	$DEFINI	HALT_CODES,$GBL
+
+$EQU	HLT$C_RESET		0
+$EQU	HLT$C_HW_HALT		1
+$EQU	HLT$C_KSP_INVAL		2
+$EQU	HLT$C_SCBB_INVAL	3
+$EQU	HLT$C_PTBR_INVAL	4
+$EQU	HLT$C_SW_HALT		5
+$EQU	HLT$C_DBL_MCHK		6
+$EQU    HLT$C_MCHK_FROM_PAL	7
+$EQU	HLT$C_START		32
+$EQU    HLT$C_CALLBACK		33
+$EQU	HLT$C_MPSTART		34
+$EQU	HLT$C_LFU_START		35
+; halt codes above 255 reserved for platform specific errors
+	$DEFEND	HALT_CODES,$GBL,DEF
+	.ENDM
+
+	.MACRO	$MCHK_CODES,$GBL
+	$DEFINI	MCHK_CODES,$GBL
+
+$EQU	MCHK$C_TPERR			64@1
+$EQU	MCHK$C_TCPERR			65@1
+$EQU	MCHK$C_HERR			66@1
+$EQU	MCHK$C_ECC_C			67@1
+$EQU	MCHK$C_ECC_NC			68@1
+$EQU    MCHK$C_UNKNOWN		        69@1
+$EQU	MCHK$C_CACKSOFT			70@1
+$EQU    MCHK$C_BUGCHECK			71@1
+$EQU	MCHK$C_OS_BUGCHECK		72@1
+$EQU	MCHK$C_DCPERR			73@1
+$EQU	MCHK$C_ICPERR			74@1
+$EQU	MCHK$C_RETRYABLE_IRD		75@1
+$EQU	MCHK$C_PROC_HRD_ERROR		76@1
+$EQU	MCHK$C_SCPERR			77@1
+$EQU	MCHK$C_BCPERR			78@1
+; mchk codes above 255 reserved for platform specific errors
+
+
+$EQU	MCHK$C_READ_NXM			256@1
+$EQU	MCHK$C_SYS_HRD_ERROR		257@1
+$EQU	MCHK$C_SYS_ECC			258@1
+$EQU	MCHK$C_IIC_ERR			260@1
+
+	$DEFEND	MCHK_CODES,$GBL,DEF
+	.ENDM
+
+
+	.MACRO	$EV5_MM,$GBL
+	$DEFINI	$EV5_MM,$GBL
+
+	page_seg_size_bits	= 10
+	page_offset_size_bits	= 13
+	page_size_bytes		= 8192
+	va_size_bits		= 43
+	pa_size_bits		= 45
+
+
+	$DEFEND	$EV5_MM,$GBL,DEF
+	.ENDM
+
+
+	.MACRO	$PALTEMP,$GBL
+	$DEFINI	$PALTEMP,$GBL
+
+pt0  		== <^x140>
+pt1  		== <^x141>
+pt2  		== <^x142>
+pt_entuna	== <^x142>
+pt3	 	== <^x143>
+pt_impure	== <^x143>
+pt4  		== <^x144>
+pt5  		== <^x145>
+pt6  		== <^x146>
+pt7  		== <^x147>
+pt_entIF	== <^x147>
+pt8  		== <^x148>
+pt_intmask	== <^x148>
+pt9  		== <^x149>
+pt_entSys	== <^x149>
+pt_ps  		== <^x149>
+pt10  		== <^x14a>
+pt11  		== <^x14b>
+pt_trap		== <^x14b>
+pt_entInt	== <^x14b>
+pt12  		== <^x14c>
+pt_entArith	== <^x14c>
+pt13		== <^x14d>
+pt_sys0		== <^x14d>
+pt14		== <^x14e>
+pt_sys1		== <^x14e>
+pt15		== <^x14f>
+pt_sys2		== <^x14f>
+pt16  		== <^x150>
+pt_whami	== <^x150>
+pt_mces		== <^x150>
+pt_misc 	== <^x150>
+pt17  		== <^x151>
+pt_scc 		== <^x151>
+pt_sysval	== <^x151>
+pt18  		== <^x152>
+pt_prbr		== <^x152>
+pt_usp		== <^x152>
+pt19  		== <^x153>
+pt_ksp 		== <^x153>
+pt20  		== <^x154>
+pt_ptbr		== <^x154>
+pt21  		== <^x155>
+pt_vptbr	== <^x155>
+pt_entMM	== <^x155>
+pt22  		== <^x156>
+pt_scbb		== <^x156>
+pt_kgp		== <^x156>
+pt23  		== <^x157>
+pt_pcbb		== <^x157>		
+
+
+pt_misc$v_switch == <48>
+pt_misc$v_cm == <56>
+
+	$DEFEND	$PALTEMP,$GBL,DEF
+	.ENDM
+
+	.MACRO	$OSF_MMCSR_DEF,$GBL
+	$DEFINI	OSFMMCSR,$GBL
+
+$EQU	MMCSR$C_TNV		<^B00000000>
+$EQU	MMCSR$C_ACV		<^B00000001>
+$EQU	MMCSR$C_FOR		<^B00000010>
+$EQU	MMCSR$C_FOE		<^B00000011>
+$EQU	MMCSR$C_FOW		<^B00000100>
+	$DEFEND	OSFMMCSR,$GBL,DEF
+	.ENDM
+
+	.MACRO	$MM_STAT_DEF,$GBL
+	$DEFINI	MMSTATDEF,$GBL
+
+$EQU	MM_STAT$M_OPCODE  	<^X3F>
+$EQU	MM_STAT$M_RA  		<^X1F>
+$EQU	EVX$OPC_SYNC	 	<^X18>
+$EQU	EVX$OPC_HW_LD	 	<^X1B>
+
+
+	$DEFEND	MMSTATDEF,$GBL,DEF
+	.ENDM
+
+
+	.MACRO	$OSF_A0_DEF,$GBL
+	$DEFINI	OSFA0DEF,$GBL
+
+$EQU	OSF_A0$bpt	  	<^X0>
+$EQU	OSF_A0$bugchk	  	<^X1>
+$EQU	OSF_A0$gentrap	  	<^X2>
+$EQU	OSF_A0$fen	  	<^X3>
+$EQU	OSF_A0$opdec	  	<^X4>
+
+
+
+	$DEFEND	OSFA0DEF,$GBL,DEF
+	.ENDM
+
+	.MACRO	$EV5_IPLDEF,$GBL
+	$DEFINI	EV5_IPLDEF,$GBL
+
+$EQU	IPL$MACHINE_CHECK	31
+$EQU	IPL$POWERFAIL		30
+$EQU	IPL$PERF_COUNT		29
+$EQU	IPL$CLOCK		22
+$EQU	IPL$INTERPROCESSOR	22
+
+	$DEFEND	EV5_IPLDEF,$GBL,DEF
+	.ENDM

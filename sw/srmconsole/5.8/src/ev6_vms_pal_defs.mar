@@ -1,0 +1,379 @@
+;+
+; ev6_vms_pal_defs.mar
+;
+; This file is for vms definitions
+;-
+
+;+
+; Last Edit:	9-Jun-00
+;
+; Edit History
+; Who	When		What
+; ---	----		----
+; ES	09-Jun-00	Added P_MISC__EV68P2__S,M
+;-
+
+;+
+; CALL_PAL functions
+;-
+.macro	PAL_FUNC_DEFS
+	PAL_FUNC__BPT		= ^x80
+	PAL_FUNC__BUGCHK	= ^x81
+	PAL_FUNC__CHME		= ^x82
+	PAL_FUNC__CHMK		= ^x83
+	PAL_FUNC__CHMS		= ^x84
+	PAL_FUNC__CHMU		= ^x85
+	PAL_FUNC__IMB		= ^x86
+	PAL_FUNC__INSQHIL	= ^x87
+	PAL_FUNC__INSQTIL	= ^x88
+	PAL_FUNC__INSQHIQ	= ^x89
+	PAL_FUNC__INSQTIQ	= ^x8A
+	PAL_FUNC__INSQUEL	= ^x8B
+	PAL_FUNC__INSQUEQ	= ^x8C
+	PAL_FUNC__INSQUELD	= ^x8D
+	PAL_FUNC__INSQUEQD	= ^x8E
+	PAL_FUNC__PROBER	= ^x8F
+	PAL_FUNC__PROBEW	= ^x90
+	PAL_FUNC__RD_PS		= ^x91
+	PAL_FUNC__REI		= ^x92
+	PAL_FUNC__REMQHIL	= ^x93
+	PAL_FUNC__REMQTIL	= ^x94
+	PAL_FUNC__REMQHIQ	= ^x95
+	PAL_FUNC__REMQTIQ	= ^x96
+	PAL_FUNC__REMQUEL	= ^x97
+	PAL_FUNC__REMQUEQ	= ^x98
+	PAL_FUNC__REMQUELD	= ^x99
+	PAL_FUNC__REMQUEQD	= ^x9A
+	PAL_FUNC__SWASTEN	= ^x9B
+	PAL_FUNC__WR_PS_SW	= ^x9C
+	PAL_FUNC__RSCC		= ^x9D
+	PAL_FUNC__READ_UNQ	= ^x9E
+	PAL_FUNC__WRITE_UNQ	= ^x9F
+	PAL_FUNC__AMOVRR	= ^xA0
+	PAL_FUNC__AMOVRM	= ^xA1
+	PAL_FUNC__INSQHILR	= ^xA2
+	PAL_FUNC__INSQTILR	= ^xA3
+	PAL_FUNC__INSQHIQR	= ^xA4
+	PAL_FUNC__INSQTIQR	= ^xA5
+	PAL_FUNC__REMQHILR	= ^xA6
+	PAL_FUNC__REMQTILR	= ^xA7
+	PAL_FUNC__REMQHIQR	= ^xA8
+	PAL_FUNC__REMQTIQR	= ^xA9
+	PAL_FUNC__GENTRAP	= ^xAA
+	PAL_FUNC__CLRFEN	= ^xAE
+
+	PAL_FUNC__HALT		= ^x00
+	PAL_FUNC__CFLUSH	= ^x01
+	PAL_FUNC__DRAINA	= ^x02
+	PAL_FUNC__LDQP		= ^x03
+	PAL_FUNC__STQP		= ^x04
+	PAL_FUNC__SWPCTX	= ^x05
+	PAL_FUNC__MFPR_ASN	= ^x06
+	PAL_FUNC__MTPR_ASTEN	= ^x07
+	PAL_FUNC__MTPR_ASTSR	= ^x08
+	PAL_FUNC__CSERVE	= ^x09
+	PAL_FUNC__SWPPAL	= ^x0A
+	PAL_FUNC__MFPR_FEN	= ^x0B
+	PAL_FUNC__MTPR_FEN	= ^x0C
+	PAL_FUNC__MTPR_IPIR	= ^x0D
+	PAL_FUNC__MFPR_IPL	= ^x0E
+	PAL_FUNC__MTPR_IPL	= ^x0F
+	PAL_FUNC__MFPR_MCES	= ^x10
+	PAL_FUNC__MTPR_MCES	= ^x11
+	PAL_FUNC__MFPR_PCBB	= ^x12
+	PAL_FUNC__MFPR_PRBR	= ^x13
+	PAL_FUNC__MTPR_PRBR	= ^x14
+	PAL_FUNC__MFPR_PTBR	= ^x15
+	PAL_FUNC__MFPR_SCBB	= ^x16
+	PAL_FUNC__MTPR_SCBB	= ^x17
+	PAL_FUNC__MTPR_SIRR	= ^x18
+	PAL_FUNC__MFPR_SISR	= ^x19
+	PAL_FUNC__MFPR_TBCHK	= ^x1A
+	PAL_FUNC__MTPR_TBIA	= ^x1B
+	PAL_FUNC__MTPR_TBIAP	= ^x1C
+	PAL_FUNC__MTPR_TBIS	= ^x1D
+	PAL_FUNC__MFPR_ESP	= ^x1E
+	PAL_FUNC__MTPR_ESP	= ^x1F
+	PAL_FUNC__MFPR_SSP	= ^x20
+	PAL_FUNC__MTPR_SSP	= ^x21
+	PAL_FUNC__MFPR_USP	= ^x22
+	PAL_FUNC__MTPR_USP	= ^x23
+	PAL_FUNC__MTPR_TBISD	= ^x24
+	PAL_FUNC__MTPR_TBISI	= ^x25
+	PAL_FUNC__MFPR_ASTEN	= ^x26
+	PAL_FUNC__MFPR_ASTSR	= ^x27
+	PAL_FUNC__OPCDEC28	= ^x28
+	PAL_FUNC__MFPR_VPTB	= ^x29
+	PAL_FUNC__MTPR_VPTB	= ^x2A
+	PAL_FUNC__MTPR_PERFMON	= ^x2B
+	PAL_FUNC__OPCDEC2C	= ^x2C
+	PAL_FUNC__OPCDEC2D	= ^x2D
+	PAL_FUNC__MTPR_DATFX	= ^x2E
+	PAL_FUNC__OPCDEC2F	= ^x2F
+	PAL_FUNC__MFPR_VIRBND	= ^x30
+	PAL_FUNC__MTPR_VIRBND	= ^x31
+	PAL_FUNC__MFPR_SYSPTBR	= ^x32
+	PAL_FUNC__MTPR_SYSPTBR	= ^x33
+	PAL_FUNC__OPCDEC34	= ^x34
+	PAL_FUNC__OPCDEC35	= ^x35
+	PAL_FUNC__OPCDEC36	= ^x36
+	PAL_FUNC__OPCDEC37	= ^x37
+	PAL_FUNC__OPCDEC38	= ^x38
+	PAL_FUNC__OPCDEC39	= ^x39
+	PAL_FUNC__OPCDEC3A	= ^x3A
+	PAL_FUNC__OPCDEC3B	= ^x3B
+	PAL_FUNC__OPCDEC3C	= ^x3C
+	PAL_FUNC__OPCDEC3D	= ^x3D
+	PAL_FUNC__OPCDEC3E	= ^x3E
+	PAL_FUNC__MFPR_WHAMI	= ^x3F
+.endm	PAL_FUNC_DEFS
+
+
+;+
+; PAL_P_MISC definition
+;-
+.macro	PAL_P_MISC_DEFS
+	P_MISC__SW__S		= 0
+	P_MISC__SW__M		= ^x3
+	P_MISC__IP__S		= 2
+	P_MISC__IP__M		= ^x1
+	P_MISC__CM__S		= 3
+	P_MISC__CM__M		= ^x3
+	P_MISC__VMM__S		= 7
+	P_MISC__VMM__M		= ^x1
+	P_MISC__IPL__S		= 8
+	P_MISC__IPL__M		= ^x1F
+	P_MISC__RSV__S		= 13
+	P_MISC__RSV__M		= ^x7
+
+	P_MISC__MCES__MCHK__S	= 16
+	P_MISC__MCES__SCE__S	= 17
+	P_MISC__MCES__PCE__S	= 18
+	P_MISC__MCES__DPC__S	= 19
+	P_MISC__MCES__DSC__S	= 20
+	P_MISC__MCES__RSV__S	= 21
+	P_MISC__MCES__RSV__M	= ^x7
+
+	P_MISC__SCBV__S		= 24
+	P_MISC__SCBV__M		= ^xFFFF
+	P_MISC__MCHK_CODE__S	= 40
+	P_MISC__MCHK_CODE__M	= ^xFFFF
+;
+; <59> Set for ev68 pass2
+; For istream mchk, no longer need to check for pc near a cmov 
+;
+	P_MISC__EV68P2__S	= 59
+	P_MISC__EV68P2__M	= ^x1
+;
+; <61:60> reserved for ev7
+;
+	P_MISC__SWITCH__S	= 62
+	P_MISC__PHYS__S		= 63
+.endm	PAL_P_MISC_DEFS
+
+
+;+
+; PAL_PS definition
+;-
+.macro	PAL_PS_DEFS
+	PS__SW__S		= 0
+	PS__SW__M		= ^x3
+	PS__IP__S		= 2
+	PS__IP__M		= ^x1
+	PS__CM__S		= 3
+	PS__CM__M		= ^x3
+	PS__VMM__S		= 7
+	PS__VMM__M		= ^x1
+	PS__IPL__S		= 8
+	PS__IPL__M		= ^x1F
+	PS__SP_ALIGN__S		= 56
+	PS__SP_ALIGN__M		= ^x3F
+
+	PS__KERN		= ^x00
+	PS__EXEC		= ^x08
+	PS__SUPR		= ^x10
+	PS__USER		= ^x18
+
+.endm	PAL_PS_DEFS
+
+
+;+
+; PTE layout
+;
+;	Loc	Size	name 	function
+;	------	------	------	-----------------------------------
+;	<63:32>	32	PFN	Page Frame Number
+;	<31:16>	16	SOFT	Bits reserved for software use
+;	<15>	1	UWE	User write enable
+;	<14>	1	SWE	Super write enable
+;	<13>	1	EWE	Exec write enable
+;	<12>	1	KWE	Kernel write enable
+;	<11>	1	URE	User read enable
+;	<10>	1	SRE	Super read enable
+;	<9>	1	ERE	Exec read enable
+;	<8>	1	KRE	Kernel read enable
+;	<7:6>	2	RES	Reserved SBZ 
+;	<5>	1	HPF	Huge Page Flag
+;	<4>	1	ASM	Wild card address space number match
+;	<3>	1	FOE	Fault On execute
+;	<2>	1	FOW	Fault On Write
+;	<1>	1	FOR	Fault On Read
+; 	<0>	1	V	valid bit
+;-
+
+.macro	PTE_DEFS
+	PTE__PFN__S	= 32
+	PTE__PFN__M	= ^xFFFFFFFF
+
+	PTE__SOFT__S	= 16
+	PTE__SOFT__M	= ^xFFFF
+
+	PTE__UWE__S	= 15
+	PTE__UWE__M	= ^x1
+	PTE__SWE__S	= 14
+	PTE__SWE__M	= ^x1
+	PTE__EWE__S	= 13
+	PTE__EWE__M	= ^x1
+	PTE__KWE__S	= 12
+	PTE__KWE__M	= ^x1
+
+	PTE__URE__S	= 11
+	PTE__URE__M	= ^x1
+	PTE__SRE__S	= 10
+	PTE__SRE__M	= ^x1
+	PTE__ERE__S	= 9
+	PTE__ERE__M	= ^x1
+	PTE__KRE__S	= 8
+	PTE__KRE__M	= ^x1
+
+	PTE__GH__S	= 5
+	PTE__GH__M	= ^x3
+
+	PTE__ASM__S	= 4
+	PTE__ASM__M	= ^x1
+	PTE__FOE__S	= 3
+	PTE__FOE__M	= ^x1
+	PTE__FOW__S	= 2
+	PTE__FOW__M	= ^x1
+	PTE__FOR__S	= 1
+	PTE__FOR__M	= ^x1
+
+	PTE__V__S	= 0
+	PTE__V__M	= ^x1
+.endm	PTE_DEFS
+
+
+;+
+; SYSTEM CONTROL BLOCK (SCB)
+;-
+.macro	SCB_DEFS
+	SCB__FEN		= ^x0010
+	SCB__ACV		= ^x0080
+	SCB__TNV		= ^x0090
+	SCB__FOR		= ^x00A0
+	SCB__FOW		= ^x00B0
+	SCB__FOE		= ^x00C0
+	SCB__ARITH		= ^x0200
+	SCB__KAST		= ^x0240
+	SCB__EAST		= ^x0250
+	SCB__SAST		= ^x0260
+	SCB__UAST		= ^x0270
+	SCB__UNALIGN		= ^x0280
+	SCB__BPT		= ^x0400
+	SCB__BUGCHK		= ^x0410
+	SCB__OPCDEC		= ^x0420
+	SCB__ILLOP		= ^x0430
+	SCB__TRAP		= ^x0440
+	SCB__CHMK		= ^x0480
+	SCB__CHME		= ^x0490
+	SCB__CHMS		= ^x04A0
+	SCB__CHMU		= ^x04B0
+	SCB__SW0		= ^x0500
+	SCB__SW1		= ^x0510
+	SCB__SW2		= ^x0520
+	SCB__SW3		= ^x0530
+	SCB__SW4		= ^x0540
+	SCB__SW5		= ^x0550
+	SCB__SW6		= ^x0560
+	SCB__SW7		= ^x0570
+	SCB__SW8		= ^x0580
+	SCB__SW9		= ^x0590
+	SCB__SW10		= ^x05A0
+	SCB__SW11		= ^x05B0
+	SCB__SW12		= ^x05C0
+	SCB__SW13		= ^x05D0
+	SCB__SW14		= ^x05E0
+	SCB__SW15		= ^x05F0
+	SCB__CLOCK		= ^x0600
+	SCB__INTER		= ^x0610
+	SCB__SYS_CORR_ERR	= ^x0620
+	SCB__PROC_CORR_ERR	= ^x0630
+	SCB__PWRFAIL		= ^x0640
+	SCB__PERFMON		= ^x0650
+	SCB__SYSMCHK		= ^x0660
+	SCB__PROCMCHK		= ^x0670
+	SCB__SYS_EVENT		= ^x0680
+	SCB__PASSIVE__REL	= ^x06F0
+.endm	SCB_DEFS
+
+
+;+
+; IPL_DEFS
+;-
+.macro	IPL_DEFS
+	IPL__MCHK		= 31
+	IPL__PROC_CORR		= 31
+	IPL__PERFMON		= 29
+	IPL__DEV23		= 23
+	IPL__IP			= 22
+	IPL__CLOCK		= 22
+	IPL__DEV22		= 22
+	IPL__DEV21		= 21
+	IPL__DEV20		= 20
+.endm	IPL_DEFS
+
+;+
+; PRIVILEGED CONTEXT BLOCK (PCB)
+;-
+.macro	PCB_DEFS
+	PCB__STACKS		=  0
+	PCB__KSP		=  0
+	PCB__ESP		=  8
+	PCB__SSP		= 16
+	PCB__USP		= 24
+	PCB__PTBR		= 32
+	PCB__ASN		= 40
+	PCB__AST		= 48
+	PCB__FEN		= 56
+	PCB__CPC		= 64
+	PCB__UNQ		= 72
+	PCB__SCT		= 80
+
+	PCB__ASN__S		= 0
+	PCB__ASN__M		= ^xFF
+	PCB__ASTEN__S		= 0
+	PCB__ASTEN__M		= ^xF
+	PCB__ASTSR__S		= 4
+	PCB__ASTSR__M		= ^xF
+	PCB__FEN__S		= 0
+	PCB__FEN__M		= ^x1
+	PCB__PME__S		= 62
+	PCB__PME__M		= ^x1
+	PCB__DAT__S		= 63
+	PCB__DAT__M		= ^x1
+.endm	PCB_DEFS
+
+
+;+
+; Stack frame (FRM)
+;-
+.macro	FRM_DEFS
+	FRM__R2			= ^x0000
+	FRM__R3			= ^x0008
+	FRM__R4			= ^x0010
+	FRM__R5			= ^x0018
+	FRM__R6			= ^x0020
+	FRM__R7			= ^x0028
+	FRM__PC			= ^x0030
+	FRM__PS			= ^x0038
+.endm	FRM_DEFS

@@ -1,0 +1,5 @@
+while (true)
+do
+show_s
+sleep 5
+done

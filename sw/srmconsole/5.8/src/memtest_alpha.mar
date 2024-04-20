@@ -1,0 +1,542 @@
+	.title	memtest_alpha
+; file:	memtest_alpha.mar
+;           
+; Copyright (C) 1991 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;       
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.          
+;           
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;
+
+;++               
+;  FACILITY:
+;
+;      Alpha Console, Alpha version
+;
+;  MODULE DESCRIPTION:
+;                    
+;      Graycode memory test - Alpha version
+;      This routine is the time critical section of the graycode memory
+;      test.  	       
+;                       
+;  AUTHORS:             
+;
+;	Harold Buckingham
+;
+;  CREATION DATE: 
+;                
+;	26-Jul-1991
+;
+;  MODIFICATION HISTORY:
+;   
+;	cto	04-Jan-1994	Initial entry from Traci's RUBY code for
+;				new memtests.
+;
+;	hcb	14-Jan-1993	Make work on multiple bcache sizes
+;
+;	hcb	21-Dec-1992	Change stq to stl when setting pass flag
+;
+;	hcb	23-Nov-1992	Fix loop branches so if the end is not hexaword
+;				aligned we still dropout of the loop.
+;
+;	hcb	08-Oct-1992	add pass flag to keep track of the loop pass
+;
+;	hcb	07-Jul-1992	switch between graycode/inverse every 
+;				hexaword.
+;				Modify to run from cmm_diag on powerup
+;
+;	hcb	03-Oct-1991	Added optional mb code
+;
+;	hcb	21-Aug-1991	Debugged and optimized on ADU.
+;
+;	hcb	26-Jul-1991	Initial entry.
+;
+;--                 
+
+	.psect	kernel$data, 4, noexe
+                              
+linkage:                                                                    
+
+pd	graycode_memtest
+pd	do_stq_ldq
+pd	stq_ldq
+pd	stl_ldl
+
+ref	turn_on_edc
+ref	get_bcache_size
+                                                  
+	.psect	kernel$code, 4, exe
+                             
+;+            
+; ============================================================================
+; = graycode_memtest - do gray code memtest				     =
+; ============================================================================
+;                           
+; OVERVIEW:
+;                                                                           
+;	This is the time critical section of Graycode memtest.  The file
+;	takes as an input the starting address and length in bytes of
+;	the section of memory to test.  The test is divided into three
+;	loops. The first loop write alternating graycodes/inverse graycode
+;	throughout the memory under test.  The second loop reads each
+;	location and writes back the inverse.  The third loop reads all 
+;	memory. Note that no explicit data checking is performed. The
+;	EDC/ECC logic will detect any bit errors which occur.  The fault 
+;	model is not to detect address shorts but to stress the memory path
+;	with high throughput and state transitions.
+;                             
+;                                 
+; FORM OF CALL:    
+;           
+;	graycode_memtest(start, len, do_mb, do_init, brd_mask, pass)        
+;                       
+; RETURNS:                                  
+;                       
+;	None                
+;                                                 
+; ARGUMENTS:                                      
+;              
+;	int start 	- the starting address of test block
+;           
+;       int len		- the number of bytes to test
+;                           
+;       int do_mb 	- when set do an mb after every memory access
+;
+;       int do_init 	- when set turn on the board edc after the first loop
+;			  and init memory with 0xef pattern on last pass    
+;     
+;       int brd_mask 	- board installed mask.  Used to turn on edc on
+;			  installed boards.  Only used when do_init is set.
+;
+;       int pass	- address of flag to indicate either the graycode
+;			  /inverse graycode loop or the inverse graycode
+;			  /graycode loop.
+;
+; REGISTERS:
+;                                                                    
+;	None       
+;                           
+; SIDE EFFECTS:       
+;                                                                       
+;	Test memory is overwritten.                                         
+;                                                 
+;-                                                
+; This is a graycode memory test.  It does not checking of the data.  It
+; relies upon the EDC to flag all errors.
+;                       
+; inputs:   	                  
+;	     	r16 - start address 
+;		r17 - length number of bytes to test 
+;		r18 - mb flag 
+;		r19 - init memory with 0xef pattern on last loop, turn on edc
+;		r20 - board mask to turn on edc
+;		r21 - address of pass flag
+;                         
+; returns:      
+;		r26 - return address
+;                                       
+; register usage:        
+;     		r0  - graycode counter 
+;		r1  - next address graycode counter 
+;		r2  - saved/restored scratch
+;		r3  - saved/restored scratch
+;	       	r4  - saved/restored graycode caclulations
+;		r20 - graycode caclulations       
+;	    	r22 - graycode caclulations
+;   	    	r23 - graycode caclulations                          
+;	    	r24 - test address             
+;		r25 - scratch
+;	     	r28 - constant -1
+;		         
+                                 
+_graycode_memtest_:                                
+                               
+      	lda	sp,-24(sp) ; Save some registers
+	stq	r2,(sp)                        
+	stq	r3,8(sp) 
+	stq	r4,16(sp) 
+                                    
+	zap 	r17, ^xf0, r17	; clear upper longword
+	zap 	r16, ^xf0, r16	; clear upper longword
+	srl	r17, #3, r17    ; loop counter length/2qw per loop
+	lda	r28, -1(r31)   	; load r28 with -1 for inverse graycode       
+	bis 	r31, r31, r1	; clear r1=j      
+	bis	r31, r16, r24	; set the start address
+
+;                          
+; Loop 1 write Graycode and Inverse Graycode
+;
+align_branch_target                 
+10$:	                    
+	addq	r1, 1, r0	; k++ 
+	srl	r1, 1, r4     	; calulate the graycode - (j>>1)
+	srl	r0, 1, r22	; calulate the graycode - (k>>1)
+	xor	r4, r1, r4	; graycode - (j>>1)^j 
+	xor	r22, r0, r22	; graycode - (k>>1)^k 
+	addq	r1, 2, r1    	; j++
+	stq	r4, (r24)  	; store the graycode
+    	beq	r18, 11$    	; do mb if flag is set
+ 	mb                                     
+11$:	stq    	r22, ^x8(r24)	; store the graycode
+	beq	r18, 12$   	; do mb if flag is set
+	mb               
+12$:                      
+	addq 	r1, 1, r0   	; k++ 
+ 	srl	r1, 1, r4	; inverse graycode - (j>>1)
+ 	srl	r0, 1, r22   	; inverse graycode - (k>>1)
+	xor	r4, r1, r4   	; inverse graycode - (j>>1)^j	
+	xor	r22, r0, r22	; inverse graycode - (k>>1)^k	
+	xor	r4, r28, r4	; inverse graycode - (j>>1)^j^-1
+	xor	r22, r28, r22	; inverse graycode - (k>>1)^k^-1
+	addq	r1, 2, r1   	; j++
+	stq	r4, ^x10(r24)	; store the inverse graycode
+    	beq	r18, 13$    	; do mb if flag is set
+	mb                                
+13$:	stq    	r22, ^x18(r24)	; store the inverse graycode
+	beq	r18, 14$   	; do mb if flag is set
+ 	mb               
+14$:                        
+	addq 	r24, ^x20, r24	; next address to test 
+                                               
+	cmplt	r1, r17, r25	; end of test memory?
+	bne	r25, 10$	; keep testing if not at end of memory
+;                            
+; Turn on the edc on the boards installed. Only used when do_init flag is set
+;                                                      
+    	beq	r19, 17$    	; only if edc_test flag is set
+                      
+	bis 	r31, r31, r2	; clear r2
+	lda	r3, 1(r31)      ; walking board mask
+                   
+15$:	and	r20, r3, r25	; do we set edc on this board?
+	beq	r25, 16$        ; branch if not
+	                      
+	lda	sp,-64(sp)	; Acquire stack space
+	stq	r27,(sp)	; Save R27 
+	stq	r26,8(sp)	; Save R26
+	stq	r21,16(sp)	; Save R21
+	stq	r20,24(sp)	; Save R20
+	stq	r19,32(sp)	; Save R19
+	stq	r18,40(sp)	; Save R18
+  	stq	r17,48(sp)	; Save R17
+	stq	r16,56(sp)	; Save R16
+                     
+	lda	r1,linkage-graycode_memtest(r27) ; get storage location
+	bis	r31, r2, r16        		 ; board number
+	lda	r25, 1(r31)	        
+ 	ldq	r27, _turn_on_edc(r1)	; Load Procedure Value.
+	ldq	r26, 8(r27)	    	; Load Procedure Entry Address.
+ 	jsr	r26, (r26)		; turn on the edc
+                                          
+	ldq	r16,56(sp)	; Restore R16 
+	ldq	r17,48(sp)	; Restore R17 
+	ldq	r18,40(sp)	; Restore R18 
+	ldq	r19,32(sp)	; Restore R19 
+	ldq	r20,24(sp)	; Restore R20 
+	ldq	r21,16(sp)	; Restore R20 
+	ldq	r26,8(sp)	; Restore R26 
+	ldq	r27,(sp)	; Restore R27 
+	lda	sp,64(sp)	; Release stack space
+
+16$:    addq	r2, 1, r2  	; next board             
+	cmpeq	r2, 4, r25	; have all 4 been checked?
+	bne	r25, 17$	; yes, exit loop
+	sll	r3, 1, r3     	; next board mask
+	br	r31, 15$        ; check next board
+
+;                            
+; Loop 2 read memory let EDC detect errors write Inverse Graycode and Graycode
+;                                                      
+                                  
+17$:	bis 	r31, r31, r1	; clear r1=j      
+	bis	r31, r16, r24	; set the start address
+	lda	r28, -1(r31) 	; load r28 with -1 for inverse graycode       
+
+align_branch_target                       
+20$:	                                  
+  	addq	r1, 1, r0	; k++        
+ 	ldq    	r4, (r24) 	; read the graycode
+	beq	r18, 21$  	; do mb if flag is set
+	mb             
+21$:	             
+ 	srl	r1, 1, r22	; inverse graycode - (j>>1)
+ 	srl	r0, 1, r23   	; inverse graycode - (k>>1)
+  	xor	r22, r1, r22	; inverse graycode - (j>>1)^j	
+	xor	r23, r0, r23	; inverse graycode - (k>>1)^k	
+	xor	r22, r28, r22	; inverse graycode - (j>>1)^j^-1
+	xor	r23, r28, r23	; inverse graycode - (k>>1)^k^-1
+                                             
+	addq	r1, 2, r1	; j++ 
+                                             
+	stq  	r22, (r24)	; store the graycode
+	beq	r18, 22$	; do mb if flag is set
+    	mb                        
+22$:	stq	r23, 8(r24)	; store the graycode
+ 	beq	r18, 23$	; do mb if flag is set
+	mb         
+23$:	                                  
+	srl	r1, 1, r22   	; calulate the graycode - (j>>1)
+	srl	r0, 1, r23	; calulate the graycode - (k>>1)
+ 	xor	r22, r1, r22	; graycode - (j>>1)^j 
+	xor	r23, r0, r23	; graycode - (k>>1)^k 
+	addq	r1, 2, r1	; j++ 
+                   
+ 	stq	r22, ^x10(r24)	; store the graycode
+	beq	r18, 24$     	; do mb if flag is set
+    	mb             
+24$:	stq	r23, ^x18(r24)	; store the graycode
+	beq	r18, 25$	; do mb if flag is set
+	mb                                   
+25$:                     
+	addq	r24, ^x20, r24	; next address to test 
+                                             
+	cmplt	r1, r17, r25  	; end of test memory?
+ 	bne    	r25, 20$	; keep testing if not at end of memory
+                                                    
+;                                 
+; Loop 3 read memory let EDC detect errors             
+;                                                  
+	bis 	r31, r31, r1	; clear r1=j      
+	bis	r31, r16, r24	; set the start address
+;                    
+; Generate the ef pattern needed to initialize memory
+;                                          
+    	beq	r19, 30$    	; only if edc_test flag is set
+
+	lda	r4, 1(r31)	; set the pass flag
+	stl	r4, (r21)
+                                    	
+	lda	r22, ^xefef(r31)      
+	zap	r22, ^xfc, r22
+ 	sll	r22, #16, r23 
+	bis	r22, r23, r22         
+                     
+	sll	r22, #32, r23
+	bis	r22, r23, r22
+	bis  	r31, r22, r23            
+                       
+align_branch_target    
+30$:	                     
+	addq	r1, 4, r1    	; j++,j++ 
+                                          
+	ldq	r4, (r24)	; read the inverse graycode
+	beq	r18, 31$	; do mb if flag is set
+	mb                            
+31$:
+    	beq	r19, 32$    	; only if edc_test flag is set
+                                             
+; write the ef pattern only when required
+ 	stq	r22, (r24)	; store ^xef pattern
+	stq	r23, ^x8(r24)	; store ^xef pattern
+ 	stq	r22, ^x10(r24)	; store ^xef pattern
+    	stq	r23, ^x18(r24)	; store ^xef pattern
+                                      
+32$:	addq	r24, ^x20, r24	; next address to test 
+                         
+ 	cmplt  	r1, r17, r2 	; end of test memory?
+	bne  	r2, 30$ 	; keep testing if not at end of memory
+
+;                                 
+; Loop 4 1MB to force last pattern to memory 
+;                                                  
+    	beq	r19, 42$    	; only if edc_test flag is set
+ 
+	lda	sp,-16(sp)	; Acquire stack space
+	stq	r27,(sp)	; Save R27 
+	stq	r26,8(sp)	; Save R26
+
+	lda	r1,linkage-graycode_memtest(r27) ; get storage location
+	bis	r31, r31, r25
+ 	ldq	r27, _get_bcache_size(r1) 	; Load Procedure Value.
+	ldq	r26, 8(r27)	    		; Load Procedure Entry Address.
+ 	jsr	r26, (r26)			; get the bcache size
+	
+	ldq	r26,8(sp)	; Restore R26 
+	ldq	r27,(sp)	; Restore R27 
+	lda	sp,16(sp)	; Release stack space
+
+	bis 	r31, r31, r24
+
+align_branch_target    
+40$:                            
+ 	ldq  	r20, (r24)	; read the graycode
+	beq	r18, 41$	; do mb if flag is set
+	mb                        
+41$:                
+	addq 	r24, ^x20, r24	; next address to test 
+	cmplt  	r24, r0, r25 	; end of test memory?
+	bne	r25, 40$ 	; keep testing if not at end of memory
+                                             
+42$:
+	ldq	r2,(sp)         
+	ldq	r3,8(sp)                   
+	ldq	r4,16(sp)                   
+	lda	sp,24(sp) 	; Restore the registers
+                
+    	ret	r31,(r26)       
+
+
+.if eq 1                    
+_mem_fast_write_:  
+;  This is just a test to Run as fast as I can
+	zap 	r17, ^xf0, r17	; clear upper longword
+	zap 	r16, ^xf0, r16	; clear upper longword
+	bis	r31, r16, r25	; set the start address
+
+
+	addq	r17, r25, r1	; last address test 
+	lda	r21, -1(r31) 	; load r21 with -1 for test pattern
+
+10$:	
+	stq	r21, (r25)	; store the data
+	stq	r21, ^x8(r25)	; store the data
+	stq	r21, ^x10(r25)	; store the data
+	stq	r21, ^x18(r25)	; store the data
+	addq	r25, ^x20, r25	; next address to test 
+
+ 	cmpeq	r25, r1, r0	; end of test memory?
+	beq	r0, 10$		; keep testing if not at end of memory
+
+	ret	r31,(r26)                       
+.endc
+
+
+.if eq 1
+; This is the unoptimized version I'll keep it around for now...
+
+	zap 	r17, ^xf0, r17	; clear upper longword
+	zap 	r16, ^xf0, r16	; clear upper longword
+	srl	r17, #3, r17    ; loop counter length/2qw per loop
+	lda	r28, -1(r31) 	; load r28 with -1 for inverse graycode       
+	zap 	r1, ^xff, r1	; clear r1=j      
+	bis	r31, r16, r25	; set the start address
+
+;                                                                       
+; Loop 1 write Graycode and Inverse Graycode                      
+;                      
+10$:	bis	r31, r25, r24	; address to test
+    	srl 	r1, 1, r21	; calulate the graycode - (j>>1)
+	xor	r21, r1, r21	; graycode - (j>>1)^j
+	stq	r21, (r24)	; store the graycode
+ 	addq	r1, 1, r1	; j++ 
+	addq	r25, 8, r25	; next address to test 
+                              
+	srl	r1, 1, r22   	; inverse graycode - (j>>1)
+	xor	r22, r1, r22	; inverse graycode - (j>>1)^j	
+	xor	r22, r28, r22	; inverse graycode - (j>>1)^j^-1
+	stq	r22, (r25)	; store the inverse graycode
+	addq	r1, 1, r1	; j++
+	addq	r25, 8, r25	; next address to test 
+                   
+	cmpeq	r1, r17, r19	; end of test memory?
+	beq	r19, 10$	; keep testing if not at end of memory
+     
+;           
+; Loop 2 read memory let EDC detect errors write Inverse Graycode and Graycode
+;
+	zap 	r1, ^xff, r1	; clear r1=j
+	bis	r31, r16, r25	; set the start address
+            
+20$:	bis	r31, r25, r24	; address to test
+
+	ldq	r20, (r24)	; read the graycode
+	srl	r1, 1, r22	; inverse graycode - (j>>1)     
+	xor	r22, r1, r22	; inverse graycode - (j>>1)^j	
+	xor	r22, r28, r22	; inverse graycode - (j>>1)^j^-1
+	stq	r22, (r24)	; store the inverse graycode
+     	addq	r1, 1, r1	; j++ 
+	addq	r25, 8, r25	; next address to test 
+            
+	ldq	r21, (r25)	; read the inverse graycode
+ 	srl	r1, 1, r23	; graycode - (j>>1)
+	xor	r23, r1, r23	; graycode - (j>>1)^j
+	stq	r23, (r25)	; store the graycode
+	addq	r1, 1, r1	; j++
+	addq	r25, 8, r25	; next address to test 
+
+	cmpeq	r1, r17, r19	; end of test memory?
+	beq	r19, 20$	; keep testing if not at end of memory
+
+	zap 	r1, ^xff, r1	; clear r1=j
+	bis	r31, r16, r25	; set the start address
+;    
+; Loop 3 read memory let EDC detect errors 
+;           
+30$:	bis	r31, r25, r24	; address to test
+ 
+	ldq	r21, (r24)	; read the graycode
+	addq	r1, 1, r1	; j++ 
+	addq	r25, 8, r25	; next address to test 
+                             
+	ldq	r23, (r25)	; read the inverse graycode
+	addq	r1, 1, r1      	; j++
+	addq	r25, 8, r25	; next address to test 
+                         
+	cmpeq	r1, r17, r19	; end of test memory?
+	beq	r19, 30$	; keep testing if not at end of memory
+	ret	r31,(r26)
+.endc
+
+	; Routine to call from a C routine to make sure to perform 
+	; a stq (once a 64 bit compiler exists) and a ldq
+	; R16 contains address to store to
+	; R17 contains data to store
+	; R0 contains data read
+
+_stq_ldq_:
+	stq	r17,(r16)
+	mb
+	ldq	r0,(r16)
+	ret	r31,(r26)
+
+	; Routine to call from a C routine to make sure to perform 
+	; a stl
+	; R16 contains address to store to
+	; R17 contains data to store
+	; R0 contains data read
+
+_stl_ldl_:
+	stl	r17,(r16)
+	mb
+	ldl	r0,(r16)
+	ret	r31,(r26)
+
+; Do STQ LDQ routine to perform a STQ and an LDQ at the given address
+; The first parameter passed in the C call (r16) should be the address
+; to load from. The second parameter passed should contain the address
+; of the variable that contains the data (which will also contain the 
+; data to compliment as the second longword) to write.  The third and 
+; fourth parameters passed in the C call should be the address of the
+; variables that will contain the upper (r17) and lower (r18) data.
+;
+; Note: r16 must be quadword aligned!
+;
+
+_do_stq_ldq_:
+	zap 	r17,^xf0,r17	; zap sign extension
+	ornot	r31,r17,r0	; get compliment of r17 into r0
+	sll	r0,32,r0	; shift r0 into upper 32 bits
+	bis	r0,r17,r0	; or r0 and r17 together
+	stq	r0,0(r16)	; and store to *r16
+
+	ldq	r1,0(r16)	; load *r16 into R1
+	zap	r1,^xf0,r0	; 0 out the lower 32 bits of r1
+	stl	r0,0(r19)	;  and store to *r19
+	zap	r1,^x0f,r0	; 0 out the upper 32 bits of r1
+	srl	r0,32,r0	;  shift into position 
+	stl	r0,0(r18)	;   and store to *r18
+	ret	r31,(r26)
+
+.end                      

@@ -1,0 +1,4 @@
+GetCpuName( )
+    {
+    return;
+    }

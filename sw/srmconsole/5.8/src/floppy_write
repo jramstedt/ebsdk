@@ -1,0 +1,3 @@
+echo "Destructive Test of the Floppy started"
+chmod +w dva0*
+exer -a '?w-Rc' dva0 -p 0 -d1 0 -m -l 240&

@@ -1,0 +1,191 @@
+/* file:	alcor.sdl
+/*
+/* Copyright (C) 1993, 1993 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	ALCOR specific definitions for Alpha firmware.
+/*
+/* Author:	Jim Hamel
+/*
+/* Modifications:
+/*
+
+module	$machdep;
+
+/*
+/* ALCOR specific parameters of the HWRPB
+/*
+constant IPL_RUN equals 20;		/* Run drivers in polled mode
+constant HWRPB$_PAGESIZE equals %x2000;	/* System page size in bytes
+constant HWRPB$_PAGEBITS equals 13;	/* System page size in bits
+constant HWRPB$_PA_SIZE equals 40;	/* Physical address size in bits
+constant HWRPB$_ASN_MAX equals 127; 	/* Maximum ASN value 
+constant HWRPB$_SYSTYPE equals 15;	/* Alpha system type (ALCOR)
+constant HWRPB$_SYSVAR equals 4;	/* System variation - Embedded Console
+constant HWRPB$_NPROC equals 1;		/* Number of processor supported
+constant HWRPB$_ICLK_FREQ equals 4096*1024; /* Interval timer frequency
+constant HWRPB$_CC_FREQ equals 100000000; /* Cycle counter frequency (@10ns)
+constant HWRPB$_CC_FREQ_50 equals 200000000; /* Cycle counter frequency (@5ns)
+constant HWRPB$_CC_FREQ_60 equals 166666667; /* Cycle counter frequency (@6ns)
+constant HWRPB$_CC_FREQ_66 equals 151515152; /* Cycle counter frequency (@6.6ns)
+constant HWRPB$_CC_FREQ_70 equals 142857143; /* Cycle counter frequency (@7ns)
+
+constant SLOT$_CPU_TYPE equals 5;	/* Processor type (EV4)
+constant SLOT$_CPU_VAR equals 3;	/* Processor Variation (VAX/IEEE FP)
+constant SLOT$_PAL_LOGOUT equals %x6000; /* PAL logout area
+constant SLOT$_PAL_LOGOUT_LEN equals %x400; /* PAL logout area length
+
+constant CTB$MAX_UNITS equals 1;	/* 1 CTB for Workstations
+                                          
+constant CTB$CSR0 equals 0;		/* Base CSR address for LOC port
+constant CTB$TX_IPL0 equals 21;		/* Transmit interrupt IPL for LOC port
+constant CTB$TX_SCB0 equals %x840;	/* Transmit vector for LOC port
+constant CTB$RX_IPL0 equals 21;		/* Receive interrupt IPL for LOC port
+constant CTB$RX_SCB0 equals %x840;	/* Receive vector for LOC port
+
+constant CTB$CSR1 equals 0;		/* Base CSR address for RD port
+constant CTB$TX_IPL1 equals 21;		/* Transmit interrupt for RD port
+constant CTB$TX_SCB1 equals %x830;	/* Transmit vector for RD port
+constant CTB$RX_IPL1 equals 21;		/* Receive interrupt IPL for RD port
+constant CTB$RX_SCB1 equals %x830;	/* Receive vector for RD port
+
+constant COM1_VECTOR  equals %x84;	/* serial port COM1 vector irq4
+constant COM2_VECTOR  equals %x83;	/* serial port COM2 vector irq3
+constant KEYBD_VECTOR equals %x81;	/* keyboard vector         irq1
+constant MOUSE_VECTOR equals %x8c;	/* mouse    vector	   irq12
+
+constant ALCOR$PRIMARY_CPU 	equals 0;
+constant ALCOR$DISPLAY_EV  	equals %x01; /* Display ev registers
+constant ALCOR$DISPLAY_CIA  	equals %x02; /* Display alcor registers
+constant ALCOR$DISPLAY_PC  	equals %x04; /* Display Process info
+constant ALCOR$MEM_TOTAL   	equals 16;   /* Total memory banks for ALCOR
+
+aggregate MCHK$LOGOUT structure prefix "" tag "" fill;
+	ei_stat		quadword unsigned;
+	ei_addr		quadword unsigned;
+	cia_err		quadword unsigned;
+	cia_err_stat	quadword unsigned;
+	mem_st0		quadword unsigned;
+	mem_st1		quadword unsigned;
+end MCHK$LOGOUT;
+
+aggregate PAL$LOGOUT structure prefix "" tag "" fill;
+	r_byte_count		quadword unsigned;
+	sys_proc$$offset	quadword unsigned;
+	mchk_code		quadword unsigned;
+	shadow8			quadword unsigned;
+	shadow9			quadword unsigned;
+	shadow10		quadword unsigned;
+	shadow11		quadword unsigned;
+	shadow12		quadword unsigned;
+	shadow13		quadword unsigned;
+	shadow14		quadword unsigned;
+	shadow25		quadword unsigned;
+	pt0			quadword unsigned;
+	pt1			quadword unsigned;
+	pt2			quadword unsigned;
+	pt3			quadword unsigned;
+	pt4			quadword unsigned;
+	pt5			quadword unsigned;
+	pt6			quadword unsigned;
+	pt7			quadword unsigned;
+	pt8			quadword unsigned;
+	pt9			quadword unsigned;
+	pt10			quadword unsigned;
+	pt11			quadword unsigned;
+	pt12			quadword unsigned;
+	pt13			quadword unsigned;
+	pt14			quadword unsigned;
+	pt15			quadword unsigned;
+	pt16			quadword unsigned;
+	pt17			quadword unsigned;
+	pt18			quadword unsigned;
+	pt19			quadword unsigned;
+	pt20			quadword unsigned;
+	pt21			quadword unsigned;
+	pt22			quadword unsigned;
+	pt23			quadword unsigned;
+	exc_addr		quadword unsigned;
+	exc_sum			quadword unsigned;
+	exc_msk			quadword unsigned;
+	pal_base		quadword unsigned;
+	isr			quadword unsigned;
+	icsr			quadword unsigned;
+	ic_perr_stat	        quadword unsigned;
+	dc_perr_stat	        quadword unsigned;
+	va		        quadword unsigned;
+	mm_stat		        quadword unsigned;
+	sc_addr		        quadword unsigned;
+	sc_stat		        quadword unsigned;
+	bc_tag_addr	        quadword unsigned;
+	ei_addr			quadword unsigned;
+	fill_syn	        quadword unsigned;
+	ei_stat		        quadword unsigned;
+	ld_lock		        quadword unsigned;
+	/* ALCOR specific error registers
+	eir0			quadword unsigned;
+	eir1			quadword unsigned;
+	cia_err			quadword unsigned;
+	cia_err_stat		quadword unsigned;
+	cia_err_mask		quadword unsigned;
+	ecc_syn			quadword unsigned;
+	mem_st0			quadword unsigned;
+	mem_st1			quadword unsigned;
+	pci_err0		quadword unsigned;
+	pci_err1		quadword unsigned;
+	nmi_info		quadword unsigned;
+	pci_err2		quadword unsigned;
+end PAL$LOGOUT;
+
+aggregate PAL$LOGOUT_620 structure prefix "" tag "" fill;
+	r_byte_count		quadword unsigned;
+	sys_proc$$offset	quadword unsigned;
+	mchk_code		quadword unsigned;
+	ei_addr			quadword unsigned;
+	fill_syn		quadword unsigned;
+	ei_stat			quadword unsigned;
+	isr			quadword unsigned;
+	ecc_syn			quadword unsigned;
+	mem_st0			quadword unsigned;
+	mem_st1                 quadword unsigned;
+	cia_err_stat            quadword unsigned;
+	cia_err                 quadword unsigned;
+end PAL$LOGOUT_620;
+
+aggregate PAL$LOGOUT_630 structure prefix "" tag "" fill;
+	r_byte_count		quadword unsigned;
+	sys_proc$$offset	quadword unsigned;
+	mchk_code		quadword unsigned;
+	ei_addr			quadword unsigned;
+	fill_syn		quadword unsigned;
+	ei_stat			quadword unsigned;
+	isr			quadword unsigned;
+	ecc_syn			quadword unsigned;
+	mem_st0			quadword unsigned;
+	mem_st1                 quadword unsigned;
+	cia_err_stat            quadword unsigned;
+	cia_err                 quadword unsigned;
+end PAL$LOGOUT_630;
+
+constant MODREV_ALCOR	    equals 1;
+constant MODREV_MAVERICK    equals 8;
+constant MODREV_BRET	    equals 10;
+constant MODREV_XL300	    equals 12;
+constant MODREV_XLT366	    equals 13;
+end_module;

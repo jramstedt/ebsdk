@@ -1,0 +1,4 @@
+showconfig()
+    {
+	return(0);
+    }

@@ -1,0 +1,109 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:26:18 by OpenVMS SDL EV1-33     
+;  Source:  28-JAN-2000 16:24:09 AFW_USER$:[CONSOLE.V58.COMMON.SRC]APRDEF.SDL;1 
+; ********************************************************************************************************************************
+;  file:	aprdef.sdl
+; 
+;  Copyright (C) 1990 by
+;  Digital Equipment Corporation, Maynard, Massachusetts.
+;  All rights reserved.
+; 
+;  This software is furnished under a license and may be used and copied
+;  only  in  accordance  of  the  terms  of  such  license  and with the
+;  inclusion of the above copyright notice. This software or  any  other
+;  copies thereof may not be provided or otherwise made available to any
+;  other person.  No title to and  ownership of the  software is  hereby
+;  transferred.
+; 
+;  The information in this software is  subject to change without notice
+;  and  should  not  be  construed  as a commitment by digital equipment
+;  corporation.
+; 
+;  Digital assumes no responsibility for the use  or  reliability of its
+;  software on equipment which is not supplied by digital.
+; 
+;          
+;  Abstract:	Alpha Internal Processor Register IDs.
+; 
+;  Author:	JDS - Jim Sawin
+; 
+;  Modifications:
+; 
+;  3	by ajb 14-Jan-1992 Added missing KSP definition
+; 
+;  2	by HCB, 11-4-91 Added EV ABOX and IBOX IPRs.
+; 
+;  1	by JDS, Mon Mar 11 10:14:52 1991
+; 	Initial entry.
+ 
+	.MACRO	$aprdef,..EQU=<=>,..COL=<:>
+APR$K_ASN'..equ'0
+APR$K_ASTEN'..equ'1
+APR$K_ASTSR'..equ'2
+APR$K_FEN'..equ'3
+APR$K_IPIR'..equ'4
+APR$K_IPL'..equ'5
+APR$K_MCES'..equ'6
+APR$K_PCBB'..equ'7
+APR$K_PRBR'..equ'8
+APR$K_PTBR'..equ'9
+APR$K_SCBB'..equ'10
+APR$K_SIRR'..equ'11
+APR$K_SISR'..equ'12
+APR$K_TBCHK'..equ'13
+APR$K_TBIA'..equ'14
+APR$K_TBIAP'..equ'15
+APR$K_TBIS'..equ'16
+APR$K_KSP'..equ'17
+APR$K_ESP'..equ'18
+APR$K_SSP'..equ'19
+APR$K_USP'..equ'20
+APR$K_VPTB'..equ'21
+APR$K_WHAMI'..equ'22
+APR$K_PS'..equ'23
+APR$K_ICSR'..equ'24
+APR$K_MCSR'..equ'25
+APR$K_VIRBND'..equ'26
+APR$K_SYSPTBR'..equ'27
+IBX$K_TB_TAG'..equ'28
+IBX$K_ITB_PTE'..equ'29
+IBX$K_ICCSR'..equ'30
+IBX$K_ITB_PTE_TEMP'..equ'31
+IBX$K_EXC_ADDR'..equ'32
+IBX$K_SL_RCV'..equ'33
+IBX$K_ITBZAP'..equ'34
+IBX$K_ITBASM'..equ'35
+IBX$K_ITBIS'..equ'36
+IBX$K_PS'..equ'37
+IBX$K_EXC_SUM'..equ'38
+IBX$K_PAL_BASE'..equ'39
+IBX$K_HIRR'..equ'40
+IBX$K_SIRR'..equ'41
+IBX$K_ASTRR'..equ'42
+IBX$K_HIER'..equ'43
+IBX$K_SIER'..equ'44
+IBX$K_ASTER'..equ'45
+IBX$K_SL_CLR'..equ'46
+IBX$K_SL_XMIT'..equ'47
+ABX$K_DTB_CTL'..equ'48
+ABX$K_DTB_PTE'..equ'49
+ABX$K_DTB_PTE_TEMP'..equ'50
+ABX$K_MMCSR'..equ'51
+ABX$K_VA'..equ'52
+ABX$K_DTBZAP'..equ'53
+ABX$K_DTASM'..equ'54
+ABX$K_DTBIS'..equ'55
+ABX$K_BIU_ADDR'..equ'56
+ABX$K_BIU_STAT'..equ'57
+ABX$K_DC_ADDR'..equ'58
+ABX$K_DC_STAT'..equ'59
+ABX$K_FILL_ADDR'..equ'60
+ABX$K_ABOX_CTL'..equ'61
+ABX$K_ALT_MODE'..equ'62
+ABX$K_CC'..equ'63
+ABX$K_CC_CTL'..equ'64
+ABX$K_BIU_CTL'..equ'65
+ABX$K_FILL_SYNDROME'..equ'66
+ABX$K_BC_TAG'..equ'67
+MAX_IPR'..equ'67
+	.ENDM

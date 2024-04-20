@@ -1,0 +1,68 @@
+;; Alpha assembly macro (-m) output created by DEFNR
+;   
+;  EV6_SYSTEM_PAL_DEFS.DNR  
+;   
+;   
+;  LAST EDIT:	28-MAY-98  
+;   
+;  EDIT HISTORY  
+;  WHO	WHEN		WHAT  
+;  ---	----		----  
+;  ES	09-JUL-97	ADD CSERVES  
+;  ES	28-May-98	Change pal base and impure base
+;   
+
+; messed around with by STIG
+; PAL data layout is now all squeezed into the first page of memory,
+; along with the HWRPB etc. (allocated the bottom 4K, uses just over 1K)
+; I keep things consistent between here and the Linux kernel so that things
+; don't change and cause unexpected results.  A dynamic adjustment of these
+; variables during the PALcode switch is ultimately more desirable
+
+; IMPORTANT NOTE: these allocations are for single-cpu systems only!
+; A system has one common region for all CPUs, and one specific region per CPU
+
+PAL__PAL_BASE = ^x08000	
+PAL__OSFPAL_BASE = ^x08000	
+PAL__CONSOLE_BASE = ^x10000	
+PAL__EMUL_BASE = ^xFFFFFFFF	
+
+PAL__IMPURE_BASE = ^x1000       	; 
+PAL__IMPURE_SPECIFIC_SIZE = ^x400	
+
+PAL__LOGOUT_BASE = ^x1800		; 
+PAL__LOGOUT_SPECIFIC_SIZE = ^x200	
+
+PAL__TEMPS_BASE = ^x1c00        	; 
+PAL__TEMPS_SPECIFIC_SIZE = ^x200	
+
+
+; 
+; DEFINE ADDRESSES OF LOCATIONS IN THE IMPURE 
+; COMMON AREA. ASSUMES BASE AT 0XC000 AND LOCATIONS 
+; STARTING AT 0X100. 
+; 
+
+PAL__ENTER_OSF = ^x0c100	
+;   
+;  DEFINE DEVICE INTERRUPT IRQ(S) AS A MASK IN ISUM<EI> FIELD  
+;   
+
+IRQ_DEV__M = ^x2	; IRQ1 
+; 
+; DEFINE CSERVE FUNCTIONS 
+; 
+CSERVE__START = ^x1	
+CSERVE__CALLBACK = ^x2	
+; 
+; FOR DP264 DEBUG MONITOR 
+; 
+CSERVE__JTOPAL = ^x9	
+CSERVE__RD_IMPURE = ^xb	
+CSERVE_K_SROM_INIT      = ^x18
+CSERVE_K_SROM_PUTC      = ^x19
+CSERVE_K_SROM_GETC      = ^x20
+
+CSERVE_K_SROM_PUTSTR    = ^x30  ; write an 8-character string passed in r16
+CSERVE_K_SROM_PUTNUM    = ^x31  ; write a 64-bit hex number passed in r16
+

@@ -1,0 +1,12 @@
+define verb replace
+    image cp$ref:replace.exe
+    parameter p1, label=element, prompt="Element"
+	    value( required, list, type=$file )
+    qualifier class, value( required )
+    qualifier id, value( required, type=$number )
+    qualifier input, value( required, type=$file )
+    qualifier if_changed
+    qualifier keep
+    qualifier reserve
+    qualifier user, value( required )
+    qualifier variant, value( required )

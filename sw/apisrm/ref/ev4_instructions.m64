@@ -1,0 +1,760 @@
+	.title	EV5 - ALPHA PALcode MACROS
+	.ident	/V1.0/
+;
+;****************************************************************************
+;*									    *
+;*  Copyright (c) 1989, 1990, 1991, 1992				    *
+;*  by DIGITAL Equipment Corporation, Maynard, Mass.			    *
+;* 									    *
+;*  This software is furnished under a license and may be used and  copied  *
+;*  only  in  accordance  with  the  terms  of  such  license and with the  *
+;*  inclusion of the above copyright notice.  This software or  any  other  *
+;*  copies  thereof may not be provided or otherwise made available to any  *
+;*  other person.  No title to and ownership of  the  software  is  hereby  *
+;*  transferred.							    *
+;* 									    *
+;*  The information in this software is subject to change  without  notice  *
+;*  and  should  not  be  construed  as  a commitment by DIGITAL Equipment  *
+;*  Corporation.							    *
+;* 									    *
+;*  DIGITAL assumes no responsibility for the use or  reliability  of  its  *
+;*  software on equipment which is not supplied by DIGITAL.		    *
+;*									    *
+;****************************************************************************
+
+; These are the macros that define the EV5 PAL reserved opcodes.
+
+.macro mfpr gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+;    	exp = <%EXTRACT(1,reg_length,gpr)@21> ! <%EXTRACT(1,reg_length,gpr)@16> ! ipr_num
+    	exp = <%ireg(gpr)@21> ! <%ireg(gpr)@16> ! ipr_num
+    	respal19 exp
+.endm
+
+
+.macro mtpr gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+;    	exp = <%EXTRACT(1,reg_length,gpr)@21> ! <%EXTRACT(1,reg_length,gpr)@16> ! ipr_num
+    	exp = <%ireg(gpr)@21> ! <%ireg(gpr)@16> ! ipr_num
+    	respal1d exp
+.endm
+
+.macro mf gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+;    	exp = <%EXTRACT(1,reg_length,gpr)@21> ! <%EXTRACT(1,reg_length,gpr)@16> ! ipr_num
+    	exp = <%ireg(gpr)@21> ! <%ireg(gpr)@16> ! ipr_num
+    	respal19 exp
+.endm
+
+
+.macro mt gpr, ipr_num
+        reg_length = %LENGTH(gpr) - 1
+;    	exp = <%EXTRACT(1,reg_length,gpr)@21> ! <%EXTRACT(1,reg_length,gpr)@16> ! ipr_num
+    	exp = <%ireg(gpr)@21> ! <%ireg(gpr)@16> ! ipr_num
+    	respal1d exp
+.endm
+
+.macro	hw_rei					; hw_rei, normal
+	exp = <^X1F@21> ! <^X1F@16> ! <2@14>
+    	respal1e exp
+.endm
+
+.if ne 0
+.macro ldqp dest, src				; hw_ld, quad, physical
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! disp
+	respal1b exp
+.endm
+.endc
+
+.macro ldlp dest, src				; hw_ld, long, physical
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> !  disp
+	respal1b exp
+.endm
+
+
+.macro ldqpl dest, src				; hw_ld, quad, physical, lock
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> !  <1@12> ! <1@10> !disp
+	respal1b exp
+.endm
+
+
+.macro ldla dest, src				; hw_ld, long, alternate_mode
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! disp
+	respal1b exp
+.endm
+
+.macro ldqa dest, src				; hw_ld, long, alternate_mode
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <1@12> !disp
+	respal1b exp
+.endm
+
+
+.macro ldlaw dest, src				; hw_ld, long, alternate_mode, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <1@13> ! disp
+	respal1b exp
+.endm
+
+.macro ldlw dest, src				; hw_ld, long, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@13> ! disp
+	respal1b exp
+.endm
+
+
+
+.macro ldqw dest, src				; hw_ld, quad, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@13> ! <1@12> ! disp
+	respal1b exp
+.endm
+
+
+; store sequences
+
+
+.macro stlp data, addr				; hw_st, longword, physical
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> !  disp
+	respal1f exp
+.endm
+
+
+.macro stqa data, addr				; hw_st, quad, alternate_mode
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@14> ! <1@12> ! disp
+	respal1f exp
+.endm
+
+
+.macro stqp data, addr				; hw_st, quad, physical
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! disp
+	respal1f exp
+.endm
+
+.macro stqpc data, addr				; hw_st, quad, physical, conditional
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! <1@10> ! disp
+	respal1f exp
+.endm
+
+
+
+; these are so we don't have to do the code over
+.macro ldq_p dest, src				; hw_ld, quad, physical
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! disp
+	respal1b exp
+.endm
+
+.macro ldl_p dest, src				; hw_ld, long, physical
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> !  disp
+	respal1b exp
+.endm
+
+
+.macro ldq_pl dest, src				; hw_ld, quad, physical, lock
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@15> !  <1@12> ! <1@10> !disp
+	respal1b exp
+.endm
+
+
+.macro ldl_a dest, src				; hw_ld, long, alternate_mode
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! disp
+	respal1b exp
+.endm
+
+.macro ldq_a dest, src				; hw_ld, long, alternate_mode
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <1@12> !disp
+	respal1b exp
+.endm
+
+
+.macro ldl_aw dest, src				; hw_ld, long, alternate_mode, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <1@13> ! disp
+	respal1b exp
+.endm
+
+.macro ldl_w dest, src				; hw_ld, long, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@14> ! <1@13> ! disp
+	respal1b exp
+.endm
+
+
+
+.macro ldq_w dest, src				; hw_ld, quad, write_check
+        dest_reg_length = %LENGTH(dest) - 1
+        dest_reg_num = %ireg(dest)
+
+	lp_pos = %LOCATE(<(>, src)	;find left parenthesis
+	lp_pos2= lp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, src) - lp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(lp_pos2,reg_length, src))
+
+	.if equal lp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, lp_pos, src)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <dest_reg_num@21> ! <base@16> ! <1@13> ! <1@12> ! disp
+	respal1b exp
+.endm
+
+
+
+
+.macro stl_p data, addr				; hw_st, longword, physical
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> !  disp
+	respal1f exp
+.endm
+
+
+.macro stq_a data, addr				; hw_st, quad, alternate_mode
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@14> ! <1@12> ! disp
+	respal1f exp
+.endm
+
+
+.macro stq_p data, addr				; hw_st, quad, physical
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! disp
+	respal1f exp
+.endm
+
+.macro stq_pc data, addr				; hw_st, quad, physical, conditional
+        data_reg_length = %LENGTH(data) - 1
+        data_reg_num = %ireg(data)
+
+	sp_pos = %LOCATE(<(>, addr)	;find left parenthesis
+	sp_pos2= sp_pos + 1		;skip parenthesis and R
+	reg_length = %LOCATE(<)>, addr) - sp_pos2  ;get size of reg number 
+	base = %ireg(%EXTRACT(sp_pos2,reg_length, addr))
+
+	.if equal sp_pos
+	disp = 0
+	.iff
+	 disp = %EXTRACT(0, sp_pos, addr)
+
+	 .if gt disp
+	  .if  ne <disp & 1>
+	   .print    "Non-negative displacement with sign bit set"
+	  .endc
+	 .if_false
+	  disp = <disp & <^xfff>>
+	 .endc
+	.endc
+        assume  <disp & <^c<^xfff>>> eq 0
+
+	exp = <data_reg_num@21> ! <base@16> ! <1@15> ! <1@12> ! <1@10> ! disp
+	respal1f exp
+.endm
+

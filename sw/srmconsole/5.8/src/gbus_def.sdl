@@ -1,0 +1,90 @@
+/* file:	gbus_def.sdl
+/*
+/* Copyright (C) 1991 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	structure definitions for Laser GBUS 
+/*
+/* Author:	David Mayo
+/*
+/* Modifications:
+/*
+/* 	kcq	21-Apr-1992	added gbus base address for uarts
+/*
+module	$gbusdef;
+
+/* GBUS address of UART base registers
+constant GBUS$UART0A_BASE equals	%xF4000080;
+constant GBUS$UART0B_BASE equals	%xF4000000;
+constant GBUS$UART1A_BASE equals	%xF4800080;
+constant GBUS$UART1B_BASE equals	%xF4800000;
+constant GBUS$UART2A_BASE equals	%xF5000080;
+constant GBUS$UART2B_BASE equals	%xF5000000;
+
+constant GBUS$LOC_BASE	equals %xF4000080;
+constant GBUS$PS_BASE	equals %xF4800000;
+constant GBUS$CTRLP_BASE equals %xF5000080;
+
+constant WATCH$SECONDS	equals %xF6000000;
+constant WATCH$MINUTES	equals %xF6000080;
+constant WATCH$HOURS	equals %xF6000100;
+constant WATCH$DAY_OF_MONTH	equals %xF60001C0;
+constant WATCH$MONTH	equals %xF6000200;
+constant WATCH$YEAR	equals %xF6000240;
+constant WATCH$CSRA	equals %xF6000280;
+constant WATCH$CSRB	equals %xF60002C0;
+constant WATCH$CSRC	equals %xF6000300;
+constant WATCH$CSRD	equals %xF6000340;
+constant WATCH$RAM_BASE	equals %xF6000380;
+
+constant GBUS$WHAMI	equals %xF7000000;
+constant GBUS$LEDS	equals %xF7000040;
+constant GBUS$PMASK	equals %xF7000080;
+constant GBUS$INTR	equals %xF70000C0;
+constant GBUS$HALT	equals %xF7000100;
+constant GBUS$LSBRST	equals %xF7000140;
+constant GBUS$MISC	equals %xF7000180;
+constant GBUS$RMODE_ENA	equals %xF7800000;
+constant GBUS$LTAGRW	equals %xF7800100;
+
+/* Define all UART ports
+constant (
+	UART0A,
+	UART0B,
+	UART1A,
+	UART1B,
+	UART2A,
+	UART2B ) equals 0 increment 1 prefix "";
+
+/* Define UART ports used
+constant UART_LOCAL equals UART0A;
+constant UART_PS equals UART1B;
+constant UART_CTRLP equals UART2A;
+
+/* DRV11-J register definitions - GBUS breadboard debug only
+constant csra equals %x20000870;
+constant dbra equals %x20000872;
+constant csrb equals %x20000874;
+constant dbrb equals %x20000876;
+constant csrc equals %x20000878;
+constant dbrc equals %x2000087a;
+constant csrd equals %x2000087c;
+constant dbrd equals %x2000087e;
+
+end_module;

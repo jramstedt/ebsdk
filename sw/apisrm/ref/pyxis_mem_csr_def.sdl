@@ -1,0 +1,284 @@
+{ Copyright (c) 1996 by
+{ Digital Equipment Corporation, Maynard, Massachusetts.
+{ All rights reserved.
+{
+{ This software is furnished under a license and may be used and copied
+{ only  in  accordance  of  the  terms  of  such  license  and with the
+{ inclusion of the above copyright notice.  This software or any  other
+{ copies thereof may not be provided or otherwise made available to any
+{ other person.  No title to and  ownership of the  software is  hereby
+{ transferred.
+{
+{ The information in this software is  subject to change without notice
+{ and  should  not  be  construed  as a commitment by Digital Equipment
+{ Corporation.
+{
+{ Digital assumes no responsibility for the use  or  reliability of its
+{ software on equipment which is not supplied by Digital.
+{
+{
+{ Abstract:
+{   This definition file contains all of the register definitions for
+{   pyxis memory CSR's
+{
+{ Author:
+{   Jim Delmonico
+{
+{ Creation Date: 10-jun-96
+{
+{ Modification History:
+{
+{       10-jun-96  jjd -- updated to reflect the way pyxis was actually
+{                       implemented and released for fabrication.
+{                       Based in some CIA SDL stuff.
+{
+
+MODULE pyxis_mem_csr_def IDENT "x0.1";
+
+iflanguage cc
+literal;
+
+#ifndef	PYXIS_MEM_CSR_DEF
+#define PYXIS_MEM_CSR_DEF 1
+
+end_literal;
+end_iflanguage cc;
+
+/*
+/*
+/* The following is the base address of the system configuration registers in
+/* the PYXIS.  This value must be shifted left 28 places to yield the proper
+/* value, thus simplifying the load of the address into registers.
+/*
+CONSTANT pyxis_k_mem_csr_base EQUALS %X875;	/* sysconfig base
+CONSTANT pyxis_v_mem_csr_base EQUALS 28;	/* sysconfig base extent
+
+/*
+/*
+/*  Memory Configuration Register bitfields
+/*
+aggregate MCR union fill prefix mcr_;
+    displacement byte dimension %x40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      mode_req bitfield mask;		/* [0]
+      mcr_reserved1 bitfield length 8-^; /* [7:1]
+      server_mode bitfield mask;	/* [8]
+      bcache_stat bitfield mask;	/* [9]
+      bcache_enable bitfield mask;	/* [10]
+      pipelined_cache bitfield mask;	/* [11]
+      overlap_disable bitfield mask;	/* [12]
+      seq_trace bitfield mask;		/* [13]
+      cke_auto bitfield mask;		/* [14]
+      dram_clk_auto bitfield mask;	/* [15]
+      dram_burst_len bitfield length 19-^ mask; /* [18:16]
+      dram_wrap_type bitfield length 20-^ mask; /* [19]
+      dram_lat_mode bitfield length 23-^ mask; /* [22:20]
+      dram_mode_unused bitfield length 30-^ mask; /*[29:23]
+      mcr_reserved3 bitfield length 32-^; /* [31:30]
+    end field;
+end MCR;
+	
+/*
+/*  Memory Base Address Register
+/*
+aggregate MCMR union prefix mcmr_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      dram_clk0 bitfield mask;
+      dram_clk1 bitfield mask;
+      dram_clk2 bitfield mask;
+      dram_clk3 bitfield mask;
+      dram_clk4 bitfield mask;
+      dram_clk5 bitfield mask;
+      dram_clk6 bitfield mask;
+      dram_clk7 bitfield mask;
+      dram_clk8 bitfield mask;
+      dram_clk9 bitfield mask;
+      dram_clk10 bitfield mask;
+      dram_clk11 bitfield mask;
+      dram_clk12 bitfield mask;
+      sram_clk1 bitfield mask;
+      sram_clk2 bitfield mask;
+      sram_clk3 bitfield mask;
+    end field;
+end MCMR;
+
+/*
+/*  Global Timing Register
+/*
+aggregate GTR union prefix gtr_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      min_ras_precharge bitfield length 3-^ mask;	/* [2:0]
+      gtr_reserved1 bitfield length 4-^;		/* [3]
+      cas_latency bitfield length 6-^;			/* [5:4]
+      gtr_reserved2 bitfield length 8-^;		/* [7:6]
+      idle_bc_width bitfield length 11-^ mask;		/* [10:8]
+      gtr_reserved3 bitfield length 32-^;		/* [31:11]
+    end field;
+end GTR;
+
+
+/*
+/*  Refresh Timing Register
+/*
+aggregate RTR union prefix rtr_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      rtr_reserved1 bitfield length 4-^;	/* [3:0]
+      refresh_width bitfield length 7-^ mask;	/* [6:4]
+      ref_interval bitfield length 13-^ mask;	/* [12:7]
+      rtr_reserved2 bitfield length 15-^;	/* [14:13]
+      force_ref bitfield mask;			/* [15]
+      rtr_reserved3 bitfield length 32-^;	/* [31:16]
+    end field;
+end RTR;
+
+/*
+/*  Row History Policy Register
+/*
+aggregate RHPR union prefix rhpr_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      policy_mask bitfield length 16-^ mask;	/* [15:0]
+      rphr_reserved1 bitfield length 32-^;	/* [31:16]
+    end field;
+end RHPR;
+
+/*
+/*  Memory debug 1 Register
+/*
+aggregate MDR1 union prefix mdr1_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      sel0 bitfield length 6-^ mask;		/* [5:0]
+      mdr1_reserve1 bitfield length 8-^;	/* [7:6]
+      sel1 bitfield length 14-^ mask;		/* [13:8]
+      mdr1_reserve2 bitfield length 16-^;	/* [15:14]
+      sel2 bitfield length 22-^ mask;		/* [21:16]
+      mdr1_reserve3 bitfield length 24-^;	/* [23:22]
+      sel3 bitfield length 30-^ mask;		/* [29:24]
+      mdr1_reserve4 bitfield length 31-^;	/* [30]
+      enable bitfield mask;			/* [31]
+    end field;
+end MDR1;
+
+
+/*
+/*  Memory debug 2 Register
+/*
+aggregate MDR2 union prefix mdr2_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      sel0 bitfield length 6-^ mask;		/* [5:0]
+      mdr1_reserve1 bitfield length 8-^;	/* [7:6]
+      sel1 bitfield length 14-^ mask;		/* [13:8]
+      mdr1_reserve2 bitfield length 16-^;	/* [15:14]
+      sel2 bitfield length 22-^ mask;		/* [21:16]
+      mdr1_reserve3 bitfield length 24-^;	/* [23:22]
+      sel3 bitfield length 30-^ mask;		/* [29:24]
+      mdr1_reserve4 bitfield length 31-^;	/* [30]
+      enable bitfield mask;			/* [31]
+    end field;
+end MDR2;
+
+/*
+/*  Base Bank Addr Register
+/*
+aggregate BBAR union prefix bbar_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      bbarx_reserved1 bitfield length 6-^;	/* [5:0]
+      base_addr bitfield length 16-^ mask;	/* [15:6]
+      bbarx_reserved2 bitfield length 32-^;	/* [31:16]
+    end field;
+end BBAR;
+
+/*
+/*  Bank Config Register
+/*
+aggregate BCR union prefix bcr_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      bank_enable bitfield mask;		/* [0]
+      bank_size bitfield length 5-^ mask;	/* [4:1]
+      subbank_enable bitfield mask;		/* [5]
+      rowsel bitfield mask;			/* [6]
+      k4bank bitfield mask;			/* [7]
+      reserve1 bitfield length 32-^;		/* [31:8]
+    end field;
+end BCR;
+
+
+
+/*
+/*  Bank Timing Register
+/*
+aggregate BTR union prefix btr_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+      row_addr_hold bitfield length 3-^ mask;	/* [2:0]
+      btrx_reserved1 bitfield;			/* [3]
+      toshiba bitfield mask;			/* [4]
+      slow_precharge bitfield mask;		/* [5]
+      btrx_reserved2 bitfield length 32-^;	/* [31:6]
+    end field;
+end BTR;
+
+
+/* CACHE VALID MAP REGISTERS
+
+AGGREGATE CVM STRUCTURE;
+    CACHE_VALID LONGWORD UNSIGNED;
+    END CVM;
+
+
+/*
+/*
+/*  PYXIS Memory CSR Register Block
+/*
+/*  This block of registers contains at all of the registers modelled in the
+/*  structures above in the address space order in which they will appear on the
+/*  machine.
+/*
+aggregate PYXIS_MEM_CSR structure prefix csr_;
+    mcr	MCR;				/* Memory Configuration Register 0x0
+    mcmr MCMR;				/* Memory Clock mask register 0x40
+    offset_0 byte dimension %x200-:;
+    gtr GTR;				/* global timing register 0x200
+    offset_1 byte dimension %x300-:;
+    rtr RTR;				/* refresh timing register 0x300
+    offset_2 byte dimension %x400-:;
+    rhpr RHPR;				/* row history policy reg 0x400
+    offset_3 byte dimension %x500-:;
+    mdr1 MDR1;				/* mem ctlr debug reg 1 0x500
+    mdr2 MDR2;				/* mem ctlr debug reg 2 0x540
+    offset_4 byte dimension %x600-:;
+    bbarx BBAR dimension 8;		/* Bank base Addr reg 0  0x600
+    bcrx BCR dimension 8;		/* Bank Config reg 0  0x800
+    btrx BTR dimension 8;		/* Bank timing reg 0  0xa00
+    cvm CVM;				/* Cache valid MAP reg
+end PYXIS_MEM_CSR;
+
+/*
+/*
+
+iflanguage cc
+literal;
+
+#endif
+end_literal;
+end_iflanguage cc;
+
+END_MODULE pyxis_mem_csr_def;
+

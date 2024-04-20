@@ -1,0 +1,180 @@
+/* file:	ev_def.sdl
+/*
+/* Copyright (C) 1990 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Environment Variable data structure definitions for
+/*		Alpha firmware.
+/*
+/* Authors:	David Mayo
+/*		jds - Jim Sawin
+/*
+/* Modifications:
+/*
+/*	jrk	29-Apr-1998	Removed saved_value string.
+/*	jds	23-May-1991	Added NOMALLOC option defs for ev_write.
+/*	phk	08-May-1991	Split the action field in wr_ & rd_action fields
+/*	dtm	14-Feb-1991	Add EVNODE size field and SRM/UNUSED attributes
+/*	dtm	20-Dec-1990	Add default value field
+/*	dtm	12-Oct-1990	Add ev attributes and validation table formats
+/*	dtm	30-Jul-1990	Initial entry.
+/*
+module	$evdef;
+
+DECLARE	"void" SIZEOF LONGWORD;
+
+constant EV_NAME_LEN	equals 32;	/* max size of an identifier
+constant EV_VALUE_LEN	equals 256;	/* max size of a value + save_value + 2
+constant (
+    "STRING",
+    "INTEGER"
+    ) equals 0 increment 1 prefix "EV$";
+constant (
+    LOCAL,
+    GLOBAL
+    ) equals 0 increment 2 prefix "EV$";
+constant (
+    VOLATILE,
+    NONVOLATILE
+    ) equals 0 increment 4 prefix "EV$";
+constant (
+    "READ",
+    NOREAD
+    ) equals 0 increment 8 prefix "EV$";
+constant (
+    WRITE,
+    NOWRITE
+    ) equals 0 increment 16 prefix "EV$";
+constant (
+    DELETE,
+    NODELETE
+    ) equals 0 increment 32 prefix "EV$";
+constant (
+    SYSTEM,
+    USER
+    ) equals 0 increment 64 prefix "EV$";
+constant (
+    TABLE,
+    ROUTINE
+    ) equals 0 increment 128 prefix "EV$";
+constant (
+    DEF_STRING,
+    DEF_INTEGER
+    ) equals 0 increment 256 prefix "EV$";
+constant (
+    USER_DEF,
+    SRM_DEF
+    ) equals 0 increment 512 prefix "EV$";
+constant (
+    IN_USE,
+    UNUSED
+    ) equals 0 increment 1024 prefix "EV$";
+constant (
+    MALLOC,
+    NOMALLOC
+    ) equals 0 increment 2048 prefix "EV$";
+constant (
+    UNMODIFIED,
+    MODIFIED
+    ) equals 0 increment 4096 prefix "EV$";
+constant (
+    ARC
+    ) equals 8192 prefix "EV$";
+
+
+aggregate EV_OPTIONS struct prefix "EV$";
+    TYPE bitfield mask;
+    CLASS bitfield mask;
+    VOLATILE bitfield mask;	
+    "READ" bitfield mask;
+    WRITE bitfield mask;
+    DELETE bitfield mask;
+    USER bitfield mask;
+    VALIDATE bitfield mask;
+    DEFAULT bitfield mask;
+    SRM bitfield mask;
+    UNUSED bitfield mask;
+    NOMALLOC bitfield mask;
+    MODIFIED bitfield mask;
+    ARC bitfield mask;
+end EV_OPTIONS;
+
+
+/*
+/* Structure of a predefined environment variable table entry
+/*
+aggregate env_table struct prefix "" tag "";
+	ev_name address(byte);		/* pointer to parameter name
+	ev_value address(byte);		/* pointer to parameter value
+	ev_options longword;		/* environment variable attributes
+	validate address("void");	/* code associated with value
+	ev_wr_action address(entry);	/* address of action routine
+	ev_rd_action address(entry);	/* address of action routine
+	ev_init address(entry);		/* address of init routine
+end env_table;
+
+/*
+/* Structure of a predefined environment variable validation table
+/*
+
+/* ajbfix:  we shouldn't rely on hard coded abbreviations, let the program
+/* figure it out!!!!
+
+
+aggregate set_param_table struct prefix "" tag "";
+	param	address(byte);		/* pointer to parmeter value name
+	code	longword;		/* code associated with value
+end set_param_table;
+
+/*
+/* Structure of an environment variable entry
+/*
+aggregate EVNODE struct prefix "" tag "";
+	flink	address (EVNODE);       /* linked list flink
+	blink	address (EVNODE);       /* linked list blink
+	name	byte dimension (EV_NAME_LEN); /* variable name
+#ev_l_attributes = .;
+	attributes longword;		/* EV attributes field
+	validate union;			/* union of validate entries
+	   table address (set_param_table); /* table of valid entries
+	   routine address (entry);	/* routine to validate entries
+	end validate;	
+	wr_action	address (entry);/* EV action routine
+	rd_action	address (entry);/* EV action routine
+	misc	longword;		/* miscellaneous field
+#ev_l_size = .;
+	size	longword;		/* length of value field
+#ev_r_value = .;
+	"value"	union;			/* union of values
+	   "string"  byte dimension EV_VALUE_LEN;
+	   "integer" longword;
+	end "value";
+end EVNODE;
+
+constant EV$K_LENGTH equals EV_VALUE_LEN;
+constant EV$L_SIZE equals #ev_l_size;
+constant EV$L_ATTRIBUTES equals #ev_l_attributes;
+constant EV$R_VALUE equals #ev_r_value;
+
+aggregate evar_table struct ;
+	name	byte dimension (EV_NAME_LEN); /* variable name
+	var	address(longword);            /* pointer to input param value
+end evar_table;
+
+end_module;

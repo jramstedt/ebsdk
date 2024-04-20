@@ -1,0 +1,35 @@
+;+
+; platform_tinosa.mar - platform switches for API Tinosa platform
+;-
+
+;+
+; Begun June 2000 by Stig Telfer, Alpha Processor Inc.
+;-
+
+        tinosa_platform = 1
+        smp_platform = 1
+	ipi_init_hack = 0
+        smi_platform = 0		; STIG DEBUG - removed for now
+        check_interrupt_pending = 0
+
+	crd_en = 1			; CRD errors avoided in early debug
+        mchk_en = 1
+
+	i_ctl__sbe = 3			; prefetching of instructions (3=normal)
+	i_ctl__sglissue = 0		; 1->issue only from bottom of queue
+
+
+; External interrupt routings for Tinosa:
+; These numbers are positions within EV6__ISUM__IE field
+
+IRQ_HLT = ^x00				; no halt interrupt on Tinosa
+
+IRQ_ERR = ^x01				; system errors (NMI)
+IRQ_DEV = ^x02				; external device interrupt
+IRQ_SMI = ^x04				; power management from southbridge
+IRQ_IP  = ^x08				; inter-processor interrupt (IPI)
+IRQ_CLK = ^x20				; direct coupling of clock connection
+
+
+IRQ_MASK= <IRQ_ERR ! IRQ_DEV ! IRQ_CLK ! IRQ_SMI ! IRQ_IP>
+

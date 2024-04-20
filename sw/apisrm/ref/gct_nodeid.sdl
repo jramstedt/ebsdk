@@ -1,0 +1,265 @@
+/* file:	gct_nodeid.sdl
+/*
+/* Copyright (C) 1998, by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Galaxy Node ID specific definitions for Alpha firmware.
+/*
+/* Author:	Nigel J. Croxon
+/*
+/* Modifications:
+/*
+/*   12-Nov-98  NJC - Flip all hardware ID 180 Degrees
+/* 
+
+module	$gct_nodeid;
+
+  aggregate GCT_NODE_ID_ROOT struct prefix "" tag "" typedef;
+	node_id_root			bitfield length  8;
+	node_id_root_rsrvd_08_15	bitfield length  8;
+	node_id_root_rsrvd_16_31	bitfield length 16;
+	node_id_root_rsrvd_32_63	bitfield length 32;
+  end GCT_NODE_ID_ROOT;
+
+  aggregate GCT_NODE_ID_HW_ROOT struct prefix "" tag "" typedef;
+	node_id_hw_root			bitfield length   8;
+	node_id_hw_root_rsrvd_08_15	bitfield length   8;
+	node_id_hw_root_rsrvd_16_31	bitfield length  16;
+	node_id_hw_root_rsrvd_32_63	bitfield length  32;
+  end GCT_NODE_ID_HW_ROOT;
+
+  aggregate GCT_NODE_ID_SW_ROOT struct prefix "" tag "" typedef;
+	node_id_sw_root			bitfield length   8;
+	node_id_sw_root_rsrvd_08_15	bitfield length   8;
+	node_id_sw_root_rsrvd_16_31	bitfield length  16;
+	node_id_sw_root_rsrvd_32_63	bitfield length  32;
+  end GCT_NODE_ID_SW_ROOT;
+
+  aggregate GCT_NODE_ID_TEMPLATE_ROOT struct prefix "" tag "" typedef;
+	node_id_template_root			bitfield length   8;
+	node_id_template_root_rsrvd_08_15	bitfield length   8;
+	node_id_template_root_rsrvd_16_31	bitfield length  16;
+	node_id_template_root_rsrvd_32_63	bitfield length  32;
+  end GCT_NODE_ID_TEMPLATE_ROOT;
+
+  aggregate GCT_NODE_ID_SBB struct prefix "" tag "" typedef;
+	node_id_sbb_rsrvd_0_31		bitfield length  32;
+	node_id_sbb_hsbb		bitfield length   8;
+	node_id_sbb_rsrvd_40_47		bitfield length   8;
+	node_id_sbb_sbb			bitfield length   8;
+	node_id_sbb_rsrvd_56_63		bitfield length   8;
+  end GCT_NODE_ID_SBB;
+
+  aggregate GCT_NODE_ID_SMB struct prefix "" tag "" typedef;
+	node_id_smb_rsrvd_0_31		bitfield length  32;
+	node_id_smb_hsbb		bitfield length   8;
+	node_id_smb_smb			bitfield length   8;
+	node_id_smb_sbb			bitfield length   8;
+	node_id_smb_rsrvd_56_63		bitfield length   8;
+  end GCT_NODE_ID_SMB;
+
+  aggregate GCT_NODE_ID_CPU struct prefix "" tag "" typedef;
+	node_id_cpu_cpu			bitfield length  16;
+	node_id_cpu_rsrvd_16_23		bitfield length   8;
+	node_id_cpu_revcnt		bitfield length   8;
+	node_id_cpu_hsbb		bitfield length   8;
+	node_id_cpu_smb			bitfield length   8;
+	node_id_cpu_sbb			bitfield length   8;
+	node_id_cpu_rsrvd_56_63		bitfield length   8;
+  end GCT_NODE_ID_CPU;
+
+  aggregate GCT_NODE_ID_CPU_MODULE struct prefix "" tag "" typedef;
+	node_id_cpu_module		bitfield length  16;
+	node_id_cpu_module_rsrvd_16_31	bitfield length  16;
+	node_id_cpu_module_hsbb		bitfield length   8;
+	node_id_cpu_module_smb		bitfield length   8;
+	node_id_cpu_module_sbb		bitfield length   8;
+	node_id_cpu_module_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_CPU_MODULE;
+
+  aggregate GCT_NODE_ID_MEM_SUB struct prefix "" tag "" typedef;
+	node_id_mem_sub_memsub		bitfield length   8;
+	node_id_mem_sub_rsrvd_8_31	bitfield length  24;
+	node_id_mem_sub_hsbb		bitfield length   8;
+	node_id_mem_sub_smb		bitfield length   8;
+	node_id_mem_sub_sbb		bitfield length   8;
+	node_id_mem_sub_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_MEM_SUB;
+
+  aggregate GCT_NODE_ID_MEM_DESC struct prefix "" tag "" typedef;
+	node_id_mem_desc_memdesc	bitfield length  16;
+	node_id_mem_desc_memsub		bitfield length   8;
+	node_id_mem_desc_rsrvd_24_31	bitfield length   8;
+	node_id_mem_desc_hsbb		bitfield length   8;
+	node_id_mem_desc_smb		bitfield length   8;
+	node_id_mem_desc_sbb		bitfield length   8;
+	node_id_mem_desc_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_MEM_DESC;
+
+  aggregate GCT_NODE_ID_MEM_CTRL struct prefix "" tag "" typedef;
+	node_id_mem_ctrl_memctrl	bitfield length  16;
+	node_id_mem_ctrl_memsub		bitfield length   8;
+	node_id_mem_ctrl_rsrvd_24_31	bitfield length   8;
+	node_id_mem_ctrl_hsbb		bitfield length   8;
+	node_id_mem_ctrl_smb		bitfield length   8;
+	node_id_mem_ctrl_sbb		bitfield length   8;
+	node_id_mem_ctrl_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_MEM_CTRL;
+
+  aggregate GCT_NODE_ID_IOP struct prefix "" tag ""  typedef;
+	node_id_iop_iop			bitfield length   8;
+	node_id_iop_rsrvd_8_31		bitfield length  24;
+	node_id_iop_hsbb		bitfield length   8;
+	node_id_iop_smb			bitfield length   8;
+	node_id_iop_sbb			bitfield length   8;
+	node_id_iop_rsrvd_56_63		bitfield length   8;
+  end GCT_NODE_ID_IOP;
+
+  aggregate GCT_NODE_ID_HOSE struct prefix "" tag "" typedef;
+	node_id_hose_hose		bitfield length   8;
+	node_id_hose_iop		bitfield length   8;
+	node_id_hose_rsrvd_16_31	bitfield length  16;
+	node_id_hose_hsbb		bitfield length   8;
+	node_id_hose_smb		bitfield length   8;
+	node_id_hose_sbb		bitfield length   8;
+	node_id_hose_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_HOSE;
+
+  aggregate GCT_NODE_ID_BUS struct prefix "" tag "" typedef;
+	node_id_bus_bus			bitfield length   8;
+	node_id_bus_hose		bitfield length   8;
+	node_id_bus_iop			bitfield length   8;
+	node_id_bus_rsrvd_24_31		bitfield length   8;
+	node_id_bus_hsbb		bitfield length   8;
+	node_id_bus_smb			bitfield length   8;
+	node_id_bus_sbb			bitfield length   8;
+	node_id_bus_rsrvd_56_63		bitfield length   8;
+  end GCT_NODE_ID_BUS;
+
+  aggregate GCT_NODE_ID_SLOT struct prefix "" tag "" typedef;
+	node_id_slot_slot		bitfield length   8;
+	node_id_slot_bus		bitfield length   8;
+	node_id_slot_hose		bitfield length   8;
+	node_id_slot_iop		bitfield length   8;
+	node_id_slot_hsbb		bitfield length   8;
+	node_id_slot_smb		bitfield length   8;
+	node_id_slot_sbb		bitfield length   8;
+	node_id_slot_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_SLOT;
+
+  aggregate GCT_NODE_ID_IO_CTRL struct prefix "" tag "" typedef;
+	node_id_io_ctrl_ctrlr		bitfield length   8;
+	node_id_io_ctrl_bus		bitfield length   8;
+	node_id_io_ctrl_hose		bitfield length   8;
+	node_id_io_ctrl_iop		bitfield length   8;
+	node_id_io_ctrl_hsbb		bitfield length   8;
+	node_id_io_ctrl_smb		bitfield length   8;
+	node_id_io_ctrl_sbb		bitfield length   8;
+	node_id_io_ctrl_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_IO_CTRL;
+
+
+  aggregate GCT_NODE_ID_POWER_ENVIR5 struct prefix "" tag "" typedef;
+	node_id_power_envir_pe_num	bitfield length  16;
+	node_id_power_rsrvd_16_23	bitfield length   8;
+	node_id_power_envir_hsbb	bitfield length   8;
+	node_id_power_envir_smb		bitfield length   8;
+	node_id_power_envir_sbb		bitfield length   8;
+	node_id_power_envir_chassis	bitfield length   8;
+	node_id_power_envir_cab		bitfield length   8;
+  end GCT_NODE_ID_POWER_ENVIR5;
+
+  aggregate GCT_NODE_ID_POWER_ENVIR struct prefix "" tag "" typedef;
+	node_id_power_envir_pe_num	bitfield length  16;
+	node_id_power_rsrvd_16_23	bitfield length   8;
+	node_id_power_envir_cab		bitfield length   8;
+	node_id_power_envir_hsbb	bitfield length   8;
+	node_id_power_envir_smb		bitfield length   8;
+	node_id_power_envir_sbb		bitfield length   8;
+	node_id_power_envir_chassis	bitfield length   8;
+  end GCT_NODE_ID_POWER_ENVIR;
+
+  aggregate GCT_NODE_ID_PSEUDO struct prefix "" tag "" typedef;
+	node_id_pseudo_num		bitfield length  16;
+	node_id_pseudo_rsrvd_16_31	bitfield length  16;
+	node_id_pseudo_rsrvd_32_47	bitfield length  16;
+	node_id_pseudo_chassis		bitfield length   8;
+	node_id_pseudo_cab		bitfield length   8;
+  end GCT_NODE_ID_PSEUDO;
+
+  aggregate GCT_NODE_ID_FRU_DESC struct prefix "" tag "" typedef;
+	node_id_fru_desc_site_loc	bitfield length   8;
+	node_id_fru_desc_cab_id		bitfield length   8;
+	node_id_fru_desc_position	bitfield length   8;
+	node_id_fru_desc_chassis	bitfield length   8;
+	node_id_fru_desc_assembly	bitfield length   8;
+	node_id_fru_desc_subassembly	bitfield length   8;
+	node_id_fru_desc_slot		bitfield length  16;
+  end GCT_NODE_ID_FRU_DESC;
+
+  aggregate GCT_NODE_ID_SYS_INTER_SWITCH struct prefix "" tag "" typedef;
+	node_id_switch_id		bitfield length  16;
+	node_id_switch_rsrvd_16_31	bitfield length  16;
+	node_id_switch_hsbb		bitfield length   8;
+	node_id_switch_rsrvd_40_63	bitfield length  24;
+  end GCT_NODE_ID_SYS_INTER_SWITCH;
+
+  aggregate GCT_NODE_ID_PARTITION struct prefix "" tag "" typedef;
+	node_id_part_part		bitfield length  16;
+	node_id_part_16_31		bitfield length  16;
+	node_id_part_32_63		bitfield length  32;
+  end GCT_NODE_ID_PARTITION;
+
+  aggregate GCT_NODE_ID_COMMUNITY struct prefix "" tag "" typedef;
+	node_id_comm_id			bitfield length  16;
+	node_id_comm_16_31		bitfield length  16;
+	node_id_comm_32_63		bitfield length  32;
+  end GCT_NODE_ID_COMMUNITY;
+
+  aggregate GCT_NODE_ID_CAB struct prefix "" tag "" typedef;
+	node_id_cab			bitfield length   8;
+	node_id_cab_08_15		bitfield length   8;
+	node_id_cab_16_31		bitfield length  16;
+	node_id_cab_32_63		bitfield length  32;
+  end GCT_NODE_ID_CAB;
+
+  aggregate GCT_NODE_ID_CHASSIS struct prefix "" tag "" typedef;
+	node_id_chassis			bitfield length   8;
+	node_id_chassis_08_15		bitfield length   8;
+	node_id_chassis_16_31		bitfield length  16;
+	node_id_chassis_32_63		bitfield length  32;
+  end GCT_NODE_ID_CHASSIS;
+
+  aggregate GCT_NODE_ID_HARD_PART struct prefix "" tag "" typedef;
+	node_id_hard_part		bitfield length  16;
+	node_id_hard_part_16_31		bitfield length  16;
+	node_id_hard_part_32_63		bitfield length  32;
+  end GCT_NODE_ID_HARD_PART;
+
+  aggregate GCT_NODE_ID_RISER struct prefix "" tag "" typedef;
+	node_id_riser_num		bitfield length   8;
+	node_id_riser_iop		bitfield length   8;
+	node_id_riser_rsrvd_16_31	bitfield length  16;
+	node_id_riser_hsbb		bitfield length   8;
+	node_id_riser_smb		bitfield length   8;
+	node_id_riser_sbb		bitfield length   8;
+	node_id_riser_rsrvd_56_63	bitfield length   8;
+  end GCT_NODE_ID_RISER;
+
+end_module	$gct_nodeid;

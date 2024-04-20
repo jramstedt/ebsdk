@@ -1,0 +1,2742 @@
+; file:	callbacks_alpha.mar
+;
+; Copyright (C) 1991 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;
+                                                         
+;++
+;  FACILITY:
+;
+;      Alpha Console, ALPHA version
+;
+;  MODULE DESCRIPTION:
+;
+;	Alpha Callback functions for EVAX/Alpha firmware.
+;
+;  AUTHORS:
+;
+;	David T. Mayo
+;
+;  CREATION DATE:
+;  
+;	19-Feb-1991
+;
+;  MODIFICATION HISTORY:
+;
+;	dtr	7-Apr-1999	Added monet to conditionals that go to console
+;				rather than hard coding call backs for keyboard
+;				and serial line.
+;				
+;       ska/tna/jwj	7-jan-1999	Conditionalized for YUKONA
+;
+;	jhs     9-jul-1997	fix for the TX/RX interrupt enable bits being
+;            			written in wrong place in CTB
+;
+;       jhs     7-may-1997      conditionalized with SECURE for OS password
+;
+;       jhs     30-apr-1997     add OS password support
+;
+;	jrk	12-Apr-1995	remove obsolete history
+;				cleanup
+;				add Turbo non-callback for getc, puts
+;
+;	jje	16-Feb-1996	Add Cortex support
+;				
+;	er	23-Apr-1996	Added some missing conditionals for EBxx platforms.
+;--
+
+	.title	callbacks_alpha
+
+TURBO_DEBUG = 0
+
+	$hwrpbdef
+	$pal_impure
+	$ctbdef
+	$crbdef
+	$evdef
+	$pal_func
+	$pal_def
+	$cserve_def
+	$halt_codes
+.if ne TURBO
+	$kerneldef
+	$pal_logout
+.endc
+
+.if ne	SABLE
+sparse = 1
+.if ne	GAMMA
+pci0_io = ^x83a0
+.iff
+pci0_io = ^x3a0
+.endc
+.endc
+
+.if ne	RAWHIDE
+sparse = 1
+pci0_io = ^xf980
+.endc
+
+.if ne MIKASA
+sparse = 1
+.if ne PINNACLE
+pci0_io = ^x8580
+.iff
+pci0_io = ^x1c0
+.endc
+.endc
+
+.if ne REGATTA
+sparse = 0
+pci0_io = ^x801fc
+.endc
+
+.if ne MONET ! EIGER
+sparse = 0
+pci0_io = ^x801fc
+.endc
+
+.if ne WILDFIRE
+sparse = 0
+pci0_io = ^x1ff			; high bits will be supplied by PALcode
+.endc
+
+.if ne WILDFIRE
+GALAXY = 0			; don't need the special Galaxy code here
+.endc
+
+.if df sparse
+.if ne sparse
+	.macro	load	addr
+	lda	r3, addr(r31)
+	sll	r3, #5, r3
+	bis	r2, r3, r17
+	ldlp
+	extbl	r0, #<addr>&3, r0
+	.endm
+	.macro	store	addr, data
+	lda	r3, addr(r31)
+	sll	r3, #5, r3
+	bis	r2, r3, r17
+.if idn <%extract(0,1,data)> <r>
+	and	data, #^xff, r18
+.iff
+	bis	r31, #<data>&^xff, r18
+.endc
+	insbl	r18, #<addr>&3, r18
+	stlp
+	.endm
+.iff
+	.macro	load	addr
+	lda	r3, addr(r31)
+	bis	r2, r3, r17
+	ldbp
+	.endm
+	.macro	store	addr, data
+	lda	r3, addr(r31)
+	bis	r2, r3, r17
+.if idn <%extract(0,1,data)> <r>
+	and	data, #^xff, r18
+.iff
+	bis	r31, #<data>&^xff, r18
+.endc
+	stbp
+	.endm
+.endc
+.endc
+
+.if df macro64$
+	.psect	kernel$code, 4, exe, mix
+.iff
+	.psect	kernel$code, 4, exe
+.endc
+
+	cpu_slotid	= 4
+	iom_slotid	= 8
+	use_jio		= 0
+
+.iif ndf use_jio, use_jio = 0			; set to 0 for ssb, 1 for jio
+.iif ndf use_fake_console, use_fake_console = 0
+
+.if ne TURBO
+.macro	ldlp
+	cserve	CSERVE$LDLP
+.endm
+
+.macro	stlp
+	cserve	CSERVE$STLP
+.endm
+
+uart0_h = ^xa000
+uart0_l = ^x80
+kbd_stat = ^x64
+kbd_data = ^x60
+stat$v_obf = 0
+stat$v_ibf = 1
+.endc
+
+.if ne MEDULLA
+.if eq MEDULLA_CPU_TYPE, MEDULLA_LCADS
+med$v_ioshift  == 7			; pci address align value
+pci_addr_shift	= 7			; # left shifts to generate cpu addr
+pci_addr_high	  = ^x3000		; The upper bits of the PCI I/O
+.endc
+
+.if eq MEDULLA_CPU_TYPE, MEDULLA_LCA1
+med$v_ioshift  == 5			; pci address align value
+pci_addr_shift	= 5			; # left shifts to generate cpu addr
+pci_addr_high	  = ^x3000		; The upper bits of the PCI I/O
+.endc
+
+.if eq MEDULLA_CPU_TYPE, MEDULLA_LCA2
+med$v_ioshift  == 5			; pci address align value
+pci_addr_shift	= 5			; # left shifts to generate cpu addr
+pci_addr_high	  = ^x1C00		; The upper bits of the PCI I/O
+.endc
+
+med$m_pciio    == 3
+med$a_disp_reg == 9216			; display register address
+uart_cha_rdwrB	  = ^x6000		; PCI I/O address for Ch B R/W register
+uart_cha_rxtxB	  = ^x6004		; PCI I/O address for Ch B Rx/Tx reg
+uart_cha_rdwrA	  = ^x6008		; PCI I/O address for Ch A R/W register
+uart_cha_rxtxA	  = ^x600c		; PCI I/O address for Ch A Rx/Tx reg
+.endc
+
+dispatch::
+	.quad	^x1808
+	.quad	<<1@28> ! <_dispatch_ - ^x2000>>
+fixup::
+	.quad	^x1808
+	.quad	<<1@28> ! <_fixup_ - ^x2000>>
+
+
+.if ne TURBO
+
+; The following is TURBO callback debug code 
+
+.macro $save_regs,list 
+	count = 0
+.irp reg,list
+	count = count + 1
+.endr   
+	lda	sp,-<<count+1>*8>(sp)
+	count = 0
+.irp reg,list
+	count = count + 1
+	stq	'reg,<count*8>(sp)
+.endr
+.endm
+
+.macro $restore_regs,list 
+	count = 0      
+.irp reg,list            
+	count = count + 1
+	ldq	'reg,<count*8>(sp)
+.endr
+	count = 0      
+.irp reg,list
+	count = count + 1
+.endr   
+	lda	sp,<<count+1>*8>(sp)
+.endm
+
+.macro blast str, ?bg, ?lpi, ?lpo, ?dn, ?rdy
+
+	$save_regs <r0,r1,r2,r3,r4,r5,r16,r17,r18>	
+	align_branch_target
+	bis	r31, r31, r31	;force the table to be QW aligned
+        br	r5,bg  
+	.quad ^xffa00000C0	; data reg
+	.quad ^xffa0000080     	; cmd reg
+	.ascii/str/
+	.byte  20,20,0,0
+	.align	quad
+bg:	addq	r5,#^x10,r2	; point to string
+
+lpo:	bis	r31, r31, r3	; init byte count
+	ldq	r4,(r2)		; read qw data
+
+lpi:	and	r4,#^xFF,r18	; low byte to r18
+	beq	r18,dn
+	ldq	r17,(r5)	; r17 = address of data reg
+
+	stlp              	; write to the UART
+	mb
+
+	ldq	r17,8(r5)	; get cmd reg address
+rdy:    ldlp			; get cmd reg data
+	and	r0,#4,r0	; check TX Empty bit
+	beq	r0, rdy		; wait for TX Empty
+	
+	srl	r4, #8, r4	; shift in next byte
+	addq	r3, #1, r3	; increment byte count
+	cmpeq	r3, #8, r1	; end of QW?
+	beq	r1, lpi		; no, continue
+	addq	r2, #8, r2	; increment string adress
+	br	r31, lpo	; go read next qW
+	
+dn:	$restore_regs <r0,r1,r2,r3,r4,r5,r16,r17,r18>	
+.endm
+
+.macro crlf ?bg, ?lpo, ?lpi, ?dn, ?rdy
+
+	$save_regs <r0,r1,r2,r3,r4,r5,r16,r17,r18>	
+	align_branch_target
+	bis	r31, r31, r31	;force the table to be QW aligned
+        br r5,bg  
+	.quad ^xffa00000C0	; data reg
+	.quad ^xffa0000080	; cmd reg
+	.byte  ^xD,^xA,0,0
+	.align quad
+bg:	addq	r5,#^x10,r2	; point to string
+
+lpo:	bis	r31, r31, r3	; init byte count
+	ldq	r4,(r2)		; read qw data
+
+lpi:	and	r4,#^xFF,r18	; low byte to r18
+	beq	r18,dn
+	ldq	r17,(r5)	; r17 = address of data reg
+
+	stlp              	; write to the UART
+	mb
+
+	ldq	r17,8(r5)	; get cmd reg address
+rdy:    ldlp			; get cmd reg data
+	and	r0,#4,r0	; check TX Empty bit
+	beq	r0, rdy		; wait for TX Empty
+	
+	srl	r4, #8, r4	; shift in next byte
+	addq	r3, #1, r3	; increment byte count
+	cmpeq	r3, #8, r1	; end of QW?
+	beq	r1, lpi		; no, continue
+	addq	r2, #8, r2	; increment string adress
+	br	r31, lpo	; go read next QW
+
+dn:	$restore_regs <r0,r1,r2,r3,r4,r5,r16,r17,r18>	
+.endm
+
+.macro regout rx, ?bg, ?lp, ?dn, ?rdy, ?a
+
+	$save_regs <r0,r1,r2,r3,r4,r5,r16,r17,r18>	
+	align_branch_target
+	bis	r31, r31, r31	; force the table to be QW aligned
+        br 	r5,bg  
+	.quad ^xffa00000C0      ; data reg
+	.quad ^xffa0000080	; cmd reg
+	.align quad
+bg:	bis     rx, r31, r1	; Put reg data in r1
+	lda	r2, 28(r31)	; init shift count
+	lda	r3, 8(r31)	; nibble count
+
+lp:	srl	r1, r2, r18	; get nibble to print
+	and	r18, #^xF, r18	; isolate low nibble
+	lda	r18,^x30(r18)	; Make ascii digit
+	cmple	r18,#^x39,r4	; Is it 0-9
+	bne	r4,a		; Yes, 0-9, spit it out
+	lda	r18,7(r18)	; A-F
+	
+a:	ldq	r17,(r5)	; data reg address
+	stlp              	; write the uart 
+	mb
+
+	ldq	r17,8(r5)	; get cmd reg address
+rdy:    ldlp			; get cmd reg data
+	and	r0,#4,r0	; check TX Empty bit
+	beq	r0, rdy		; wait for TX Empty
+
+	subq	r3, #1, r3	; decrement nibble count
+	ble	r3, dn		; exit if done
+	subq	r2, #4, r2	; decrement shift count
+	br	r31, lp		; and repeat
+
+dn:	$restore_regs <r0,r1,r2,r3,r4,r5,r16,r17,r18>	
+.endm
+
+.endc
+
+
+.enable LSB
+;+
+; DISPATCH
+; 
+; FUNCTION:
+;
+;	Used to access console service routines.
+;	Takes the function code of the routine to execute and its
+;	argument list and invokes the proper routine.
+;
+; INPUTS:
+;
+;	function code	= R16
+;	retadr		= R26; return address
+;	
+; OUTPUTS:
+;
+;	status		= R0; bit encoded return status as follows:
+;			  R0<63> eql '1' if failure, reserved function code
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R10	= base address of console routine table
+;-
+
+MAX_FUNC_CODE = ^x34	; maximum function code
+DISPATCH_FAIL = 1	; R0<63> = 1, failure due reserved function code
+
+	align_branch_target
+
+_dispatch_::
+	bis	sp, r31, r28		; save sp for call_backs.c
+	lda	sp, -17*8(sp)		; get stack space
+	stq	r10, 0*8(sp)		; save R10
+	stq	r1, 1*8(sp)		; save R1
+	stq	r2, 2*8(sp)		; save R2
+	stq	r3, 3*8(sp)		; save R3
+	stq	r4, 4*8(sp)		; save R4
+	stq	r5, 5*8(sp)		; save R5
+	stq	r6, 6*8(sp)		; save R6
+	stq	r7, 7*8(sp)		; save R7
+	stq	r8, 8*8(sp)		; save R8
+SCR16 = 9*8
+	stq	r16, 9*8(sp)		; save R16
+SCR17 = 10*8
+	stq	r17, 10*8(sp)		; save R17
+	stq	r18, 11*8(sp)		; save R18
+	stq	r19, 12*8(sp)		; save R19
+	stq	r20, 13*8(sp)		; save R20
+	stq	r21, 14*8(sp)		; save R21
+	stq	r22, 15*8(sp)		; save R22
+	stq	r23, 16*8(sp)		; save R23
+
+	cmpule	r16, #MAX_FUNC_CODE, r0	; check limits on function code
+	beq	r0, RESERVED_FUNC	; if out-of-range,
+					; goto reserved function code
+
+	align_branch_target odd=1	; force odd quadword alignment
+
+	br	r0, 10$			; save base address of table in r0
+
+
+CR_TABLE:				; table of console routine offsets
+  .address RESERVED_FUNC-CR_TABLE	; func = 00, reserved
+  .address GETC-CR_TABLE		; func = 01, gets character
+  .address PUTS-CR_TABLE		; func = 02, put string
+  .address RESET_TERM-CR_TABLE		; func = 03, reset terminal
+  .address SET_TERM_INT-CR_TABLE	; func = 04, set terminal interrupts
+  .address SET_TERM_CTL-CR_TABLE	; func = 05, set terminal controls
+  .address PROCESS_KEYCODE-CR_TABLE	; func = 06, processes keycode
+  .address RESERVED_FUNC-CR_TABLE	; func = 07, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 08, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 09, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 0A, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 0B, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 0C, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 0D, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 0E, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 0F, reserved
+  .address OPEN_CB-CR_TABLE		; func = 10, open I/O device
+  .address CLOSE_CB-CR_TABLE		; func = 11, close I/O device
+  .address IOCTL-CR_TABLE		; func = 12, perform I/O operation
+  .address READ_CB-CR_TABLE		; func = 13, read I/O device
+  .address WRITE_CB-CR_TABLE		; func = 14, write I/O device
+  .address RESERVED_FUNC-CR_TABLE	; func = 15, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 16, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 17, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 18, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 19, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 1A, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 1B, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 1C, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 1D, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 1E, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 1F, reserved
+  .address SET_ENV-CR_TABLE		; func = 20, sets an ev
+  .address RESET_ENV-CR_TABLE		; func = 21, resets an ev
+  .address GET_ENV-CR_TABLE		; func = 22, gets an ev
+  .address SAVE_ENV-CR_TABLE		; func = 23, saves an ev
+  .address RESERVED_FUNC-CR_TABLE	; func = 24, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 25, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 26, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 27, reserved
+.if ne GALAXY_CALLBACKS
+  .address GALAXY_CB-CR_TABLE		; func = 28, Galaxy callback
+.iff
+  .address RESERVED_FUNC-CR_TABLE	; func = 28, reserved
+.endc
+  .address RESERVED_FUNC-CR_TABLE	; func = 29, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 2A, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 2B, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 2C, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 2D, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 2E, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 2F, reserved
+  .address PSWITCH-CR_TABLE		; func = 30, switches primary
+.if ne TURBO
+  .address SAVE_ERR_LOG-CR_TABLE	; func = 31, save error log entry
+.iff
+  .address RESERVED_FUNC-CR_TABLE	; func = 31, reserved
+.endc
+.if ne GALAXY_CALLBACKS
+  .address GALAXY_CB-CR_TABLE		; func = 32, Galaxy callback
+.iff
+  .address RESERVED_FUNC-CR_TABLE	; func = 32, reserved
+.endc
+.if ne EEROM_CALLBACKS
+  .address WRITE_EEROM_CB-CR_TABLE	; func = 33, write EEROM
+  .address READ_EEROM_CB-CR_TABLE	; func = 34, read EEROM
+.iff
+  .address RESERVED_FUNC-CR_TABLE	; func = 33, reserved
+  .address RESERVED_FUNC-CR_TABLE	; func = 34, reserved
+.endc
+					; Change MAX_FUNC_CODE if you add to the end of this table!
+
+
+	
+.align quad
+
+; scratch area
+
+; local copy of slot numbers
+
+PATCH$IO_SLOT_NUM::
+  .quad	iom_slotid	; contains TVBus slot number of I/O module
+  .quad	0		; value to XOR with iom tty addrs
+  IO_SN = PATCH$IO_SLOT_NUM-CR_TABLE
+  IO_SN_XOR_TTY = PATCH$IO_SLOT_NUM-CR_TABLE+8
+
+PATCH$CPU_SLOT_NUM::
+  .quad	cpu_slotid	; contains TVBus slot number of CPU module
+  CPU_SN = PATCH$CPU_SLOT_NUM-CR_TABLE
+
+;
+; serial line variables
+;
+SERIAL_LINE_FLAG::
+  .quad	0	; flag indicating if serial line registers are set up
+  SL_FLAG = SERIAL_LINE_FLAG-CR_TABLE
+
+SL_ICR_COPY::
+  .quad	0	; copy of serial line interrupt control register
+  SL_ICR_LOCAL = SL_ICR_COPY-CR_TABLE
+
+SL_ICR_OLD_COPY::
+  .quad	0	; copy of serial line interrupt control register
+  SL_ICR_OLD_LOCAL = SL_ICR_OLD_COPY-CR_TABLE
+
+SL_ICR_COPY1::
+  .quad	0	; copy of serial line interrupt control register1
+  SL_ICR_LOCAL1 = SL_ICR_COPY1-CR_TABLE
+
+SL_ICR_OLD_COPY1::
+  .quad	0	; copy of previous serial line interrupt control register1
+  SL_ICR_OLD_LOCAL1 = SL_ICR_OLD_COPY1-CR_TABLE
+
+HWRPB_ADDR::
+  .quad	0	; virtual HWRPB address in bootstrap space
+
+	align_branch_target
+
+10$:	or	r0, r31, r10		; set up base of table into R10
+	sll	r16, #3, r0		; determine index into table
+	addq	r10, r0, r0		; determine location of console routine offset
+	ldl	r0, 0(r0)		; get console routine offset
+	addq	r10, r0, r0		; determine console routine address
+	jmp	r31, (r0)		; call console routine
+
+.disable LSB
+
+
+;+
+; for reserved functions, set failure status in R0 and return
+;-
+	align_branch_target
+
+RESERVED_FUNC:
+	or	r31, #DISPATCH_FAIL, r0	; set status in R0
+	sll	r0, #63, r0		; re-position status in R0
+return_to_os:
+	ldq	r10, 0*8(sp)		; restore R10
+	ldq	r1, 1*8(sp)		; restore R1
+	ldq	r2, 2*8(sp)		; restore R2
+	ldq	r3, 3*8(sp)		; restore R3
+	ldq	r4, 4*8(sp)		; restore R4
+	ldq	r5, 5*8(sp)		; restore R5
+	ldq	r6, 6*8(sp)		; restore R6
+	ldq	r7, 7*8(sp)		; restore R7
+	ldq	r8, 8*8(sp)		; restore R8
+	ldq	r16, 9*8(sp)		; restore R16
+	ldq	r17, 10*8(sp)		; restore R17
+	ldq	r18, 11*8(sp)		; restore R18
+	ldq	r19, 12*8(sp)		; restore R19
+	ldq	r20, 13*8(sp)		; restore R20
+	ldq	r21, 14*8(sp)		; restore R21
+	ldq	r22, 15*8(sp)		; restore R22
+	ldq	r23, 16*8(sp)		; restore R23
+	lda	sp, 17*8(sp)		; release stack space
+	ret	r31, (r26)		; return from console routine
+
+
+;+
+; FIXUP
+;
+; FUNCTION:
+;
+;	Fixup virtual addresses in console routines
+;	status	= FIXUP (NEW_BASE_VA, HWRPB_VA)
+;
+; INPUTS:
+;
+;	NEW_BASE_VA	= R16; the new starting virtual address of the console
+;			        service routines and their I/O pages
+;	HWRPB_VA	= R17; the new starting virtual address of the HWRPB
+;	retadr		= R26; return address
+;
+; OUTPUTS:
+;
+;	status		= R0; bit encoded return status as follows:
+;			  R0<63> eql '0' if success
+;				 eql '1' if failure
+;-
+
+	align_branch_target
+
+_fixup_::
+
+	align_branch_target odd=1	; force odd quadword alignment
+
+	br	r0, 10$			; br to code
+5$:	.quad	<dispatch - ^x2000>	; offset to dispatch entry
+	.quad	<_dispatch_ - ^x2000>	; offset to dispatch rtn
+	.quad	<fixup - ^x2000>	; offset to dispatch entry
+	.quad	<_fixup_ - ^x2000>	; offset to dispatch rtn
+	.quad	<HWRPB_ADDR - 5$>
+	.quad	<ENV_VAR_TABLE - 5$>
+	.quad	<ENV_VAR_TABLE_END - 5$>
+	.quad	<SERIAL_LINE_FLAG - 5$>
+	.quad	<SHELL_AFFINITY_PTR - 5$>
+
+	.quad	0		; scratch
+	.quad	0		; scratch
+	.quad	0		; scratch
+	.quad	0		; scratch
+
+10$:	stq	r1, 9*8(r0)	; save a reg
+ 	stq	r2, 10*8(r0)	; save a reg
+	stq	r3, 11*8(r0)	; save a reg
+	stq	r4, 12*8(r0)	; save a reg
+
+
+	ldq	r3, 7*8(r0)	; get offset to serial_line_flag
+	addl	r3, r0, r3	; add to current va
+	stq	r31, (r3)	; clear flag
+
+	ldq	r3, 4*8(r0)	; get pointer to HWRPB address
+	addl	r3, r0, r3	; add to current va
+
+	ldq	r1, (r3)	; fetch current HWRPB VA
+	stq	r17, (r3)	; save new virtual HWRPB address
+
+	ldq	r3, crb_offset(r1) ; get offset to crb
+	addq	r3, r1, r3	; now va of crb
+
+	ldq	r2, CRB$Q_VDISPATCH(r3)	; get old va of dispatch proc entry
+	ldq	r1, 1*8(r0)	; get offset for dispatch rtn
+	addq	r1, r16, r1	; new va of rtn
+	ldq	r4, 8(r2)	; old va of rtn
+	stq	r1, 8(r2)	; write new va into proc desc
+	subq	r4, r1, r4	; get delta between old va and new va
+
+	ldq	r2, CRB$Q_VFIXUP(r3) ; get old va of dispatch proc entry
+	ldq	r1, 3*8(r0)	; get offset for fixup rtn
+	addq	r1, r16, r1	; new va of rtn
+	stq	r1, 8(r2)	; write new va into proc desc
+
+	ldq	r1, 5*8(r0)	; get offset for ENV_VAR_TABLE
+	addq	r1, r0, r1	; add to current virtual address
+	ldq	r3, 6*8(r0)	; get offset for ENV_VAR_TABLE_END
+	addq	r3, r0, r3	; add to current virtual address
+20$:	ldq	r2, 0(r1)	; get ENV_VAR_TABLE entry
+	subq	r2, r4, r2	; calculate offset from hwrpb
+	stq	r2, 0(r1)	; write new va into ENV_VAR_TABLE
+	addq	r1, #16, r1	; increment to next entry
+	cmpeq	r3, r1, r2	; repeat for all entries
+	beq	r2, 20$
+
+	ldq	r1, 8*8(r0)	; get offset for SHELL_AFFINITY_PTR
+	addq	r1, r0, r1	; add to current virtual address
+	ldq	r2, 0(r1)	; get SHELL_AFFINITY_PTR entry
+	subq	r2, r4, r2	; calculate offset from hwrpb
+	stq	r2, 0(r1)	; write new va into SHELL_AFFINITY_PTR 
+
+	ldq	r1, 9*8(r0)	; save a reg
+	ldq	r2, 10*8(r0)	; save a reg
+	ldq	r3, 11*8(r0)	; save a reg
+	ldq	r4, 12*8(r0)	; save a reg
+	or	r31, r31, r0	; set success status
+	ret	r31, (r26)	; return from console routine
+
+
+;+
+; GETC
+;
+; FUNCTION:
+;
+;	Get Character from Console Terminal
+;	char	= DISPATCH (GETC)
+;
+; INPUTS:
+;
+;	GETC	= R16; GETC function code (equal 01)
+;		= R17; terminal device unit number
+;	retadr	= R26; return address
+;
+; OUTPUTS:
+;
+;  char	= R0; bit encoded return status as follows:
+;
+;	  R0<63:62> eql '00' if success, character received
+;		    eql '10' if failure, character not yet ready
+;		    eql '11' if failure, character received with error
+;	  R0<61>    eql '1' if more characters to be read
+;		    eql '0' otherwise
+;	  R0<60>    eql '1' if terminal supports input interrupts
+;		    eql '0' otherwise
+;	  R0<59:40> MBZ
+;	  R0<39:32> = unit number of device returning character
+;	  R0<31:0>  = character read from console terminal
+;
+; *NOTE*: This implementation of GETC will never return R0<63:62> eql '11'
+;	  because no terminal errors are reported
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0 	= status; character read from console terminal
+;	R2 	= temporary state
+;	R3 	= VA of serial line ring buffer
+;	R4 	= PA of I/O base address
+;	R5 	= RXUI, RXBUF unload index
+;	R6 	= temporary status; RXBUF address
+;	R7	= RXBUF quadword to be read
+;	R16	= quadword aligned PA for STQP
+;	R17	= data to be written for STQP
+;-
+
+; symbols for GETC encoded return status
+
+GETC_SUCCESS	= ^B00	; R0<63:62> = 00, success, character received
+GETC_MODEM	= ^B01	; R0<63:62> = 01, modem transition (no character)
+GETC_FAIL_CNR	= ^B10	; R0<63:62> = 10, failure, character not yet ready
+
+
+	align_branch_target
+
+GETC:
+	or	r31, r31, r0		; clear R0 for count of bytes
+
+.if ne	TURBO
+.if ne	GALAXY
+	bis	r16, r31, r1		; save r16
+	cserve	cserve$get_base		; find our base address
+	bis	r1, r31, r16		; restore r16
+	bne	r0, console_getc	; branch if non-zero base
+.endc
+	bis	r17, r31, r4		; save r17 to r4
+	cmpeq	r17, #1, r2		; power uart ?
+	bne	r2, 23$			; yes, handle directly
+	cmpeq	r17, #2, r2		; kbd ?
+	bne	r2, 200$		; yes, handle directly
+	cmpeq	r17, #3, r2		; mouse ?
+	bne	r2, 200$		; yes, handle directly
+
+; unit 0
+
+	br	r0, 110$
+100$:	.long	graphics_console-100$
+110$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	bne	r0, 140$		; Graphics
+
+	br	r0, 130$
+120$:	.long	both_console-120$
+130$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	beq	r0, 150$		; No both
+
+; Perform callback to console
+
+	align_branch_target odd=1	; force odd quadword alignment
+
+140$:   bis	r16, r31, r1
+	cserve	cserve$callback		; do the callback elsewhere
+	br	r31, return_to_os
+
+; unit 0
+
+150$:	ldah	r3, ^xa000(r31)		; load UART0 physical address
+	lda	r3,^x80(r3)		; use a-channel offset
+	br	r31,24$
+
+; unit 1
+
+23$:	ldah	r3, ^xa000(r31)		; load UART0B physical address
+	lda	r3,^x00(r3)		; use a-channel offset
+
+; common uart routine
+
+24$:	bis	r3, r31, r17		; create physical address
+	ldlp				; read register
+	and	r0,#1,r2		; check RX Rcv bit
+	beq	r2, 30$			; jump if no char available
+	lda	r17,^x40(r3)
+	ldlp				; read register
+	and	r0, #^xff, r0		; clear all but low byte	
+
+25$:	ldq	r2, scr17(sp)		; get unit
+	sll	r2, #32, r2		; position for return
+	or	r0, r2, r0		; insert character
+	or	r31, #GETC_SUCCESS, r2	; set success status
+	br	r31, getc_end		; return with character and good status
+
+30$:	ldq	r0, scr17(sp)		; get unit
+	sll	r0, #32, r0		; position for return
+	or	r31, #GETC_FAIL_CNR, r2	; set failure status
+	br	r31, getc_end		; return
+
+; Graphics, kbd or mouse
+
+200$:	br	r0, 202$		; get pci physical address
+201$:	.long	kbd_pci_ptr-201$
+202$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldq	r2, (r1)
+
+	lda	r3, kbd_stat(r31)	; create status address
+	sll	r3, #5, r3
+	bis	r2, r3, r17
+	ldlp				; read register
+
+	srl	r0, #stat$v_obf, r0
+	blbc	r0, 30$			; no char available
+
+	lda	r3, kbd_data(r31)	; create data address
+	sll	r3, #5, r3
+	bis	r2, r3, r17
+	ldlp				; read register
+	and	r0, #^xff, r0		; keep char
+	br	r31, 25$		; success
+console_getc:
+.endc
+
+
+;
+; Callback is handled in the context of the console
+;
+
+.if ne	GALAXY ! AVANTI ! ALCOR ! K2 ! MTU ! CORTEX ! YUKONA ! TAKARA ! MONET ! APC_PLATFORM
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+.endc
+
+
+.if ne	SABLE ! RAWHIDE ! MIKASA ! REGATTA ! WILDFIRE ! EIGER
+com1 = ^x3f8
+thr = 0
+rbr = 0
+ier = 1
+iir = 2
+lcr = 3
+mcr = 4
+lsr = 5
+msr = 6
+scr = 7
+lsr$v_dr = 0
+lsr$v_thre = 5
+stat = ^x64
+data = ^x60
+stat$v_obf = 0
+stat$v_ibf = 1
+stat$v_ods = 5
+
+	cmpeq	r17, #2, r0
+	bne	r0, 60$
+	cmpeq	r17, #3, r0
+	bne	r0, 60$
+	cmpeq	r17, #1, r0
+	bne	r0, 30$
+	bsr	r0, 20$
+10$:	.long	graphics_console-10$
+20$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	beq	r0, 30$
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+
+30$:	lda	r5, sl_icr_local(r10)
+	get_addr r2, <pci0_io>, r31
+	sll	r2, #24, r2
+	load	<com1+msr>
+	load	<com1+lsr>
+	srl	r0, #lsr$v_dr, r0
+	blbc    r0, 80$
+	load	<com1+rbr>
+	and	r0, #^xff, r0
+	cmpeq	r0, #^x10, r1
+	beq	r1, 70$
+	ldq	r2, scr17(sp)
+	bne	r2, 70$
+	bsr	r2, 50$
+40$:	.long	controlp_enable-40$
+50$:	ldl	r1, (r2)
+	addq	r1, r2, r1
+	ldl	r2, (r1)
+	beq	r2, 70$
+	cserve	cserve$halt
+	br	r31, 70$
+
+60$:	get_addr r2, <pci0_io>, r31
+	sll	r2, #24, r2
+	load	<stat>
+	srl	r0, #stat$v_obf, r0
+	blbc    r0, 80$
+	load	<data>
+	and	r0, #^xff, r0
+
+70$:	ldq	r2, scr17(sp)
+	sll	r2, #32, r2
+	or	r0, r2, r0
+	or	r31, #getc_success, r2
+	br	r31, 90$
+
+80$:	ldq	r0, scr17(sp)
+	sll	r0, #32, r0
+	or	r31, #getc_fail_cnr, r2
+90$:
+.endc
+
+
+.if ne	MEDULLA
+.if ne TGA
+	cmpeq	r17, #1, r0
+	bne	r0, 30$
+	bsr	r0, 20$
+10$:	.long	graphics_console-10$
+20$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	beq	r0, 30$
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+30$:
+.endc
+	bis	r17, r31, r6		; copy r17 to r6, this is the channel 
+					; no: 0=Chnl A, 1=Chnl B
+
+	ldah	r3, pci_addr_high(r31)	; 0.3000.0000, 0.1C00.0000 for LCA2 
+	sll	r3, #4, r3		; 3.0000.0000
+
+	blbs	r6, dochnlB		; unit is 1 so jump to Chnl B
+	lda	r4, uart_cha_rdwrA(r31)	; pci i/o address
+	lda	r5, uart_cha_rxtxA(r31)	; pci i/o address
+	br	r31, getachar
+dochnlB:
+	lda	r4, uart_cha_rdwrB(r31)	; pci i/o address
+	lda	r5, uart_cha_rxtxB(r31)	; pci i/o address
+
+getachar:
+	sll	r4, #pci_addr_shift, r4	;
+	bis	r4, r3, r4	; complete cpu address for rdwr
+	sll	r5, #pci_addr_shift, r5	;
+	bis	r5, r3, r5	; complete cpu address for rxtx
+
+	bis	r4, r31, r17	; set up r17 for cserve read of rdwr reg
+	ldlp			; read RR0 using cserve pal call to get to physical address
+				; if no byte in rx buffer then return with status = 100
+	blbs	r0, L2		; Branch if Rx buffer has a byte
+	or	r31, #GETC_FAIL_CNR, r2	; set fail status, no data in buffer yet
+				; SRM says we can't hog the system so let
+				; caller do the wait for char
+	br	r31, medulla_getc_end	; bail out		
+L2:
+
+	bis	r5, r31, r17	; set up r17 for rxtx read
+
+	ldlp			; read RXDATA using cserve pal call 
+	and	r0, #^xff, r0		; SBZ all don't care bits.
+	
+	or		r31, #GETC_SUCCESS, r2	; set success status
+
+medulla_getc_end:
+	bis		r6, r31, r17		; restore r17
+		
+.endc
+
+; common exit from GETC routine
+
+getc_end:
+	sll		r2, #62, r2		; re-position status bits
+	or		r2, r0, r0		; insert status into R0
+	br		r31, return_to_os	; return from console routine
+
+
+;+
+; PUTS
+;
+; FUNCTION:
+;
+;	Put String to Console Terminal
+;	wcount	= DISPATCH ( PUTS, address, length, unit)
+;
+; INPUTS:
+;
+;	PUTS	= R16; PUTS function code (equals 02)
+;	unit	= R17; unit number of device to write bytes to in a
+;		       multi-terminal configuration; otherwise MBZ
+;	address	= R18; virtual address of byte string to write
+;	length	= R19; number of bytes in byte string (unsigned)
+;	retadr	= R26; return address
+;
+; OUTPUTS:
+;
+;  wcount = R0; count of bytes written and status
+;
+;	R0<63:61> 	eql '000' if success, some bytes written
+;	eql '010' if success, some bytes written but terminal error encountered
+;	eql '100' if faulure, no bytes written, terminal not ready
+;	eql '110' if failure, no bytes written, terminal error encountered
+;	eql '101' if failure, previous write failed
+;	R0<60>	eql '1' if terminal supports output interrupts
+;		eql '0' otherwise
+;	R0<59:32>	SBZ
+;	R0<31:0>  	count of bytes written (unsigned)
+;
+; *NOTE*: This implementation of PUTS will never return R0<63:61> eql '010'
+;	  because no terminal errors are reported and R0<63:61> eql '101'.
+;
+;	  R0<63:61> = 100 no bytes written, terminal not ready because
+;		      the TXBUF is full
+;		    = 110 no bytes written, terminal error encountered
+;		      because R19 is incorrect
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0 	= status; count of bytes written
+;	R2 	= temporary state
+;	R3 	= VA of serial line ring buffer
+;	R4 	= PA of I/O base address
+;	R5 	= TXLI (TXBUF load index)
+;	R6 	= TXBUF address
+;	R7	= TXBUF quadword to be written into
+;	R8	= byte to be written
+;	R16	= quadword aligned PA for STQP
+;	R17	= data to be written for STQP
+;	R19	= VA of byte string to be written (since R17 is used for STQP)
+;-
+
+; symbols for PUTS encoded return status
+PUTS_SUCCESS	= ^B000		; R0<63:61> = 000, all bytes written
+PUTS_SUCCESS_PARTIAL = ^B001	; R0<63:61> = 001, some bytes written
+PUTS_FAIL_TNR	= ^B100		; R0<63:61> = 100, failure, no bytes written -- terminal not ready
+PUTS_FAIL_TE	= ^B110		; R0<63:61> = 110, failure, no bytes written -- terminal error encountered
+
+	align_branch_target
+PUTS:
+	or	r31, r31, r0		; clear R0 for count of bytes
+
+   	cmoveq	r19, #PUTS_SUCCESS, r2	; zero bytes to write over-rides any other failure
+   	beq	r19, puts_end		; if given byte count = 0, goto end of routine
+   
+.if ne	TURBO
+.if ne	GALAXY
+	bis	r16, r31, r1		; save r16
+	cserve	cserve$get_base		; find our base address
+	bis	r1, r31, r16		; restore r16
+	bne	r0, console_puts	; branch if non-zero base
+.endc
+	ldq_u	r6, (r18)
+	extbl	r6, r18, r6
+
+	or	r31, r31, r5		; clear R5 for count of bytes
+
+	cmpeq	r17, #1, r2		; power uart ?
+	bne	r2, 23$			; yes, handle directly
+	cmpeq	r17, #2, r2		; kbd ?
+	bne	r2, puts_kbd		; yes, handle directly
+	cmpeq	r17, #3, r2		; mouse ?
+	bne	r2, puts_mouse		; yes, handle directly
+
+; unit 0
+
+	br	r0, 110$
+100$:	.long	graphics_console-100$
+110$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	bne	r0, 140$		; Graphics
+
+	br	r0, 130$
+120$:	.long	both_console-120$
+130$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	beq	r0, 170$		; No both
+
+; Perform callback to console
+
+140$:	bis	r16, r31, r1
+	ldq_u	r2, (r18)
+	ldq_u	r3, 7(r18)
+	extql	r2, r18, r2
+	extqh	r3, r18, r3
+	bis	r2, r3, r22
+	bis	r19, r31, r23
+	cmple	r23, #8, r2
+	cmoveq	r2, #8, r23
+
+	align_branch_target odd=1	; force odd quadword alignment
+
+150$:	bis	r16, r31, r1
+	cserve	cserve$callback		; pass callback to console
+	br	r31, return_to_os	; return from console routine
+
+170$:	ldah	r3, ^xa000(r31)		; load UART0 physical address
+	lda	r3,^x80(r3)		; use a-channel offset
+	br	r31,25$
+
+23$:	ldah	r3, ^xa000(r31)		; load UART0B physical address
+	lda	r3,^x00(r3)		; use a-channel offset
+
+25$:	bis	r3, r31, r17
+	ldlp				; cserve
+	and	r0,#4,r2		; check TX Empty bit
+	bne	r2, send_char		; ok of TX Empty
+	br	r31, puts_fail		; transmitter not ready
+
+puts_loop:
+	bis	r3, r31, r17		; read status from RR0
+	ldlp				; cserve
+	and	r0,#4,r2		; check TX Empty bit
+	beq	r2, puts_partial	; transmitter not ready
+
+send_char:
+   	ldq_u	r8, 0(r18)		; load byte string quadword with specific byte
+   	lda	r2, 0(r18)		; determine byte location, R2<2:0>
+   	extbl	r8, r2, r8		; extract byte
+	bis	r18, r31, r6		; save r18 to r6
+
+	bis	r8, r31, r18		; load data 
+	lda	r17,^x40(r3)		; load address	
+	stlp				; cserve
+	mb
+
+	bis	r6, r31, r18		; restore r18
+   	addq	r18, #1, r18		; increment address of byte string
+   	addq	r5, #1, r5		; increment count of bytes written
+   	cmpult	r5, r19, r2		; check # of bytes written
+   	bne	r2, puts_loop		; if more bytes to be written
+
+puts_done:	
+	or	r5, r31, r0		; count of bytes
+	or	r31, #PUTS_SUCCESS, r2	; set success status
+	br	r31, puts_end		; return with status
+
+puts_partial:
+	or	r5, r31, r0		; count of bytes
+	or	r31, #PUTS_SUCCESS_PARTIAL, r2	; set partial success status
+	br	r31, puts_end		; return with status
+	
+puts_fail:
+	or	r31, r31, r0		; no bytes
+	or	r31, #PUTS_FAIL_TNR, r2	; set failure status
+	br	r31, puts_end		; return with status
+
+; Graphics, mouse
+
+puts_mouse:
+	br	r0, 202$		; get pci physical address
+201$:	.long	kbd_pci_ptr-201$
+202$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldq	r2, (r1)
+
+	lda	r3, kbd_stat(r31)	; create status address
+	sll	r3, #5, r3
+	bis	r2, r3, r17
+	ldlp				; read register
+
+	srl	r0, #stat$v_ibf, r0
+	blbs    r0, puts_mouse		; wait till empty
+
+	bis	r2, r3, r17
+	bis	r31, #^xd4, r18
+	stlp				; write register
+	mb
+
+; Graphics, kbd or mouse part 2
+
+puts_kbd:
+	br	r0, 302$		; get pci physical address
+301$:	.long	kbd_pci_ptr-301$
+302$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldq	r2, (r1)
+
+	lda	r3, kbd_stat(r31)	; create status address
+	sll	r3, #5, r3
+	bis	r2, r3, r17
+	ldlp				; read register
+
+	srl	r0, #stat$v_ibf, r0
+	blbs    r0, puts_kbd		; wait till empty
+
+	lda	r3, kbd_data(r31)
+	sll	r3, #5, r3
+	bis	r2, r3, r17
+	bis	r6, r31, r18
+	stlp				; write register
+	mb
+
+	or	r31, #1, r0
+	or	r31, #puts_success, r2
+	br	r31, puts_end		; return with status
+console_puts:
+.endc
+
+
+.if ne	MEDULLA
+.if ne TGA        
+   	cmpeq	r17, #1, r0
+   	bne	r0, 30$
+   	bsr	r0, 20$
+10$:	.long	graphics_console-10$
+20$:	ldl	r1, (r0)
+   	addq	r1, r0, r1
+   	ldl	r0, (r1)
+   	beq	r0, 30$
+   	bis	r16, r31, r1
+   	ldq_u	r2, (r18)
+   	ldq_u	r3, 7(r18)
+   	extql	r2, r18, r2
+   	extqh	r3, r18, r3
+   	bis	r2, r3, r22
+	bis	r19, r31, r23
+	cmple	r23, #8, r2
+	cmoveq	r2, #8, r23
+	cserve	cserve$callback
+	br	r31, return_to_os
+30$:
+.endc
+	bis	r17, r31, r6		; copy r17 to r6, this is the channel 
+					; no: 0=Chnl A, 1=Chnl B
+	bis 	r18, r31, r4		; copy ptr to r4, r17 used by cserve
+	bis 	r19, r31, r5		; copy len to r5, r18 used by cserve
+	bis 	r0, r31, r1		; copy r0 to r1 r0 used by cserve
+	bis	r31, r31, r7		; clear byte count of full str
+
+	ldah	r17, pci_addr_high(r31)	; 0.3000.0000, 0.1C00.0000 for LCA2 
+	sll	r17, #4, r17		; 3.0000.0000
+
+	blbs	r6, putchnlB		; unit is 1 so jump to Chnl B
+	lda	r2, uart_cha_rdwrA(r31)	; 
+	lda	r3, uart_cha_rxtxA(r31)	; 
+	br	r31, wrdata
+putchnlB:
+	lda	r2, uart_cha_rdwrB(r31)	; 
+	lda	r3, uart_cha_rxtxB(r31)	; 
+
+wrdata:
+	sll	r2, #pci_addr_shift, r2	;
+	bis	r2, r17, r2	; complete cpu address for rdwr
+	sll	r3, #pci_addr_shift, r3	;
+	bis	r3, r17, r3	; complete cpu address for rxtx
+
+getloop:
+	bis	r31, r31, r8		; clear byte count of a qw of data	
+	and	r4,  #7, r19		; get QW misalignment count
+	subq	r4,  r19, r4		; align string pointer
+	addq	r19, r8,  r8		; incre Byte cnt by # of invalid bytes
+	ldq	r6, (r4)		; get 8 bytes to tx
+	sll	r19, #3, r19		; turn byte cnt into bit cnt
+	srl	r6,  r19, r6		; clr out invalid bytes
+	addq	r4, #8, r4		; point to next qw
+putcloop:
+	bis	r2, r31, r17		; load r17 with rdwr address
+txempty:
+	ldlp				; read RR0, result returned in r0
+	srl	r0, #2, r0		; wait until Tx buffer empty
+	blbc	r0, txempty
+					; Tx Buffer is now empty
+
+	bis	r3, r31, r17		; load r17 with rxtx address
+
+	and	r6, #^xff, r18          ; load character byte
+	stlp				; store  r18 to location pointed to by r17
+	mb
+
+	addq	r7, #1, r7		; incr our byte count
+	cmpeq	r7, r5, r10
+	bne	r10, putsdone		; if full string sent, then exit
+	srl	r6, #8, r6		; move to next char
+	addq	r8, #1, r8		; incr our byte count
+	cmpeq	r8, #8, r10
+	bne	r10, getloop
+	br 	r31,putcloop	
+putsdone:
+	bis r1, r31, r0		; restore r0
+
+        bis	r7, r31, r0		; put number of bytes sent into r0
+	bis	r31, #PUTS_SUCCESS, r2
+	br 	r31, puts_end
+
+.endc
+
+
+;
+; handle the callback in the context of the console
+;
+
+.if ne	GALAXY ! AVANTI ! ALCOR ! K2 ! MTU ! CORTEX ! YUKONA ! TAKARA ! MONET ! APC_PLATFORM
+	bis	r16, r31, r1
+	ldq_u	r2, (r18)
+	extql	r2, r18, r22
+	bis	r19, r31, r23
+	and	r18, #7, r2
+	bis	r31, #8, r3
+	subq	r3, r2, r3
+	cmple	r23, r3, r2
+	cmoveq	r2, r3, r23
+	cserve	cserve$callback
+	br	r31, return_to_os
+.endc
+
+
+.if ne	SABLE ! RAWHIDE ! MIKASA ! REGATTA ! WILDFIRE ! EIGER
+com1 = ^x3f8
+thr = 0
+rbr = 0
+ier = 1
+iir = 2
+lcr = 3
+mcr = 4
+lsr = 5
+msr = 6
+scr = 7
+lsr$v_dr = 0
+lsr$v_thre = 5
+stat = ^x64
+data = ^x60
+stat$v_obf = 0
+stat$v_ibf = 1
+stat$v_ods = 5
+
+	ldq_u	r6, (r18)
+	extbl	r6, r18, r6
+	cmpeq	r17, #2, r0
+	bne	r0, 60$
+	cmpeq	r17, #3, r0
+	bne	r0, 50$
+	cmpeq	r17, #1, r0
+	bne	r0, 30$
+	bsr	r0, 20$
+10$:	.long	graphics_console-10$
+20$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	beq	r0, 30$
+	bis	r16, r31, r1
+	ldq_u	r2, (r18)
+	extql	r2, r18, r22
+	bis	r19, r31, r23
+	and	r18, #7, r2
+	bis	r31, #8, r3
+	subq	r3, r2, r3
+	cmple	r23, r3, r2
+	cmoveq	r2, r3, r23
+	cserve	cserve$callback
+	br	r31, return_to_os
+
+30$:	lda	r5, sl_icr_local(r10)
+	get_addr r2, <pci0_io>, r31
+	sll	r2, #24, r2
+	load	<com1+lsr>
+	srl	r0, #lsr$v_thre, r0
+	blbc    r0, 40$
+	store	<com1+thr>, r6
+	mb
+	br	r31, 70$
+
+40$:	or	r31, #0, r0
+	or	r31, #puts_fail_tnr, r2
+	br	r31, 80$
+
+50$:	get_addr r2, <pci0_io>, r31
+	sll	r2, #24, r2
+	load	<stat>
+	srl	r0, #stat$v_ibf, r0
+	blbs    r0, 50$
+	store	<stat>, <^xd4>
+	mb
+
+60$:	get_addr r2, <pci0_io>, r31
+	sll	r2, #24, r2
+	load	<stat>
+	srl	r0, #stat$v_ibf, r0
+	blbs    r0, 60$
+	store	<data>, r6
+	mb
+
+70$:	or	r31, #1, r0
+	or	r31, #puts_success, r2
+80$:
+.endc
+
+; common exit from PUTS routine
+
+puts_end:
+	sll		r2, #61, r2		; re-position status bits
+	or		r2, r0, r0		; insert status into R0
+	br		r31, return_to_os	; return from console routine
+
+
+;+
+; RESET_TERM
+;
+; FUNCTION:
+;	Reset Console Terminal to default parameters
+;	status	= DISPATCH (RESET_TERM)
+;
+; INPUTS:
+;	RESET_TERM	= R16; RESET_TERM function code (equals 03)
+;	retadr		= R26; return address
+;
+; OUTPUTS:
+;	status		= R0; bit encoded return status as follows:
+;			  R0<63> eql '0' if success, terminal reset
+;				 eql '1' if failure, terminal not fully reset
+;			  R0<62:0>	MBZ
+; 
+; *NOTE*: This implementation of RESET_TERM does not reset console terminal
+;	  and always returns success status.
+;-
+
+	align_branch_target
+
+RESET_TERM:
+
+.if ne TURBO_DEBUG
+	blast <RESET_TERM>
+	crlf
+	regout R16
+        crlf
+	regout R17
+        crlf
+	regout R18
+        crlf
+	regout R19
+        crlf
+.endc
+
+	or		r31, r31, r0		; set success status
+	br		r31, return_to_os	; return from console routine
+
+
+;+
+; SET_TERM_INT
+;
+; FUNCTION:
+;
+;	Set Console Terminal Interrupts
+;	setting	= DISPATCH (SET_TERM_INT, mask)
+;
+; INPUTS:
+;
+;	SET_TERM_INT	= R16; SET_TERM_INR function code (equals 04)
+;			= R17; terminal device unit number
+;	mask		= R18; bit encoded mask
+;			  R18<2,0> eql '01' keep current transmit int setting
+;				   eql '1X' enable transmit interrupts
+;				   eql '00' disable transmit interrupts
+;			  R18<3,1> eql '01' keep current receive int setting
+;				   eql '1X' enable receive interrupts
+;				   eql '00' disable receive interrupts
+;	retadr		= R26; return address
+;
+;	R0<0>		= TRANSMIT_INT_ON
+;	R0<1>		= RECEIVE_INT_ON
+;	TRANSMIT_INT_ON	= [(TRANSMIT_INT_ON AND R18<0>) OR R18<2>]
+;	RECEIVE_INT_ON	= [(RECEIVE_INT_ON AND R18<1>) OR R18<3>]
+;
+; OUTPUTS:
+;
+;	status	= R0; bit encoded return status as follows:
+;		  R0<63> eql '0' if success
+;			 eql '1' if failure, operation not supported
+;		  R0<62:2> MBZ
+;		  R0<1>	eql '1' if transmit interrupts enabled
+;			eql '0' if transmit interrupts disabled
+;		  R0<0>	eql '1' if receive interrupts enabled
+;			eql '0' if receive interrupts disabled
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0	= status; previous settings
+;	R2	= temporary state
+;	R3	= new serial line interrupt control register settings
+;	R4	= PA of I/O base address
+;	R16	= quadword aligned PA for STQP
+;	R17	= data to be written for STQP
+;-
+
+	align_branch_target
+
+.if ne TURBO
+
+SET_TERM_INT::
+
+.if ne TURBO_DEBUG
+	blast <SET_TERM_INT>
+	crlf
+	regout R16
+        crlf
+	regout R17
+        crlf
+	regout R18
+        crlf
+	regout R19
+        crlf
+.endc
+
+.if ne	GALAXY
+	bis	r16, r31, r1		; save r16
+	cserve	cserve$get_base		; find our base address
+	bis	r1, r31, r16		; restore r16
+	beq	r0, 1000$		; branch if zero base
+	bis	r16, r31, r1		; non-zero base 
+	cserve	cserve$callback		; execute in console context
+	br	r31, return_to_os	; and return
+1000$:
+.endc
+
+	bne	r17, 1$		; select uart 0 or 1
+
+; get local copy of serial line interrupt control register0
+; save previous copy of serial line interrupt control register0
+
+	ldq	r0, SL_ICR_LOCAL(r10)
+	stq	r0, SL_ICR_OLD_LOCAL(r10)
+	br	r31, 2$
+
+; get local copy of serial line interrupt control register1
+; save previous copy of serial line interrupt control register1
+
+1$:	ldq	r0, SL_ICR_LOCAL1(r10)
+	stq	r0, SL_ICR_OLD_LOCAL1(r10)
+
+; extract <1:0> = transmit/receive interrupt enable bits and set success status
+
+2$:	and	r0, #3, r0
+
+; extract RECEIVE_INT_ON from receive interrupt enable bit (RE bit) in SL_ICR
+
+	and	r0, #1, r2
+   	srl	r18, #8, r3		; re-position R18<8>
+   	and	r3, #1, r3		; extract R18<8>
+   	and	r2, r3, r3		; RECEIVE_INT_ON = [(RECEIVE_INT_ON AND R18<1>) OR R18<3>]
+   	srl	r18, #9, r2		; re-position R18<9>
+   	and	r2, #1, r2		; extract R18<9>
+   	cmovne	r2, #1, r3		; RECEIVE_INT_ON = [(RECEIVE_INT_ON AND R18<1>) OR R18<3>]
+
+	srl	r0, #1, r2		; re-position transmit interrupt enable bit (TE bit)
+	and	r2, #1, r2		; extract TRANSMIT_INT_ON from TE bit in SL_ICR
+   	and	r18, #1, r4		; extract R18<0>
+   	and	r2, r4, r4		; TRANSMIT_INT_ON = [(TRANSMIT_INT_ON AND R18<0>) OR R18<2>]
+   	srl	r18, #1, r2		; re-position R18<1>
+   	and	r2, #1, r2		; extract R18<1>
+   	cmovne	r2, #1, r4		; TRANSMIT_INT_ON = [(TRANSMIT_INT_ON AND R18<0>) OR R18<2>]
+   	sll	r4, #1, r4		; re-position TE bit for SL_ICR
+	or	r4, r3, r3		; insert RE bit for SL_ICR
+
+	bne	r17, 3$			; select uart 0 or 1
+
+	br	r0, 110$
+100$:	.long	graphics_console-100$
+110$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	bne	r0, 140$		; Graphics
+
+	br	r0, 130$
+120$:	.long	both_console-120$
+130$:	ldl	r1, (r0)
+	addq	r1, r0, r1
+	ldl	r0, (r1)
+	beq	r0, 150$		; No both
+
+	align_branch_target odd=1	; force odd quadword alignment
+140$:	bis	r16, r31, r1
+	cserve	cserve$callback		; do the callback elsewhere
+	br	r31, return_to_os
+
+150$:	stq	r3, SL_ICR_LOCAL(r10)	; write local copy of UART0 interrupt control register0
+	br	r31, 4$
+3$:	stq	r3, SL_ICR_LOCAL1(r10)	; write local copy of UART1 interrupt control register1
+
+4$:	or	r3, r31, r0		; return status
+	and	r3, #1, r2		; isolate RX Enable bit
+	sll	r2, #4, r2		; shift to proper bit in WR1
+	and	r3, #2, r3		; isolate TX Enable bit
+	or	r2, r3, r1		; merge bits into WR1 data
+	
+	bis	r17, r31, r4		; save r17 to r4
+	cmpeq	r17,#1,r2		; power uart ?
+	bne	r2,23$			; yes, skip			
+	ldah	r3, ^xa000(r31)		; else load UART0 physical address
+	lda	r3,^x80(r3)		; use a-channel offset
+	br	r31,25$
+23$:	ldah	r3, ^xa000(r31)		; else load UART0B physical address
+	lda	r3,^x00(r3)		; use a-channel offset
+25$:	lda	r2, 1(r31)		; WR1
+	bis	r3, r31, r17
+	bis	r2, r31, r18
+	stlp
+	mb
+	bis	r3, r31, r17
+	bis	r1, r31, r18
+	stlp
+	mb
+	bis	r4, r31, r17		; restore r17
+
+	align_branch_target odd=1	; force odd quadword alignment
+	br	r2, 40$			; br to code
+30$:	.quad	<HWRPB_ADDR - 30$>
+
+40$:	ldl	r3,(r2)			; find HWRPB address
+	addq	r2,r3,r2		; 
+	ldq	r2,(r2)
+	bne	r2, 50$			; ok if non-zero
+	ldah	r3, uart0_h(r31)	; else load UART0 physical address
+	lda	r2, uart0_l(r31)
+	addq	r3, r2, r3
+	br	r31,60$
+
+50$:	ldq	r3,ctb_offset(r2)	; get offset to CTB
+	addq	r2, r3, r2		; CTB address
+	lda	r3, <CTB$WS_LEN>(r31) ; offset by unit number
+	mulq	r3, r17, r3
+	addq	r3, r2, r2
+
+	bne	r17, 51$		; select uart 0 or 1
+  	ldq	r0, SL_ICR_LOCAL(r10)	; get current interrupt0 enables
+	br	r31, 52$
+51$:  	ldq	r0, SL_ICR_LOCAL1(r10)	; get current interrupt1 enables
+52$:	srl	r0, #1, r0		; isolate TX Enable bit
+	and	r0, #1, r0		
+	sll	r0, #63, r0		; shift up to bit <63>
+	ldq	r3, <CTB_VT$L_TX_SCB_OFFSET_L>(r2) ; get current CTB entry
+	sll	r3, #1, r3		; clear T bit <63>
+	srl	r3, #1, r3
+	or	r0, r3, r3		; or in new TX Enable bit
+	stq	r3, <CTB_VT$L_TX_SCB_OFFSET_L>(r2) ; write new CTB entry
+
+	bne	r17, 53$		; select uart 0 or 1
+  	ldq	r0, SL_ICR_LOCAL(r10)	; get current interrupt0 enables
+	br	r31, 54$
+53$:  	ldq	r0, SL_ICR_LOCAL1(r10)	; get current interrupt1 enables
+54$:	and	r0, #1, r0		; isolate RX Enable bit
+	sll	r0, #63, r0		; shift up to bit <63>
+	ldq	r3, <CTB_VT$L_RX_SCB_OFFSET_L>(r2) ; get current CTB entry
+	sll	r3, #1, r3		; clear R bit <63>
+	srl	r3, #1, r3
+	or	r0, r3, r3		; or in new RX Enable bit
+	stq	r3, <CTB_VT$L_RX_SCB_OFFSET_L>(r2) ; write new CTB entry
+
+60$:	bne	r17, 61$		; select uart 0 or 1
+   	ldq	r0, SL_ICR_OLD_LOCAL(r10) ; get copy of previous serial line interrupt control register0
+	br	r31, 62$
+61$:   	ldq	r0, SL_ICR_OLD_LOCAL1(r10) ; get copy of previous serial line interrupt control register1
+62$:   	srl	r0, #1, r2		; swap bits <1> and <0>
+   	and	r2, #1, r2		; isolate transmit enable bit
+   	sll	r0, #1, r0
+   	and	r0, #2, r0		; isolate receive enable bit
+   	or	r0, r2, r0
+   	and	r0, #3, r0		; extract <1:0> = transmit/receive interrupt enable bits and set success status
+	br	r31, return_to_os	; return from console routine
+
+
+.iff
+
+SET_TERM_INT:
+
+;
+; Callback is handled in the context of the console
+;
+
+.if ne	GALAXY ! SABLE ! ALCOR ! AVANTI ! MIKASA ! K2 ! RAWHIDE ! MTU ! CORTEX ! YUKONA ! TAKARA ! APC_PLATFORM ! REGATTA ! WILDFIRE ! MONET ! EIGER
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+.if_false
+
+	bne		r17, 1$			; select uart 0 or 1
+	ldq		r0, SL_ICR_LOCAL(r10)	; get local copy of serial line interrupt control register0
+	stq		r0, SL_ICR_OLD_LOCAL(r10) ; save previous copy of serial line interrupt control register0
+	br		r31, 2$
+1$:	ldq		r0, SL_ICR_LOCAL1(r10)	; get local copy of serial line interrupt control register1
+	stq		r0, SL_ICR_OLD_LOCAL1(r10) ; save previous copy of serial line interrupt control register1
+2$:	and		r0, #3, r0		; extract <1:0> = transmit/receive interrupt enable bits and set success status
+
+	and		r0, #1, r2		; extract RECEIVE_INT_ON from receive interrupt enable bit (RE bit) in SL_ICR
+   	srl		r18, #8, r3		; re-position R18<8>
+   	and		r3, #1, r3		; extract R18<8>
+   	and		r2, r3, r3		; RECEIVE_INT_ON = [(RECEIVE_INT_ON AND R18<1>) OR R18<3>]
+   	srl		r18, #9, r2		; re-position R18<9>
+   	and		r2, #1, r2		; extract R18<9>
+   	cmovne		r2, #1, r3		; RECEIVE_INT_ON = [(RECEIVE_INT_ON AND R18<1>) OR R18<3>]
+
+	srl		r0, #1, r2		; re-position transmit interrupt enable bit (TE bit)
+	and		r2, #1, r2		; extract TRANSMIT_INT_ON from TE bit in SL_ICR
+   	and		r18, #1, r4		; extract R18<0>
+   	and		r2, r4, r4		; TRANSMIT_INT_ON = [(TRANSMIT_INT_ON AND R18<0>) OR R18<2>]
+   	srl		r18, #1, r2		; re-position R18<1>
+   	and		r2, #1, r2		; extract R18<1>
+   	cmovne		r2, #1, r4		; TRANSMIT_INT_ON = [(TRANSMIT_INT_ON AND R18<0>) OR R18<2>]
+   	sll		r4, #1, r4		; re-position TE bit for SL_ICR
+	or		r4, r3, r3		; insert RE bit for SL_ICR
+
+.if ne	TURBO
+	stq		r3, SL_ICR_LOCAL(r10)	; write local copy of interrupt control register
+	or		r3, r31, r0		; return status
+	and		r3, #1, r2		; isolate RX Enable bit
+	sll		r2, #4, r2		; shift to proper bit in WR1
+	and		r3, #2, r3		; isolate TX Enable bit
+	or		r2, r3, r1		; merge bits into WR1 data
+	
+	align_branch_target odd=1	; force odd quadword alignment
+	br	r2, 20$			; br to code
+10$:	.quad	<HWRPB_ADDR - 10$>
+
+20$:	ldl	r3,(r2)			; find HWRPB address
+	addq	r2,r3,r2		; 
+	ldq	r2,(r2)
+	bne	r2, 24$			; ok if non-zero
+	ldah	r3, ^xa000(r31)		; else load UART0 physical address
+	br	r31,25$
+
+24$:	ldq	r3,crb_offset(r2)	; get offset to CRB
+	addq	r2, r3, r2		; CRB address
+	ldq	r3, <CRB$R_ENTRY+<CRB$K_CT_UART*CRB_ENTRY$K_SIZE>>(r2)
+					; get UART0 virtual address
+25$:	lda	r2, 1(r31)		; WR1
+	stq	r2,^x80(r3)		; write pointer register
+	mb
+	stq	r1,^x80(r3)		; write WR1 
+	mb
+.endc
+.endc
+
+
+.if ne ALCOR
+;
+; Alcor specific set interrupt code will go here .....
+;
+; need code to support COM1, and Keyboard devices
+;
+.endc
+
+	ldq		r17, SCR17(sp)		; fetch unit again
+	bne		r17, 3$			; select uart 0 or 1
+   	ldq		r0, SL_ICR_OLD_LOCAL(r10) ; get old copy of serial line interrupt control register
+	br		r31, 4$
+3$:   	ldq		r0, SL_ICR_OLD_LOCAL1(r10) ; get old copy of serial line interrupt control register
+4$:   	srl		r0, #1, r2		; swap bits <1> and <0>
+   	and		r2, #1, r2		; isolate transmit enable bit
+   	sll		r0, #1, r0
+   	and		r0, #2, r0		; isolate receive enable bit
+   	or		r0, r2, r0
+   	and		r0, #3, r0		; extract <1:0> = transmit/receive interrupt enable bits and set success status
+	br		r31, return_to_os	; return from console routine
+.endc
+
+
+;+
+; SET_TERM_CTL
+;
+; FUNCTION:
+;
+;	Set Console Terminal Controls
+;	status = DISPATCH (SET_TERM_CTL, unit, ctb)
+;
+; INPUTS:
+;
+;	SET_TERM_CTL	= R16; SET_TERM_INT function code (equals 05)
+;
+;	retadr		= R26; return address
+;
+;	R0<0>		= TRANSMIT_INT_ON
+;	R0<1>		= RECEIVE_INT_ON
+;	TRANSMIT_INT_ON	= [(TRANSMIT_INT_ON AND R17<0>) OR R17<2>]
+;	RECEIVE_INT_ON	= [(RECEIVE_INT_ON AND R17<1>) OR R17<3>]
+;
+; OUTPUTS:
+;
+;	status		= R0; bit encoded return status as follows:
+;			  R0<63> eql '0' if success
+;				 eql '1' if failure, operation not supported
+;			  R0<62:2> MBZ
+;			  R0<1>	eql '1' if transmit interrupts enabled
+;				eql '0' if transmit interrupts disabled
+;			  R0<0>	eql '1' if receive interrupts enabled
+;				eql '0' if receive interrupts disabled
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0	= status; previous settings
+;	R2	= temporary state
+;	R3	= new serial line interrupt control register settings
+;	R4	= PA of I/O base address
+;	R16	= quadword aligned PA for STQP
+;	R17	= data to be written for STQP
+;
+;-
+
+	align_branch_target
+
+SET_TERM_CTL:
+
+.if ne TURBO_DEBUG
+	blast <SET_TERM_CTL>
+	crlf
+	regout R16
+        crlf
+	regout R17
+        crlf
+	regout R18
+        crlf
+	regout R19
+        crlf
+.endc
+
+.if ne	RAWHIDE ! SABLE ! ALCOR ! AVANTI ! MIKASA ! K2 ! TAKARA ! APC_PLATFORM ! REGATTA ! WILDFIRE ! MONET ! EIGER
+	bis	r16, r31, r1
+	cserve	cserve$callback
+.endc
+
+	br		r31, return_to_os	; return from console routine
+
+
+;+
+; OPEN
+;
+; FUNCTION:
+;
+;	Open I/O device for access
+;
+;	Refer to SRM.
+;-
+
+OPEN_CB:
+
+;+
+; CLOSE
+;
+; FUNCTION:
+;
+;	Close I/O device for access
+;
+;	Refer to SRM.
+;-
+
+CLOSE_CB:
+
+;+
+; CLOSE
+;
+; FUNCTION:
+;
+;	Close I/O device for access
+;
+;	Refer to SRM.
+;-
+
+;+
+; IOCTL
+;
+; FUNCTION:
+;
+;	Perform Device-specific I/O Operations on a Device
+;
+;	Refer to SRM.
+;-
+
+IOCTL:
+
+;+
+; READ
+;
+; FUNCTION:
+;
+;	Read I/O Device
+;
+;	Refer to SRM.
+;-
+
+READ_CB:
+
+;+
+; WRITE
+;
+; FUNCTION:
+;
+;	Write I/O Device
+;
+;	Refer to SRM.
+;-
+
+WRITE_CB:
+
+;+
+; SAVE_ENV
+;
+; FUNCTION:
+;
+;	Save current environment variables.
+;
+;	Refer to SRM.
+;-
+
+SAVE_ENV:
+
+	align_branch_target
+
+.if ne TURBO_DEBUG
+	blast <CALLBACK_ENTRY>	
+        crlf
+	regout R16
+        crlf
+	regout R17
+        crlf
+	regout R18
+        crlf
+	regout R19
+        crlf
+.endc
+
+.if ne GALAXY_CALLBACKS
+;+
+; GALAXY
+;
+; FUNCTION:
+;
+;	Galaxy callback
+;
+;	Refer to GCT spec.
+;-
+GALAXY_CB:
+.endc
+
+.if ne EEROM_CALLBACKS
+;+
+; WRITE_EEROM
+;
+; FUNCTION:
+;
+;	Write EEROM
+;
+;	Refer to SRM.
+;-
+WRITE_EEROM_CB:
+
+;+
+; READ_EEROM
+;
+; FUNCTION:
+;
+;	Read EEROM
+;
+;	Refer to SRM.
+;-
+READ_EEROM_CB:
+.endc
+
+	align_branch_target odd=1		; force odd quadword alignment
+	bis	r16, r31, r1
+	cserve	cserve$callback			; do the callback elsewhere
+	br		r31, return_to_os	; return from console routine
+
+
+;+
+; Console Environment variable pointers
+;
+
+.align quad
+
+ENV_VAR_TABLE::
+$$auto_action:		.quad	0,^x01
+$$boot_dev:		.quad	0,^x02
+$$bootcmd_dev:		.quad	0,^x03
+$$booted_dev:		.quad	0,^x04
+$$boot_file:		.quad	0,^x05
+$$booted_file:		.quad	0,^x06
+$$boot_osflags:		.quad	0,^x07
+$$booted_osflags:	.quad	0,^x08
+$$boot_reset:		.quad	0,^x09
+$$dump_dev:		.quad	0,^x0a
+$$enable_audit:		.quad	0,^x0b
+$$license:		.quad	0,^x0c
+$$char_set:		.quad	0,^x0d
+$$language:		.quad	0,^x0e
+$$tty_dev:		.quad	0,^x0f
+$$srm2dev:		.quad	0,^x4f
+.if ne	SABLE ! RAWHIDE ! MIKASA ! REGATTA ! WILDFIRE ! MONET ! EIGER ! WEBBRICK ! PC264
+$$com1_baud:		.quad	0,^x44
+$$com1_modem:		.quad	0,^x45
+$$com1_flow:		.quad	0,^x46
+$$com2_baud:		.quad	0,^x48
+$$com2_modem:		.quad	0,^x49
+$$com2_flow:		.quad	0,^x4a
+.endc
+.if ne SECURE
+;;;$$password:		.quad	0,^x4c		/* handled specially */
+;;;$$secure:		.quad	0,^x4d		/* handled specially */
+;;;$$loginfail:		.quad	0,^x4e		/* handled specially */
+.endc
+ENV_VAR_TABLE_END::
+
+; symbols for environment variable table sizes
+
+EV_LENGTH	= EV$K_LENGTH		; minimum required buffer size
+EV_SIZE		= EV$L_SIZE		; offset to size field
+EV_ATTRIBUTES	= EV$L_ATTRIBUTES	; offset to attributes field
+EV_VALUE	= EV$R_VALUE		; offset to value field
+EV_UNUSED 	= EV$M_UNUSED		; mask for UNUSED flag
+EV_MODIFIED	= EV$M_MODIFIED		; mask for MODIFIED flag
+
+
+;
+; Console Environment Routines
+;
+
+;+
+; SET_ENV
+;
+; FUNCTION:
+;
+;	Set an environment variable
+;	status	= DISPATCH( SET_ENV, ID, value, length)
+;
+; INPUTS:
+;
+;	SET_ENV	= R16; SET_ENV function code (equals 13)
+;	ID	= R17; ID number of environment variable
+;	value	= R18; Starting virtual address of byte stream containing value
+;	length	= R19; Length of byte stream (unsigned)
+;	retadr	= R26; return address
+;
+; OUTPUTS:
+;
+;	status	= R0; bit encoded return status as follows:
+;		  R0<63:61> 	eql '000' if success
+;				eql '100' if failure, illegal operation
+;				eql '110' if failure, variable not present
+;					 in namespace
+;				eql '111' if failure, value length exceeded
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0 = status; temporary state
+;	R2 = temporary state
+;	R3 = address of first environment variable table entry
+;	R4 = address of specific environment variable entry
+;	R5 = length/status/ID of specific entry
+;-
+
+; symbols for SET_ENV encoded return status
+
+SE_SUCCESS 	= ^B000	; R0<63:61> = 000, success
+SE_FAIL_IL 	= ^B100	; R0<63:61> = 100, failure due to illegal operation
+SE_FAIL_NS 	= ^B110	; R0<63:61> = 110, failure due to namespace
+SE_FAIL_LEN 	= ^B111	; R0<63:61> = 111, failure due to exceeded value length
+
+	align_branch_target
+
+SET_ENV:
+
+.if ne TURBO_DEBUG
+	blast <SET_ENV>	
+	crlf
+.endc
+
+	cmoveq		r17, #SE_FAIL_NS, r6	; if ID = 0, set failure status
+	beq		r17, se_end		; if ID = 0, goto end of routine
+
+	and		r18, #7, r2		; check for quadword-aligned on value byte stream
+	cmovne		r2, #SE_FAIL_NS, r6	; if not quadword-aligned, set failure status for illegal operation 
+	bne		r2, se_end		; if not quadword-aligned, goto end of routine
+
+	lda		r2, EV_LENGTH(r31)	; get length into a register
+	cmpult		r19, r2, r2		; check length of given byte stream
+	cmoveq		r2, #SE_FAIL_LEN, r6	; if given length is greater than allocated, set failure status for illegal 
+	beq		r2, se_end		; if given length is greater than allocated, goto end of routine
+
+	cmpeq		r17, #^x40, r2
+	bne		r2, se_end
+	cmpeq		r17, #^x41, r2
+	bne		r2, se_end
+.if ne SECURE
+	cmpeq		r17, #^x4c, r2		; Password EV handled in console
+	bne		r2, se_notreq
+	cmpeq		r17, #^x4d, r2		; Secure EV handled in console
+	bne		r2, se_notreq
+	cmpeq		r17, #^x4e, r2		; loginfail EV
+        cmoveq          r2, #SE_FAIL_IL, r6     ; illegal operation 
+	bne		r2, se_end
+.endc
+	get_addr	r3, <ENV_VAR_TABLE-CR_TABLE>, r10 ; determine address of beginning of table
+	get_addr	r4, <ENV_VAR_TABLE_END-CR_TABLE>, r10 ; determine address of end of table
+
+se_loop:
+	cmpeq		r4, r3, r2		; are we done?
+	bne		r2, se_notreq		; bail out
+	ldq		r5, 8(r3)		; get this ID
+	cmpeq		r17, r5, r2		; match?
+	bne		r2, se_match		; yep
+	addq		r3, #16, r3		; step to the next one
+	br		r31, se_loop		; and try again
+
+	; copy environment variable from buffer to table
+
+se_match:
+	ldq		r4, 0(r3)		; get pointer to EVNODE
+	ldl		r5, EV_ATTRIBUTES(r4)	; load attributes of entry
+	lda		r2, EV_MODIFIED(r31)	; 
+	or		r5, r2, r2		; change attributes
+	stl		r2, EV_ATTRIBUTES(r4)	; update attributes
+	or		r31, r19, r5		; set up count of bytes to be copied
+	or		r31, r18, r3		; set up address of given value
+	stl		r5, EV_SIZE(r4)		; save EV size
+	lda		r4, EV_VALUE(r4)	; set up address of input buffer
+se_copy_loop:
+	ldq_u		r2, (r3)		; load byte of given value from buffer
+	extbl		r2, r3, r2		;
+	addq		r3, #1, r3		; point to next byte in given value
+	ldq_u		r7, (r4)		; store byte of given value into table
+	insbl		r2, r4, r2		;
+	mskbl		r7, r4, r7		;
+	or		r2, r7, r2		;
+	stq_u		r2, (r4)		;
+	addq		r4, #1, r4		; point to next LW in entry value
+	subq		r5, #1, r5		; decrement count of bytes to be copied
+	bgt		r5, se_copy_loop	; if necessary, go copy next byte
+	ldq_u		r7, (r4)		; store zero terminator byte into table
+	mskbl		r7, r4, r7		;
+	stq_u		r7, (r4)		;
+	or		r31, #SE_SUCCESS, r6	; after all bytes are copied, set success status
+	
+; common exit from SET_ENV routine
+
+se_end:
+	sll		r6, #61, r6		; re-position status
+	lda		r0, EV_LENGTH-1(r31)	; move length into R0<31:0>
+	or		r6, r0, r0		; insert status into R0
+	br		r31, return_to_os	; return from console routine
+
+se_notreq:
+;
+; Callback is handled in the context of the console
+;
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+
+
+;+
+; RESET_ENV
+;
+; FUNCTION:
+;
+;	Delete an environment variable from the namespace
+;	status	= DISPATCH( RESET_ENV, ID)
+;
+; INPUTS:
+;
+;	RESET_ENV = R16; RESET_ENV function code (equals 14)
+;	ID	  = R17; ID number of environment variable
+;	retadr	  = R26; return address
+;
+; OUTPUTS:
+;	status	= R0; bit encoded return status as follows:
+;		  R0<63:62>	eql '00' if success
+;				eql '10' if failure, variable not present in
+;				namespace or read-only
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0 = status; temporary state
+;	R2 = temporary state
+;	R3 = address of first environment variable table entry
+;	R4 = address of specific environment variable entry
+;	R5 = length/status/ID of specific entry
+;-
+
+; symbols for RESET_ENV encoded return status
+
+RE_SUCCESS 	= 0	; R0<63> = 0, success
+RE_FAIL 	= 1	; R0<63> = 1, failure due to variable not present
+			; in namespace or read-only
+
+	align_branch_target
+
+RESET_ENV:
+
+.if ne TURBO_DEBUG
+	blast <RESET_ENV>
+	crlf
+	regout R16
+       crlf
+	regout R17
+       crlf
+	regout R18
+       crlf
+	regout R19
+       crlf
+.endc
+
+	cmoveq		r17, #RE_FAIL, r0	; if ID = 0, set failure status
+	beq		r17, re_end		; if ID = 0, goto end of routine
+.if ne SECURE
+	cmpeq		r17, #^x4c, r2		; Password EV handled in console
+	bne		r2, re_notreq
+	cmpeq		r17, #^x4d, r2		; Secure EV handled in console
+	bne		r2, re_notreq
+	cmpeq		r17, #^x4e, r2		; loginfail EV
+	bne		r2, re_notreq
+.endc
+	get_addr	r3, <ENV_VAR_TABLE-CR_TABLE>, r10 ; determine address of beginning of table
+	get_addr	r4, <ENV_VAR_TABLE_END-CR_TABLE>, r10 ; determine address of end of table
+
+re_loop:
+	cmpeq		r4, r3, r2		; are we done?
+	bne		r2, re_notreq		; bail out
+	ldq		r5, 8(r3)		; get this ID
+	cmpeq		r17, r5, r2		; match?
+	bne		r2, re_match		; yep
+	addq		r3, #16, r3		; step to the next one
+	br		r31, re_loop		; and try again
+
+re_match:
+	ldq		r4, 0(r3)		; get pointer to EVNODE
+	ldl		r5, EV_ATTRIBUTES(r4)	; load attributes of entry
+	lda		r2, EV_UNUSED(r31)	; 
+	or		r5, r2, r2		; change attributes
+	stl		r2, EV_ATTRIBUTES(r4)	; update attributes
+	or		r31, #RE_SUCCESS, r0	; set success status
+
+; common exit from RESET_ENV routine
+
+re_end:
+	sll		r0, #63, r0		; re-position status in R0
+	br		r31, return_to_os	; return from console routine
+.if ne SECURE
+re_notreq:
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+.endc
+.if eq SECURE
+re_notreq:
+        or              r31, #RE_FAIL, r0       ; set error code
+        br              r31, re_end             ; bail out
+.endc
+
+
+;+
+; GET_ENV
+;
+; FUNCTION:
+;
+;	Get an environment variable
+;	status	= DISPATCH( GET_ENV, ID, addr, length)
+;
+; INPUTS:
+;
+;	GET_ENV	= R16; GET_ENV function code (equals 15)
+;	ID	= R17; ID number of environment variable
+;	addr	= R18; Virtual address of buffer to write variable into
+;	length	= R19; Length of buffer
+;	retadr	= R26; return address
+;
+; OUTPUTS:
+;	status	= R0; bit encoded return status as follows:
+;		  R0<63:61> 	eql '000' if success
+;				eql '001' if success, but truncated
+;				eql '110' if failure, variable not present
+;					 in namespace
+;				(or *SRM* virtual address not QW aligned)
+;		  R0<60:32> 	SBZ
+;		  R0<31:0>  	actual length of variable (unsigned)
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0 = status; temporary state
+;	R2 = temporary state
+;	R3 = address of first environment variable table entry
+;	R4 = address of specific environment variable entry
+;	R5 = length/status/ID of specific entry
+;	R6 = temporary state for setting up return status
+;-
+
+; symbols for GET_ENV encoded return status
+
+GE_SUCCESS	= ^B000	; R0<63:61> = 000, success
+GE_FAIL_NS	= ^B110	; R0<63:61> = 110, failure due to variable not present
+			;		  in namespace
+GE_FAIL_BUF	= ^B001	; R0<63:61> = 001, success, but truncated due to buffer
+			;		  too small
+
+	align_branch_target
+
+GET_ENV:
+
+.if ne TURBO_DEBUG
+	blast <GET_ENV>
+	crlf
+	regout R16
+       crlf
+	regout R17
+       crlf
+	regout R18
+       crlf
+	regout R19
+       crlf
+.endc
+
+
+	cmoveq		r17, #GE_FAIL_NS, r6	; if ID = 0, set failure status
+	beq		r17, ge_end		; if ID = 0, goto end of routine
+
+	;*SRM* check for quadword-aligned on virtual address of buffer to write variable into
+	and		r18, #7, r2		; check for quadword-aligned on value byte stream
+	cmovne		r2, #GE_FAIL_BUF, r6	; if not quadword-aligned, set failure status for illegal operation 
+	bne		r2, ge_end		; if not quadword-aligned, goto end of routine
+.if ne SECURE
+        cmpeq           r17, #^x4c, r2
+        cmovne          r2, #GE_FAIL_NS, r6     ; illegal operation on password
+        bne             r2, ge_end
+
+        cmpeq           r17, #^x4d, r2		; secure EV handled in console
+        bne             r2, ge_notreq
+        cmpeq           r17, #^x4e, r2		; loginfail EV handled in console
+        bne             r2, ge_notreq
+.endc
+	get_addr	r3, <ENV_VAR_TABLE-CR_TABLE>, r10 ; determine address of beginning of table
+	get_addr	r4, <ENV_VAR_TABLE_END-CR_TABLE>, r10 ; determine address of end of table
+
+ge_loop:
+	cmpeq		r4, r3, r2		; are we done?
+	bne		r2, ge_notreq		; bail out
+	ldq		r5, 8(r3)		; get this ID
+	cmpeq		r17, r5, r2		; match?
+	bne		r2, ge_match		; yep
+	addq		r3, #16, r3		; step to the next one
+	br		r31, ge_loop		; and try again
+
+	; copy environment variable from table into buffer
+
+ge_match:
+	ldq		r4, 0(r3)		; get pointer to EVNODE
+	ldl		r5, EV_SIZE(r4)		; get size of ev value
+	cmplt		r19, r5, r3		; R3 = 1 if buffer length (R19) < entry length (R5)
+	cmovne		r3, #GE_FAIL_BUF, r6	; if buffer length < entry length, set failure status for buffer too small
+	cmoveq		r3, #GE_SUCCESS, r6	; otherwise, set success status
+	or		r31, r5, r0		; move length into R0<31:0>
+	cmovne		r3, r19, r5		; set up count of bytes to be copied
+	or		r31, r18, r3		; set up address of given value
+	lda		r4, EV_VALUE(r4)	; set up address of input buffer
+ge_copy_loop:
+	ldq_u		r2, (r4)		; load byte of given value from table
+	extbl		r2, r4, r2		;
+	addq		r4, #1, r4		; point to next byte in entry value
+	ldq_u		r7, (r3)		; store byte of given value into buffer
+	insbl		r2, r3, r2		;
+	mskbl		r7, r3, r7		;
+	or		r2, r7, r2		;
+	stq_u		r2, (r3)		;
+	addq		r3, #1, r3		; point to next byte in given value
+	subq		r5, #1, r5		; decrement count of bytes to be copied
+	bgt		r5, ge_copy_loop	; if necessary, go copy next byte
+	
+; common exit from GET_ENV routine
+
+ge_end:
+	sll		r6, #61, r6		; re-position status
+	or		r6, r0, r0		; insert status into R0
+	br		r31, return_to_os	; return from console routine
+
+ge_notreq:
+;
+; Callback is handled in the context of the console
+;
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+
+
+;+
+; PROCESS_KEYCODE
+;	
+; FUNCTION:	
+;	Processes and translates keycode.
+;	char	= DISPATCH (PROCESS_KEYCODE, keycode, again)
+;
+; INPUTS:
+;	PROCESS_KEYCODE 	= R16; PROCESS_KEYCODE function code (equals 05)
+;	keycode			= R17; Keycode to be processed
+;	again			= R18; eql '1' if calling again for same keycode
+;	retadr			= R26; return address
+;
+; OUTPUTS:
+;	char			= R0; bit encoded return status and character as follows:
+;				  R0<63:61> 	eql '000' If Success, Character
+;				            	eql '110' If failure, no character - more keycodes needed or illegal 
+;						          sequence encountered
+;				            	eql '101' If failure, not enough time to process keycode, try later
+;               		            	eql '100' If failure, Device Unsupported by routine
+;				  R0<60>    	eql   '0' If success in correcting severe error
+;				            	eql   '1' If failure in correcting severe error
+;				  R0<59:32> 	SBZ
+;				  R0<31:0>  	Translated character
+;
+; *NOTE*: This implementation of PROCESS_KEYCODE will always return R0 with the value of R17 and success status.
+;-
+
+	align_branch_target
+
+PROCESS_KEYCODE:
+
+.if ne TURBO_DEBUG
+	blast <PROCESS_KEYCODE>
+	crlf
+.endc
+;
+; handle the callback in the context of the console
+;
+
+.if ne	ALCOR ! AVANTI ! MIKASA ! K2 ! MTU ! TAKARA ! APC_PLATFORM ! REGATTA ! WILDFIRE ! MONET ! EIGER
+	bis	r16, r31, r1
+	cserve	cserve$callback
+	br	r31, return_to_os
+.if_false
+
+	or		r31, r31, r0		; set success status
+	br		r31, return_to_os	; return from console routine
+.endc
+
+
+; 
+; State that must be modified for primary switch
+;
+
+.align quad
+SHELL_AFFINITY_PTR::	.quad	 0	; pointer to shell's affinity
+REMOVED_CPU::	.quad 0			; CPU's removed from console mode
+PRIMARY_CPU::	.quad 0			; primary cpu
+TIMER_CPU::	.quad 0			; timer cpu
+
+;+
+; PSWITCH
+;
+; FUNCTION:
+;
+;	Switch primary processor
+;	status	= DISPATCH( PSWITCH, action, id)
+;
+; INPUTS:
+;
+;	PSWITCH		= R16; PSWITCH function code (equals 30)
+;	action		= R17 <1:0>; PSWITCH action code
+;		  	  '01' transition from primary
+;		  	  '10' transition to primary
+;			  '11' switch primary
+;		  	  <63:2> should be zero
+;	target node id	= R18; CPU ID
+;	retadr		= R26; return address
+;
+; OUTPUTS:
+;	status		= R0; bit encoded return status as follows:
+;			  R0<63:63> 	eql '0' if success
+;					eql '1' if failure
+;			  R0<62:0>	implementation specific error
+;
+; INTERNAL REGISTER USAGE:
+;
+;	R0 = status; temporary state
+;	R2 = temporary state
+;	R3 = temporary state
+;	R4 = temporary state
+;	R5 = temporary state
+;	R6 = temporary state
+;-
+
+	align_branch_target
+
+PSWITCH:
+
+.if ne TURBO_DEBUG
+	blast <PSWITCH>
+	crlf
+.endc
+
+;
+; handle the callback in the context of the console
+;
+
+	bis		r16, r31, r1
+	cserve		cserve$callback
+	br		r31, return_to_os	; return from console routine
+
+
+.if ne	TURBO
+;+
+; SAVE_ERR_LOG
+;
+; FUNCTION:
+;
+;	Write Error Log packet to EEPROM
+;	status	= DISPATCH( SAVE_ERR_LOG, device, size, buffer, classtype,
+;			    flag )
+;
+; INPUTS:
+;	SAVE_ERR_LOG	= R16; SAVE_ERR_LOG function code (equals 31)
+;	device		= R17; selects device containing non-volatile storage
+;	size		= R18; size in bytes of data packet to be written
+;	buffer		= R19; VA of buffer containing write data
+;	classtype	= R20; target area number for formatted EEPROM
+;	flag		= R21; timely completion flag
+;                              0 = routine may usurp machine control
+;                              1 = routine must complete in timely fashion
+;	retadr		= R26; return address
+;
+; OUTPUTS:
+;
+;	status		= R0; bit encoded return status as follows:
+;			  R0<63:62> eql '00' success, all bytes written
+;				    eql '01' success, bytes will be written later
+;				    eql '10' failure, no bytes written
+;				    eql '11' failure, some bytes written
+;			  R0<60:32> SBZ
+;			  R0<31:00> = count of bytes written
+;   
+; INTERNAL REGISTER USAGE:
+;
+;	R0 = status; temporary state
+;-
+
+; symbols for SAVE_ERR_LOG encoded return status
+
+SEL_SUCCESS	= ^B01	; R0<63:62> = 01, success, bytes will be written later
+SEL_FAIL_CNR	= ^B10	; R0<63:62> = 10, failure, no bytes written
+
+	align_branch_target
+
+SAVE_ERR_LOG:
+
+.if ne TURBO_DEBUG
+	blast <SAVE_ERR_LOG>
+	crlf
+	regout R16
+       crlf
+	regout R17
+       crlf
+	regout R18
+       crlf
+	regout R19
+       crlf
+	regout R20
+       crlf
+	regout R21
+       crlf
+.endc
+
+	cserve	CSERVE$IDENTIFY
+	extbl	r0, #2, r0		; isolate the PAL type field
+	cmpeq	r0, #2, r1		; Is this OSF?
+	bne	r1, get_osf_whami	
+	cmpeq	r0, #1, r1		; Is this VMS?
+	beq	r1, sel_fail
+	mfpr_whami	
+	br	r31, got_whami
+get_osf_whami:
+	.long	^x3C
+got_whami:
+	cmpeq	r17, r0, r1		; device must be this CPU
+	beq	r1, sel_fail		; and goto end of routine
+
+	;*SRM* check for quadword-aligned on virtual address of error log buffer 
+	and	r19, #7, r2		; check for quadword-aligned on value byte stream
+	bne	r2, sel_fail		; if not quadword-aligned, goto end of routine
+
+	align_branch_target odd=1		; force odd quadword alignment
+	br	r1, sel_cont
+ERR_LOG_FLAG::	.blkq MAX_PROCESSOR_ID	; flags indicating routine was called
+sel_cont:
+	mulq	r0, #8, r0		; compute offset to our flag
+	addq	r0, r1, r8		; add offset to base address
+	ldq	r7, 0(r8)		; load the error log flag
+	beq	r7, sel_fail		; check for non-zero
+
+; HACK ALERT - we need to determine the type of error that is being logged.
+; That information is available in the error log header, but VMS and OSF have
+; different header formats (even though the rest of the error log is the same).
+; So, we have to figure out which OS is currently running and process the
+; header accordingly.  We'll do this by looking at the current PALcode, which
+; is available via the IDENTIFY cserve call.
+
+	cserve	CSERVE$IDENTIFY
+	beq	r0, sel_fail		; make sure we got something back
+	extbl	r0, #2, r0		; isolate the PAL type field
+	cmpeq	r0, #2, r1		; Is this OSF?
+	bne	r1, parse_osf_header		
+	cmpeq	r0, #1, r1		; Is this VMS?
+	beq	r1, sel_fail
+
+parse_vms_header:
+	ldl	r0, ^x24(r19)		; read HD_ENTRY field
+	lda	r19, 96(r19)		; strip off the VMS header
+	lda	r18, -96(r18)		; subtract the header size
+	cmpeq	r0, #2, r1		; Is it a 670?
+	beq	r1, 1$			; branch if not
+	lda	r17, ^x670(r31)		; save vector
+	br	r31, full_error_log
+1$:	cmpeq	r0, #27, r1		; Is it a 660?
+	beq	r1, 2$			; branch if not
+	lda	r17, ^x660(r31)		; save vector
+	br	r31, full_error_log
+2$:	cmpeq	r0, #26, r1		; Is it a 630?
+	beq	r1, 3$			; branch if no
+	br	r31, crd_error_log	; join common routine
+3$:	cmpeq	r0, #25, r1		; Is it a 620?
+	bne	r1, parse_620_error	; branch if yes
+	br	r31, sel_fail		; branch if unknown
+
+parse_osf_header:
+	ldl	r0, ^x28(r19)		; read el_sub_id field
+	lda	r19, 64(r19)		; strip of the OSF header
+	lda	r18, -64(r18)		; subtract the header size
+	extwl	r0, #0, r2		; first, validate the subid_class
+	cmpeq	r2, 100, r2		; = 100?
+	beq	r2, sel_fail		; report failure if no match
+	extbl	r0, #2, r0		; next, get the subid_type
+	cmpeq	r0, #2, r1		; Is it a 670?
+	beq	r1, 1$			; branch if not
+	lda	r17, ^x670(r31)		; save vector
+	br	r31, full_error_log
+1$:	cmpeq	r0, #1, r1		; Is it a 660?
+	beq	r1, 2$			; branch if not
+	lda	r17, ^x660(r31)		; save vector
+	br	r31, full_error_log
+2$:	cmpeq	r0, #4, r1		; Is it a 630?
+	beq	r1, 3$			; branch if no
+	br	r31, crd_error_log	; join common routine
+3$:	cmpeq	r0, #3, r1		; Is it a 620?
+	beq	r1, sel_fail		; branch if no
+
+parse_620_error:
+	lda	r0, 88(r19)		; find beginning of CRD logout frame
+	ldl	r2, mchk$crd_mchk_code(r0)	; read the CRD Reason Mask
+	lda	r1, ^x204(r31)		; load system correctable error code
+	cmpeq	r2, r1, r1		; Is it a 620/204 system correctable?
+	bne	r1, crd_error_log	; log crd error if it is
+	lda	r17, ^x620(r31)		; save vector
+	br	r31, full_error_log	; log full error if not a 204
+
+crd_error_log:
+	lda	r19, 88(r19)		; for CRDs only log the frame
+	lda	r18, mchk$crd_size(r31)	; 
+	mb
+	ldq_l	r1, 0(r8)		; increment the CRD counter (interlocked)
+	srl	r1, #63, r0
+	ornot	r31, r0, r0
+	and	r0, #1, r0
+	sll	r0, #60, r0
+	addq	r0, r1, r0
+	stq_c	r0, 0(r8)
+	bne	r0, 1$
+	br	r31, sel_fail
+1$:	mb
+	srl	r1, #63, r0
+	blbs	r0, sel_fail		; check if CRD frames full
+	srl	r1, #60, r0		; get the index into CRD frames
+	lda	r2, 8(r31)		; compute the proper offset into buffer
+	subq	r2, r0, r2		; 
+	lda	r1, mchk$crd_size(r31)	; get crd frame size
+	mulq	r2, r1, r1		; get crd frame offset
+	lda	r2, <3*1024>(r7)	; find end of buffer
+	subq	r2, r1, r20		; 8-n from the end of buffer
+	bic	r20, #1, r20		; make sure bit 0 is clear
+	br	r31, copyit
+
+full_error_log:
+	mb
+	ldq_l	r1, 0(r8)		; mark the flag as in use (interlocked)
+	blbc	r1, 1$			; check if already in use
+	stq_c	r1, 0(r8)
+	br	r31, sel_fail
+1$:	lda	r1, 1(r1)
+	stq_c	r1, 0(r8)
+	bne	r1, 5$
+	br	r31, sel_fail
+5$:	mb
+	or	r18, r31, r21		; save size
+	or	r17, r31, r18		; data for cserve 
+	or	r7, r31, r17		; buffer address for cserve
+	stlp				; first qw gets vector type
+	or	r21, r31, r18		; restore size
+	addq	r7, #8, r20		; update buffer pointer
+
+copyit:	
+	addq	r19, r18, r1		; calculate ending address
+10$:	cmplt	r19, r1, r2		; check for limit
+	beq	r2, 20$			; exit loop if limit reached
+	ldl	r18, 0(r19)		; read a qw from the buffer
+	or	r20, r31, r17
+	stlp				; write it to our buffer
+	addq	r19, #4, r19		; increment address pointers
+	addq	r20, #4, r20
+	br	r31, 10$		; loop til done
+	
+20$:	or	r31, #SEL_SUCCESS, r6	; set success status
+	br	r31, sel_end
+	
+sel_fail:
+	or	r31, #SEL_FAIL_CNR, r6	; set failure status
+	lda	r18, 0(r31)
+
+; common exit from SAVE_ERR_LOG routine
+
+sel_end:
+	sll		r6, #62, r6		; re-position status
+	or		r6, r18, r0		; insert status into R0
+	br		r31, return_to_os	; return from console routine
+.endc
+
+	.end

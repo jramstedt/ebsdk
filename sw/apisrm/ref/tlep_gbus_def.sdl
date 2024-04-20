@@ -1,0 +1,87 @@
+/* file:	tlep_gbus_def.sdl
+/*
+/* Copyright (C) 1993 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	structure definitions for Turbo-Laser GBUS 
+/*
+/* Author:	Ernie Preisig
+/*
+/* Modifications:
+/*
+/*
+module	$gbusdef;
+
+/* GBUS address of UART base registers
+constant GBUS$UART0A_BASE equals	%xA0000080;
+constant GBUS$UART0B_BASE equals	%xA0000000;
+constant GBUS$UART1A_BASE equals	%xA1000080;
+constant GBUS$UART1B_BASE equals	%xA1000000;
+constant GBUS$UART2A_BASE equals	%x00BADADD;
+constant GBUS$UART2B_BASE equals	%x01BADADD;
+
+constant GBUS$LOC_BASE	equals %xA0000080;
+constant GBUS$PS_BASE	equals %xA0000000;
+constant GBUS$CTRLP_BASE equals %xA1000080;
+
+constant WATCH$BASE	equals %xB0000000;
+constant WATCH$SECONDS	equals %xB0000000;
+constant WATCH$MINUTES	equals %xB0000080;
+constant WATCH$HOURS	equals %xB0000100;
+constant WATCH$DAY_OF_MONTH	equals %xB00001C0;
+constant WATCH$MONTH	equals %xB0000200;
+constant WATCH$YEAR	equals %xB0000240;
+constant WATCH$CSRA	equals %xB0000280;
+constant WATCH$CSRB	equals %xB00002C0;
+constant WATCH$CSRC	equals %xB0000300;
+constant WATCH$CSRD	equals %xB0000340;
+constant WATCH$RAM_BASE	equals %xB0000380;
+
+constant GBUS$WHAMI	equals %xC0000000;
+constant GBUS$LEDS0	equals %xC1000000;
+constant GBUS$LEDS1	equals %xC2000000;
+constant GBUS$LEDS2	equals %xC3000000;
+constant GBUS$MISCR	equals %xC4000000;
+constant GBUS$MISCW	equals %xC5000000;
+constant GBUS$TLSBRST	equals %xC6000000;
+constant GBUS$SERNUM	equals %xC7000000;
+constant GBUS$TEST	equals %xC8000000;
+
+/* Define all UART ports
+constant (
+	UART0A,
+	UART0B,
+	UART1A,
+	UART1B ) equals 0 increment 1 prefix "";
+
+/* These UARTs do not exist on Turbo, but are defined for consistancy
+/* of the 8530TT_DRIVER
+constant (
+	UART2A,
+	UART2B ) equals %xBAD00BAD increment 1 prefix "";
+
+
+
+/* Define UART ports used
+constant UART_LOCAL equals UART0A;
+constant UART_PS equals UART0B;
+constant UART_CTRLP equals UART1A;
+constant DBG_UART0 equals UART1A;
+constant DBG_UART1 equals UART1B;
+end_module;

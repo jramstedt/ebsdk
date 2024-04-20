@@ -1,0 +1,3 @@
+void vga_reinit( )
+    {
+    }

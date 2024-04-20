@@ -1,0 +1,805 @@
+.title	inst_alpha
+;
+;File:	inst_alpha.mar
+;J. Kirchoff		28-Jun-1991
+
+;++
+; Console Alpha Instruction Set Table
+;
+; Functional description:
+;
+;  This module defines a table which describes the Alpha
+;  Instruction set.
+;
+;  One line describes each Alpha opcode.
+;  The first is the actual opcode, in decimal.
+;  The second entry in each line is the assembler mnemonic.
+;  The third is the format type.
+;
+;  See the header file, alpha_inst_ops.mar for how these fields are defined.
+;--
+
+.library "cp$src:instops_alpha"
+	$instops_alpha
+
+.psect inst,shr,mix,nowrt,long
+
+.show meb
+
+float_aux_decode == 0
+float_dec_decode == 0
+float_ieee_decode == 0
+
+	$format = 0
+
+ALPHA_OPINFO::
+
+; Memory opcodes
+
+INST_INFO_OPS::
+
+	$format = EVX$K_imemory
+
+  opdef EVX$OPC_LDL,	<LDL>
+  opdef EVX$OPC_LDQ,	<LDQ>
+  opdef EVX$OPC_LDQL,	<LDQ_L>
+  opdef EVX$OPC_LDQU,	<LDQ_U>
+  opdef EVX$OPC_LDLL,	<LDL_L>
+  opdef EVX$OPC_LDA,	<LDA>
+  opdef EVX$OPC_JSR,	<JSR>,	EVX$K_jsr
+  opdef EVX$OPC_STL,	<STL>
+  opdef EVX$OPC_STQ,	<STQ>
+  opdef EVX$OPC_STQC,	<STQ_C>
+  opdef EVX$OPC_STLC,	<STL_C>
+  opdef EVX$OPC_STQU,	<STQ_U>
+  opdef EVX$OPC_LDAH,	<LDAH>
+
+	$format = EVX$K_fmemory
+
+  opdef EVX$OPC_LDF,	<LDF>
+  opdef EVX$OPC_LDD,	<LDD>
+  opdef EVX$OPC_LDS,	<LDS>
+  opdef EVX$OPC_LDT,	<LDT>
+  opdef EVX$OPC_STF,	<STF>
+  opdef EVX$OPC_STD,	<STD>
+  opdef EVX$OPC_STS,	<STS>
+  opdef EVX$OPC_STT,	<STT>
+
+; Branch opcodes
+
+	$format = EVX$K_ibranch
+
+  opdef EVX$OPC_BLBC,	<BLBC>
+  opdef EVX$OPC_BEQ,	<BEQ>
+  opdef EVX$OPC_BLT,	<BLT>
+  opdef EVX$OPC_BLE,	<BLE>
+  opdef EVX$OPC_BLBS,	<BLBS>
+  opdef EVX$OPC_BNE,	<BNE>
+  opdef EVX$OPC_BGE,	<BGE>
+  opdef EVX$OPC_BGT,	<BGT>
+  opdef EVX$OPC_BR,	<BR>
+  opdef EVX$OPC_BSR,	<BSR>
+
+	$format = EVX$K_fbranch
+
+  opdef EVX$OPC_FBEQ,	<FBEQ>
+  opdef EVX$OPC_FBLT,	<FBLT>
+  opdef EVX$OPC_FBLE,	<FBLE>
+  opdef EVX$OPC_FBNE,	<FBNE>
+  opdef EVX$OPC_FBGE,	<FBGE>
+  opdef EVX$OPC_FBGT,	<FBGT>
+ 
+; Operate opcodes
+
+  opdef EVX$OPC_ADDI,	<ADDI>,	EVX$K_addi
+
+; Logical opcodes
+
+  opdef EVX$OPC_LOGI,	<LOGI>,	EVX$K_logi
+
+; Shift opcodes
+
+  opdef EVX$OPC_SHFI,	<SHFI>,	EVX$K_shfi
+
+; Multiply opcodes
+
+  opdef EVX$OPC_MULI,	<MULI>,	EVX$K_muli
+
+; Sync opcodes
+
+  opdef EVX$OPC_SYNC,	<SYNC>,	EVX$K_sync
+
+; Float opcodes
+
+  opdef EVX$OPC_FPAUX,	<FPAUX>,	EVX$K_fpaux
+  opdef EVX$OPC_FPDEC,	<FPDEC>,	EVX$K_fpdec
+  opdef EVX$OPC_FPIEEE,	<FPIEEE>,	EVX$K_fpieee
+
+; PAL opcodes
+
+  opdef EVX$OPC_PAL,	<PAL>,	EVX$K_pal
+
+; Special PAL opcodes
+
+  opdef EVX$PAL_HW_MFPR, <HW_MFPR>,	EVX$K_mtmf
+  opdef EVX$PAL_HW_MTPR, <HW_MTPR>,	EVX$K_mtmf
+  opdef EVX$PAL_HW_ST,	 <HW_ST>,	EVX$K_ldst
+  opdef EVX$PAL_HW_LD,   <HW_LD>,	EVX$K_ldst
+  opdef EVX$PAL_HW_REI,	 <HW_REI>,	EVX$K_hwrei
+
+INST_LENGTH_OPS::
+	.long	. - INST_INFO_OPS
+
+
+; Functions
+;=======================================================
+;
+; JSR opcodes
+;
+
+INST_INFO_JSR::
+
+	$format = EVX$K_jsr
+
+   opdef 0,	<JMP>
+   opdef 1,	<JSR>
+   opdef 2,	<RET>
+   opdef 3,	<JSR_CO>
+
+INST_LENGTH_JSR::
+	.long	. - INST_INFO_JSR
+
+; Operate opcodes
+
+INST_INFO_ADDI::
+
+	$format = EVX$K_operate
+
+   opdef EVX$ADDI_ADDL,		<ADDL>
+   opdef EVX$ADDI_ADDLV,	<ADDL/V>
+   opdef EVX$ADDI_ADDQ,		<ADDQ>
+   opdef EVX$ADDI_ADDQV,	<ADDQ/V>
+   opdef EVX$ADDI_SUBL,		<SUBL>
+   opdef EVX$ADDI_SUBLV,	<SUBL/V>
+   opdef EVX$ADDI_SUBQ,		<SUBQ>
+   opdef EVX$ADDI_SUBQV,	<SUBQ/V>
+   opdef EVX$ADDI_CMPEQ,	<CMPEQ>
+   opdef EVX$ADDI_CMPLT,	<CMPLT>
+   opdef EVX$ADDI_CMPLE,	<CMPLE>
+   opdef EVX$ADDI_CMPULT,	<CMPULT>
+   opdef EVX$ADDI_CMPULE,	<CMPULE>
+   opdef EVX$ADDI_S4ADDL,	<S4ADDL>
+   opdef EVX$ADDI_S4SUBL,	<S4SUBL>
+   opdef EVX$ADDI_S8ADDL,	<S8ADDL>
+   opdef EVX$ADDI_S8SUBL,	<S8SUBL>
+   opdef EVX$ADDI_S4ADDQ,	<S4ADDQ>
+   opdef EVX$ADDI_S4SUBQ,	<S4SUBQ>
+   opdef EVX$ADDI_S8ADDQ,	<S8ADDQ>
+   opdef EVX$ADDI_S8SUBQ,	<S8SUBQ>
+
+INST_LENGTH_ADDI::
+	.long	. - INST_INFO_ADDI
+
+; Logical opcodes
+
+INST_INFO_LOGI::
+
+	$format = EVX$K_operate
+
+   opdef EVX$LOGI_AND,		<AND>
+   opdef EVX$LOGI_BIC,		<BIC>
+   opdef EVX$LOGI_CMOVEQ,	<CMOVEQ>
+   opdef EVX$LOGI_CMOVNE,	<CMOVNE>
+   opdef EVX$LOGI_BIS,		<BIS>
+   opdef EVX$LOGI_ORNOT,	<ORNOT>
+   opdef EVX$LOGI_CMOVLT,	<CMOVLT>
+   opdef EVX$LOGI_CMOVGE,	<CMOVGE>
+   opdef EVX$LOGI_XOR,		<XOR>
+   opdef EVX$LOGI_EQV,		<EQV>
+   opdef EVX$LOGI_CMOVLE,	<CMOVLE>
+   opdef EVX$LOGI_CMOVGT,	<CMOVGT>
+   opdef EVX$LOGI_CMOVLBC,	<CMOVLBC>
+   opdef EVX$LOGI_CMOVLBS,	<CMOVLBS>
+
+INST_LENGTH_LOGI::
+	.long	. - INST_INFO_LOGI
+
+; Shift opcodes
+
+INST_INFO_SHFI::
+
+	$format = EVX$K_operate
+
+   opdef EVX$SHFI_EXTBL,	<EXTBL>
+   opdef EVX$SHFI_EXTWL,	<EXTWL>
+   opdef EVX$SHFI_EXTLL,	<EXTLL>
+   opdef EVX$SHFI_EXTQL,	<EXTQL>
+   opdef EVX$SHFI_EXTWH,	<EXTWH>
+   opdef EVX$SHFI_EXTLH,	<EXTLH>
+   opdef EVX$SHFI_EXTQH,	<EXTQH>
+   opdef EVX$SHFI_INSBL,	<INSBL>
+   opdef EVX$SHFI_INSWL,	<INSWL>
+   opdef EVX$SHFI_INSLL,	<INSLL>
+   opdef EVX$SHFI_INSQL,	<INSQL>
+   opdef EVX$SHFI_INSWH,	<INSWH>
+   opdef EVX$SHFI_INSLH,	<INSLH>
+   opdef EVX$SHFI_INSQH,	<INSQH>
+   opdef EVX$SHFI_SRA,		<SRA>
+   opdef EVX$SHFI_SRL,		<SRL>
+   opdef EVX$SHFI_SLL,		<SLL>
+   opdef EVX$SHFI_MSKBL,	<MSKBL>
+   opdef EVX$SHFI_MSKWL,	<MSKWL>
+   opdef EVX$SHFI_MSKLL,	<MSKLL>
+   opdef EVX$SHFI_MSKQL,	<MSKQL>
+   opdef EVX$SHFI_MSKWH,	<MSKWH>
+   opdef EVX$SHFI_MSKLH,	<MSKLH>
+   opdef EVX$SHFI_MSKQH,	<MSKQH>
+   opdef EVX$SHFI_ZAP,		<ZAP>
+   opdef EVX$SHFI_ZAPNOT,	<ZAPNOT>
+
+INST_LENGTH_SHFI::
+	.long	. - INST_INFO_SHFI
+
+; Multiply opcodes
+
+INST_INFO_MULI::
+
+	$format = EVX$K_operate
+
+   opdef EVX$MULI_MULL,		<MULL>
+   opdef EVX$MULI_MULQV,	<MULQ/V>
+   opdef EVX$MULI_MULLV,	<MULL/V>
+   opdef EVX$MULI_UMULH,	<UMULH>
+   opdef EVX$MULI_MULQ,		<MULQ>
+
+INST_LENGTH_MULI::
+	.long	. - INST_INFO_MULI
+
+; Sync opcodes
+
+INST_INFO_SYNC::
+
+	$format = EVX$K_sync0
+
+   opdef EVX$SYNC_MB,		<MB>
+   opdef EVX$SYNC_FETCH,	<FETCH>,	EVX$K_sync1
+   opdef EVX$SYNC_RS,		<RS>,		EVX$K_sync1
+   opdef EVX$SYNC_DRAINT,	<DRAINT>
+   opdef EVX$SYNC_FETCH_M,	<FETCH_M>,	EVX$K_sync1
+   opdef EVX$SYNC_RPCC,		<RPCC>,		EVX$K_sync1
+   opdef EVX$SYNC_RC,		<RC>,		EVX$K_sync1
+
+INST_LENGTH_SYNC::
+	.long	. - INST_INFO_SYNC
+
+; FPAUX Float opcodes
+
+INST_INFO_FPAUX::
+
+.if ne float_aux_decode
+
+	$format = EVX$K_float3  	;Assume float3
+
+   opdef EVX$FPAUX_CPYS,	<CPYS>
+   opdef EVX$FPAUX_CPYSN,	<CPYSN>
+   opdef EVX$FPAUX_CPYSE,	<CPYSE>
+   opdef EVX$FPAUX_CPYSEE,	<CPYSEE>
+   opdef EVX$FPAUX_CVTLQ,	<CVTLQ>
+   opdef EVX$FPAUX_CVTQL,	<CVTQL>
+   opdef EVX$FPAUX_CVTQLV,	<CVTQL/V>
+   opdef EVX$FPAUX_FCMOVGT,	<FCMOVGT>
+   opdef EVX$FPAUX_FCMOVLT,	<FCMOVLT>
+   opdef EVX$FPAUX_FCMOVEQ,	<FCMOVEQ>
+   opdef EVX$FPAUX_FCMOVLE,	<FCMOVLE>
+   opdef EVX$FPAUX_FCMOVGE,	<FCMOVGE>
+   opdef EVX$FPAUX_FCMOVNE,	<FCMOVNE>
+
+.endc
+
+INST_LENGTH_FPAUX::
+	.long	. - INST_INFO_FPAUX
+
+; FPDEC Float opcodes
+
+INST_INFO_FPDEC::
+
+.if ne float_dec_decode
+
+	$format = EVX$K_float3		;Assume float3
+
+   opdef EVX$FPDEC_ADDD,	<ADDD>
+   opdef EVX$FPDEC_ADDDC,	<ADDD/C>
+   opdef EVX$FPDEC_ADDDU,	<ADDD/U>
+   opdef EVX$FPDEC_ADDDUC,	<ADDD/UC>
+   opdef EVX$FPDEC_ADDDS,	<ADDD/S>
+   opdef EVX$FPDEC_ADDDSC,	<ADDD/SC>
+   opdef EVX$FPDEC_ADDDSU,	<ADDD/SU>
+   opdef EVX$FPDEC_ADDDSUC,	<ADDD/SUC>
+   opdef EVX$FPDEC_ADDF,	<ADDF>
+   opdef EVX$FPDEC_ADDFC,	<ADDF/C>
+   opdef EVX$FPDEC_ADDFU,	<ADDF/U>
+   opdef EVX$FPDEC_ADDFUC,	<ADDF/UC>
+   opdef EVX$FPDEC_ADDFS,	<ADDF/S>
+   opdef EVX$FPDEC_ADDFSC,	<ADDF/SC>
+   opdef EVX$FPDEC_ADDFSU,	<ADDF/SU>
+   opdef EVX$FPDEC_ADDFSUC,	<ADDF/SUC>
+   opdef EVX$FPDEC_ADDG,	<ADDG>
+   opdef EVX$FPDEC_ADDGC,	<ADDG/C>
+   opdef EVX$FPDEC_ADDGU,	<ADDG/U>
+   opdef EVX$FPDEC_ADDGUC,	<ADDG/UC>
+   opdef EVX$FPDEC_ADDGS,	<ADDG/S>
+   opdef EVX$FPDEC_ADDGSC,	<ADDG/SC>
+   opdef EVX$FPDEC_ADDGSU,	<ADDG/SU>
+   opdef EVX$FPDEC_ADDGSUC,	<ADDG/SUC>
+   opdef EVX$FPDEC_CMPDEQ,	<CMPDEQ>
+   opdef EVX$FPDEC_CMPDLT,	<CMPDLT>
+   opdef EVX$FPDEC_CMPDLE,	<CMPDLE>
+   opdef EVX$FPDEC_CMPGEQ,	<CMPGEQ>
+   opdef EVX$FPDEC_CMPGLT,	<CMPGLT>
+   opdef EVX$FPDEC_CMPGLE,	<CMPGLE>
+   opdef EVX$FPDEC_CMPDEQS,	<CMPDEQ/S>
+   opdef EVX$FPDEC_CMPDLTS,	<CMPDLT/S>
+   opdef EVX$FPDEC_CMPDLES,	<CMPDLE/S>
+   opdef EVX$FPDEC_CMPGEQS,	<CMPGEQ/S>
+   opdef EVX$FPDEC_CMPGLTS,	<CMPGLT/S>
+   opdef EVX$FPDEC_CMPGLES,	<CMPGLE/S>
+   opdef EVX$FPDEC_CVTDF,	<CVTDF>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTDFC,	<CVTDF/C>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTDFS,	<CVTDF/S>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTDFSC,	<CVTDF/SC>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTFG,	<CVTFG>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTFGC,	<CVTFG/C>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTFGS,	<CVTFG/S>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTFGSC,	<CVTFG/SC>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGF,	<CVTGF>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGFC,	<CVTGF/C>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGFU,	<CVTGF/U>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGFUC,	<CVTGF/UC>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGFS,	<CVTGF/S>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGFSC,	<CVTGF/SC>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGFSU,	<CVTGF/SU>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTGFSUC,	<CVTGF/SUC>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQD,	<CVTQD>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQDC,	<CVTQD/C>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQDS,	<CVTQD/S>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQDSC,	<CVTQD/SC>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQF,	<CVTQF>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQFC,	<CVTQF/C>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQFS,	<CVTQF/S>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQFSC,	<CVTQF/SC>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQG,	<CVTQG>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQGC,	<CVTQG/C>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQGS,	<CVTQG/S>,	EVX$K_float2
+   opdef EVX$FPDEC_CVTQGSC,	<CVTQG/SC>,	EVX$K_float2
+   opdef EVX$FPDEC_DIVD,	<DIVD>
+   opdef EVX$FPDEC_DIVDC,	<DIVD/C>
+   opdef EVX$FPDEC_DIVDU,	<DIVD/U>
+   opdef EVX$FPDEC_DIVDUC,	<DIVD/UC>
+   opdef EVX$FPDEC_DIVDS,	<DIVD/S>
+   opdef EVX$FPDEC_DIVDSC,	<DIVD/SC>
+   opdef EVX$FPDEC_DIVDSU,	<DIVD/SU>
+   opdef EVX$FPDEC_DIVDSUC,	<DIVD/SUC>
+   opdef EVX$FPDEC_DIVF,	<DIVF>
+   opdef EVX$FPDEC_DIVFC,	<DIVF/C>
+   opdef EVX$FPDEC_DIVFU,	<DIVF/U>
+   opdef EVX$FPDEC_DIVFUC,	<DIVF/UC>
+   opdef EVX$FPDEC_DIVFS,	<DIVF/S>
+   opdef EVX$FPDEC_DIVFSC,	<DIVF/SC>
+   opdef EVX$FPDEC_DIVFSU,	<DIVF/SU>
+   opdef EVX$FPDEC_DIVFSUC,	<DIVF/SUC>
+   opdef EVX$FPDEC_DIVG,	<DIVG>
+   opdef EVX$FPDEC_DIVGC,	<DIVG/C>
+   opdef EVX$FPDEC_DIVGU,	<DIVG/U>
+   opdef EVX$FPDEC_DIVGUC,	<DIVG/UC>
+   opdef EVX$FPDEC_DIVGS,	<DIVG/S>
+   opdef EVX$FPDEC_DIVGSC,	<DIVG/SC>
+   opdef EVX$FPDEC_DIVGSU,	<DIVG/SU>
+   opdef EVX$FPDEC_DIVGSUC,	<DIVG/SUC>
+   opdef EVX$FPDEC_MULD,	<MULD>
+   opdef EVX$FPDEC_MULDC,	<MULD/C>
+   opdef EVX$FPDEC_MULDU,	<MULD/U>
+   opdef EVX$FPDEC_MULDUC,	<MULD/UC>
+   opdef EVX$FPDEC_MULDS,	<MULD/S>
+   opdef EVX$FPDEC_MULDSC,	<MULD/SC>
+   opdef EVX$FPDEC_MULDSU,	<MULD/SU>
+   opdef EVX$FPDEC_MULDSUC,	<MULD/SUC>
+   opdef EVX$FPDEC_MULF,	<MULF>
+   opdef EVX$FPDEC_MULFC,	<MULF/C>
+   opdef EVX$FPDEC_MULFU,	<MULF/U>
+   opdef EVX$FPDEC_MULFUC,	<MULF/UC>
+   opdef EVX$FPDEC_MULFS,	<MULF/S>
+   opdef EVX$FPDEC_MULFSC,	<MULF/SC>
+   opdef EVX$FPDEC_MULFSU,	<MULF/SU>
+   opdef EVX$FPDEC_MULFSUC,	<MULF/SUC>
+   opdef EVX$FPDEC_MULG,	<MULG>
+   opdef EVX$FPDEC_MULGC,	<MULG/C>
+   opdef EVX$FPDEC_MULGU,	<MULG/U>
+   opdef EVX$FPDEC_MULGUC,	<MULG/UC>
+   opdef EVX$FPDEC_MULGS,	<MULG/S>
+   opdef EVX$FPDEC_MULGSC,	<MULG/SC>
+   opdef EVX$FPDEC_MULGSU,	<MULG/SU>
+   opdef EVX$FPDEC_MULGSUC,	<MULG/SUC>
+   opdef EVX$FPDEC_SUBD,	<SUBD>
+   opdef EVX$FPDEC_SUBDC,	<SUBD/C>
+   opdef EVX$FPDEC_SUBDU,	<SUBD/U>
+   opdef EVX$FPDEC_SUBDUC,	<SUBD/UC>
+   opdef EVX$FPDEC_SUBDS,	<SUBD/S>
+   opdef EVX$FPDEC_SUBDSC,	<SUBD/SC>
+   opdef EVX$FPDEC_SUBDSU,	<SUBD/SU>
+   opdef EVX$FPDEC_SUBDSUC,	<SUBD/SUC>
+   opdef EVX$FPDEC_SUBF,	<SUBF>
+   opdef EVX$FPDEC_SUBFC,	<SUBF/C>
+   opdef EVX$FPDEC_SUBFU,	<SUBF/U>
+   opdef EVX$FPDEC_SUBFUC,	<SUBF/UC>
+   opdef EVX$FPDEC_SUBFS,	<SUBF/S>
+   opdef EVX$FPDEC_SUBFSC,	<SUBF/SC>
+   opdef EVX$FPDEC_SUBFSU,	<SUBF/SU>
+   opdef EVX$FPDEC_SUBFSUC,	<SUBF/SUC>
+   opdef EVX$FPDEC_SUBG,	<SUBG>
+   opdef EVX$FPDEC_SUBGC,	<SUBG/C>
+   opdef EVX$FPDEC_SUBGU,	<SUBG/U>
+   opdef EVX$FPDEC_SUBGUC,	<SUBG/UC>
+   opdef EVX$FPDEC_SUBGS,	<SUBG/S>
+   opdef EVX$FPDEC_SUBGSC,	<SUBG/SC>
+   opdef EVX$FPDEC_SUBGSU,	<SUBG/SU>
+   opdef EVX$FPDEC_SUBGSUC,	<SUBG/SUC>
+   opdef EVX$FPDEC_CVTDQ,	<CVTDQ>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTDQC,	<CVTDQ/C>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTDQV,	<CVTDQ/V>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTDQVC,	<CVTDQ/VC>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTDQS,	<CVTDQ/S>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTDQSC,	<CVTDQ/SC>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTDQSV,	<CVTDQ/SV>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTDQSVC,	<CVTDQ/SVC>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQ,	<CVTGQ>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQC,	<CVTGQ/C>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQV,	<CVTGQ/V>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQVC,	<CVTGQ/VC>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQS,	<CVTGQ/S>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQSC,	<CVTGQ/SC>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQSV,	<CVTGQ/SV>,	EVX$K_float2  
+   opdef EVX$FPDEC_CVTGQSVC,	<CVTGQ/SVC>,	EVX$K_float2  
+
+.endc
+
+INST_LENGTH_FPDEC::
+	.long	. - INST_INFO_FPDEC
+
+; FPIEEE Float opcodes
+
+INST_INFO_FPIEEE::
+
+.if ne float_ieee_decode
+
+	$format = EVX$K_float3		;Assume float3
+
+   opdef EVX$FPIEEE_ADDS,	<ADDS>
+   opdef EVX$FPIEEE_ADDSC,	<ADDS/C>
+   opdef EVX$FPIEEE_ADDSM,	<ADDS/M>
+   opdef EVX$FPIEEE_ADDSP,	<ADDS/P>
+   opdef EVX$FPIEEE_ADDSU,	<ADDS/U>
+   opdef EVX$FPIEEE_ADDSUC,	<ADDS/UC>
+   opdef EVX$FPIEEE_ADDSUM,	<ADDS/UM>
+   opdef EVX$FPIEEE_ADDSUP,	<ADDS/UP>
+   opdef EVX$FPIEEE_ADDSSU,	<ADDS/SU>
+   opdef EVX$FPIEEE_ADDSSUC,	<ADDS/SUC>
+   opdef EVX$FPIEEE_ADDSSUM,	<ADDS/SUM>
+   opdef EVX$FPIEEE_ADDSSUP,	<ADDS/SUP>
+   opdef EVX$FPIEEE_ADDSSUI,	<ADDS/SUI>
+   opdef EVX$FPIEEE_ADDSSUIC,	<ADDS/SUIC>
+   opdef EVX$FPIEEE_ADDSSUIM,	<ADDS/SUIM>
+   opdef EVX$FPIEEE_ADDSSUIP,	<ADDS/SUIP>
+   opdef EVX$FPIEEE_ADDT,	<ADDT>
+   opdef EVX$FPIEEE_ADDTC,	<ADDT/C>
+   opdef EVX$FPIEEE_ADDTM,	<ADDT/M>
+   opdef EVX$FPIEEE_ADDTP,	<ADDT/P>
+   opdef EVX$FPIEEE_ADDTU,	<ADDT/U>
+   opdef EVX$FPIEEE_ADDTUC,	<ADDT/UC>
+   opdef EVX$FPIEEE_ADDTUM,	<ADDT/UM>
+   opdef EVX$FPIEEE_ADDTUP,	<ADDT/UP>
+   opdef EVX$FPIEEE_ADDTSU,	<ADDT/SU>
+   opdef EVX$FPIEEE_ADDTSUC,	<ADDT/SUC>
+   opdef EVX$FPIEEE_ADDTSUM,	<ADDT/SUM>
+   opdef EVX$FPIEEE_ADDTSUP,	<ADDT/SUP>
+   opdef EVX$FPIEEE_ADDTSUI,	<ADDT/SUI>
+   opdef EVX$FPIEEE_ADDTSUIC,	<ADDT/SUIC>
+   opdef EVX$FPIEEE_ADDTSUIM,	<ADDT/SUIM>
+   opdef EVX$FPIEEE_ADDTSUIP,	<ADDT/SUIP>
+   opdef EVX$FPIEEE_CMPSEQ,	<CMPSEQ>
+   opdef EVX$FPIEEE_CMPSLT,	<CMPSLT>
+   opdef EVX$FPIEEE_CMPSLE,	<CMPSLE>
+   opdef EVX$FPIEEE_CMPSUN,	<CMPSUN>
+   opdef EVX$FPIEEE_CMPTEQ,	<CMPTEQ>
+   opdef EVX$FPIEEE_CMPTLT,	<CMPTLT>
+   opdef EVX$FPIEEE_CMPTLE,	<CMPTLE>
+   opdef EVX$FPIEEE_CMPTUN,	<CMPTUN>
+   opdef EVX$FPIEEE_CMPSEQSU,	<CMPSEQ/SU>
+   opdef EVX$FPIEEE_CMPSLTSU,	<CMPSLT/SU>
+   opdef EVX$FPIEEE_CMPSLESU,	<CMPSLE/SU>
+   opdef EVX$FPIEEE_CMPSUNSU,	<CMPSUN/SU>
+   opdef EVX$FPIEEE_CMPTEQSU,	<CMPTEQ/SU>
+   opdef EVX$FPIEEE_CMPTLTSU,	<CMPTLT/SU>
+   opdef EVX$FPIEEE_CMPTLESU,	<CMPTLE/SU>
+   opdef EVX$FPIEEE_CMPTUNSU,	<CMPTUN/SU>
+   opdef EVX$FPIEEE_CVTQS,	<CVTQS>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQSC,	<CVTQS/C>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQSM,	<CVTQS/M>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQSP,	<CVTQS/P>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQSSUI,	<CVTQS/SUI>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQSSUIC,	<CVTQS/SUIC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQSSUIM,	<CVTQS/SUIM>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQSSUIP,	<CVTQS/SUIP>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQT,	<CVTQT>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQTC,	<CVTQT/C>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQTM,	<CVTQT/M>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQTP,	<CVTQT/P>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQTSUI,	<CVTQT/SUI>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQTSUIC,	<CVTQT/SUIC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQTSUIM,	<CVTQT/SUIM>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTQTSUIP,	<CVTQT/SUIP>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTST,	<CVTST>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSTC,	<CVTST/C>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSTM,	<CVTST/M>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSTP,	<CVTST/P>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSTSUI,	<CVTST/SUI>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSTSUIC,	<CVTST/SUIC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSTSUIM,	<CVTST/SUIM>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSTSUIP,	<CVTST/SUIP>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTS,	<CVTTS>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSC,	<CVTTS/C>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSM,	<CVTTS/M>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSP,	<CVTTS/P>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSU,	<CVTTS/U>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSUC,	<CVTTS/UC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSUM,	<CVTTS/UM>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSUP,	<CVTTS/UP>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSU,	<CVTTS/SU>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSUC,	<CVTTS/SUC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSUM,	<CVTTS/SUM>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSUP,	<CVTTS/SUP>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSUI,	<CVTTS/SUI>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSUIC,	<CVTTS/SUIC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSUIM,	<CVTTS/SUIM>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTSSUIP,	<CVTTS/SUIP>,	EVX$K_float2  
+   opdef EVX$FPIEEE_DIVS,	<DIVS>
+   opdef EVX$FPIEEE_DIVSC,	<DIVS/C>
+   opdef EVX$FPIEEE_DIVSM,	<DIVS/M>
+   opdef EVX$FPIEEE_DIVSP,	<DIVS/P>
+   opdef EVX$FPIEEE_DIVSU,	<DIVS/U>
+   opdef EVX$FPIEEE_DIVSUC,	<DIVS/UC>
+   opdef EVX$FPIEEE_DIVSUM,	<DIVS/UM>
+   opdef EVX$FPIEEE_DIVSUP,	<DIVS/UP>
+   opdef EVX$FPIEEE_DIVSSU,	<DIVS/SU>
+   opdef EVX$FPIEEE_DIVSSUC,	<DIVS/SUC>
+   opdef EVX$FPIEEE_DIVSSUM,	<DIVS/SUM>
+   opdef EVX$FPIEEE_DIVSSUP,	<DIVS/SUP>
+   opdef EVX$FPIEEE_DIVSSUI,	<DIVS/SUI>
+   opdef EVX$FPIEEE_DIVSSUIC,	<DIVS/SUIC>
+   opdef EVX$FPIEEE_DIVSSUIM,	<DIVS/SUIM>
+   opdef EVX$FPIEEE_DIVSSUIP,	<DIVS/SUIP>
+   opdef EVX$FPIEEE_DIVT,	<DIVT>
+   opdef EVX$FPIEEE_DIVTC,	<DIVT/C>
+   opdef EVX$FPIEEE_DIVTM,	<DIVT/M>
+   opdef EVX$FPIEEE_DIVTP,	<DIVT/P>
+   opdef EVX$FPIEEE_DIVTU,	<DIVT/U>
+   opdef EVX$FPIEEE_DIVTUC,	<DIVT/UC>
+   opdef EVX$FPIEEE_DIVTUM,	<DIVT/UM>
+   opdef EVX$FPIEEE_DIVTUP,	<DIVT/UP>
+   opdef EVX$FPIEEE_DIVTSU,	<DIVT/SU>
+   opdef EVX$FPIEEE_DIVTSUC,	<DIVT/SUC>
+   opdef EVX$FPIEEE_DIVTSUM,	<DIVT/SUM>
+   opdef EVX$FPIEEE_DIVTSUP,	<DIVT/SUP>
+   opdef EVX$FPIEEE_DIVTSUI,	<DIVT/SUI>
+   opdef EVX$FPIEEE_DIVTSUIC,	<DIVT/SUIC>
+   opdef EVX$FPIEEE_DIVTSUIM,	<DIVT/SUIM>
+   opdef EVX$FPIEEE_DIVTSUIP,	<DIVT/SUIP>
+   opdef EVX$FPIEEE_MULS,	<MULS>
+   opdef EVX$FPIEEE_MULSC,	<MULS/C>
+   opdef EVX$FPIEEE_MULSM,	<MULS/M>
+   opdef EVX$FPIEEE_MULSP,	<MULS/P>
+   opdef EVX$FPIEEE_MULSU,	<MULS/U>
+   opdef EVX$FPIEEE_MULSUC,	<MULS/UC>
+   opdef EVX$FPIEEE_MULSUM,	<MULS/UM>
+   opdef EVX$FPIEEE_MULSUP,	<MULS/UP>
+   opdef EVX$FPIEEE_MULSSU,	<MULS/SU>
+   opdef EVX$FPIEEE_MULSSUC,	<MULS/SUC>
+   opdef EVX$FPIEEE_MULSSUM,	<MULS/SUM>
+   opdef EVX$FPIEEE_MULSSUP,	<MULS/SUP>
+   opdef EVX$FPIEEE_MULSSUI,	<MULS/SUI>
+   opdef EVX$FPIEEE_MULSSUIC,	<MULS/SUIC>
+   opdef EVX$FPIEEE_MULSSUIM,	<MULS/SUIM>
+   opdef EVX$FPIEEE_MULSSUIP,	<MULS/SUIP>
+   opdef EVX$FPIEEE_MULT,	<MULT>
+   opdef EVX$FPIEEE_MULTC,	<MULT/C>
+   opdef EVX$FPIEEE_MULTM,	<MULT/M>
+   opdef EVX$FPIEEE_MULTP,	<MULT/P>
+   opdef EVX$FPIEEE_MULTU,	<MULT/U>
+   opdef EVX$FPIEEE_MULTUC,	<MULT/UC>
+   opdef EVX$FPIEEE_MULTUM,	<MULT/UM>
+   opdef EVX$FPIEEE_MULTUP,	<MULT/UP>
+   opdef EVX$FPIEEE_MULTSU,	<MULT/SU>
+   opdef EVX$FPIEEE_MULTSUC,	<MULT/SUC>
+   opdef EVX$FPIEEE_MULTSUM,	<MULT/SUM>
+   opdef EVX$FPIEEE_MULTSUP,	<MULT/SUP>
+   opdef EVX$FPIEEE_MULTSUI,	<MULT/SUI>
+   opdef EVX$FPIEEE_MULTSUIC,	<MULT/SUIC>
+   opdef EVX$FPIEEE_MULTSUIM,	<MULT/SUIM>
+   opdef EVX$FPIEEE_MULTSUIP,	<MULT/SUIP>
+   opdef EVX$FPIEEE_SUBS,	<SUBS>
+   opdef EVX$FPIEEE_SUBSC,	<SUBS/C>
+   opdef EVX$FPIEEE_SUBSM,	<SUBS/M>
+   opdef EVX$FPIEEE_SUBSP,	<SUBS/P>
+   opdef EVX$FPIEEE_SUBSU,	<SUBS/U>
+   opdef EVX$FPIEEE_SUBSUC,	<SUBS/UC>
+   opdef EVX$FPIEEE_SUBSUM,	<SUBS/UM>
+   opdef EVX$FPIEEE_SUBSUP,	<SUBS/UP>
+   opdef EVX$FPIEEE_SUBSSU,	<SUBS/SU>
+   opdef EVX$FPIEEE_SUBSSUC,	<SUBS/SUC>
+   opdef EVX$FPIEEE_SUBSSUM,	<SUBS/SUM>
+   opdef EVX$FPIEEE_SUBSSUP,	<SUBS/SUP>
+   opdef EVX$FPIEEE_SUBSSUI,	<SUBS/SUI>
+   opdef EVX$FPIEEE_SUBSSUIC,	<SUBS/SUIC>
+   opdef EVX$FPIEEE_SUBSSUIM,	<SUBS/SUIM>
+   opdef EVX$FPIEEE_SUBSSUIP,	<SUBS/SUIP>
+   opdef EVX$FPIEEE_SUBT,	<SUBT>
+   opdef EVX$FPIEEE_SUBTC,	<SUBT/C>
+   opdef EVX$FPIEEE_SUBTM,	<SUBT/M>
+   opdef EVX$FPIEEE_SUBTP,	<SUBT/P>
+   opdef EVX$FPIEEE_SUBTU,	<SUBT/U>
+   opdef EVX$FPIEEE_SUBTUC,	<SUBT/UC>
+   opdef EVX$FPIEEE_SUBTUM,	<SUBT/UM>
+   opdef EVX$FPIEEE_SUBTUP,	<SUBT/UP>
+   opdef EVX$FPIEEE_SUBTSU,	<SUBT/SU>
+   opdef EVX$FPIEEE_SUBTSUC,	<SUBT/SUC>
+   opdef EVX$FPIEEE_SUBTSUM,	<SUBT/SUM>
+   opdef EVX$FPIEEE_SUBTSUP,	<SUBT/SUP>
+   opdef EVX$FPIEEE_SUBTSUI,	<SUBT/SUI>
+   opdef EVX$FPIEEE_SUBTSUIC,	<SUBT/SUIC>
+   opdef EVX$FPIEEE_SUBTSUIM,	<SUBT/SUIM>
+   opdef EVX$FPIEEE_SUBTSUIP,	<SUBT/SUIP>
+   opdef EVX$FPIEEE_CVTSQ,	<CVTSQ>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSQC,	<CVTSQ/C>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSQV,	<CVTSQ/V>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSQVC,	<CVTSQ/VC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSQSV,	<CVTSQ/SV>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSQSVC,	<CVTSQ/SVC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSQSVI,	<CVTSQ/SVI>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTSQSVIC,	<CVTSQ/SVIC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQ,	<CVTTQ>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQC,	<CVTTQ/C>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQV,	<CVTTQ/V>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQVC,	<CVTTQ/VC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQSV,	<CVTTQ/SV>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQSVC,	<CVTTQ/SVC>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQSVI,	<CVTTQ/SVI>,	EVX$K_float2  
+   opdef EVX$FPIEEE_CVTTQSVIC,	<CVTTQ/SVIC>,	EVX$K_float2  
+
+.endc
+
+INST_LENGTH_FPIEEE::
+	.long	. - INST_INFO_FPIEEE
+
+; PAL opcodes
+
+INST_INFO_PAL::
+
+	$format = EVX$K_pal
+
+  opdef EVX$PAL_BPT,		<BPT>
+  opdef EVX$PAL_BUGCHK,		<BUGCHK>
+  opdef EVX$PAL_CHME,		<CHME>
+  opdef EVX$PAL_CHMK,		<CHMK>
+  opdef EVX$PAL_CHMS,		<CHMS>
+  opdef EVX$PAL_CHMU,		<CHMU>
+  opdef EVX$PAL_CFLUSH,		<CFLUSH>
+  opdef EVX$PAL_CSERVE,		<CSERVE>
+  opdef EVX$PAL_HALT,		<HALT>
+  opdef EVX$PAL_IMB,		<IMB>
+  opdef EVX$PAL_INSQHIL,	<INSQHIL>
+  opdef EVX$PAL_INSQTIL,	<INSQTIL>
+  opdef EVX$PAL_INSQHIQ,	<INSQHIQ>
+  opdef EVX$PAL_INSQTIQ,	<INSQTIQ>
+  opdef EVX$PAL_INSQUEL,	<INSQUEL>
+  opdef EVX$PAL_INSQUEQ,	<INSQUEQ>
+  opdef EVX$PAL_INSQUELD,	<INSQUEL/D>
+  opdef EVX$PAL_INSQUEQD,	<INSQUEQ/D>
+  opdef EVX$PAL_LDQP,		<LDQP>
+  opdef EVX$PAL_MFPR_ASN,	<MFPR_ASN>
+  opdef EVX$PAL_MFPR_FEN,	<MFPR_FEN>
+  opdef EVX$PAL_MFPR_IPL,	<MFPR_IPL>
+  opdef EVX$PAL_MFPR_MCES,	<MFPR_MCES>
+  opdef EVX$PAL_MFPR_PCBB,	<MFPR_PCBB>
+  opdef EVX$PAL_MFPR_PTBR,	<MFPR_PTBR>
+  opdef EVX$PAL_MFPR_SISR,	<MFPR_SISR>
+  opdef EVX$PAL_MFPR_TBCHK,	<MFPR_TBCHK>
+  opdef EVX$PAL_MFPR_ESP,	<MFPR_ESP>
+  opdef EVX$PAL_MFPR_SSP,	<MFPR_SSP>
+  opdef EVX$PAL_MFPR_USP,	<MFPR_USP>
+  opdef EVX$PAL_MFPR_WHAMI,	<MFPR_WHAMI>
+  opdef EVX$PAL_MTPR_AT,	<QUILTPOINT>
+  opdef EVX$PAL_MTPR_FEN,	<MTPR_FEN>
+  opdef EVX$PAL_MTPR_IPL,	<MTPR_IPL>
+  opdef EVX$PAL_MTPR_MCES,	<MTPR_MCES>
+  opdef EVX$PAL_MFPR_PRBR,	<MFPR_PRBR>
+  opdef EVX$PAL_MTPR_PRBR,	<MTPR_PRBR>
+  opdef EVX$PAL_MFPR_SCBB,	<MFPR_SCBB>
+  opdef EVX$PAL_MTPR_SCBB,	<MTPR_SCBB>
+  opdef EVX$PAL_MTPR_SIRR,	<MTPR_SIRR>
+  opdef EVX$PAL_MTPR_TBIA,	<MTPR_TBIA>
+  opdef EVX$PAL_MTPR_TBIS,	<MTPR_TBIS>
+  opdef EVX$PAL_MTPR_ESP,	<MTPR_ESP>
+  opdef EVX$PAL_MTPR_SSP,	<MTPR_SSP>
+  opdef EVX$PAL_MTPR_USP,	<MTPR_USP>
+  opdef EVX$PAL_PROBER,		<PROBER>
+  opdef EVX$PAL_PROBEW,		<PROBEW>
+  opdef EVX$PAL_RD_PS,		<RD_PS>
+  opdef EVX$PAL_WR_PS_SW,	<WR_PS_SW>
+  opdef EVX$PAL_REI,		<REI>
+  opdef EVX$PAL_REMQHIL,	<REMQHIL>
+  opdef EVX$PAL_REMQTIL,	<REMQTIL>
+  opdef EVX$PAL_REMQHIQ,	<REMQHIQ>
+  opdef EVX$PAL_REMQTIQ,	<REMQTIQ>
+  opdef EVX$PAL_REMQUEL,	<REMQUEL>
+  opdef EVX$PAL_REMQUEQ,	<REMQUEQ>
+  opdef EVX$PAL_REMQUELD,	<REMQUEL/D>
+  opdef EVX$PAL_REMQUEQD,	<REMQUEQ/D>
+  opdef EVX$PAL_STQP,		<STQP>
+  opdef EVX$PAL_SWASTEN,	<SWASTEN>
+  opdef EVX$PAL_SWPCTX,		<SWPCTX>
+  opdef EVX$PAL_RESERVED_DVT,	<RESERVED_DVT>
+  opdef EVX$PAL_RESERVED_SIM,	<RESERVED_SIM>
+  opdef EVX$PAL_TRAPB,		<TRAPB>
+
+INST_LENGTH_PAL::
+	.long	. - INST_INFO_PAL
+
+; PAL opcodes
+
+INST_INFO_PAL_HW_LD::
+
+	$format = EVX$K_ldst
+
+  opdef EVX$PAL_HW_LDP,	 	<HW_LD/P>
+  opdef EVX$PAL_HW_LDQ,	 	<HW_LD/Q>
+  opdef EVX$PAL_HW_LDW,	 	<HW_LD/W>
+  opdef EVX$PAL_HW_LDA,	 	<HW_LD/A>
+  opdef EVX$PAL_HW_LDPQ,	<HW_LD/PQ>
+  opdef EVX$PAL_HW_LDPA,	<HW_LD/PA>
+  opdef EVX$PAL_HW_LDPW,	<HW_LD/PW>
+  opdef EVX$PAL_HW_LDQW,	<HW_LD/QW>
+  opdef EVX$PAL_HW_LDQA,	<HW_LD/QA>
+  opdef EVX$PAL_HW_LDAW,	<HW_LD/AW>
+  opdef EVX$PAL_HW_LDPQA,	<HW_LD/PQA>
+  opdef EVX$PAL_HW_LDQWA,	<HW_LD/QWA>
+  opdef EVX$PAL_HW_LDPWA,	<HW_LD/PWA>
+  opdef EVX$PAL_HW_LDPWQ,	<HW_LD/PWQ>
+  opdef EVX$PAL_HW_LDPQWA,	<HW_LD/PQAW>
+
+INST_LENGTH_PAL_HW_LD::
+	.long	. - INST_INFO_PAL_HW_LD
+
+INST_INFO_PAL_HW_ST::
+
+  opdef EVX$PAL_HW_STP,	 	<HW_ST/P>
+  opdef EVX$PAL_HW_STQ,	 	<HW_ST/Q>
+  opdef EVX$PAL_HW_STW,	 	<HW_ST/W>
+  opdef EVX$PAL_HW_STA,	 	<HW_ST/A>
+  opdef EVX$PAL_HW_STPQ,	<HW_ST/PQ>
+  opdef EVX$PAL_HW_STPA,	<HW_ST/PA>
+  opdef EVX$PAL_HW_STPW,	<HW_ST/PW>
+  opdef EVX$PAL_HW_STQW,	<HW_ST/QW>
+  opdef EVX$PAL_HW_STQA,	<HW_ST/QA>
+  opdef EVX$PAL_HW_STAW,	<HW_ST/AW>
+  opdef EVX$PAL_HW_STPQA,	<HW_ST/PQA>
+  opdef EVX$PAL_HW_STQWA,	<HW_ST/QWA>
+  opdef EVX$PAL_HW_STPWA,	<HW_ST/PWA>
+  opdef EVX$PAL_HW_STPWQ,	<HW_ST/PWQ>
+  opdef EVX$PAL_HW_STPQWA,	<HW_ST/PQAW>
+
+INST_LENGTH_PAL_HW_ST::
+	.long	. - INST_INFO_PAL_HW_ST
+
+INST_INFO_END::
+
+	.end
+

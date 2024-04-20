@@ -1,0 +1,340 @@
+#+
+# ============================================================================
+# = test - Test the system.			    	     	             =
+# ============================================================================
+#
+# OVERVIEW:
+#
+#	Test the entire system, including memory, disks, floppy, ethernet,
+#	and graphics.  If D_GROUP is set to MFG, the IIC devices, the TOY 
+#	NVRAM, EEROM, parallel port, and COM2 serial port are also tested.
+#
+#       Runtime is determined by the TEST command's -t qualifier.
+#
+#	The TEST command's -lb qualifier allows an external loopback test 
+#	to be performed on the parallel port and COM2 serial port, but 
+#	only if D_GROUP is set to MFG.
+#
+#	Only one instance of TEST is supported at a time.  TEST is intended 
+#	to be run as a foreground process, but can be run in the background.
+#
+#	Use the SET command to establish parameters, such as whether to halt,
+#	loop, or continue on error. The passcount environment variable, 
+#	D_PASSES, is used by TEST only during the testing of junk I/O devices.
+#	If D_PASSES equals the default of 1, the junk I/O tests are run for
+#	default time periods established in the TEST script.  Else, the TEST 
+#	script uses the value specified in D_PASSES (proportionately).  If
+#       D_PASSES=0, the junk I/O tests and exercisers are not run.
+#
+#   COMMAND FORM:
+#
+#       test [-lb] [-t <time>] 
+#
+#   COMMAND ARGUMENT(S):
+#
+#	None
+#
+#   COMMAND OPTION(S):
+#
+#      -lb        - External loopback tests are performed on the parallel
+#		    and COM2 serial ports (only if D_GROUP is set to MFG).
+#
+#      -t <time>  - Specify a test time in seconds.
+#
+#      -q         - Disables the display of status messages as exerciser
+#                   processes are started and stopped during testing.  
+#                   Sets the environment variable d_verbose to zero.
+#
+#   COMMAND EXAMPLE(S):
+#~
+#	P00>>> set d_group mfg          # Enable MFG-mode testing
+#	P00>>> set d_status on          # Print full test status reports
+#	P00>>> set d_passes 5           # Override default junk I/O passcounts
+#       P00>>> echo "DK DR" >d_write    # Perform writes on all SCSI/RAID disks
+#       P00>>> test -lb -t 1200         # Enable COM2/PARA loopbacks; Run system
+#                                       # test for 20 minutes;
+#~
+#-
+set d_verbose 1 2>nl
+set d_runtime 96 2>nl
+set aa_use_next_arg$$ 0 2>nl
+for i in ${*}
+do
+    if (show aa_use_next_arg$$ | grep z >nl) then
+        if (echo $i | grep '[~0-9]' >nl 2>nl) then
+            echo "Invalid value $i"
+            exit 1
+        else
+            set d_runtime $i
+            set aa_use_next_arg$$ 0
+        fi
+    else
+        case $i in
+           " ") ;;
+           -lb) set d_loopback on 2>nl;;
+            -t) set aa_use_next_arg$$ z ;;
+	    -q) set d_verbose 0 2>nl;;
+             *) echo "Invalid option $i"
+                exit 1 ;;
+        esac
+    fi
+done
+clear i
+set>nl 2>nl mout "tt"
+if (eval>nl d_verbose) then
+    if (eval>nl `echo $d_group | grep -i mfg | wc -l`) then
+    else
+	set>nl 2>nl mout "nl"
+    fi
+    set>nl 2>nl tout "nl"
+else
+    set>nl 2>nl tout "tt"
+fi
+kill_diags
+set d_cleanup on
+set d_complete off
+set d_eop off
+set d_logsoft on
+set d_report full
+set d_startup off
+set d_trace off
+set 2>nl s_flag 0
+set_flag &
+echo>$mout
+echo>$mout "System test, runtime $d_runtime seconds"
+#
+# In the event that -q has been specified, always print out the next message so
+# we can let the user know that we're running...
+#
+echo>$mout
+echo>$mout "Type ^C if you wish to abort testing once it has started"
+echo>$mout
+dynamic -extend 100000
+if (eval>nl `echo $d_group | grep -i mfg | wc -l`) then
+else
+    set d_group mfg >nl
+    if (ls>nl d_write) then
+       if (eval>nl `cat d_write | grep D | wc -w`) then
+       else
+          set d_oper off
+          for i in `cat d_write`; do
+             echo>$mout "Disk WRITES have been enabled for $i devices!"
+          done
+          echo>$mout
+       fi
+    fi
+    if (eval>nl d_passes 0 ==) then 
+	mfgtest
+    fi
+fi
+clear d_loopback 2>nl >nl
+if (eval>nl s_flag) then
+    if (ls ewa0 >nl) then
+	echo>$mout
+	echo "Testing Ethernet device(s)"
+	for i in a b c d e f g h; do
+	    if (ls ew"$i"0 >nl) then
+		set xx 2>nl `ls ew"$i"0|elem -d "."`
+		net -cm in "$xx" 2>nl
+		net -sa "$xx" >ndbr/lp_nodes_"$xx" 2>nl 
+		set "$xx"_loop_count 1
+		set "$xx"_loop_size 100
+		set "$xx"_lp_msg_node 1
+		set d_softerr halt
+		echo "" >tmp
+		nettest "$xx" -mode nc -f lp_nodes_"$xx" -p 1 2>tmp
+		if (eval>nl `cat tmp|wc -w`) then
+		    set d_softerr continue
+		    set "$xx"_loop_count 2
+		    set "$xx"_loop_inc 1
+		    set "$xx"_loop_patt ffffffff
+		    set "$xx"_loop_size 0e
+		    set "$xx"_lp_msg_node 1
+		    nettest "$xx" -mode nc -f lp_nodes_"$xx" -p 1 -w 1
+		    set "$xx"_loop_count 2
+		    set "$xx"_loop_inc d0
+		    set "$xx"_loop_patt ffffffff
+		    set "$xx"_loop_size 100
+		    set "$xx"_lp_msg_node 8
+		    nettest "$xx" -mode nc -f lp_nodes_"$xx" -p 1 -w 1 
+		else
+		    set d_softerr continue
+		    echo>$mout "External loopback failed on $xx - check network connection"
+		fi
+		net -cm nm "$xx" 2>nl
+		clear xx
+	    fi
+	done
+    else
+	echo>$mout "No Ethernet device found; skipping network test"
+    fi
+fi
+
+# Test video controller zero (VGA0 and TGA0) unless CONSOLE=GRAPHICS
+if (eval>nl s_flag) then
+    if (ls tga0 >nl) then
+	echo -n "TGA" >vga$$
+    fi
+    if (ls vga0 >nl) then
+	echo -n "VGA" >vga$$
+    fi
+    if (ls vga$$ >nl) then
+	if (show console | grep serial >nl) then
+	    echo>$mout
+	    echo Testing `cat vga${p}`
+	    set lpcnt$$ 750 2>nl
+	    while (eval "lpcnt$$ 0 ==" >nl) do
+		if (eval>nl s_flag) then
+		else
+		    break
+		fi
+		echo -n 'digital' >`cat vga${p}`0
+		eval "lpcnt$$ lpcnt$$ 1 - =" >nl
+	    done
+	    echo "" >`cat vga${p}`0
+	    clear lpcnt$$
+	else
+	    echo>$mout `cat vga${p}` used as main console - test bypassed
+	fi
+	rm vga$$
+    else
+	echo>$mout
+	echo>$mout "No VGA/TGA available for testing"
+    fi
+fi
+
+if (eval>nl s_flag) then
+    echo>$mout
+    echo "Testing Memory"
+    memexer 3
+fi
+  
+if (eval>nl s_flag) then
+   for i in DU DR DK DQ DV; do
+      set >nl 2>nl act$i "?r-Rc"
+      set >nl 2>nl str$i "read-only"
+   done
+   if (eval>nl `echo $d_group | grep -i mfg | wc -l`) then
+   else
+      if (ls>nl d_write) then
+         if (eval>nl `cat d_write | grep D | wc -w`) then
+            echo>$mout "Read-only disk tests selected; no writes enabled"
+         else
+            set d_oper off
+            for i in `cat d_write`; do
+               chmod +w $i*
+               echo>$mout "Disk WRITES have been enabled for $i devices!"
+               set >nl 2>nl act$i "?w-Rc"
+               set >nl 2>nl str$i "write/read"
+            done
+         fi
+         echo>$mout
+      fi
+   fi
+fi
+
+if (eval>nl s_flag) then
+    if (ls dq*.* >nl) then
+	echo>$mout
+	echo "Testing IDE/ATAPI disks ($strDQ)"
+	show device | element | grep dq >idedev
+	for uut in a b c d e f g; do 
+	    if (eval>nl `cat idedev | grep dq$uut | wc -w`) then
+	    else
+		exer -a $actDQ -p 0 dq$uut*.* &
+	    fi
+	done
+    fi
+    if (ls dk*.* >nl) then
+	echo>$mout
+	echo "Testing SCSI disks ($strDK)"
+	show device | element | grep dk >dev1
+        if (exer dka* -sb 0 -eb 1 -a "R" -p 1 2>nl) then
+           echo>$mout "Testing DKA* devices (read-only).."
+           exer -bc 20 -a "?r-Rc" -p 0 dka*.* &
+	fi
+        if (eval>nl `cat dev1 | grep -v dka | wc -w`) then
+           echo>$mout "No other SCSI disks to test"
+        else
+           echo>$mout "Testing other SCSI devices ($strDK).."
+	   for uut in b c d e f g h i j k l m n o p; do
+	      if (eval>nl `cat dev1 | grep dk$uut | wc -w`) then
+	      else
+	         exer -bc 20 -a $actDK -p 0 dk$uut*.* &
+	      fi
+	   done
+        fi
+    fi
+fi
+
+if (eval>nl s_flag) then
+    if (ls dr*.* >nl) then
+	echo>$mout
+	echo "Testing RAID disks ($strDR)"
+	show device | element | grep dr >dev1
+        for uut in a b c d e f g h i j k l m n o p q r s t u v w x y z; do
+	    if (eval>nl `cat dev1 | grep dr$uut | wc -w`) then
+	    else
+		exer -bc 20 -a $actDR -p 0 dr$uut*.* &
+	    fi
+	done
+    fi
+fi
+
+if (eval>nl s_flag) then
+# Test the Floppy Drive
+    if (ls dv*.* >nl) then
+	echo>$mout
+	echo "Testing floppy drive (dva0, $strDV)"
+	if (exer dva0 -sb 0 -eb 1 -a R -p 1 2>nl) then
+	    exer -bc 50 -a $actDV -p 0 dva0 &
+	else
+	    echo>$mout "No diskette present, skipping floppy test"
+	fi
+    fi
+fi
+
+echo>$mout
+for pid in `ps | grep exer | element`; do
+  sa $pid f
+done
+
+# Wait for run-time to expire and then shutdown tests before returning
+while eval>nl s_flag; do
+    if (eval>nl s_flag) then
+	sleep 5
+	if (eval>nl s_flag) then
+	    if (eval>nl `show d_group | grep -i field | wc -w` `show d_status | grep on | wc -w` \|) then
+		if (eval>nl `show d_heartbeat | grep -i on | wc -w`) then
+		    echo "Still testing.." >$tout
+		else
+		    echo "Still testing.."
+		fi
+		for i in 1 2 3 4 5 6; do
+		    if (eval>nl s_flag) then
+			sleep 5
+		    fi
+		done
+	    else
+		show_status | grep -v "set_fl" | grep -v "idle" >$tout
+	    fi
+	    sleep 5
+	    if (eval>nl s_flag) then
+		sleep 5
+		if (eval>nl s_flag) then
+		    sleep 5
+		fi
+            fi
+        fi
+    fi
+done
+kill_diags
+if (ls>nl d_write) then
+   for i in `cat d_write`; do
+      chmod -w $i*
+   done
+fi
+echo
+echo "System test complete"
+echo
+clear aa_use_next_arg$$

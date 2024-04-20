@@ -1,0 +1,784 @@
+;+
+; per cpu private pal logout area
+;-
+	
+	.MACRO	$PAL_LOGOUT_SABLE
+
+
+; Macro to name each place in the frame  
+
+tt = 0                     
+
+.macro	mchk$def	name,unit,lep=0
+	mchk$'name'unit' = tt
+	tt  = tt+8	; 8 bytes apart 
+.endm	mchk$def	
+
+;
+; Define mchk frame offsets
+;
+
+	mchk$def	byte_count	; +000	<63>	Retry flag
+					;	<15:0>	Byte count 
+ 	mchk$def	offsets		; +008	<63:31>	Sys$offset
+					;	<31:0>	CPU$offset
+
+	mchk$def	mchk_code	; Error code and revision
+
+	t = 1				
+	.repeat	31
+	  mchk$def	pt \t		; +010	PALtemps
+	  t = t + 1
+	.endr
+
+ 	mchk$cpu_offset			= <tt - mchk$byte_count>
+
+ 	mchk$def	exc_addr	; +110
+	mchk$def	exc_sum		; +118
+	mchk$def	exc_msk		; +120
+	mchk$def	iccsr		; +128
+	mchk$def	pal_base	; +130
+	mchk$def	hier		; +138
+	mchk$def	hirr		; +140
+	mchk$def	mm_csr		; +148
+	mchk$def	dc_stat		; +150
+	mchk$def	dc_addr		; +158		(unlocks dc_stat)
+	mchk$def	abox_ctl	; +160		(for interest)
+	mchk$def	biu_stat        ; +168
+	mchk$def	biu_addr	; +170		(unlocks biu_stat)
+	mchk$def	biu_ctl		; +178		(for interest)
+	mchk$def	fill_syndrome	; +180
+	mchk$def	fill_addr	; +188		(unlocks fill syn)
+	mchk$def	va		; +190		(unlocks va)
+ 	mchk$def	bc_tag		; +198		(one bit at a time!)
+
+ 	mchk$sys_offset			= <tt - mchk$byte_count>
+
+	mchk$def	bcc_csr0
+	mchk$def	bcce_csr1
+	mchk$def	bccea_csr2
+	mchk$def	bcue_csr3
+	mchk$def	bcuea_csr4
+	mchk$def	dter_csr5
+	mchk$def	cbctl_csr6
+	mchk$def	cbe_csr7
+	mchk$def	cbeal_csr8
+	mchk$def	cbeah_csr9
+	mchk$def	pmbx_csr10
+	mchk$def	ipir_csr11
+	mchk$def	sic_csr12
+	mchk$def	adlk_csr13
+	mchk$def	madrl_csr14
+	mchk$def	crr_csr15
+
+	mchk$mchk_size			= <tt - mchk$byte_count>
+
+ 	mchk$def	pc_byte_count	; +000	<63>	Retry flag 
+ 					;	<15:0>	Byte count 
+ 	mchk$def	pc_offsets	; +008	<63:31>	Sys$offset
+ 					;	<31:0>	Proc$offset
+
+	mchk$def	pc_mchk_code	; Error code and revision
+
+ 	mchk$pc_cpu_offset		= <tt - mchk$pc_byte_count>
+
+ 	mchk$def	pc_biu_stat	; +010
+ 	mchk$def	pc_biu_addr	; +018		(unlocks biu_stat)
+ 	mchk$def	pc_biu_ctl	; +020		(for interest)
+ 	mchk$def	pc_fill_syndrome ;+028
+ 	mchk$def	pc_fill_addr	; +030		(unlocks fill syn)
+ 	mchk$def	pc_bc_tag	; +038		(one bit at a time!)
+
+ 	mchk$pc_sys_offset		= <-1>
+
+ 	mchk$pc_mchk_size		= <tt - mchk$pc_byte_count>
+
+	.mdelete mchk$def
+
+	.ENDM
+
+
+;+
+; per cpu private pal logout area
+;-
+	
+	.MACRO	$PAL_LOGOUT_AVANTI
+
+
+; Macro to name each place in the frame  
+
+tt = 0                     
+
+.macro	mchk$def	name,unit,lep=0
+	mchk$'name'unit' = tt
+	tt  = tt+8	; 8 bytes apart 
+.endm	mchk$def	
+
+;
+; Define mchk frame offsets
+;
+
+	mchk$def	byte_count	; +000	<63>	Retry flag
+					;	<15:0>	Byte count 
+ 	mchk$def	offsets		; +008	<63:31>	Sys$offset
+					;	<31:0>	CPU$offset
+
+	mchk$def	mchk_code	; Error code and revision
+
+	t = 1				
+	.repeat	31
+	  mchk$def	pt \t		; +010	PALtemps
+	  t = t + 1
+	.endr
+
+ 	mchk$cpu_offset			= <tt - mchk$byte_count>
+
+ 	mchk$def	exc_addr	; +110
+	mchk$def	exc_sum		; +118
+	mchk$def	exc_msk		; +120
+	mchk$def	iccsr		; +128
+	mchk$def	pal_base	; +130
+	mchk$def	hier		; +138
+	mchk$def	hirr		; +140
+	mchk$def	mm_csr		; +148
+	mchk$def	dc_stat		; +150
+	mchk$def	dc_addr		; +158		(unlocks dc_stat)
+	mchk$def	abox_ctl	; +160		(for interest)
+	mchk$def	biu_stat        ; +168
+	mchk$def	biu_addr	; +170		(unlocks biu_stat)
+	mchk$def	biu_ctl		; +178		(for interest)
+	mchk$def	fill_syndrome	; +180
+	mchk$def	fill_addr	; +188		(unlocks fill syn)
+	mchk$def	va		; +190		(unlocks va)
+ 	mchk$def	bc_tag		; +198		(one bit at a time!)
+
+ 	mchk$sys_offset			= <tt - mchk$byte_count>
+
+	mchk$def	coma_gcr	
+	mchk$def	coma_edsr		
+	mchk$def	coma_ter		
+	mchk$def	coma_elar		
+	mchk$def	coma_ehar		
+	mchk$def	coma_ldlr		
+	mchk$def	coma_ldhr		
+	mchk$def	coma_base0		
+	mchk$def	coma_base1		
+	mchk$def	coma_base2		
+	mchk$def	coma_cnfg0		
+	mchk$def	coma_cnfg1		
+	mchk$def	coma_cnfg2		
+	mchk$def	epic_dcsr		
+	mchk$def	epic_pear		
+	mchk$def	epic_sear		
+	mchk$def	epic_tbr1		
+	mchk$def	epic_tbr2		
+	mchk$def	epic_pbr1		
+	mchk$def	epic_pbr2		
+	mchk$def	epic_pmr1		
+	mchk$def	epic_pmr2		
+	mchk$def	epic_harx1		
+	mchk$def	epic_harx2		
+	mchk$def	epic_pmlt		
+	mchk$def	epic_tag0		
+	mchk$def	epic_tag1		
+	mchk$def	epic_tag2		
+	mchk$def	epic_tag3		
+	mchk$def	epic_tag4		
+	mchk$def	epic_tag5		
+	mchk$def	epic_tag6		
+	mchk$def	epic_tag7		
+	mchk$def	epic_data0	
+	mchk$def	epic_data1	
+	mchk$def	epic_data2	
+	mchk$def	epic_data3	
+	mchk$def	epic_data4	
+	mchk$def	epic_data5	
+	mchk$def	epic_data6	
+	mchk$def	epic_data7	
+
+	mchk$mchk_size			= <tt - mchk$byte_count>
+
+ 	mchk$def	pc_byte_count	; +000	<63>	Retry flag 
+ 					;	<15:0>	Byte count 
+ 	mchk$def	pc_offsets	; +008	<63:31>	Sys$offset
+ 					;	<31:0>	Proc$offset
+
+	mchk$def	pc_mchk_code	; Error code and revision
+
+ 	mchk$pc_cpu_offset		= <tt - mchk$pc_byte_count>
+
+ 	mchk$def	pc_biu_stat	; +010
+ 	mchk$def	pc_biu_addr	; +018		(unlocks biu_stat)
+ 	mchk$def	pc_biu_ctl	; +020		(for interest)
+ 	mchk$def	pc_fill_syndrome ;+028
+ 	mchk$def	pc_fill_addr	; +030		(unlocks fill syn)
+ 	mchk$def	pc_bc_tag	; +038		(one bit at a time!)
+
+ 	mchk$pc_sys_offset		= <-1>
+
+ 	mchk$pc_mchk_size		= <tt - mchk$pc_byte_count>
+
+	.mdelete mchk$def
+
+	.ENDM
+
+;+
+; per cpu private pal logout area
+;-
+	
+	.MACRO	$PAL_LOGOUT_MIKASA
+
+
+; Macro to name each place in the frame  
+
+tt = 0                     
+
+.macro	mchk$def	name,unit,lep=0
+	mchk$'name'unit' = tt
+	tt  = tt+8	; 8 bytes apart 
+.endm	mchk$def	
+
+;
+; Define mchk frame offsets
+;
+
+	mchk$def	byte_count	; +000	<63>	Retry flag
+					;	<15:0>	Byte count 
+ 	mchk$def	offsets		; +008	<63:31>	Sys$offset
+					;	<31:0>	CPU$offset
+
+	mchk$def	mchk_code	; Error code and revision
+
+	t = 1				
+	.repeat	31
+	  mchk$def	pt \t		; +010	PALtemps
+	  t = t + 1
+	.endr
+
+ 	mchk$cpu_offset			= <tt - mchk$byte_count>
+
+ 	mchk$def	exc_addr	; +110
+	mchk$def	exc_sum		; +118
+	mchk$def	exc_msk		; +120
+	mchk$def	iccsr		; +128
+	mchk$def	pal_base	; +130
+	mchk$def	hier		; +138
+	mchk$def	hirr		; +140
+	mchk$def	mm_csr		; +148
+	mchk$def	dc_stat		; +150
+	mchk$def	dc_addr		; +158		(unlocks dc_stat)
+	mchk$def	abox_ctl	; +160		(for interest)
+	mchk$def	biu_stat        ; +168
+	mchk$def	biu_addr	; +170		(unlocks biu_stat)
+	mchk$def	biu_ctl		; +178		(for interest)
+	mchk$def	fill_syndrome	; +180
+	mchk$def	fill_addr	; +188		(unlocks fill syn)
+	mchk$def	va		; +190		(unlocks va)
+ 	mchk$def	bc_tag		; +198		(one bit at a time!)
+
+ 	mchk$sys_offset			= <tt - mchk$byte_count>
+
+	mchk$def	coma_gcr	
+	mchk$def	coma_edsr		
+	mchk$def	coma_ter		
+	mchk$def	coma_elar		
+	mchk$def	coma_ehar		
+	mchk$def	coma_ldlr		
+	mchk$def	coma_ldhr		
+	mchk$def	coma_base0		
+	mchk$def	coma_base1		
+	mchk$def	coma_base2		
+	mchk$def	coma_base3
+	mchk$def	coma_cnfg0		
+	mchk$def	coma_cnfg1		
+	mchk$def	coma_cnfg2		
+	mchk$def	coma_cnfg3
+	mchk$def	epic_dcsr		
+	mchk$def	epic_pear		
+	mchk$def	epic_sear		
+	mchk$def	epic_tbr1		
+	mchk$def	epic_tbr2		
+	mchk$def	epic_pbr1		
+	mchk$def	epic_pbr2		
+	mchk$def	epic_pmr1		
+	mchk$def	epic_pmr2		
+	mchk$def	epic_harx1		
+	mchk$def	epic_harx2		
+	mchk$def	epic_pmlt		
+	mchk$def	epic_tag0		
+	mchk$def	epic_tag1		
+	mchk$def	epic_tag2		
+	mchk$def	epic_tag3		
+	mchk$def	epic_tag4		
+	mchk$def	epic_tag5		
+	mchk$def	epic_tag6		
+	mchk$def	epic_tag7		
+	mchk$def	epic_data0	
+	mchk$def	epic_data1	
+	mchk$def	epic_data2	
+	mchk$def	epic_data3	
+	mchk$def	epic_data4	
+	mchk$def	epic_data5	
+	mchk$def	epic_data6	
+	mchk$def	epic_data7	
+	mchk$def	pceb_vid		
+	mchk$def	pceb_did		
+	mchk$def	pceb_revision
+	mchk$def	pceb_command		
+	mchk$def	pceb_status		
+	mchk$def	pceb_latency		
+	mchk$def	pceb_control		
+	mchk$def	pceb_arbcon		
+	mchk$def	pceb_arbpri		
+	mchk$def	esc_id		
+	mchk$def	esc_revision		
+	mchk$def	esc_int0		
+	mchk$def	esc_int1
+	mchk$def	esc_elcr0		
+	mchk$def	esc_elcr1
+	mchk$def	esc_last_eisa		
+	mchk$def	esc_nmi_stat		
+.if ne mikasa_system
+	mchk$def	mik_irr			
+	mchk$def	mik_imr			
+	mchk$def	mik_utility		
+.endc
+.if ne noritake_system
+	mchk$def	nor_irr1			
+	mchk$def	nor_irr2			
+	mchk$def	nor_irr3			
+	mchk$def	nor_imr1			
+	mchk$def	nor_imr2			
+	mchk$def	nor_imr3			
+	mchk$def	ppb_pstatus			
+	mchk$def	ppb_sstatus			
+	mchk$def	utility
+.endc
+
+	mchk$mchk_size			= <tt - mchk$byte_count>
+
+ 	mchk$def	pc_byte_count	; +000	<63>	Retry flag 
+ 					;	<15:0>	Byte count 
+ 	mchk$def	pc_offsets	; +008	<63:31>	Sys$offset
+ 					;	<31:0>	Proc$offset
+
+	mchk$def	pc_mchk_code	; Error code and revision
+
+ 	mchk$pc_cpu_offset		= <tt - mchk$pc_byte_count>
+
+ 	mchk$def	pc_biu_stat	; +010
+ 	mchk$def	pc_biu_addr	; +018		(unlocks biu_stat)
+ 	mchk$def	pc_biu_ctl	; +020		(for interest)
+ 	mchk$def	pc_fill_syndrome ;+028
+ 	mchk$def	pc_fill_addr	; +030		(unlocks fill syn)
+ 	mchk$def	pc_bc_tag	; +038		(one bit at a time!)
+
+ 	mchk$pc_sys_offset		= <-1>
+
+ 	mchk$pc_mchk_size		= <tt - mchk$pc_byte_count>
+
+	.mdelete mchk$def
+
+	.ENDM
+
+
+;+
+; per cpu LOGOUT areas 
+;-
+	
+	.MACRO	$PAL_LOGOUT_MTU
+
+.macro	mchk_def	name, unit
+	mchklas$'name'unit' == tt
+	tt = tt+8
+.endm	mchk_def
+
+
+	.list	me
+
+	t = 0
+	tt = 0
+	mchk_def	byte_count
+	mchk_def	off
+
+	mchk_def	mchk_code
+	las$cpu_base == tt
+	mchk_def	biu_stat
+	mchk_def	biu_addr
+	mchk_def	dc_stat
+	mchk_def	fill_syndrome
+	mchk_def	fill_addr
+	mchk_def	bc_tag
+
+	las$sys_base == -1
+	mchk_def	size
+
+	.nlist	me
+	.mdelete mchk_def
+
+
+
+
+
+
+
+.macro	mchk_def	name, unit
+	mchklaf$'name'unit' == tt
+	tt = tt+8
+.endm	mchk_def
+
+
+	.list	me
+
+	t = 0
+	tt = 0
+	mchk_def	flag
+	mchk_def	off
+
+;;;	mchk_def	mchk_code
+	t = 0
+	.repeat	32
+	  mchk_def	pt \t
+	  t = t + 1
+	.endr
+
+ 	mchk$cpu_offset			= <tt - mchklas$byte_count>
+
+	mchk_def	exc_addr
+	mchk_def	exc_sum
+	mchk_def	exc_msk
+	mchk_def	iccsr
+	mchk_def	pal_base
+	mchk_def	hier
+	mchk_def	hirr
+	mchk_def	mm_csr
+	mchk_def	dc_stat
+	mchk_def	dc_addr
+	mchk_def	abox_ctl
+	mchk_def	biu_stat
+	mchk_def	biu_addr
+	mchk_def	biu_ctl
+	mchk_def	fill_syndrome
+	mchk_def	fill_addr
+	mchk_def	va
+	mchk_def	bc_tag
+
+
+	; platform specific registers
+	t = 0
+	laf$sys_base == tt
+	.repeat	32
+	  mchk_def	plt \t
+	  t = t + 1
+	.endr
+
+ 	mchk$sys_offset			= <tt - mchklas$byte_count>
+
+	mchk_def	sio_status
+	mchk_def	sio_rev
+	mchk_def	sio_ubcsa
+	mchk_def	sio_ubcsb
+	mchk_def	sio_pirq
+	mchk_def	sio_irq_mask0
+	mchk_def	sio_irq_mask1
+	mchk_def	sio_irq_edge0
+	mchk_def	sio_irq_edge1
+	mchk_def	sio_irq_irr0
+	mchk_def	sio_irq_irr1
+	mchk_def	sio_irq_isr0
+	mchk_def	sio_irq_isr1
+	mchk_def	sio_nmi_status
+	mchk_def	sio_dma_status0
+	mchk_def	sio_dma_status1
+
+	mchk$mchk_size			= <tt - mchklas$byte_count>
+
+	.nlist	me
+	.mdelete mchk_def
+
+
+	las$base		== 0
+	laf$base		== mchklas$size
+	pal$logout_area		== 3*8192
+
+
+	.ENDM
+
+
+
+;+
+; per cpu private pal logout area
+;-
+	
+	.MACRO	$PAL_LOGOUT_K2
+
+
+; Macro to name each place in the frame  
+
+tt = 0                     
+
+.macro	mchk$def	name,unit,lep=0
+	mchk$'name'unit' = tt
+	tt  = tt+8	; 8 bytes apart 
+.endm	mchk$def	
+
+;
+; Define mchk frame offsets
+;
+
+	mchk$def	byte_count	; +000	<63>	Retry flag
+					;	<15:0>	Byte count 
+ 	mchk$def	offsets		; +008	<63:31>	Sys$offset
+					;	<31:0>	CPU$offset
+
+	mchk$def	mchk_code	; Error code and revision
+
+	t = 1				
+	.repeat	31
+	  mchk$def	pt \t		; +010	PALtemps
+	  t = t + 1
+	.endr
+
+ 	mchk$cpu_offset			= <tt - mchk$byte_count>
+
+ 	mchk$def	exc_addr	; +110
+	mchk$def	exc_sum		; +118
+	mchk$def	exc_msk		; +120
+	mchk$def	iccsr		; +128
+	mchk$def	pal_base	; +130
+	mchk$def	hier		; +138
+	mchk$def	hirr		; +140
+	mchk$def	mm_csr		; +148
+	mchk$def	dc_stat		; +150
+	mchk$def	dc_addr		; +158		(unlocks dc_stat)
+	mchk$def	abox_ctl	; +160		(for interest)
+	mchk$def	biu_stat        ; +168
+	mchk$def	biu_addr	; +170		(unlocks biu_stat)
+	mchk$def	biu_ctl		; +178		(for interest)
+	mchk$def	fill_syndrome	; +180
+	mchk$def	fill_addr	; +188		(unlocks fill syn)
+	mchk$def	va		; +190		(unlocks va)
+ 	mchk$def	bc_tag		; +198		(one bit at a time!)
+
+ 	mchk$sys_offset			= <tt - mchk$byte_count>
+
+	mchk$def	coma_gcr	
+	mchk$def	coma_edsr		
+	mchk$def	coma_ter		
+	mchk$def	coma_elar		
+	mchk$def	coma_ehar		
+	mchk$def	coma_ldlr		
+	mchk$def	coma_ldhr		
+	mchk$def	coma_base0		
+	mchk$def	coma_base1		
+	mchk$def	coma_base2		
+	mchk$def	coma_cnfg0		
+	mchk$def	coma_cnfg1		
+	mchk$def	coma_cnfg2		
+	mchk$def	epic_dcsr		
+	mchk$def	epic_pear		
+	mchk$def	epic_sear		
+	mchk$def	epic_tbr1		
+	mchk$def	epic_tbr2		
+	mchk$def	epic_pbr1		
+	mchk$def	epic_pbr2		
+	mchk$def	epic_pmr1		
+	mchk$def	epic_pmr2		
+	mchk$def	epic_harx1		
+	mchk$def	epic_harx2		
+	mchk$def	epic_pmlt		
+	mchk$def	epic_tag0		
+	mchk$def	epic_tag1		
+	mchk$def	epic_tag2		
+	mchk$def	epic_tag3		
+	mchk$def	epic_tag4		
+	mchk$def	epic_tag5		
+	mchk$def	epic_tag6		
+	mchk$def	epic_tag7		
+	mchk$def	epic_data0	
+	mchk$def	epic_data1	
+	mchk$def	epic_data2	
+	mchk$def	epic_data3	
+	mchk$def	epic_data4	
+	mchk$def	epic_data5	
+	mchk$def	epic_data6	
+	mchk$def	epic_data7	
+
+	mchk$def	inter_config
+	mchk$def	inter_reg1
+	mchk$def	inter_reg2
+	mchk$def	inter_reg3
+	mchk$def	inter_reg4
+	mchk$def	watchdog_reg
+	mchk$def	srvman_reg
+
+	mchk$def	sio_status
+	mchk$def	sio_rev
+	mchk$def	sio_ubcsa
+	mchk$def	sio_ubcsb
+	mchk$def	sio_pirq
+	mchk$def	sio_irq_mask0
+	mchk$def	sio_irq_mask1
+	mchk$def	sio_irq_edge0
+	mchk$def	sio_irq_edge1
+	mchk$def	sio_irq_irr0
+	mchk$def	sio_irq_irr1
+	mchk$def	sio_irq_isr0
+	mchk$def	sio_irq_isr1
+	mchk$def	sio_nmi_status
+	mchk$def	sio_dma_status0
+	mchk$def	sio_dma_status1
+
+	mchk$mchk_size			= <tt - mchk$byte_count>
+
+ 	mchk$def	pc_byte_count	; +000	<63>	Retry flag 
+ 					;	<15:0>	Byte count 
+ 	mchk$def	pc_offsets	; +008	<63:31>	Sys$offset
+ 					;	<31:0>	Proc$offset
+
+	mchk$def	pc_mchk_code	; Error code and revision
+
+ 	mchk$pc_cpu_offset		= <tt - mchk$pc_byte_count>
+
+ 	mchk$def	pc_biu_stat	; +010
+ 	mchk$def	pc_biu_addr	; +018		(unlocks biu_stat)
+ 	mchk$def	pc_biu_ctl	; +020		(for interest)
+ 	mchk$def	pc_fill_syndrome ;+028
+ 	mchk$def	pc_fill_addr	; +030		(unlocks fill syn)
+ 	mchk$def	pc_bc_tag	; +038		(one bit at a time!)
+
+ 	mchk$pc_sys_offset		= <-1>
+
+ 	mchk$pc_mchk_size		= <tt - mchk$pc_byte_count>
+
+	.mdelete mchk$def
+
+	.ENDM
+
+
+;+
+; per cpu private pal logout area
+;-
+	
+	.MACRO	$PAL_LOGOUT_CORTEX
+
+
+; Macro to name each place in the frame  
+
+tt = 0                     
+
+.macro	mchk$def	name,unit,lep=0
+	mchk$'name'unit' = tt
+	tt  = tt+8	; 8 bytes apart 
+.endm	mchk$def	
+
+;
+; Define mchk frame offsets
+;
+
+	mchk$def	byte_count	; +000	<63>	Retry flag
+					;	<15:0>	Byte count 
+ 	mchk$def	offsets		; +008	<63:31>	Sys$offset
+					;	<31:0>	CPU$offset
+
+	mchk$def	mchk_code	; Error code and revision
+
+	t = 1				
+	.repeat	31
+	  mchk$def	pt \t		; +010	PALtemps
+	  t = t + 1
+	.endr
+
+ 	mchk$cpu_offset			= <tt - mchk$byte_count>
+
+ 	mchk$def	exc_addr	; +110
+	mchk$def	exc_sum		; +118
+	mchk$def	exc_msk		; +120
+	mchk$def	iccsr		; +128
+	mchk$def	pal_base	; +130
+	mchk$def	hier		; +138
+	mchk$def	hirr		; +140
+	mchk$def	mm_csr		; +148
+	mchk$def	dc_stat		; +150
+	mchk$def	dc_addr		; +158		(unlocks dc_stat)
+	mchk$def	abox_ctl	; +160		(for interest)
+	mchk$def	biu_stat        ; +168
+	mchk$def	biu_addr	; +170		(unlocks biu_stat)
+	mchk$def	biu_ctl		; +178		(for interest)
+	mchk$def	fill_syndrome	; +180
+	mchk$def	fill_addr	; +188		(unlocks fill syn)
+	mchk$def	va		; +190		(unlocks va)
+ 	mchk$def	bc_tag		; +198		(one bit at a time!)
+
+ 	mchk$sys_offset			= <tt - mchk$byte_count>
+
+	mchk$def	coma_gcr	
+	mchk$def	coma_edsr		
+	mchk$def	coma_ter		
+	mchk$def	coma_elar		
+	mchk$def	coma_ehar		
+	mchk$def	coma_ldlr		
+	mchk$def	coma_ldhr		
+	mchk$def	coma_base0		
+	mchk$def	coma_base1		
+	mchk$def	coma_base2		
+	mchk$def	coma_base3
+	mchk$def	coma_cnfg0		
+	mchk$def	coma_cnfg1		
+	mchk$def	coma_cnfg2		
+	mchk$def	coma_cnfg3
+	mchk$def	epic_dcsr		
+	mchk$def	epic_pear		
+	mchk$def	epic_sear		
+	mchk$def	epic_tbr1		
+	mchk$def	epic_tbr2		
+	mchk$def	epic_pbr1		
+	mchk$def	epic_pbr2		
+	mchk$def	epic_pmr1		
+	mchk$def	epic_pmr2		
+	mchk$def	epic_harx1		
+	mchk$def	epic_harx2		
+	mchk$def	epic_pmlt		
+	mchk$def	epic_tag0		
+	mchk$def	epic_tag1		
+	mchk$def	epic_tag2		
+	mchk$def	epic_tag3		
+	mchk$def	epic_tag4		
+	mchk$def	epic_tag5		
+	mchk$def	epic_tag6		
+	mchk$def	epic_tag7		
+	mchk$def	epic_data0		
+	mchk$def	epic_data1		
+	mchk$def	epic_data2		
+	mchk$def	epic_data3		
+	mchk$def	epic_data4		
+	mchk$def	epic_data5		
+	mchk$def	epic_data6		
+	mchk$def	epic_data7		
+
+	mchk$mchk_size			= <tt - mchk$byte_count>
+
+ 	mchk$def	pc_byte_count	; +000	<63>	Retry flag 
+ 					;	<15:0>	Byte count 
+ 	mchk$def	pc_offsets	; +008	<63:31>	Sys$offset
+ 					;	<31:0>	Proc$offset
+
+	mchk$def	pc_mchk_code	; Error code and revision
+
+ 	mchk$pc_cpu_offset		= <tt - mchk$pc_byte_count>
+
+ 	mchk$def	pc_biu_stat	; +010
+ 	mchk$def	pc_biu_addr	; +018		(unlocks biu_stat)
+ 	mchk$def	pc_biu_ctl	; +020		(for interest)
+ 	mchk$def	pc_fill_syndrome ;+028
+ 	mchk$def	pc_fill_addr	; +030		(unlocks fill syn)
+ 	mchk$def	pc_bc_tag	; +038		(one bit at a time!)
+
+ 	mchk$pc_sys_offset		= <-1>
+
+ 	mchk$pc_mchk_size		= <tt - mchk$pc_byte_count>
+
+	.mdelete mchk$def
+
+	.ENDM
+

@@ -1,0 +1,81 @@
+/* file:	pc264.sdl
+/*                 
+/* Copyright (C) 1993, 1996 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:   	PC264 specific definitions for Alpha firmware.
+/*                  
+/* Author:	Eric Goehl
+/*
+/* Modifications:
+/*
+/*	er	15-Jul-1997	Fix for EV6 based platform.
+/*	egg	20-Sep-1996	Initial port taken from eb164.sdl module.
+/*
+                             
+module	$machdep;
+
+constant IPL_RUN equals 21;
+/*
+/* EB164 specific parameters of the HWRPB
+/*
+constant HWRPB$_PAGESIZE equals %x2000;	/* System page size in bytes
+constant HWRPB$_PAGEBITS equals 13;	/* System page size in bits
+constant HWRPB$_PA_SIZE equals 44;	/* Physical address size in bits
+constant HWRPB$_VA_SIZE equals 48;	/* Virtual address size in bits
+constant HWRPB$_ASN_MAX equals 255; 	/* Maximum ASN value 
+constant HWRPB$_SYSTYPE equals 34;	/* Alpha system type
+constant HWRPB$_SYSVAR equals 5;	/* System variation - Embedded Console, MP capable
+constant HWRPB$_NPROC equals 2;		/* Number of processor supported
+constant HWRPB$_ICLK_FREQ equals 4096*1024; /* Interval timer frequency
+constant HWRPB$_CC_FREQ equals 100000000; /* Cycle counter frequency (@10ns)
+
+constant SLOT$_CPU_TYPE equals 8;	/* Processor type (EV6)
+constant SLOT$_CPU_VAR equals 7;	/* Processor Variation (VAX/IEEE FP)
+constant SLOT$_PAL_LOGOUT equals %x6000; /* PAL logout area
+constant SLOT$_PAL_LOGOUT_LEN equals %x400; /* PAL logout area length
+
+constant CTB$MAX_UNITS equals 1;	/* 1 CTB for Workstations
+                                          
+constant CTB$CSR0 equals 0;		/* Base CSR address for LOC port
+constant CTB$TX_IPL0 equals 21;		/* Transmit interrupt IPL for LOC port
+constant CTB$TX_SCB0 equals %x840;	/* Transmit vector for LOC port
+constant CTB$RX_IPL0 equals 21;		/* Receive interrupt IPL for LOC port
+constant CTB$RX_SCB0 equals %x840;	/* Receive vector for LOC port
+
+constant CTB$CSR1 equals 0;		/* Base CSR address for RD port
+constant CTB$TX_IPL1 equals 21;		/* Transmit interrupt for RD port
+constant CTB$TX_SCB1 equals %x830;	/* Transmit vector for RD port
+constant CTB$RX_IPL1 equals 21;		/* Receive interrupt IPL for RD port
+constant CTB$RX_SCB1 equals %x830;	/* Receive vector for RD port
+
+constant COM1_VECTOR  equals %x84;	/* serial port COM1 vector irq4
+constant COM2_VECTOR  equals %x83;	/* serial port COM2 vector irq3
+constant FLOPPY_VECTOR equals %x86;	/* floppy vector irq6
+constant KEYBD_VECTOR equals %x81;	/* keyboard vector irq1
+constant MOUSE_VECTOR equals %x8c;	/* mouse vector	irq12
+
+constant ISA_BASE_VECTOR equals %x80;	/* SCB vector base for ISA devices
+constant PCI_BASE_VECTOR equals %x90;	/* SCB vector base for PCI devices
+
+constant PC264$DISPLAY_CPU  	equals %x01; /* Display CPU registers
+constant PC264$DISPLAY_SYS	equals %x02; /* Display System registers
+constant PC264$DISPLAY_PC  	equals %x04; /* Display Process info
+
+end_module;

@@ -1,0 +1,12 @@
+.macro xx ...args ~t1=0 ~t2=1
+	.repeat
+		.iif blank, <args>, .break
+		.print ; arg is args
+		.next_argument
+	.endr
+	.print ;t1
+	.print ;t2
+.endm
+
+xx t1=3 1 2
+.end

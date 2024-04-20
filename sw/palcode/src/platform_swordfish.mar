@@ -1,0 +1,40 @@
+;+
+; platform_swordfish_defs.mar - platform switches for API Swordfish platform
+;-
+
+;+
+; Begun June 1999 by Stig Telfer, Alpha Processor Inc.
+;-
+
+	swordfish_platform = 1
+	smp_platform = 1
+	smi_platform = 0
+        check_interrupt_pending = 1	; Tsunami DEVSUP business
+
+	tb_mb_en = 0			; SMP - memory barrier on tb miss?
+
+	crd_en = 1			; always report CRD errors
+        mchk_en = 1
+
+        i_ctl__sbe = 3			; no prefetching of instructions
+        i_ctl__sglissue = 0		; issue only from bottom of queue
+
+
+; External Interrupt routings for Swordfish:
+; These numbers are positions within EV6__ISUM__IE field
+
+;       IRQ<0> = Pchip errors           ipl 7
+;       IRQ<1> = device                 ipl 4
+;       IRQ<2> = clock                  ipl 5
+;       IRQ<3> = interprocessor         ipl 5
+;       IRQ<4> = halt
+;       IRQ<5> = unused
+
+IRQ_ERR = ^x01
+IRQ_DEV = ^x02
+IRQ_CLK = ^x04
+IRQ_IP  = ^x08
+IRQ_HLT = ^x10		; halt switch directly connected to this EI
+
+IRQ_MASK= < IRQ_ERR ! IRQ_DEV ! IRQ_CLK ! IRQ_IP ! IRQ_HLT >
+

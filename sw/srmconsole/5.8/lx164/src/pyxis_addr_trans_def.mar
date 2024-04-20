@@ -1,0 +1,189 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:24:21 by OpenVMS SDL EV1-33     
+;  Source:   5-NOV-1996 11:20:22 AFW_USER$:[CONSOLE.V58.COMMON.SRC]PYXIS_ADDR_TR 
+; ********************************************************************************************************************************
+ 
+	.MACRO	PYXIS_ADDR_TRANS_DEF,..EQU=<=>,..COL=<:> ; IDENT V1.0
+; 
+;  Window base register 0-3
+;  
+wbase_m_w_en'..equ'^X1
+wbase_m_sg'..equ'^X2
+wbase_m_memcs_enable'..equ'^X4
+wbase_m_dac_enable'..equ'^X8
+wbase_m_unused_0'..equ'^XFFFF0
+wbase_m_w_base'..equ'^XFFF00000
+wbase_S_pci_win_base'..equ'64
+pci_win_base'..equ'0
+wbase_S_by_field'..equ'4
+wbase_r_by_field'..equ'0
+wbase_v_w_en'..equ'0
+wbase_v_sg'..equ'1
+wbase_v_memcs_enable'..equ'2
+wbase_v_dac_enable'..equ'3
+wbase_S_unused_0'..equ'16
+wbase_v_unused_0'..equ'4
+wbase_S_w_base'..equ'12
+wbase_v_w_base'..equ'20
+wbase_l_whole'..equ'0
+wbase_S_displacement'..equ'64
+wbase_b_displacement'..equ'0
+; 
+;  Window mask register 0-3
+; 
+wmask_k_sz1mb'..equ'0
+wmask_k_sz2mb'..equ'1048576
+wmask_k_sz4mb'..equ'3145728
+wmask_k_sz8mb'..equ'7340032
+wmask_k_sz16mb'..equ'15728640
+wmask_k_sz32mb'..equ'32505856
+wmask_k_sz64mb'..equ'66060288
+wmask_k_sz128mb'..equ'133169152
+wmask_k_sz256mb'..equ'267386880
+wmask_k_sz512mb'..equ'535822336
+wmask_k_sz1gb'..equ'1072693248
+wmask_k_sz2gb'..equ'2146435072
+wmask_k_sz4gb'..equ'-1048576
+wmask_m_unused_0'..equ'^XFFFFF
+wmask_m_w_mask'..equ'^XFFF00000
+wmask_S_pci_win_mask'..equ'64
+pci_win_mask'..equ'0
+wmask_S_by_field'..equ'4
+wmask_r_by_field'..equ'0
+wmask_S_unused_0'..equ'20
+wmask_v_unused_0'..equ'0
+wmask_S_w_mask'..equ'12
+wmask_v_w_mask'..equ'20
+wmask_l_whole'..equ'0
+wmask_S_displacement'..equ'64
+wmask_b_displacement'..equ'0
+; 
+;  Translation Base register 0-3
+; 
+tbase_m_unused_0'..equ'^XFF
+tbase_m_t_base'..equ'^XFFFFFF00
+tbase_S_pci_trn_base'..equ'64
+pci_trn_base'..equ'0
+tbase_S_by_field'..equ'4
+tbase_r_by_field'..equ'0
+tbase_S_unused_0'..equ'8
+tbase_v_unused_0'..equ'0
+tbase_S_t_base'..equ'24
+tbase_v_t_base'..equ'8
+tbase_l_whole'..equ'0
+tbase_S_displacement'..equ'64
+tbase_b_displacement'..equ'0
+; 
+;  Window DAC base register
+; 
+wdac_m_base'..equ'^XFF
+wdac_m_unused'..equ'^XFFFFFF00
+wdac_S_pci_wdac_base'..equ'64
+pci_wdac_base'..equ'0
+wdac_S_by_field'..equ'4
+wdac_r_by_field'..equ'0
+wdac_S_base'..equ'8
+wdac_v_base'..equ'0
+wdac_S_unused'..equ'24
+wdac_v_unused'..equ'8
+wdac_l_whole'..equ'0
+wdac_S_displacement'..equ'64
+wdac_b_displacement'..equ'0
+; 
+;  Lockable Translation Buffer Tag 0-3
+; 
+locktb_tag_count'..equ'4
+locktbtag_m_valid'..equ'^X1
+locktbtag_m_locked'..equ'^X2
+locktbtag_m_dac'..equ'^X4
+locktbtag_m_unused_0'..equ'^X7FF8
+locktbtag_m_tb_tag'..equ'^XFFFF8000
+locktbtag_S_pci_lock_tbtag'..equ'64
+pci_lock_tbtag'..equ'0
+locktbtag_S_by_field'..equ'4
+locktbtag_r_by_field'..equ'0
+locktbtag_v_valid'..equ'0
+locktbtag_v_locked'..equ'1
+locktbtag_v_dac'..equ'2
+locktbtag_S_unused_0'..equ'12
+locktbtag_v_unused_0'..equ'3
+locktbtag_S_tb_tag'..equ'17
+locktbtag_v_tb_tag'..equ'15
+locktbtag_l_whole'..equ'0
+locktbtag_S_displacement'..equ'64
+locktbtag_b_displacement'..equ'0
+; 
+;  Translation Buffer Tag 4-7
+; 
+tb_tag_count'..equ'4
+tbtag_m_valid'..equ'^X1
+tbtag_m_unused_0'..equ'^X2
+tbtag_m_dac'..equ'^X4
+tbtag_m_unused_1'..equ'^X7FF8
+tbtag_m_tb_tag'..equ'^XFFFF8000
+tbtag_S_pci_tbtag'..equ'64
+pci_tbtag'..equ'0
+tbtag_S_by_field'..equ'4
+tbtag_r_by_field'..equ'0
+tbtag_v_valid'..equ'0
+tbtag_v_unused_0'..equ'1
+tbtag_v_dac'..equ'2
+tbtag_S_unused_1'..equ'12
+tbtag_v_unused_1'..equ'3
+tbtag_S_tb_tag'..equ'17
+tbtag_v_tb_tag'..equ'15
+tbtag_l_whole'..equ'0
+tbtag_S_displacement'..equ'64
+tbtag_b_displacement'..equ'0
+; 
+;  Translation Buffer Page Register [0-7] [0-3]
+;  
+tb_page_count'..equ'4
+tbpage_m_valid'..equ'^X1
+tbpage_m_page_address'..equ'^X3FFFFE
+tbpage_m_unused'..equ'^XFFC00000
+tbpage_S_pci_tbpage'..equ'64
+pci_tbpage'..equ'0
+tbpage_S_by_field'..equ'4
+tbpage_r_by_field'..equ'0
+tbpage_v_valid'..equ'0
+tbpage_S_page_address'..equ'21
+tbpage_v_page_address'..equ'1
+tbpage_S_unused'..equ'10
+tbpage_v_unused'..equ'22
+tbpage_l_whole'..equ'0
+tbpage_S_displacement'..equ'64
+tbpage_b_displacement'..equ'0
+;  Define constants to build base address of 0x8760000000
+pyxis_a_addr_trans'..equ'2166
+pyxis_v_addr_trans'..equ'28
+; 
+;  PCI Window management and Scatter/gather registers - 0x8760000000
+; 
+S_pyxis_addr_trans'..equ'6144
+pyxis_addr_trans'..equ'0
+tbia'..equ'256                          ;  0x100 from base
+w_base0'..equ'1024                      ;  0x400 from base
+w_mask0'..equ'1088                      ;  0x440 from base
+t_base0'..equ'1152                      ;  0x480 from base
+w_base1'..equ'1280                      ;  0x500 from base
+w_mask1'..equ'1344                      ;  0x540 from base
+t_base1'..equ'1408                      ;  0x580 from base
+w_base2'..equ'1536                      ;  0x600 from base
+w_mask2'..equ'1600                      ;  0x640 from base
+t_base2'..equ'1664                      ;  0x680 from base
+w_base3'..equ'1792                      ;  0x700 from base
+w_mask3'..equ'1856                      ;  0x740 from base
+t_base3'..equ'1920                      ;  0x780 from base
+w_dac3'..equ'1984                       ;  0x7c0 from base
+ltb_tag'..equ'2048                      ;  0x800 from base
+tb_tag'..equ'2304                       ;  0x900 from base
+tb0_page'..equ'4096                     ;  0x1000 from base
+tb1_page'..equ'4352                     ;  0x1100 from base
+tb2_page'..equ'4608                     ;  0x1200 from base
+tb3_page'..equ'4864                     ;  0x1300 from base
+tb4_page'..equ'5120                     ;  0x1400 from base
+tb5_page'..equ'5376                     ;  0x1500 from base
+tb6_page'..equ'5632                     ;  0x1600 from base
+tb7_page'..equ'5888                     ;  0x1700 from base
+	.ENDM

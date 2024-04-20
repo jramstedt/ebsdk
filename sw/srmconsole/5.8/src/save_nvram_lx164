@@ -1,0 +1,119 @@
+#+
+# =============================================================================
+# = save_nvram - Save NVRAM data in EEROM/TOY to a floppy file.               =
+# =============================================================================
+#
+# OVERVIEW:
+#
+#       Save the system NVRAM data from 64KB EEROM and last 50 TOY RAM bytes
+#       onto a write-UN-locked FAT formatted floppy to a file.  By default,
+#       if no script argument is specified, all NVRAM is saved to file
+#       ALLNVRAM.SAV.  If the file already exists, then a copy of the original
+#       file is made to *.BAK.  If that file exists, it is overwritten.
+#       Note, attempts to write to a write-locked floppy fail silently.
+#
+#   COMMAND FORM:
+#
+#       save_nvram ( {all,arc,srm,toy} )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       group - Specifies the group of NVRAM data to be saved.  One of
+##o
+#               o all : All of the 64KB EEROM and 50 bytes of TOY RAM are saved
+#                       in file allnvram.sav.
+#                       This is the default, if no argument is specified.
+#               o arc : ARC (AlphaBIOS) data in first 32KB of the 64KB EEROM
+#                       is saved in file arcnvram.sav.
+#               o srm : SRM console data in last 2KB of the 64KB EEROM
+#                       is saved in file srmnvram.sav.
+#               o toy : TOY console data in the 50 bytes of TOY RAM
+#                       is saved in file toynvram.sav.
+##
+#
+#   COMMAND OPTION(S):
+#
+#       None
+#
+#   COMMAND EXAMPLE(S):
+#
+#       To copy this script from floppy:
+#~
+#       >>> cat fat:savenvr.txt/dva0 > save_nvram    
+#~
+#       To save all the system NVRAM to an image on floppy:
+#~
+#       >>> save_nvram
+#       Save all NVRAM data to file fat:allnvram.sav/dva0.0.0.1000.0.
+#       If file already exists, first copy original to a .bak file.
+#       Please insert a write-UN-locked, FAT formatted floppy...
+#       ...and enter "y" to continue.
+#       y
+#       Checking for a FAT formatted floppy...
+#       ...Found it.
+#       Checking for existing fat:allnvram.sav/dva0.0.0.1000.0...
+#       ...Found one.
+#       Copying fat:allnvram.sav/dva0.0.0.1000.0 to .bak file...
+#       ...Succeeded.
+#       Copying all NVRAM to fat:allnvram.sav/dva0.0.0.1000.0...
+#       ...Succeeded.
+#       >>>
+#~
+#-
+set flop `ls dva|find 0` 2>nl
+set bfile nvram 2>nl                          
+set sfile nvram 2>nl                          
+set grp all 2>nl
+case $1 in
+  "") ;;
+  arc) set grp arc;;
+  srm) set grp srm;;
+  toy) set grp toy;;
+  *) ;;
+esac
+set bfile fat:$grp$sfile.bak/$flop
+set sfile fat:$grp$sfile.sav/$flop
+echo Save $grp NVRAM data to file $sfile.
+echo If file already exists, first copy original to a .bak file.
+echo Please insert a write-UN-locked, FAT formatted floppy...
+echo ...and enter \"y\" to continue.
+if (line<tt|cat -l 1|grep -i "y">nl) then
+  echo Checking for a FAT formatted floppy...
+  if (ls fat:*.*/$flop >nl) then
+    echo ...Found it.
+    echo Checking for existing $sfile...
+    if (cat $sfile >nl 2>nl) then
+      echo ...Found one.
+      echo Copying $sfile to .bak file...
+      if (cat $sfile >$bfile 2>nl) then
+        echo ...Succeeded.
+      else
+        echo ...Failed file copy.
+      fi
+    else
+      echo ...Not found.
+    fi
+    echo Copying $grp NVRAM to $sfile...
+    case $grp in
+      arc) cat -l 8000 eerom:0 >$sfile ;;
+      srm) cat -l 800 eerom:F800 >$sfile ;;
+      toy) cat -l 32 toy:e >$sfile ;;
+      all) cat eerom >pmem:300000
+           cat toy:e >pmem:310000
+           cat -l 10032 pmem:300000 >$sfile ;;
+    esac
+    if (cat $sfile >nl 2>nl) then
+      echo ...Succeeded.
+    else
+      echo ...Failed NVRAM copy.
+    fi
+  else 
+    echo ...Failed, floppy not formatted. 
+  fi
+else
+  echo SAVE_NVRAM cancelled.
+fi
+clear sfile
+clear bfile
+clear flop
+clear grp

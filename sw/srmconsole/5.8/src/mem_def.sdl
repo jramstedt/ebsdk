@@ -1,0 +1,241 @@
+/* file:	mem_def.sdl
+/*
+/* Copyright (C) 1990, 1991, 1992 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Device data structure definitions for Alpha firmware.
+/*
+/* Author:	David Mayo
+/*
+/* Modifications:
+/*
+/*	dwr	23-Sep-1993	Add new cpu struct to devdep union
+/*
+/*	kcq	24-May-1993	Added Python driver support.
+/*
+/*	dtm	 2-Feb-1992	Add pointer to INODE in device structure.
+/*
+/*	wcc	29-Oct-1992	Added comment to io window count. BUG 571.
+/*				
+/*	djm	26-Apr-1992	Added FAD constants used in find_all_dev
+/*				options.
+/*
+/*	jrk	18-Mar-1992	add controller to io_device, add
+/*				establish to device_list.
+/* 
+/*	jrk	12-Mar-1992	correct "device" structure, it had filler
+/*				of 456 ints at end.
+/*
+/*	jds	12-Feb-1992	Added setmode/config to device_list.
+/*				Added state/devspecific to device.devdep.io_device.
+/* 
+/*	djm	 1-May-1991	Changed the "device" structure.
+/*
+/*	dtm	11-Dec-1990	System configuration data structures added
+/*
+/*	dtm	30-Oct-1990	Initial entry.
+/*
+module	$memdef;
+
+/*
+/* Options used by find_all_dev (FAD$)
+/* The default options are for DEVICES and everything whether it
+/* passed selftest or not.
+/*
+constant FAD$K_ALLDEV equals 0;
+constant FAD$M_WANT_WINDOWS equals 1;
+constant FAD$M_PASSED_ST equals 2;
+constant FAD$M_FAILED_ST equals 4;
+constant FAD$M_CLASS equals 8;
+constant PCI_MAX_SPACE equals 3;
+constant PCI_MAX_SPACE_RANGE equals 3;
+/*
+/* Structure of a list of device types
+/*
+aggregate device_list struct prefix "" tag "";
+	type longword;			/* Bus type
+	dtype longword;			/* Device Type register
+	dtype_ext longword;		/* Device Type extention register
+	name address (byte);		/* name of device
+	mnemonic address (byte);	/* generic mnemonic for device
+	overlay address (byte);		/* overlay name pointer (if any)
+	protocol address (byte);	/* Device Protocol
+	class longword;			/* device type class
+	frutype longword;		/* fru type class
+	max_controller longword;	/* Number of controllers
+	count address (longword);	/* number of devices found
+	assign address (entry);		/* assign routine pointer (if any)
+	setmode address (entry);	/* setmode routine pointer (if any)
+	config address (entry);		/* config routine pointer (if any)
+	establish address (entry);	/* establish routine pointer (if any)
+end device_list;
+
+/*
+/* List of device types
+/*
+constant (
+    EMPTY,
+    IO_DEVICE,
+    IO_NETWORK,
+    IO_DISK,
+    IO_SPECIAL,
+    MEMORY,
+    CPU_EV3,
+    CPU_EV4,
+    CPU_VAX,
+    IO_WINDOW
+    ) equals 0 increment 1 prefix "DEVTYPE$";
+
+/*
+/* List of device classes
+/*
+constant (
+    EMPTY,
+    DISK,
+    TAPE,
+    DUP
+    ) equals 0 increment 1 prefix "DEVCLASS$";
+
+
+DECLARE	"struct device" SIZEOF LONGWORD;
+DECLARE	"struct INODE" SIZEOF LONGWORD;
+
+
+/*
+/* Structure of a hw configuration window header
+/*
+aggregate window_head struct prefix "" tag "";
+	name	byte dimension 52;	/* name of configuration window
+	count	longword;		/* number of window descriptors,
+/* starting with 0 (14 slot xmi count would be 15; xmi has no slot 0). 
+/*
+	size	longword;		/* size of window descriptor
+	descr	address(address("struct device"));	/* pointer window descriptors
+end window_head;
+
+aggregate base_address_node struct prefix "" tag "";
+	flink		address (base_address_node);	/* flink
+	blink		address (base_address_node);	/* blink
+	dev		address ("struct device");   	/* pointer to device
+	reg		longword;			/* base address reg number
+	size		longword unsigned;		/* size of space
+	base_address	longword unsigned;		/* base address
+	info		longword;			/* base address information bits
+	ba		address (base_address_node);	/* pointer to list of base address node for device
+end base_address_node;
+
+aggregate base_address_range struct prefix "" tag "";
+	range_num	longword;				/* range number		
+	base		longword unsigned dimension PCI_MAX_SPACE_RANGE; /* base
+	limit		longword unsigned dimension PCI_MAX_SPACE_RANGE; /* limit
+end base_address_range;
+
+
+aggregate base_address_head struct prefix "" tag "";
+	baq		base_address_node dimension PCI_MAX_SPACE;		
+	prim_bus	longword;				/* primary bus number
+	sec_bus		longword;				/* secondary bus number
+	sub_bus		longword;				/* subordinate bus number
+	range		base_address_range dimension PCI_MAX_SPACE; /* range
+end base_address_head;
+
+aggregate dmem struct prefix "" tag "";
+	type		longword;				/* type
+	size		quadword unsigned;			/* size
+	base		quadword unsigned;			/* base address
+end dmem;
+
+aggregate daughter_memory struct prefix "" tag "";
+	dm	dmem dimension 8; 
+	info	longword;
+end daughter_memory;
+
+aggregate part_info_ struct prefix "" tag "";
+	serial_num	byte dimension 16; 
+	part_num	byte dimension 16;
+end part_info_;
+
+aggregate part_info struct prefix "" tag "";
+	info		part_info_ dimension 2;
+end part_info;
+
+/*
+/* Structure of a device descriptor
+/*
+
+aggregate device struct prefix "" tag "";
+	flags	longword;		/* flags for this module
+	tbl	address(device_list);	/* table of attributes
+	dtype	longword;		/* raw contents of dev:dtype
+	dtype_ext longword;		/* contents of dtype extention register
+	class	longword;		/* device class
+	rev	longword;		/* raw contents of dev:rev
+	ip	address("struct INODE"); /* pointer to device inode
+	unit	longword;		/* unit# of the adapter
+	hose	longword;		/* hose
+	slot	longword;		/* slot
+	gid	longword;		/* global id
+	channel	longword;		/* channel
+	node	longword;		/* node
+	bus	longword;		/* bus
+	function longword;		/* function
+	ba	address (base_address_node); /* pointer to list of base addresses
+	bridge	address ("struct device"); /* pointer back to bridge
+	part	address (part_info);    /* pointer to part information
+	devdep union fill;
+            cpu structure fill;
+                proccnt longword;	/* # of processors
+		csize longword;		/* Cache size
+		end cpu;
+	    mem structure fill;
+		size longword;		/* memory capacity
+		strings longword;	/* number of memory strings installed
+		base longword;		/* beginning memory address
+		intlv longword;		/* number of ways interleaved
+		position longword;	/* position in interleave set
+		set longword;		/* interleave set number
+		dp address (daughter_memory); /* pointer to daughter cards 		
+		end mem;
+	    io_window structure fill;
+		vector longword dimension 4;
+		window	address(window_head);	/* pointer to next config structure
+		bah address(base_address_head); /* pointer to base_address header
+		end io_window;
+	    io_device structure fill;
+		vector longword dimension 4;
+		state longword;		/* device state
+		devspecific address;	/* Pointer to device-specific information
+                devspecific2 address;	/* Pointer to device-specific information
+		controller longword;	/* controller base character
+		int_pin longword;	/* interrupt pin
+		end io_device;
+	    end devdep;
+end device;
+
+/*
+/* Structure of a memory interleave tree node
+/*
+aggregate mtree struct prefix "" tag "";
+	label	byte;			/* single character label for node
+	left	address(mtree);		/* pointer to left child
+	right	address(mtree);		/* pointer to right child
+	parent	address(mtree);		/* pointer to parent
+end mtree;
+
+end_module;

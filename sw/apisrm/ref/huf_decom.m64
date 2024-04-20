@@ -1,0 +1,454 @@
+; file: huf_decom - huffman decompression start up file
+;
+; Copyright (C) 1992 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;
+;-
+
+;+
+;
+; Abstract:
+;	This is the source file that determines which mode teh code is
+;	executing in.  The program is entered either as the result of a
+;	bootstrap, in which case it is running virtual, or from having been
+;	loaded from the serial rom.
+;
+;	This program runs without benefit of PAL code, and so must be careful
+;	when accessing memory. There will be no DTB misses as this code will
+;	establsh an environment that is 8 megabytes.  Two Translation buffers
+;	are set up that maps address 0 through 8 meg contiguously with 512 page
+;	entries.  The code runs	in PAL mode but data miss is normal.  Load and
+;	store do not have to be done.
+;
+;	When running virtual, we drop back into pal mode by means of an
+;	undocumented cserve function.
+;
+;	If necessary we relocate so that as we decompress we don't step
+;	on ourselves.
+;
+;	After relocating, we then do the actual decompression.  The compressed
+;	image contains a header describing where the decompressed image
+;	wants to live.  This code relocates it's self up to 400000 which gives
+;	some amount of stack and plenty of room for expansion.  Actually it
+;	relocates itself up or down to where start is pointing.  Care must be
+;	taken not to over write ones self.  The code assumes a stack size of
+;	64k, a base heap of 32k, and a work area of 32k.
+;
+
+;+
+; The begining of the image starts at the first 512 byte boundary after the
+; decompression code.  At the begining of the image is a configuration block
+; indicating how big the compressed and decompressed images are.
+;-
+
+config_stamp	= <0*4>	; id stamp 
+config_dsize	= <1*4>	; size in bytes of decompressed image
+config_csize	= <2*4>	; size in bytes of compressed image, stack and dictionary
+config_stack	= <3*4>	; offset of top of stack and dictionary base
+config_target	= <4*4>	; where to put the code          
+
+config_size	= <5*4>
+
+	.psect	zzzz$last, 9, noexe
+config_image::
+
+	.psect $$first, 9,  mix
+
+; commented out but included in command line
+;.include    "cp$ref:ev4_instructions.m64"
+
+	$mxr
+	$vms_mxr
+    	$pal_func
+	$pal_def
+	$cserve_def
+	pal_instructions
+
+start:
+	;+
+	; If we've been booted, and therefore running virtual,
+	; we drop back into PAL mode.  Otherwise, we've been
+	; loaded from the serial ROM, and we assume that we're
+	; already in pal mode.
+	;
+	; If we're at any of the following addresses, we assume we're
+	; virtual.  All other addreses we assume we're physical:
+	;
+	;	00000000	virtual, loaded by APB
+	;	20000000	virtual, standard SRM boot
+	;	20000240	virtual, standard SRM boot; plus apu header
+	;	00008000	physical, loaded by Cobra serial rom
+	;	00010000	physical, loaded by hack jensen serial rom
+	;	all else	assume physical
+	;-
+	.if ne	cortex
+	bis	r1, r31, r5		; save arc passed parameter
+	bis	r2, r31, r6		; save arc passed parameter
+	.iff
+	bis	r1, r31, r21		; save arc passed parameter
+	bis	r2, r31, r22		; save arc passed parameter
+	.endc
+	bis	r31, r31, r31		; filler
+	bsr	r2, 1$
+0$:	.quad	start			; link address
+
+offset = <0$-start>
+
+	.if ne	cortex
+	;
+	; Allocate 8 quadwords for saving registers used to
+	; pass SROM parameters:
+	;
+	;	r16 - Processor Identification
+	;	r17 - Size of contiguous good memory (bytes)
+	;	r18 - Cycle count (picoseconds)
+	;	r19 - Signature and system revision identifier
+	;	r20 - Active processor mask
+	;	r21 - System context value
+	;	r1  - ABOX_CTL value
+	;	r2  - BIU_CTL value
+	;
+	.quad	0			; R16
+	.quad	0			; R17
+	.quad	0			; R18
+	.quad	0			; R19
+	.quad	0			; R20
+	.quad	0			; R21
+	.quad	0			; R1
+	.quad	0			; R2
+
+	.endc
+1$:	;
+	;
+	; If we've been loaded at 8000 or 900000, then there is no PALcode
+	; running, so don't try to reset secondaries.  Otherwise, do, since we
+	; are going to overwrite existing PALcode as we do the decompression.
+	;
+	lda	r1, -offset(r2)		; Compensate for .QUAD above
+	lda	r0, ^x8000(r1)		; Check for 8000 by subtraction
+	beq	r0, 2$			; Skip this if so
+	ldah	r0, ^xff70(r1)		; Check for 900000 by subtraction
+	beq	r0, 3$			; Skip this if so
+	.if ne	sable
+	mfpr_whami			; See who we are
+	beq	r0, 10$			; If we are CPU 0, don't restart CPU 0
+	cserve	cserve$mp_work_request, 0, mp$restart ; Ask CPU 0 to restart
+10$:	cserve	cserve$mp_work_request, 1, mp$restart ; Ask CPU 1 to restart
+	cserve	cserve$mp_work_request, 2, mp$restart ; Ask CPU 2 to restart
+	cserve	cserve$mp_work_request, 3, mp$restart ; Ask CPU 3 to restart
+	ldah	r0, 16(r31)		; Delay for 5 to 10 milliseconds
+20$:	subq	r0, #1, r0		;
+	bne	r0, 20$			;
+	.endc
+	br	r31, 2$
+
+; get the arc passed parameters
+3$:
+	.if ne	sable
+	mt	r22, pt22		; get biu_ctl from ARC
+
+	lda 	r21, ^x5678(r31)
+	ldah	r21, ^x1234(r21)
+	sll	r21, #32, r22
+	bis	r21, r22, r21		; r1 = 1234.5678.1234.5678
+        mt	r21, pt20		; pt20 = 1234.5678.1234.5678
+
+	subq	r31, #1, r22
+	xor	r21, r22, r21
+	mt	r21, pt21  		; pt21 = EDCB.A987.EDCB.A987
+	.endc
+
+2$:	lda	r1, offset(r31)
+	subq	r2, r1, r0		; check for 00000000 + offset
+	beq	r0, running_virtual
+	ldah	r1, ^x2000(r1)		; check for 20000000 + offset
+	subq	r2, r1, r0
+	beq	r0, running_virtual
+	lda	r1, ^x240(r1)		; check for 20000240 + offset
+	subq	r2, r1, r0
+	beq	r0, running_virtual
+
+	sra	r2, #41, r0		; check for fffffc0000000000 (43-bit kseg)
+	addq	r0, #2, r0
+	bne	r0, in_pal_mode
+	sll	r2, #64-41, r0
+	srl	r0, #64-41, r0
+	br	r31, switch
+
+running_virtual:
+	mfpr_vptb     			; virtual page table base address.  This
+					; has to be valid or the cod doesn't
+					; work
+
+	ldq	r4, (r2)		; get the link address.  We can do it
+					; this way because we are still virtual
+					; 
+
+	sll	r2, <64-43>,r1		; get rid of sign extension
+	srl	r1, <<64-43>+10>, r1	; make bits 32:0 of va of pte
+	bic	r1, 7, r1		; quad word align
+	bis	r1, r0, r0		; make the real address
+
+	ldq	r0, (r0)		; pick up the pte.
+
+	srl	r0,#32,r0		; Convert PTE to PFN
+	sll	r0,#13,r0		;  and then to PA
+
+	sll	r2,<64-13>,r2		;  get offset from page base
+	srl	r2,<64-13>,r2
+	addq	r0, r2, r0		; add it to our physical address.
+
+switch:
+	lda	r16,<10$-start>-offset+1(r0)	;
+	mtpr_exc_addr			; Load the new EXC_ADDR, return in PAL
+
+10$:	;
+	; Flush the Icache.
+	;
+	mt	r31,flush_ic		; Just do it
+	mt	r31, xtbzap		; flush the tlbs
+	mb
+	mt	r31,0			; stall
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+	br	r31, start
+
+.align	quad
+
+;
+; Entry registers.
+;
+;	r2 = base physical address of this code + offset.
+;	
+
+in_pal_mode:
+	.if ne	cortex
+	;
+	; Save registers used to pass SROM parameters
+	;
+	stq_p	r16,  8(r2)		; Save R16
+	stq_p	r17, 16(r2)		; Save R17
+	stq_p	r18, 24(r2)		; Save R18
+	stq_p	r19, 32(r2)		; Save R19
+	stq_p	r20, 40(r2)		; Save R20
+	stq_p	r21, 48(r2)		; Save R21
+	stq_p	r5,  56(r2)		; Save R1
+	stq_p	r6,  64(r2)		; Save R2
+	.endc
+	ldq_p	r26, (r2)		; where we want to be
+	subq	r2, #offset, r2		; where we are
+	cmpeq	r2, r26, r0		; are we where we want to be
+
+	;+
+	; We relocate only if the starting address is not equal to the link
+	; address.  When we get to here we are alrady in pal mode so all we need
+	; to do is move the code where it was linked at.
+	; 
+
+	bne	r0, 400$		; if non-zero then we are where we want
+					; to be.  Must have been a vitual
+					; transfer.
+
+
+	;
+	; Do the copy to where we want to be.  We copy 4 meg starting at the
+	; address in r2 to what is pointed to be r26
+	;
+	; We must decide how to move the data.  If the source is less than
+	; destination then we need to move source+400000 to dest+400000 down.
+	; Gets rid of over lap.  If it's theother way then nothing has to
+	; change.
+
+	bis	r26, r31, r0		; starting address
+	ldah	r1, ^x40(r31)		; counter (400000)
+
+	subq	r26, r2, r3		; find out who is where
+	blt	r3, 300$		; if r2 greater then it says the source
+					; is above the destination and can
+					; simply copy source-destination
+	addq	r1, r26, r26		; destination + 4meg
+	addq	r1, r2, r2		; destination + 4meg
+
+200$:	lda	r26, -8(r26)		; backup the address to start with
+					; (compensates for first time)
+	lda	r2, -8(r2)
+	ldq_p	r3, (r2)
+	subq	r1, #8, r1		; decrement count
+	stq_p	r3, (r26)
+	bne	r1, 200$
+	br	r31, 400$		; done
+					;  
+300$:
+	ldq_p	r3, (r2)		; data
+	subq	r1, #8, r1
+	stq_p	r3, (r0)
+	lda	r0, 8(r0)		; update destination
+	lda	r2, 8(r2)
+	bne	r1, 300$
+
+	;+
+	; Transfer control to the cloned copy
+	;-
+400$:	lda	r0, <relocated-start>(r26)
+	jsr	r31, (r0)
+
+
+.align	quad
+
+relocated::
+	bis	r31, r26, r30			; make data structures start at code base down
+
+	bsr	r26, 1$				; get base pointer of image
+	.quad	decompress
+	.quad	config_image
+1$:
+
+	ldq_p	r27, (r26)
+	ldq_p	r16, 8(r26)
+	ldq_p	r26, 8(r27)		; code address
+
+	mt	r30,  pal_base
+	mb
+	mb
+
+;
+; set up the new base addressing.  We use two large tbs for this.  Each tb is
+; 512 pages.  The first starts at 0 the second at 4 meg
+; 
+
+.if ne	0
+	mt	r31,flush_ic		; Just do it
+	mt	r31, xtbzap		; flush the tlbs
+
+	mt	r31,0			; stall
+	mt	r31,0			; stall
+	mt	r31,0			; stall
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+
+	bis 	r31, r31, r0	    ; address 0
+	mt	r0, pt6
+	mt	r1, pt7
+	mt	r0, tb_Tag
+	sll	r0, 32-13, r0
+	lda	r1, ^xff7(r31)
+	sll	r1, 4, r1
+	or	r1, r0, r1
+	mf	r0, exc_Addr
+	mt	r1, dtb_Ctl
+	mt	r1, dtb_Pte
+	mt	r0, exc_Addr
+	mf	r0, pt6
+	mf	r1, pt7
+
+	ldah	r0, ^x40(r31)
+	mt	r0, pt6
+	mt	r1, pt7
+	mt	r0, tb_Tag
+	sll	r0, 32-13, r0
+	lda	r1, ^xff7(r31)
+	sll	r1, 4, r1
+	or	r1, r0, r1
+	mf	r0, exc_Addr
+	mt	r1, dtb_Ctl
+	mt	r1, dtb_Pte
+	mt	r0, exc_Addr
+	mf	r0, pt6
+	mf	r1, pt7
+.endc
+
+	
+	jsr	r26, (r26)
+
+	.if ne	cortex
+	;
+	; Restore the base physical address of this code + offset.
+	;
+	mfpr	r2, pal_base
+	addq	r2, #offset, r2
+	.endc
+
+	;
+	; Flush the Icache.
+	;
+
+	mt	r31,flush_ic		; Just do it
+	mt	r31, xtbzap		; flush the tlbs
+	mb
+	mt	r31,0			; stall
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+	mt	r31,0
+
+	.if ne	cortex
+	;
+	; Restore registers used to pass SROM parameters
+	;
+	ldq_p	r16,  8(r2)		; Restore R16
+	ldq_p	r17, 16(r2)		; Restore R17
+	ldq_p	r18, 24(r2)		; Restore R18
+	ldq_p	r19, 32(r2)		; Restore R19
+	ldq_p	r20, 40(r2)		; Restore R20
+	ldq_p	r21, 48(r2)		; Restore R21
+	ldq_p	r1,  56(r2)		; Restore R1
+	ldq_p	r2,  64(r2)		; Restore R2
+	.endc
+
+	;+
+	; transfer control to the target address
+	;-
+
+
+
+	jsr	r26, (r0)
+	halt
+
+.align	quad
+BASE_OF_HEAP::
+	.quad	start - <<64+32+32>*1024>	
+
+;+
+; PAL ENTRY dtbMissPal	Address = 09E0
+;-
+	. = ^x09e0
+palEntryDtbmP::
+	mt	r0, pt6
+	mt	r1, pt7
+	mf	r0, va
+	mt	r0, tb_Tag
+	sll	r0, 32-13, r0
+	lda	r1, ^xff7(r31)
+	sll	r1, 4, r1
+	or	r1, r0, r1
+	mf	r0, exc_Addr
+	mt	r1, dtb_Ctl
+	mt	r1, dtb_Pte
+	mt	r0, exc_Addr
+	mf	r0, pt6
+	mf	r1, pt7
+	hw_rei	
+
+	.end

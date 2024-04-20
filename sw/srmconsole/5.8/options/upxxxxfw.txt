@@ -1,0 +1,16 @@
+upXXsrm.rom
+srm_fw
+!                                   
+This file is a list of all the firmware for the system.
+
+The exclamation point above is the file terminator, so anything below it
+will not be seen by the update utility. Anything above the exclamation
+point must adhere to the existing format.
+The first line will contain the directory and filename as it appears on
+the update media, without the extension and in upper case.
+The following line will contain the name of the file to which the image
+will be copied on the console's file system.
+Nothing else is allowed on either line and no lines should be skipped.
+
+For any new firmware images, there will be only two lines added to this file.
+

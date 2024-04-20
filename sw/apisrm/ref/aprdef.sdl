@@ -1,0 +1,58 @@
+/* file:	aprdef.sdl
+/*
+/* Copyright (C) 1990 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*         
+/* Abstract:	Alpha Internal Processor Register IDs.
+/*
+/* Author:	JDS - Jim Sawin
+/*
+/* Modifications:
+/*
+/* 3	by ajb 14-Jan-1992 Added missing KSP definition
+/*
+/* 2	by HCB, 11-4-91 Added EV ABOX and IBOX IPRs.
+/*
+/* 1	by JDS, Mon Mar 11 10:14:52 1991
+/*	Initial entry.
+
+module $aprdef;
+
+constant
+    (ASN, ASTEN, ASTSR, FEN, IPIR, IPL, MCES, PCBB, PRBR,
+     PTBR, SCBB, SIRR, SISR, TBCHK, TBIA, TBIAP, TBIS, KSP, ESP,
+     SSP, USP, VPTB, WHAMI, PS, ICSR, MCSR)
+     equals 0 increment 1 prefix APR$ counter #max_ipr;
+
+constant
+    (TB_TAG, ITB_PTE, ICCSR, ITB_PTE_TEMP, EXC_ADDR, SL_RCV, 
+     ITBZAP, ITBASM, ITBIS, PS, EXC_SUM, PAL_BASE, HIRR,
+     SIRR, ASTRR, HIER, SIER, ASTER, SL_CLR, SL_XMIT)
+     equals #max_ipr+1 increment 1 prefix IBX$ counter #max_ipr;
+
+constant
+    (DTB_CTL, DTB_PTE, DTB_PTE_TEMP, MMCSR, VA, DTBZAP,
+     DTASM, DTBIS, BIU_ADDR, BIU_STAT, DC_ADDR, DC_STAT,
+     FILL_ADDR, ABOX_CTL, ALT_MODE, CC, CC_CTL, BIU_CTL,
+     FILL_SYNDROME, BC_TAG)
+     equals #max_ipr+1 increment 1 prefix ABX$ counter #max_ipr;
+
+constant MAX_IPR equals #max_ipr;
+
+end_module $aprdef;

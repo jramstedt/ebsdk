@@ -1,0 +1,625 @@
+{  DEC/CMS REPLACEMENT HISTORY, Element PR1701DEF.SDL
+{  *2     3-JUN-1991 14:19:12 MCKENZIE "Add additional Laser/Neon support definitions."
+{  *1    20-MAY-1991 17:13:35 MCKENZIE "YELLOW$AMBER - Initial entry for Laser/Neon support."
+{  DEC/CMS REPLACEMENT HISTORY, Element PR1701DEF.SDL
+{
+{ Module:       $PR1701DEF
+{
+{ Version:      'X-1'
+{
+{****************************************************************************
+{*                                                                          *
+{*  COPYRIGHT (c) 1989, 1990 BY                                             *
+{*  DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASSACHUSETTS.                  *
+{*  ALL RIGHTS RESERVED.                                                    *
+{*                                                                          *
+{*  THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND COPIED   *
+{*  ONLY IN  ACCORDANCE WITH  THE  TERMS  OF  SUCH  LICENSE  AND WITH THE   *
+{*  INCLUSION OF THE ABOVE COPYRIGHT NOTICE. THIS SOFTWARE OR  ANY  OTHER   *
+{*  COPIES THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY   *
+{*  OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE IS  HEREBY   *
+{*  TRANSFERRED.                                                            *
+{*                                                                          *
+{*  THE INFORMATION IN THIS SOFTWARE IS  SUBJECT TO CHANGE WITHOUT NOTICE   *
+{*  AND  SHOULD  NOT  BE  CONSTRUED AS  A COMMITMENT BY DIGITAL EQUIPMENT   *
+{*  CORPORATION.                                                            *
+{*                                                                          *
+{*  DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE  OR  RELIABILITY OF ITS   *
+{*  SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.                 *
+{*                                                                          *
+{*                                                                          *
+{****************************************************************************
+
+{++
+{
+{ FACILITY:  VAX/VMS System Macro Libraries
+{
+{ ABSTRACT:
+{
+{       This file contains the SDL source for structure $PR1701DEF
+{   which defines the NVAX+ internal processor registers.
+{
+{ AUTHOR:  The VMS Group         CREATION DATE:  2-May-1991
+{
+{ MODIFIED BY:
+{
+{       X-1     MSM0001         Mark S. McKenzie          2-May-1991
+{               Initial creation for Laser/Neon support.
+{
+{       X-2                     John a DeNisco            21-Nov-1991
+{               Fixed bc_tag definition dirty and shared was flipped.
+{--
+
+module $PR1701DEF ;
+
+{*+
+{*
+{*  To convert this file to a macro library, do the following:
+{*
+{*  	SDL/LANGUAGE=MACRO/COPYRIGHT/VMS_DEVELOPMENT/LIST PR1701DEF
+{*  	LIBRARY/CREATE/MACRO/SQUEEZE PR1701DEF PR1701DEF
+{*
+{*  More generic processor register definitions are defined by the
+{*  $PRDEF macro in SYS$LIBRARY:STARLET.MLB.
+{*
+{*-
+
+    constant REVISION equals 01 prefix PR1701$;		/* Revision number of this file
+
+/* In the definitions below, registers are annotated with one of the following
+/* symbols:
+/*
+/*      RW - The register may be read and written
+/*  	RO - The register may only be read
+/*  	WO - The register may only be written
+/*
+/* For RO and WO registers, all bits and fields within the register are also
+/* read-only or write-only.  For RW registers, each bit or field within
+/* the register is annotated with one of the following:
+/*
+/*  	RW - The bit/field may be read and written
+/*  	RO - The bit/field may be read; writes are ignored
+/*  	WO - The bit/field may be written; reads return an UNPREDICTABLE result.
+/*  	WZ - The bit/field may be written; reads return a 0
+/*  	WC - The bit/field may be read; writes cause state to clear
+/*  	RC - The bit/field may be read, which also causes state to clear; writes are ignored
+
+aggregate PR1701DEF union prefix PR1701;
+
+/* Architecturally-defined registers which have different characteristics
+/* on this CPU.
+constant CPUID equals %x0e tag $;			/* CPU Identification
+
+constant IPL equals %x12 tag $;				/* Interrupt Priority Level
+
+constant LMBOX equals %x17 tag $;			/* Laser Mailbox
+
+constant ICCS equals %x18 tag $;                	/* Interval Clock Control/Status
+
+constant NICR equals %x19 tag $;			/* Next Interval Count
+
+constant ICR equals %x1A tag $;				/* Interval Count
+
+constant TODR equals %x1B tag $;			/* Time Of Year Register (RW)
+
+constant MCESR equals %x26 tag $;			/* Machine check error register (WO)
+
+constant SAVPC equals %x2A tag $;			/* Console saved PC (RO)
+
+constant SAVPSL equals %x2B tag $;			/* Console saved PSL (RO)
+    PR1701SAVPSL_BITS structure fill prefix PR17_SAVPSL$;
+	PSL_LO bitfield length 8 mask;			/* Saved PSL bits <7:0>
+	HALTCODE bitfield length 6 mask;		/* Halt code containing one of the following values
+	    constant HALT_HLTPIN equals %x2;		/* HALT_L pin asserted
+	    constant HALT_PWRUP equals %x3;		/* Initial powerup
+	    constant HALT_INTSTK equals %x4;		/* Interrupt stack not valid
+	    constant HALT_DOUBLE equals %x5;		/* Machine check during exception processing
+	    constant HALT_HLTINS equals %x6;		/* Halt instruction in kernel mode
+	    constant HALT_ILLVEC equals %x7;		/* Illegal SCB vector (bits<1:0>=11)
+	    constant HALT_WCSVEC equals %x8;		/* WCS SCB vector (bits<1:0>=10)
+	    constant HALT_CHMFI equals %xA;		/* CHMx on interrupt stack
+	    constant HALT_IE0 equals %x10;		/* ACV/TNV during machine check processing
+	    constant HALT_IE1 equals %x11;		/* ACV/TNV during KSNV processing
+	    constant HALT_IE2 equals %x12;		/* Machine check during machine check processing
+	    constant HALT_IE3 equals %x13;		/* Machine check during KSNV processing
+	    constant HALT_IE_PSL_101 equals %x19;	/* PSL<26:24>=101 during interrupt or exception
+	    constant HALT_IE_PSL_110 equals %x1A;	/* PSL<26:24>=110 during interrupt or exception
+	    constant HALT_IE_PSL_111 equals %x1B;	/* PSL<26:24>=111 during interrupt or exception
+	    constant HALT_REI_PSL_101 equals %x1D;	/* PSL<26:24>=101 during REI
+	    constant HALT_REI_PSL_110 equals %x1E;	/* PSL<26:24>=110 during REI
+	    constant HALT_REI_PSL_111 equals %x1F;	/* PSL<26:24>=111 during REI
+	INVALID bitfield length 1 mask;			/* Invalid SAVPSL if = 1
+	MAPEN bitfield length 1 mask;			/* MAPEN<0>
+	PSL_HI bitfield length 16 mask;			/* Saved PSL bits <31:16>
+    end PR1701SAVPSL_BITS;
+
+constant IORESET equals %x37 tag $;			/* I/O system reset register (WO)
+
+constant PME equals %x3D tag $;				/* Performance monitoring enable (RW)
+
+/* System-level required registers.
+/* These registers are for testability and diagnostics use only.
+/* They should not be referenced in normal operation.
+
+{* Do these stay the same for PR1701?  
+
+constant IAK14 equals %x40 tag $;			/* Level 14 interrupt acknowledge (RO)
+
+constant IAK15 equals %x41 tag $;			/* Level 15 interrupt acknowledge (RO)
+
+constant IAK16 equals %x42 tag $;			/* Level 16 interrupt acknowledge (RO)
+
+constant IAK17 equals %x43 tag $;			/* Level 17 interrupt acknowledge (RO)
+
+    PR1701IAK_VECTOR structure fill prefix IAK$;		/* Vector returned in response to IAK1x read
+    	IPL17 bitfield length 1 mask;			/* Force IPL 17, independent of actual level
+	PR bitfield length 1 mask;			/* Passive release
+	SCB_OFFSET bitfield length 14 mask;		/* LW offset in SCB of interrupt vector
+	FILL_1 bitfield length 16 fill tag $$;
+    end PR1701IAK_VECTOR;
+
+constant CWB equals %x44 tag $;				/* Clear write buffers (RW)
+
+/* Ebox registers.
+
+/* Ebox register definition
+
+constant INTSYS equals %x7A tag $;			/* Interrupt system status register (RW)
+    PR1701INTSYS_BITS structure fill prefix INTSYS$;
+    	ICCS6 bitfield length 1 mask;			/* ICCS<6> (RO)
+	SISR bitfield length 15 mask;			/* SISR<15:1> (RO)
+	INT_ID bitfield length 5 mask;			/* ID of highest pending interrupt (RO)
+	    constant INT_ID_HALT equals %x1F;		/* Halt pin
+	    constant INT_ID_PWRFL equals %x1E;		/* Power fail
+	    constant INT_ID_H_ERR equals %x1D;		/* Hard error
+	    constant INT_ID_INT_TIM equals %x1C;	/* Interval timer
+	    constant INT_ID_PMON equals %x1B;		/* Performance monitor
+	    constant INT_ID_S_ERR equals %x1A;		/* Soft error
+	    constant INT_ID_IRQ3 equals %x17;		/* IPL 17 device interrupt
+	    constant INT_ID_IRQ2 equals %x16;		/* IPL 16 device interrupt
+	    constant INT_ID_IRQ1 equals %x15;		/* IPL 15 device interrupt
+	    constant INT_ID_IRQ0 equals %x14;		/* IPL 14 device interrupt
+	    constant INT_ID_SISR15 equals %x0F;		/* SISR<15>
+	    constant INT_ID_SISR14 equals %x0E;		/* SISR<14>
+	    constant INT_ID_SISR13 equals %x0D;		/* SISR<13>
+	    constant INT_ID_SISR12 equals %x0C;		/* SISR<12>
+	    constant INT_ID_SISR11 equals %x0B;		/* SISR<11>
+	    constant INT_ID_SISR10 equals %x0A;		/* SISR<10>
+	    constant INT_ID_SISR9 equals %x09;		/* SISR<9>
+	    constant INT_ID_SISR8 equals %x08;		/* SISR<8>
+	    constant INT_ID_SISR7 equals %x07;		/* SISR<7>
+	    constant INT_ID_SISR6 equals %x06;		/* SISR<6>
+	    constant INT_ID_SISR5 equals %x05;		/* SISR<5>
+	    constant INT_ID_SISR4 equals %x04;		/* SISR<4>
+	    constant INT_ID_SISR3 equals %x03;		/* SISR<3>
+	    constant INT_ID_SISR2 equals %x02;		/* SISR<2>
+	    constant INT_ID_SISR1 equals %x01;		/* SISR<1>
+	    constant INT_ID_NO_INT equals %x00;		/* No interrupt
+	FILL_1 bitfield length 3 fill tag $$;
+	INT_TIM_RESET bitfield length 1 mask;		/* Interval timer interrupt reset (WC)
+	FILL_2 bitfield length 2 fill tag $$;
+	S_ERR_RESET bitfield length 1 mask;		/* Soft error interrupt reset (WC)
+	PMON_RESET bitfield length 1 mask;		/* Performance monitoring interrupt reset (WC)
+	H_ERR_RESET bitfield length 1 mask;		/* Hard error interrupt reset (WC)
+	PWRFL_RESET bitfield length 1 mask;		/* Power fail interrupt reset (WC)
+	HALT_RESET bitfield length 1 mask;		/* Halt pin interrupt reset (WC)
+    end PR1701INTSYS_BITS;
+
+constant PMFCNT equals %x7B tag $;			/* Performance monitoring facility count register (RW)
+    PR1701PMFCNT_BITS structure fill prefix PMFCNT$;
+    	PMCTR0 bitfield length 16 mask;			/* PMCTR0 word
+    	PMCTR1 bitfield length 16 mask;			/* PMCTR1 word
+    end PR1701PMFCNT_BITS;
+
+constant PCSCR equals %x7C tag $;			/* Patchable control store control register (WO)
+    PR1701PCSCR_BITS structure fill prefix PCSCR$;
+    	FILL_1 bitfield length 8 fill tag $$;
+	PAR_PORT_DIS bitfield length 1 mask;		/* Disable parallel port control of scan chain
+	PCS_ENB bitfield length 1 mask;			/* Enable use of patchable control store
+	PCS_WRITE bitfield length 1 mask;		/* Write scan chain to patchable control store
+	RWL_SHIFT bitfield length 1 mask;		/* Shift read-write latch scan chain by one bit
+	DATA bitfield length 1 mask;			/* Data to be shifted into the PCS scan chain
+	FILL_2 bitfield length 10 fill tag $$;
+	NONSTANDARD_PATCH bitfield length 1 mask;	/* Non-standard patch bit
+	PATCH_REV bitfield length 5 mask;		/* Patch revision number
+	FILL_3 bitfield length 3 fill tag $$;
+    end PR1701PCSCR_BITS;
+
+constant ECR equals %x7D tag $;				/* Ebox control register (RW)
+    PR1701ECR_BITS structure fill prefix ECR$;
+	VECTOR_PRESENT bitfield length 1 mask;		/* Vector unit present (RW)
+	FBOX_ENABLE bitfield length 1 mask;		/* Fbox enabled (RW)
+	TIMEOUT_EXT bitfield length 1 mask;		/* Select external timebase for S3 stall timeout timer (RW)
+	FBOX_ST4_BYPASS_ENABLE bitfield length 1 mask;	/* Fbox stage 4 conditional bypass enable (RW)
+	TIMEOUT_OCCURRED bitfield length 1 mask;	/* S3 stall timeout occurred (WC)
+	TIMEOUT_TEST bitfield length 1 mask;		/* Select test mode for S3 stall timeout (RW)
+	TIMEOUT_CLOCK bitfield length 1 mask;		/* Clock S3 timeout (RW)
+	FILL_4 bitfield length 1 fill tag $$;		/* eliminate -ICCS in external logic- bit
+	FILL_1 bitfield length 5 fill tag $$;
+	FBOX_TEST_ENABLE bitfield length 1 mask;	/* Enable test of Fbox (RW)
+	FILL_2 bitfield length 2 fill tag $$;
+	PMF_ENABLE bitfield length 1 mask;		/* Performance monitoring facility enable (RW)
+	PMF_PMUX bitfield length 2 mask;		/* Performance monitoring facility master select (RW)
+	    constant PMUX_IBOX equals %b00;		/* Select Ibox
+	    constant PMUX_EBOX equals %b01;		/* Select Ebox
+	    constant PMUX_MBOX equals %b10;		/* Select Mbox
+	    constant PMUX_CBOX equals %b11;		/* Select Cbox
+	PMF_EMUX bitfield length 3 mask;		/* Performance monitoring facility Ebox mux select (RW)
+	    constant EMUX_S3_STALL equals %b000;	/* Measure S3 stall against total cycles
+	    constant EMUX_EM_PA_STALL equals %b001;	/* Measure EM+PA queue stall against total cycles
+	    constant EMUX_CPI equals %b010;		/* Measure instructions retired against total cycles
+	    constant EMUX_STALL equals %b011;		/* Measure total stalls against total cycles
+	    constant EMUX_S3_STALL_PCT equals %b100;	/* Measure S3 stall against total stalls
+	    constant EMUX_EM_PA_STALL_PCT equals %b101; /* Measure EM+PA queue stall against total stalls
+	    constant EMUX_UWORD equals %b111;		/* Count microword increments
+	PMF_LFSR bitfield length 1 mask;		/* Performance monitoring facility Wbus LFSR enable (RW)
+	FILL_3 bitfield length 8 fill tag $$;
+	PMF_CLEAR bitfield length 1 mask;		/* Clear performance monitoring hardware counters (WO)
+    end PR1701ECR_BITS;
+
+/* Mbox TB registers.
+/* These registers are for testability and diagnostics use only.
+/* They should not be referenced in normal operation.
+
+constant MTBTAG equals %x7E tag $;			/* Mbox TB tag fill (WO)
+    PR1701MTBTAG_BITS structure fill prefix MTBTAG$;
+    	TP bitfield length 1 mask;			/* Tag parity bit
+	FILL_1 bitfield length 8 fill tag $$;
+	VPN bitfield length 23 mask;			/* Virtual page number of address (VA<31:9>)
+    end PR1701MTBTAG_BITS;
+
+constant MTBPTE equals %x7F tag $;			/* Mbox TB PTE fill (WO)
+    PR1701MTBPTE_BITS structure fill prefix MTBPTE$;	/* Format is normal PTE format, except for PTE parity bit
+    	PFN bitfield length 23 mask;			/* Page frame number (PA<31:9>)
+	FILL_1 bitfield length 1 fill tag $$;
+	P bitfield length 1 mask;			/* PTE parity
+	FILL_2 bitfield length 1 fill tag $$;
+	M bitfield length 1 mask;			/* Modify bit
+	PROT bitfield length 2 mask;			/* Protection field
+	V bitfield length 1 mask;			/* PTE valid bit
+    end PR1701MTBPTE_BITS;
+
+/* Vector architecture registers
+
+constant VPSR equals %x90 tag $;			/* Vector processor status register (RW)
+    PR1701VPSR_BITS structure fill prefix PR17_VPSR$;
+    	VEN bitfield length 1 mask;			/* Vector processor enabled (RW)
+	RST bitfield length 1 mask;			/* Vector processor state reset (WO)
+	FILL_1 bitfield length 5 fill tag $$;
+	AEX bitfield length 1 mask;			/* Vector arithmetic exception (WC)
+	FILL_2 bitfield length 16 fill tag $$;
+	IMP bitfield length 1 mask;			/* Implementation-specific hardware error (WC)
+	FILL_3 bitfield length 6 fill tag $$;
+	BSY bitfield length 1 mask;			/* Vector processor busy (RO)
+    end PR1701VPSR_BITS;
+
+constant VAER equals %x91 tag $;			/* Vector arithmetic exception register (RO)
+    PR1701VAER_BITS structure fill prefix PR17_VAER$;
+    	F_UNDF bitfield length 1 mask;			/* Floating underflow
+	F_DIVZ bitfield length 1 mask;			/* Floating divide-by-zero
+	F_ROPR bitfield length 1 mask;			/* Floating reserved operand
+	F_OVFL bitfield length 1 mask;			/* Floating overflow
+	FILL_1 bitfield length 1 fill tag $$;
+	I_OVFL bitfield length 1 mask;			/* Integer overflow
+	FILL_2 bitfield length 10 fill tag $$;
+	REGISTER_MASK bitfield length 16 mask;		/* Vector destination register mask
+    end PR1701VAER_BITS;
+
+constant VMAC equals %x92 tag $;			/* Vector memory activity register (RO)
+
+constant VTBIA equals %x93 tag $;			/* Vector translation buffer invalidate all (WO)
+
+/* Cbox registers.
+
+constant BIU_CTL equals %xA0 tag $;			/* Cbox control register (RW)
+    PR1701BIU_CTL_BITS structure fill prefix BIU_CTL$;
+    	BC_EN bitfield length 1 mask;			/* Enable Bcache (WO)
+	ECC bitfield length 1 mask;			/* ECC/Parity select (WO)
+	    constant ECC_ECC equals 1;			/*  select ECC mode
+	    constant ECC_PARITY equals 0;		/*  select Parity mode
+	OE bitfield length 1 mask;			/* CE pins not asserted during RAM write cycles (WO)
+	BC_FHIT	bitfield length 1 mask;			/* Force Bcache hit (WO)
+	BC_SPD bitfield length 4 mask;			/* Bcache speed (WO)
+	    constant BC_SPD_2X equals 0;		/* 2x cpu cycle
+	    constant BC_SPD_3X equals 1;		/* 3x cpu cycle
+	    constant BC_SPD_4X equals 2;		/* 4x cpu cycle
+	FILL_1 bitfield length 20 fill tag $$;
+	BC_SIZE	 bitfield length 3 mask;		/* Bcache size (WO)
+	    constant BC_SIZE_128KB equals 0;		/*  Select 128KB Bcache
+	    constant BC_SIZE_256KB equals 1;		/*  Select 256KB Bcache
+	    constant BC_SIZE_512KB equals 2;		/*  Select 512KB Bcache
+	    constant BC_SIZE_1MB equals 3;		/*  Select 1MB Bcache
+	    constant BC_SIZE_2MB equals 4;		/*  Select 2MB Bcache
+	    constant BC_SIZE_4MB equals 5;		/*  Select 4MB Bcache
+	    constant BC_SIZE_8MB equals 6;		/*  Select 8MB Bcache
+	WS_IO bitfield length 1 mask;			/* Workstation IO mapping
+    end PR1701BIU_CTL_BITS;
+
+
+/* Cbox registers, continued
+
+constant BC_TAG equals %xA2 tag $;			/* Bcache error tag (RO)
+    PR1701BC_TAG_BITS structure fill prefix BC_TAG$;
+	HIT bitfield length 1 mask;			/* 
+	CTL_P bitfield length 1 mask;			/* tag status parity bit
+	CTL_D bitfield length 1 mask;			/* tag dirty bit
+	CTL_S bitfield length 1 mask;			/* tag shared bit
+	CTL_V bitfield length 1 mask;			/* tag valid bit
+	TAG bitfield length 17;				/* tag
+	TAG_P bitfield length 1 mask;			/* tag parity
+    end PR1701BC_TAG_BITS;
+
+/* Cbox registers, continued
+
+constant BIU_STAT equals %xA4 tag $;			/* Bcache error data status (W1C)
+    PR1701BIU_STAT_BITS structure fill prefix BIU_STAT$;
+	BIU_HERR bitfield length 1 mask;		/* Hard_Error on cACK
+	BIU_SERR bitfield length 1 mask;		/* Soft_Error on cACK
+	BC_TPERR bitfield length 1 mask;		/* Tag Parity error in tag address RAM 
+	BC_TCPERR bitfield length 1 mask;		/* Tag Parity error in tag control RAM 
+	BIU_DSP_CMD bitfield length 3 mask;		/* Cbox cycle type
+	    constant WRITE_UNLOCK_IO equals 0;		/* WRITE_UNLOCK_IO cmd
+	    constant IREAD equals 1;			/* IREAD cmd
+	    constant WRITE_UNLOCK equals 2;		/* WRITE_UNLOCK cmd
+	    constant WRITE equals 3;			/* WRITE cmd
+	    constant DREAD equals 4;			/* DREAD cmd
+	    constant DREAD_IO equals 5;			/* DREAD_IO cmd
+	    constant DREAD_LOCK equals 6;		/* DREAD_LOCK cmd
+	BIU_SEO	bitfield length 1 mask;			/* second BIU or BC error
+	FILL_ECC bitfield length 1 mask;		/* ECC error on Pcache fill data 
+	FILL_CRD bitfield length 1 mask;		/* ECC error was correctable 
+	BIU_DPERR bitfield length 1 mask;		/* BIU parity error 
+	FILL_IRD bitfield length 1 mask;		/* error during I stream fill 
+	FILL_QW bitfield length 2;			/* Quadword within Pcache FILL hexaword which had a FILL error 
+	FILL_SEO bitfield length 1 mask;		/* second FILL error 
+	RAZ bitfield length 1 mask;			/* Read as ZERO 
+	FILL_DSP_CMD bitfield length 4 mask;		/* Cbox cmd which resulted in FILL error 
+	    constant F_IREAD equals 2;			/* IREAD cmd
+	    constant IREAD_IO equals 3;			/* IREAD_IO cmd
+	    constant F_WRITE_UNLOCK_IO equals 4;		/* WRITE_UNLOCK_IO cmd
+	    constant WRITE_IO equals 5;			/* WRITE_IO cmd
+	    constant F_WRITE equals 6;			/* WRITE cmd
+	    constant F_WRITE_UNLOCK equals 7;		/* WRITE_UNLOCK cmd
+	    constant F_DREAD equals 8;			/* DREAD cmd 100X
+	    constant F_DREAD2 equals 9;			/* DREAD cmd 100X
+	    constant F_DREAD_IO equals 10;		/* DREAD_IO cmd
+	    constant F_DREAD_LOCK equals 12;		/* DREAD_LOCK cmd
+	    constant DREAD_LOCK_IO equals 13;		/* DREAD_LOCK_IO cmd
+	RSVD bitfield length 8 mask;			/* reserved bits
+	BIU_ADDR bitfield length 2 mask;		/* BIU ADDR bits 33:32
+	FILL_ADDR bitfield length 2 mask;		/* FILL ADDR bits 33:32
+    end PR1701BC_STAT_BITS;
+
+constant BIU_ADDR equals %xA6 tag $;			/* error address associated with BIU errors (RO)
+
+constant FILL_SYN equals %xA8 tag $;			/* Syndrome bits associated with bad quadword during fill (RO)
+    PR1701FILL_SYN_BITS structure fill prefix FILL_SYN$;
+    	LO bitfield length 7;				/* ECC syndrome bits for low longword
+    	HI bitfield length 7;				/* ECC syndrome bits for high longword
+    	FILL_1 bitfield length 18;
+    end PR1701FILL_SYN_BITS;
+
+/* Cbox registers, continued
+
+constant FILL_ADDR equals %xAA tag $;			/* error address associated with FILL errors (RO)
+
+constant STC_RESULT equals %xAC tag $;			/* Result of last store conditional (RO)
+    PR1701STC_RESULT_BITS structure fill prefix STC_RESULT$;
+	FILL_1 bitfield length 2 fill tag $$;
+	PASS bitfield length 1 mask;			/* Store Conditional passed 
+	FILL_2 bitfield length 29 fill tag $$;
+    end PR1701STC_RESULT_BITS;
+
+constant BEDECC equals %xAE tag $;			/* Alternate source of ECC check bits (W)
+    PR1701BEDECC_BITS structure fill prefix BEDECC$;
+    	LO bitfield length 7;				/* BEDECC bits for low longword
+    	HI bitfield length 7;				/* BEDECC bits for high longword
+    	FILL_1 bitfield length 18;
+    end PR1701BEDECC_BITS;
+
+/* Console dispatch structure
+
+constant CHALT equals %xB0 tag $;			/* Console HALT register (RW)
+    CONSOLE_DISPATCH structure fill prefix CHALT$;	/* Console dispatch structure
+    	BRW_CODE longword unsigned;			/* BRW code
+	SYS_TYPE longword unsigned;			/* System Type
+	CNSL_LOAD_ADR longword unsigned;		/* Consoles Load address used by SROM
+	HWRPB_SIZE longword unsigned;			/* HWRPB size in pages
+	HWRPB_PHYS_ADR longword unsigned;		/* HWRPB base physical addrress
+	MEM_BITMAP_SIZ longword unsigned;		/* Memory bitmap size (bits)
+	MEM_BITMAP_PHYS_ADR longword unsigned;		/* Memory bitmap physical address
+	MEM_BITMAP_CHKSM longword unsigned;		/* Memory bitmap checksum
+    end CONSOLE_DISPATCH;
+
+/* Serial line I/O registers
+
+constant SIO equals %xB2 tag $;				/* Seral line I/O register (RW) 
+    PR1701SIO_BITS structure fill prefix SIO$;
+	SIO_IN bitfield length 1 mask;			/* Serial line/SROM input 
+	SIO_OUT bitfield length 1 mask;			/* Serial line/SROM clock output 
+	FILL_1 bitfield length 30 fill tag $$;
+    end PR1701SIO_BITS;
+
+constant SIO_IE equals %xB4 tag $;			/* Seral line I/O register (RW) 
+    PR1701SIO_IE_BITS structure fill prefix SIO$;
+	SROM_OE bitfield length 1 mask;			/* SROM output enable 
+	SROM_FAST bitfield length 1 mask;		/* Use fast version of SROM 
+	FILL_1 bitfield length 30 fill tag $$;
+    end PR1701SIO_IE_BITS;
+
+constant QW_PACK equals %xB8 tag $;			/* Pack next two longword writes (WO)
+
+
+/* Ibox registers.
+
+constant VMAR equals %xD0 tag $;			/* VIC memory address register
+    PR1701VMAR_BITS structure fill prefix VMAR$;
+	FILL_1 bitfield length 2 fill tag $$;
+	LW bitfield length 1 mask;			/* longword within quadword
+	SUB_BLOCK bitfield length 2 mask;		/* sub-block indicator
+	ROW_INDEX bitfield length 6 mask;		/* cache row index
+	ADDR bitfield length 21 mask;			/* error address
+    end PR1701VMAR_BITS;
+
+constant VTAG equals %xD1 tag $;			/* VIC tag register
+    PR1701VTAG_BITS structure fill prefix VTAG$;
+	V bitfield length 4 mask;			/* data valid bits
+	DP bitfield length 4 mask;			/* data parity bits
+	TP bitfield length 1 mask;			/* tag parity bit
+	FILL_1 bitfield length 2 fill tag $$;		/* unused bits (zero)
+	TAG bitfield length 21 mask;			/* tag
+    end PR1701VTAG_BITS;
+
+constant VDATA equals %xD2 tag $;			/* VIC data register
+
+constant ICSR equals %xD3 tag $;			/* Ibox control and status register (RW)
+    PR1701ICSR_BITS structure fill prefix ICSR$;
+	ENABLE bitfield length 1 mask;			/* VIC enable bit (RW)
+	FILL_1 bitfield length 1 fill tag $$;
+	LOCK bitfield length 1 mask;			/* Register is locked due to an error (WC)
+	DPERR bitfield length 1 mask;			/* Data parity error (RO)
+	TPERR bitfield length 1 mask;			/* Tag parity error (RO)
+	FILL_2 bitfield length 27 fill tag $$;
+    end PR1701ICSR_BITS;
+
+constant BPCR equals %xD4 tag $;			/* Ibox branch prediction control register
+    PR1701BPCR_BITS structure fill prefix BPCR$;
+	HISTORY bitfield length 4 mask;			/* branch history bits
+	FILL_1 bitfield length 1 fill tag $$;
+	MISPREDICT bitfield length 1 mask;		/* history of last branch
+	FLUSH_BHT bitfield length 1 mask;		/* flush branch history table
+	FLUSH_CTR bitfield length 1 mask;		/* flush branch hist addr counter
+	LOAD_HISTORY bitfield length 1 mask;		/* write new history to array
+	FILL_2 bitfield length 7 fill tag $$;		/* unused bits (must be zero)
+	BPU_ALGORITHM bitfield length 16 mask;		/* branch prediction algorithm
+	    constant BPU_ALGORITHM equals %xFECA;	/* default value for BPU_ALGORITHM field
+    end PR1701BPCR_BITS;
+
+/* The following two registers are for testability and diagnostics use only.
+/* They should not be referenced in normal operation.
+
+constant BPC equals %xD6 tag $;				/* Ibox Backup PC (RO)
+
+constant BPCUNW equals %xD7 tag $;			/* Ibox Backup PC with RLOG unwind (RO)
+
+/* Mbox internal memory management registers.
+/* These registers are for testability and diagnostics use only.
+/* In normal operation, the equivalent architecturally-defined registers
+/* should be used instead.
+
+constant MP0BR equals %xE0 tag $;			/* Mbox P0 base register (RW)
+
+constant MP0LR equals %xE1 tag $;			/* Mbox P0 length register (RW)
+
+constant MP1BR equals %xE2 tag $;			/* Mbox P1 base register (RW)
+
+constant MP1LR equals %xE3 tag $;			/* Mbox P1 length register (RW)
+
+constant MSBR equals %xE4 tag $;			/* Mbox system base register (RW)
+
+constant MSLR equals %xE5 tag $;			/* Mbox system length register (RW)
+
+constant MMAPEN equals %xE6 tag $;			/* Mbox memory management enable (RW)
+
+/* Mbox registers.
+
+constant PAMODE equals %xE7 tag $;			/* Mbox physical address mode (RW)
+    PR1701PAMODE_BITS structure fill prefix PAMODE$;
+	MODE bitfield length 1 mask;			/* Addressing mode(1 = 32bit addressing) (RW)
+	    constant PA_30 equals 0;			/* 30-bit PA mode
+	    constant PA_32 equals 1;			/* 32-bit PA mode
+	FILL_1 bitfield length 31 fill tag $$;
+    end PR1701PAMODE_BITS;
+
+constant MMEADR equals %xE8 tag $;			/* Mbox memory management fault address (RO)
+
+constant MMEPTE equals %xE9 tag $;			/* Mbox memory management fault PTE address (RO)
+
+constant MMESTS equals %xEA tag $;			/* Mbox memory management fault status (RO)
+    PR1701MMESTS_BITS structure fill prefix MMESTS$;
+	LV bitfield length 1 mask;			/* ACV fault due to length violation
+	PTE_REF bitfield length 1 mask;			/* ACV/TNV fault occurred on PPTE reference
+	M bitfield length 1 mask;			/* Reference had write or modify intent
+	FILL_1 bitfield length 11 fill tag $$;
+	FAULT bitfield length 2 mask;			/* Fault type, one of the following:
+	    constant FAULT_ACV equals 1;		/* ACV fault
+	    constant FAULT_TNV equals 2;		/* TNV fault
+	    constant FAULT_M0 equals 3;			/* M=0 fault
+	FILL_2 bitfield length 10 fill tag $$;
+	SRC bitfield length 3 mask;			/* Shadow copy of LOCK bits (see MSRC$ constants below)
+	LOCK bitfield length 3 mask;			/* Lock status (see MSRC$ constant below)
+    end PR1701MMESTS_BITS;  
+                          
+constant TBADR equals %xEC tag $;			/* Mbox TB parity error address (RO)
+                          
+constant TBSTS equals %xED tag $;			/* Mbox TB parity error status (RW)
+    PR1701TBSTS_BITS structure fill prefix TBSTS$;
+	LOCK bitfield length 1 mask;			/* Register is locked due to an error (WC)
+	DPERR bitfield length 1 mask;			/* Data parity error (RO)
+	TPERR bitfield length 1 mask;			/* Tag parity error (RO)
+	EM_VAL bitfield length 1 mask;			/* EM latch was valid when error occurred (RO)
+	CMD bitfield length 5 mask;			/* S5 command when TB parity error occured (RO)
+	FILL_1 bitfield length 20 fill tag $$;
+	SRC bitfield length 3 mask;			/* Source of original refernce (see MSRC$ constants below) (RO)
+    end PR1701TBSTS_BITS;   
+                          
+    constant IREF_LATCH equals 6 prefix MSRC$;		/* Source of fault was IREF latch
+    constant SPEC_QUEUE equals 4 prefix MSRC$;		/* Source of fault was spec queue
+    constant EM_LATCH equals 0 prefix MSRC$;		/* Source of fault was EM latch
+                         
+/* Mbox Pcache registers  
+                          
+constant PCADR equals %xF2 tag $;			/* Mbox Pcache parity error address (RO)
+                          
+constant PCSTS equals %xF4 tag $;			/* Mbox Pcache parity error status (RW)
+    PR1701PCSTS_BITS structure fill prefix PCSTS$;
+	LOCK bitfield length 1 mask;			/* Register is locked due to an error (WC)
+	DPERR bitfield length 1 mask;			/* Data parity error occurred (RO)
+	RIGHT_BANK bitfield length 1 mask;		/* Right bank tag parity error occurred (RO)
+	LEFT_BANK bitfield length 1 mask;		/* Left bank tag parity error occurred (RO)
+	CMD bitfield length 5 mask;			/* S6 command when Pcache parity error occured (RO)
+	PTE_ER_WR bitfield length 1 mask;		/* Hard error on PTE DREAD occurred (orig ref was WRITE) (WC)
+	PTE_ER bitfield length 1 mask;			/* Hard error on PTE DREAD occurred (WC)
+	FILL_1 bitfield length 21 fill tag $$;
+    end PR1701PCSTS_BITS;   
+                          
+constant PCCTL equals %xF8 tag $;	 		/* Mbox Pcache control (RW)
+    PR1701PCCTL_BITS structure fill prefix PCCTL$;
+	D_ENABLE bitfield length 1 mask;		/* Enable for invalidate, D-stream read/write/fill (RW)
+	I_ENABLE bitfield length 1 mask;		/* Enable for invalidate, I-stream read/fill (RW)
+	FORCE_HIT bitfield length 1 mask;		/* Enable force hit on Pcache references (RW)
+	BANK_SEL bitfield length 1 mask;		/* Select left bank if 0, right bank if 1 (RW)
+	P_ENABLE bitfield length 1 mask;		/* Enable parity checking (RW)
+	PMM bitfield length 3 mask;			/* Mbox performance monitor mode (RW)
+	ELEC_DISABLE bitfield length 1 mask;		/* Pcache electrical disable bit (RW)
+	RED_ENABLE bitfield length 1 mask;		/* Redundancy enable bit (RO) 
+	FILL_1 bitfield length 22 fill tag $$;
+    end PR1701PCCTL_BITS;
+
+constant PCTAG equals %x01800000 tag $;			/* First of 256 Pcache tag IPRs (RW)
+constant PCTAG_MAX equals %x01801FE0 tag $;		/* Last of 256 Pcache tag IPRs
+    constant IPR_INCR equals %x20 prefix PCTAG$;	/* Increment between Pcache tag IPR numbers
+    PR1701PCTAG_BITS structure fill prefix PR17_PCTAG$;
+    	A bitfield length 1 mask;			/* Allocation bit corresponding to index of this tag (RW)
+	V bitfield length 4 mask;			/* Valid bits corresponding to the 4 data subblocks (RW)
+	P bitfield length 1 mask;			/* Tag parity (RW)
+	FILL_1 bitfield length 6 fill tag $$;
+	TAG bitfield length 13 mask;			/* Tag bits (RW)
+    end PR1701PCTAG_BITS;
+
+    PR1701PCTAGA_BITS structure fill prefix PCTAGA$;	/* Address of Pcache tag IPRs - Base = PCTAG
+	FILL_1 bitfield length 5 fill tag $$;
+	INDEX bitfield length 7 mask;			/* Index of PCache tag
+    	B bitfield length 1 mask;			/* Bank of PCache to access: 0=left, 1=right
+    end PR1701PCTAGA_BITS;
+
+constant PCDAP equals %x01C00000 tag $;			/* First of 1024 Pcache data parity IPRs (RW)
+constant PCDAP_MAX equals %x01C01FF8 tag $;		/* Last of 1024 Pcache data parity IPRs
+    constant IPR_INCR equals %x8 prefix PCDAP$;		/* Increment between Pcache data parity IPR numbers
+    PR1701PCDAP_BITS structure fill prefix PCDAP$;
+    	DATA_PARITY bitfield length 8 mask;		/* Even byte parity for the addressed quadword (RW)
+	FILL_1 bitfield length 24 fill tag $$;
+    end PR1701PCDAP_BITS;
+
+end PR1701DEF;
+end_module $PR1701DEF;                 

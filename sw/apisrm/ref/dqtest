@@ -1,0 +1,12 @@
+# IDE disks
+
+for i in a b c d e f g 
+do
+for j in 0 1 2 3
+do
+    if (ls dq"$i$j" > nl) then
+	set idedev `show dev | grep dq"$i$j"|cat -l 4`
+	exer "$idedev"  -a '?r-Rc' -p 0 &
+    fi
+done
+done		

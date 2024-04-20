@@ -1,0 +1,187 @@
+/*
+/* Copyright (C) 1992 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by Digital Equipment
+/* Corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by Digital.
+/*
+/*
+/* Abstract:	VTI 82C106 Combo Chip definitions
+/*
+/* Author:	Judith E. Gold
+/*
+/* Modifications:
+/*
+/* 	jeg	15-Oct-1992	add printer port definitions.
+/*		
+/*
+
+module	$combodef;
+
+/* base addresses of various devices within combo chip 
+
+constant
+	COM1 equals %x3f8,
+	COM2 equals %x2f8,
+	LPTD equals %x3bc,
+	LPTS equals %x3bd,
+	LPTC equals %x3be,
+	KBD_MS equals %x60,
+	TOY_RAM equals %xc170;
+
+/* COMM register offsets from base
+
+constant
+	RBR equals 0,
+	THR equals 0,
+	DLL equals 0,
+	IER equals 1,
+	DLM equals 1,
+	IIR equals 2,
+	FCR equals 2,
+	LCR equals 3,
+	MCR equals 4,
+	LSR equals 5,
+	MSR equals 6,
+	SCR equals 7;
+ 
+/* FCR - FIFO Control Register (16550s only, unimplemented on 16450s)
+
+aggregate FCRR struct prefix "FCR$";
+	FE bitfield length 1 mask;	/* FIFO enable
+	RFR bitfield length 1 mask;	/* receive FIFO reset
+	TFR bitfield length 1 mask;	/* transmit FIFO reset
+	DMS bitfield length 1 mask;     /* DMA mode select
+	R bitfield length 2 mask;	/* reserved
+	RTL bitfield length 1 mask;	/* receive trigger (LSB)
+	RTM bitfield length 1 mask;	/* receive trigger (MSB)
+end FCRR;
+
+/* LCR - Line Control Register 
+
+aggregate LCRR struct prefix "LCR$";
+	WLS bitfield length 2 mask;	/* word length select 
+	SBS bitfield length 1 mask;	/* stop bit select
+	PE bitfield length 1 mask;	/* parity enable
+	EPS bitfield length 1 mask;     /* even parity select
+	SP bitfield length 1 mask;	/* stick parity
+	BC bitfield length 1 mask;	/* break control
+	DLA bitfield length 1 mask;	/* divisor latch access bit
+end LCRR;
+
+constant (
+	CHAR_5BIT,
+	CHAR_6BIT,
+        CHAR_7BIT,
+	CHAR_8BIT ) equals 0 increment 1 prefix "";
+
+/* LSR - Line Status Register
+
+aggregate LSRR struct prefix "LSR$";
+	DR bitfield length 1 mask;	/* data ready
+	OE bitfield length 1 mask;	/* overrun error
+	PE bitfield length 1 mask;	/* parity error
+	FE bitfield length 1 mask;	/* framing error
+	BI bitfield length 1 mask;	/* break interrupt
+	THRE bitfield length 1 mask;	/* tx holding register empty
+	TEMT bitfield length 1 mask;	/* transmitter empty
+	UNUSED bitfield length 1 mask;	/* not used
+end LSRR;
+
+/* MSR - Modem Status Register 
+aggregate MSRR struct prefix "MSR$";
+	DCTS bitfield length 1 mask;	/* delta clear to send
+	DDSR bitfield length 1 mask;	/* delta data set ready
+	TERI bitfield length 1 mask;	/* trailing edge of ring indicator
+	DDCD bitfield length 1 mask;	/* delta data carrier detect
+	CTS bitfield length 1 mask;	/* clear to send
+	DSR bitfield length 1 mask;	/* data set ready
+	RI bitfield length 1 mask;	/* ring indicator
+	DCD bitfield length 1 mask;	/* data carrier detect
+end MSRR;
+
+/* MCR - Modem Control Register 
+aggregate MCRR struct prefix "MCR$";
+	DTR bitfield length 1 mask;	/* data terminal ready
+	RTS bitfield length 1 mask;	/* request to send
+	OUT1 bitfield length 1 mask;	/* 
+	OUT2 bitfield length 1 mask;	/* 
+	LOOP bitfield length 1 mask;	/* 
+	UNUSED bitfield length 3 mask;	/* unused
+end MCRR;
+
+/* IIR - Interrupt Identification Register
+aggregate IIRR struct prefix "IIR$";
+	IP bitfield length 1 mask;	/* interrupt pending
+	HPIP bitfield length 2 mask;	/* highest level interrupt pending
+	UNUSED bitfield length 5 mask;	/* unused
+end IIRR;
+
+/* IER - Interrupt Enable Register
+aggregate IERR struct prefix "IER$";
+      	RDAIE bitfield length 1 mask;	/* received data available int. enable
+      	THREIE bitfield length 1 mask;	/* tx holding register empty int. enable
+      	RLSIE bitfield length 1 mask;	/* receive line status int. enable
+      	MSIE bitfield length 1 mask;	/* modem status interrupt enable
+      	UNUSED bitfield length 4 mask;	/* unused
+end IERR;
+
+/* LPTS - Line Printer Port Status
+aggregate LPTSR struct prefix "LPTS$";
+      	UNUSED bitfield length 2 mask;	/* 
+      	IRQ bitfield length 1 mask;	/* interrupt
+      	ERROR bitfield length 1 mask;	/* error
+      	SLCT bitfield length 1 mask;	/* select
+      	PE bitfield length 1 mask;	/* paper empty
+      	ACK bitfield length 1 mask;	/* acknowledge
+      	BUSY bitfield length 1 mask;	/* busy
+end LPTSR;
+
+/* LPTC - Line Printer Port Control
+aggregate LPTCR struct prefix "LPTC$";
+      	STROBE bitfield length 1 mask;	/* 
+      	AUTO_FD bitfield length 1 mask;	/* auto feed
+      	INIT bitfield length 1 mask;	/* NOT initialize printer
+      	SLCT_IN bitfield length 1 mask;	/* select input
+      	IRQ_EN bitfield length 1 mask;	/* interrupt request enable
+      	DIR bitfield length 1 mask;	/* direction
+      	UNUSED bitfield length 1 mask;	/* 
+end LPTCR;
+
+/* baud rates for DLL and DLM
+
+constant
+	BAUD_50 equals 2304,
+	BAUD_75 equals 1536,
+	BAUD_110 equals 1047,
+	BAUD_1345 equals 857,
+	BAUD_150 equals 768,
+	BAUD_300 equals 384,
+	BAUD_600 equals 192,
+	BAUD_1200 equals 96,
+	BAUD_1800 equals 64,
+	BAUD_2000 equals 58,
+	BAUD_2400 equals 48,
+	BAUD_3600 equals 32,
+	BAUD_4800 equals 24,
+	BAUD_7200 equals 16,
+	BAUD_9600 equals 12,
+	BAUD_19200 equals 6,
+	BAUD_38400 equals 3,
+	BAUD_56000 equals 2;
+
+
+
+end_module;

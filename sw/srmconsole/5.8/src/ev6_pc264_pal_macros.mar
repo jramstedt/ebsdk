@@ -1,0 +1,380 @@
+;+
+; ev6_pc264_pal_macros.mar
+;-
+
+;+
+; Last Edit:	21-Aug-98
+;
+; Edit History
+;
+; Who	When		What
+; ---	----		----
+; ER	21-Aug-98	Created
+;
+;-
+
+high_io  = ^xffff800000000000
+pci0_io  = ^x801fc000000 + high_io
+pci0_mem = ^x80000000000 + high_io
+
+.macro	enable_superpage	reg1=r14, reg2=r25, ?l1
+	bis	r31, #<2@EV6__M_CTL__SPEC_ST_CONS__S>!<4@EV6__M_CTL__SPE__S>, reg1
+	EV6_MTPR reg1, EV6__M_CTL
+	hw_ldq/p reg1, PT__VA_CTL(p_temp)
+	hw_ldq/p reg2, PT__VPTB(p_temp)
+	bis	reg1, #1@EV6__VA_CTL__VA_48__S, reg1
+	bis	reg1, reg2, reg1
+	EV6_MTPR reg1, EV6__VA_CTL, postalign=0
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	EV6_MTPR reg1, EV6__VA_CTL, prealign=0
+
+	hw_stq/p p_misc, PT__P_MISC(p_temp)		; save p_misc
+	bic	p_misc, #<1@3>, p_misc			; cm=0 
+	EV6_MTPR r31, EV6__PS, postalign=0		; switch to kern
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	EV6_MTPR r31, EV6__PS, prealign=0
+
+	br	reg1, l1				; change mode to kernel
+l1:	addq	reg1, #<12+1>, reg1			; jump past in palmode
+	bsr	r31, .					; push prediction stack
+	PVC_JSR esp_'l1
+	hw_ret_stall (reg1)				; synch up
+	PVC_JSR esp_'l1, dest=1
+.endm
+
+.macro	disable_superpage	reg1=r14, reg2=r25, ?l1
+	hw_ldq/p reg2, PT__M_CTL(p_temp)		; get old M_CTL
+	EV6_MTPR reg2, EV6__M_CTL			; restore old M_CTL
+
+	hw_ldq/p reg1, PT__VA_CTL(p_temp)		; get old VA_CTL
+	hw_ldq/p reg2, PT__VPTB(p_temp)
+	bis	reg1, reg2, reg1
+	EV6_MTPR reg1, EV6__VA_CTL, postalign=0		; restore old VA_CTL
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	EV6_MTPR reg1, EV6__VA_CTL, prealign=0
+
+	hw_ldq/p p_misc, PT__P_MISC(p_temp)		; restore p_misc
+	and	p_misc, #<1@3>, reg1			; current mode
+	EV6_MTPR reg1, EV6__PS, postalign=0		; restore PS
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	EV6_MTPR reg1, EV6__PS, prealign=0
+
+	br	reg2, l1				; change mode
+l1:	addq	reg2, #<12+1>, reg2			; jump past in palmode
+	bsr	r31, .					; push prediction stack
+	PVC_JSR dsp_'l1
+	hw_ret_stall (reg2)				; synch up
+	PVC_JSR dsp_'l1, dest=1
+.endm
+
+.macro	reg_or_literal	data, reg
+.if idn <%extract(0,1,data)> <r>
+	and	data, #^xff, reg
+.iff
+.if idn <%extract(0,1,data)> <p>
+	and	data, #^xff, reg
+.iff
+	lda	reg, <data>&^xff(r31)
+.endc
+.endc
+.endm
+
+.macro	isa_read	p, reg1=r25, reg2=r12, setup=1
+.if ne	setup
+	GET_32CONS reg1, <<pci0_io@-24>&^xffffffff>, r31, verify=0
+	sll	reg1, #24, reg1
+	lda	reg1, p(reg1)
+.endc
+	ldbu	reg2, 0(reg1)
+.endm
+
+.macro	isa_write	p, c, reg1=r25, reg2=r13, setup=1
+.if ne	setup
+	GET_32CONS reg1, <<pci0_io@-24>&^xffffffff>, r31, verify=0
+	sll	reg1, #24, reg1
+	lda	reg1, p(reg1)
+.endc
+	reg_or_literal	c, reg2
+	stb	reg2, 0(reg1)
+	mb
+.endm
+
+.macro  iack    reg1
+	GET_32CONS reg1, ^x801f8, r31	; Load iAck address.
+	sll	reg1, #24, reg1		; Shift it into the correct position.
+	hw_ldl/p reg1, (reg1)		; Initiate PCI iAck cycle.
+.endm
+
+.macro	get_pchip_addr	reg1, reg2
+	lda	reg2, ^x801a(r31)		; 801.a000.xxxx
+	zapnot	reg2, #3, reg2
+	sll	reg2, #28, reg2
+	hw_ldq/p reg1, PT__WHAMI(p_temp)	; get whami
+	s8addq	reg1, reg1, reg1
+	and	reg1, #^x11, reg1
+	sll	reg1, #6, reg1
+	addq	reg1, reg2, reg1
+.endm
+
+.macro	led_write	c, reg1, reg2
+	enable_superpage reg1, reg2
+	GET_32CONS reg1, <<pci0_io@-24>&^xffffffff>, r31, verify=0
+	sll	reg1, #24, reg1
+	reg_or_literal	c, reg2
+	stb	reg2, ^x80(reg1)
+	disable_superpage reg1, reg2
+.endm
+
+.macro	iic_get_addr	reg
+	GET_32CONS reg, <<pci0_mem@-24>&^xffffffff>, r31, verify=0
+	sll	reg, #24-3, reg
+	ldah	reg, ^x1fff(reg)
+	sll	reg, #3, reg
+.endm
+
+.macro	iic_read_status	reg1=r1, reg2=r2
+	iic_get_addr	reg2
+	ldbu	reg1, 1(reg2)		; Read S1 status register
+	isa_read <^x80>, reg2, reg2	; Deassert ROMCS
+	mb
+.endm
+
+.macro	iic_write_control	data, reg1=r1, reg2=r2
+	iic_get_addr	reg2
+	reg_or_literal	data, reg1
+	stb	reg1, 1(reg2)		; Write S1 control register
+	isa_read <^x80>, reg2, reg2	; Deassert ROMCS
+	mb
+.endm
+
+.macro	iic_read_data	reg1=r1, reg2=r2
+	iic_get_addr	reg2
+	ldbu	reg1, 0(reg2)		; Read S0 data register
+	isa_read <^x80>, reg2, reg2	; Deassert ROMCS
+	mb
+.endm
+
+.macro	iic_write_data	data, reg1=r1, reg2=r2
+	iic_get_addr	reg2
+	reg_or_literal	data, reg1
+	stb	reg1, 0(reg2)		; Write S0 data register
+	isa_read <^x80>, reg2, reg2	; Deassert ROMCS
+	mb
+.endm
+
+.macro	iic_wait_for_idle	reg1=r1, reg2=r2, reg3=r3, ?l1
+	lda	reg3, ^x1000(r31)	; Initialize timeout counter
+l1:	iic_read_status reg1, reg2
+	subq	reg3, #1, reg3		; Decrement counter
+	beq	reg3, 99$		; If counter expired, exit with error
+	blbc	reg1, l1		; Wait if bus busy
+.endm
+
+.macro	iic_wait_for_pin	reg1=r1, reg2=r2, reg3=r3 ?l1
+	lda	reg3, ^x1000(r31)	; Initialize timeout counter
+l1:	iic_read_status reg1, reg2
+	subq	reg3, #1, reg3		; Decrement counter
+	beq	reg3, 99$		; If counter expired, exit with error
+	srl	reg1, #7, reg2		; Get Pending Interrupt Not into LSB
+	blbs	reg2, l1		; Wait if transaction hasn't completed
+.endm
+
+.macro	iic_reset
+	hw_stq/p r0, PT__R0(p_temp)	; save r0
+	hw_stq/p r1, PT__R1(p_temp)	; save r1
+	hw_stq/p r2, PT__R2(p_temp)	; save r2
+	hw_stq/p r3, PT__R3(p_temp)	; save r3
+	hw_stq/p r26, PT__R26(p_temp)	; save r26
+	PVC_JSR	reset_iic, bsr=1
+	bsr	r26, sys__iic_reset
+	hw_ldq/p r0, PT__R0(p_temp)	; restore r0
+	hw_ldq/p r1, PT__R1(p_temp)	; restore r1
+	hw_ldq/p r2, PT__R2(p_temp)	; restore r2
+	hw_ldq/p r3, PT__R3(p_temp)	; restore r3
+	hw_ldq/p r26, PT__R26(p_temp)	; restore r26
+.endm
+
+.macro	iic_read	addr, data
+	hw_stq/p r0, PT__R0(p_temp)	; save r0
+	hw_stq/p r1, PT__R1(p_temp)	; save r1
+	hw_stq/p r2, PT__R2(p_temp)	; save r2
+	hw_stq/p r3, PT__R3(p_temp)	; save r3
+	hw_stq/p r26, PT__R26(p_temp)	; save r26
+	reg_or_literal	addr, r1
+	PVC_JSR	read_iic, bsr=1
+	bsr	r26, sys__iic_read
+	bis	r0, r31, data
+	hw_ldq/p r0, PT__R0(p_temp)	; restore r0
+	hw_ldq/p r1, PT__R1(p_temp)	; restore r1
+	hw_ldq/p r2, PT__R2(p_temp)	; restore r2
+	hw_ldq/p r3, PT__R3(p_temp)	; restore r3
+	hw_ldq/p r26, PT__R26(p_temp)	; restore r26
+.endm
+
+.macro	iic_eeprom_read		addr, data, ?l1
+	reg_or_literal	addr, r1
+	extbl	r1, #0, r0		; Isolate EEPROM word address
+	sll	r0, #8, r0		; Shift word address into position
+	lda	r0, ^xCC(r0)		; Add in EEPROM device type identifier
+	extbl	r1, #1, r1		; Get device specific address bits
+	mulq	r1, #2, r1		; Form slave address
+	addq	r1, r0, r1		; Combine EEPROM word and slave address bits
+	PVC_JSR write_iic, bsr=1
+	bsr	r26, sys__iic_write	; Write the EEPROM word address
+	blt	r0, l1			; Check for error on write
+	extbl	r0, #0, r1		; Isolate EEPROM slave address
+	PVC_JSR read_iic, bsr=1
+	bsr	r26, sys__iic_read	; Read a byte from an EEPROM segment
+l1:	bis	r0, r31, data		; Return data
+.endm
+
+.macro	iic_eeprom_write	addr, data, ?l1, ?l2, ?l3
+	reg_or_literal	data, r1
+	extbl	r1, #0, r2		; Isolate data byte
+	lda	r2, ^x100(r2)		; Set flag indicating data byte present
+	sll	r2, #16, r2		; Shift flag and data into position
+	reg_or_literal	addr, r1
+	extbl	r1, #0, r3		; Isolate EEPROM word address
+	sll	r3, #8, r3		; Shift word address into position
+	lda	r3, ^xCC(r3)		; Add in EEPROM device type identifier
+	extbl	r1, #1, r1		; Get device specific address bits
+	mulq	r1, #2, r1		; Form slave address
+	addq	r1, r3, r1		; Combine EEPROM word and slave address bits
+	bis	r1, r2, r1		; Merge address and data bytes
+	PVC_JSR write_iic, bsr=1
+	bsr	r26, sys__iic_write	; Write data to EEPROM segment
+	blt	r0, l1			; Check for error on write
+	extbl	r0, #1, r0		; Restore original EEPROM word address
+l1:	ldah	r1, ^x50(r31)		; delay a while, then return.
+l2:	subq	r1, #1, r1
+	beq	r1, l3
+	br	r31, l2
+l3:
+.endm
+
+.macro	iic_write_rcm_eeprom	?l1, ?l2, ?l3, ?l4
+	hw_stq/p r0, PT__R0(p_temp)	; Save r0
+	hw_stq/p r1, PT__R1(p_temp)	; Save r1
+	hw_stq/p r2, PT__R2(p_temp)	; Save r2
+	hw_stq/p r3, PT__R3(p_temp)	; Save r3
+	hw_stq/p r8, PT__R8(p_temp)	; Save r8
+	hw_stq/p r9, PT__R9(p_temp)	; Save r9
+	hw_stq/p r25, PT__R25(p_temp)	; Save r25
+	hw_stq/p r26, PT__R26(p_temp)	; Save r26
+;
+; Retrieve the saved environmental data from the PAL temp area,
+; timestamp the data, and put it back.
+;
+	hw_ldq/p r25, PT__SYS_EVENT(p_temp)
+
+	PVC_JSR timestamp, bsr=1
+	bsr	r26, sys__get_timestamp
+
+	sll	r0, #16, r0		; Shift timestamp
+	bis	r0, r25, r25		; Merge with environmental data
+
+	hw_stq/p r25, PT__SYS_EVENT(p_temp)
+;
+; Read the count field in the RCM EEPROM header into R25.  The count field contains 
+; the number of valid entries currently logged in the RCM EEPROM. 
+;
+	bis	r31, r31, r25		; Clear the data register
+	bis	r31, r31, r9		; Initialize byte counter to zero
+	lda	r8, ^x0C(r31)		; Offset to count field of RCM EEPROM header
+l1:	iic_eeprom_read r8, r0		; Read a byte from RCM EEPROM location
+	insbl	r0, r9, r0		; Shift data into proper byte lane
+	bis	r0, r25, r25		; Merge byte into data register
+	addq	r8, #1, r8		; Point to next byte in count field
+	addq	r9, #1, r9		; Increment byte counter
+	cmpeq	r9, #4, r0		; Read 4 bytes total
+	beq	r0, l1			; Repeat for each byte in count field
+;
+; Check if there is room to add another entry to the RCM EEPROM.  The word address 
+; calculation of the next available EEPROM segment to write is also done here and
+; stored in R0.
+;
+	mulq	r25, #6, r0		; Current number of entries x entry size
+	addq	r0, #16, r0		; Add in header size
+	addq	r0, #6, r8		; Plus space for new entry
+	srl	r8, #9, r8		; Check if EEPROM is full (512 bytes max)
+	bne	r8, l4			; If EEPROM full, skip write
+;
+; Write the environmental data for the new entry to the RCM EEPROM segments.
+;
+	hw_ldq/p r8, PT__SYS_EVENT(p_temp) ; Get saved environmental data
+	bis	r31, r31, r9		; Initialize byte counter to zero
+l2:	extbl	r8, r9, r1		; Get a byte of environmental data
+	iic_eeprom_write r0, r1		; Write data to RCM EEPROM segment
+	blt	r0, l4			; Check for error on write
+	addq	r9, #1, r9		; Increment byte counter
+	addq	r0, #1, r0		; Point to next EEPROM segment
+	cmpeq	r9, #6, r1		; Write 6 bytes of data
+	beq	r1, l2			; Repeat for each byte of data
+;
+; Update the count field of the RCM EEPROM header.  R25 still contains the
+; number of valid entries currently logged in the RCM EEPROM.
+;
+	addq	r25, #1, r25		; Increment count field value
+	lda	r0, ^x0C(r31)		; Offset to count field of RCM EEPROM header
+	bis	r31, r31, r8		; Initialize byte counter to zero
+l3:	extbl	r25, r8, r1		; Select data byte within count field
+	iic_eeprom_write r0, r1		; Write the count field of RCM EEPROM header
+	blt	r0, l4			; Check for error on write
+	addq	r0, #1, r0		; Point to next byte in count field
+	addq	r8, #1, r8		; Increment byte counter
+	cmpeq	r8, #4, r0		; Write 4 bytes total
+	beq	r0, l3			; Repeat for each byte in count field
+
+l4:	hw_ldq/p r0, PT__R0(p_temp)	; Restore r0
+	hw_ldq/p r1, PT__R1(p_temp)	; Restore r1
+	hw_ldq/p r2, PT__R2(p_temp)	; Restore r2
+	hw_ldq/p r3, PT__R3(p_temp)	; Restore r3
+	hw_ldq/p r8, PT__R8(p_temp)	; Restore r8
+	hw_ldq/p r9, PT__R9(p_temp)	; Restore r9
+	hw_ldq/p r25, PT__R25(p_temp)	; Restore r25
+	hw_ldq/p r26, PT__R26(p_temp)	; Restore r26
+.endm
+
+.macro	iic_init_rcm_temp	cmd, data1, data2
+	hw_stq/p r0, PT__R0(p_temp)	; Save r0
+	hw_stq/p r1, PT__R1(p_temp)	; Save r1
+	hw_stq/p r2, PT__R2(p_temp)	; Save r2
+	hw_stq/p r3, PT__R3(p_temp)	; Save r3
+	hw_stq/p r8, PT__R8(p_temp)	; Save r8
+	hw_stq/p r9, PT__R9(p_temp)	; Save r9
+	hw_stq/p r25, PT__R25(p_temp)	; Save r25
+	hw_stq/p r26, PT__R26(p_temp)	; Save r26
+
+	reg_or_literal	data1, r1
+	extbl	r1, #0, r2		; Isolate first byte of data
+	sll	r2, #16, r2		; Shift data byte into position
+	reg_or_literal	data2, r1
+	extbl	r1, #0, r3		; Isolate second byte of data
+	sll	r3, #24, r3		; Shift data byte into position
+	bis	r2, r3, r2		; Combine first and second bytes of data
+	reg_or_literal	cmd, r1
+	extbl	r1, #0, r3		; Isolate command byte
+	sll	r3, #8, r3		; Shift command byte into position
+	lda	r3, ^x9E(r3)		; Add in Dallas DS1625 slave address
+	bis	r3, r2, r1		; Merge slave address, command and data bytes
+
+	PVC_JSR	write_cmd_data, bsr=1
+	bsr	r26, sys__iic_write_cmd_data
+
+	hw_ldq/p r0, PT__R0(p_temp)	; Restore r0
+	hw_ldq/p r1, PT__R1(p_temp)	; Restore r1
+	hw_ldq/p r2, PT__R2(p_temp)	; Restore r2
+	hw_ldq/p r3, PT__R3(p_temp)	; Restore r3
+	hw_ldq/p r8, PT__R8(p_temp)	; Restore r8
+	hw_ldq/p r9, PT__R9(p_temp)	; Restore r9
+	hw_ldq/p r25, PT__R25(p_temp)	; Restore r25
+	hw_ldq/p r26, PT__R26(p_temp)	; Restore r26
+.endm

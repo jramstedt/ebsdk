@@ -1,0 +1,67 @@
+#+
+# ============================================================================
+# = kill_diags - Kill all currently executing diagnostic processes.          =
+# ============================================================================
+#
+# OVERVIEW:
+#
+#	Kill the processes running specific diagnostics.
+#
+#   COMMAND FORM:
+#
+#       kill_diags ( )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       None                         
+#
+#   COMMAND OPTION(S):
+#
+#	None
+#
+#   COMMAND EXAMPLE(S):
+#~                                    
+#       >>>memexer 2 &       # Start up two memtest processes.
+#       >>>show_status
+#             ID      Program       Device   Pass Hard/Soft Bytes Written    Bytes Read
+#       -------- ------------ ------------ ------ --------- ------------- -------------
+#       00000001         idle       system      0    0    0             0             0
+#       00000351      memtest       memory      0    0    0      37748736      37748736
+#       00000352      memtest       memory      0    0    0      37748736      37748736
+#       >>>kill_diags
+#       >>>show_status
+#             ID      Program       Device   Pass Hard/Soft Bytes Written    Bytes Read
+#       -------- ------------ ------------ ------ --------- ------------- -------------
+#       00000001         idle       system      0    0    0             0             0
+#       >>>
+#~
+#-
+echo exer >>diag$$
+echo nettest >>diag$$                
+echo graphics >>diag$$
+echo mouse >>diag$$
+echo tgax >>diag$$
+ps|grep -i -f diag$$ |find 0 >pidlist$$
+       
+# set the kill flag in all the diags at once
+for i in `cat pidlist${p}` ; do
+    kill $i
+done                                           
+
+# Wait for all of the tests to finish
+for i in `cat pidlist${p}` ; do
+    while (ps|grep ^[0-9,a-f] | grep ^$i' ' > nl) ; do sleep 1 ; done
+done                                           
+
+# memtests are killed separately because of buffer allocation
+echo memtest >diag$$
+ps|grep -i -f diag$$ |find 0 >pidlist$$
+       
+# kill memtest one at a time and wait for them to stop
+for i in `cat pidlist${p}` ; do
+    kill $i
+    while (ps|grep ^[0-9,a-f] | grep ^$i' ' > nl) ; do sleep 1 ; done
+done                                           
+rm pidlist$$ diag$$
+# allow shells to be run on serial ports now that loopback tests are done
+set tt_allow_login 1

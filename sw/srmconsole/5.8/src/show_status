@@ -1,0 +1,90 @@
+#+
+# ============================================================================
+# = show_status - Show the status of any currently executing diagnostics.    =
+# ============================================================================
+#
+# OVERVIEW:
+#
+#	Reports one line of information per currently running diagnostic.
+#	The info includes error counts, passes completed and bytes read/written
+#	to the device being tested.  The source of each line of info is an IOB,
+#	IO block.
+#
+#	Not supported on AlphaServers 8X00
+#
+#   COMMAND FORM:
+#
+#       show_status ( )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       None
+#
+#   COMMAND OPTION(S):
+#
+#       None
+#
+#   COMMAND EXAMPLE(S):
+#~
+#	P00>>>test mem &	# Memory test command on a AlphaServer 4x00
+#	P00>>>Console is in diagnostic mode
+#	System test, runtime 300 seconds
+#
+#	Type ^C if you wish to abort testing once it has started
+#
+#	Starting background memory test(s), affinity to all CPUs..
+#	Starting memory thrasher on CPU1..
+#	Starting memory thrasher on CPU0..
+#
+# ID       Program      Device       Pass  Hard/Soft Bytes Written  Bytes Read  
+# -------- ------------ ------------ ------ --------- ------------- -------------
+# 00001198      memtest memory            4    0    0     176160768     176160768
+# 000011d0      memtest memory          111    0    0     115329280     115329280
+# 000011db      memtest memory           92    0    0      95408768      95408768
+#
+# show_status		# Type the show_status commnad
+# ID       Program      Device       Pass  Hard/Soft Bytes Written  Bytes Read  
+# -------- ------------ ------------ ------ --------- ------------- -------------
+# 00000001         idle system            0    0    0             0             0
+# 0000113e     set_flag set_flag          0    0    0             0           254
+# 00001198      memtest memory           12    0    0     549453824     549453824
+# 000011d0      memtest memory          504    0    0     527369344     527369344
+# 000011db      memtest memory          445    0    0     465510912     465510912
+# 000012e3        sleep set_flag          0    0    0             0             0
+#
+#>>>
+#~
+#-
+echo 'd/S' >$$inc
+echo '---' >>$$inc
+echo system >>$$inc
+echo cpu >>$$inc
+echo _diag >>$$inc
+echo xct >>$$inc
+echo tiop >>$$inc
+echo lamb >>$$inc
+echo flag >>$$inc
+echo memtest >>$$inc
+echo exer_k >>$$inc
+echo nettest >>$$inc
+echo net_ex >>$$inc
+echo cbcc >>$$inc
+echo io_test >>$$inc
+echo mouse >>$$inc
+echo sound >>$$inc
+echo speaker >>$$inc
+echo pci_nvram_di >>$$inc
+echo "PCI NVRAM" >>$$inc
+echo fptest >>$$inc
+echo "fp_exer" >>$$inc
+
+echo bg_N >$$exc
+echo ' nl ' >>$$exc
+echo ' tt ' >>$$exc
+echo tta0 >>$$exc
+echo vga0 >>$$exc
+echo tga0 >>$$exc
+echo ntlpex >>$$exc
+show iobq|grep -f $$inc|grep -v -f $$exc
+rm $$inc
+rm $$exc

@@ -1,0 +1,974 @@
+module $EV5DEF;
+
+{*+
+{*  EV-5 Processor Register Definitions
+{*
+{*
+{*  To convert this file to a macro library, do the following:
+{*
+{*	SDL/LANGUAGE=MACRO/COPYRIGHT/LIST EVSUP_SL$:EV5_DEFS
+{*	LIB/MACRO/CREATE/SQUEEZE EVSUP_SL$:EV5_DEFS EVSUP_SL$:EV5_DEFS
+{*
+{*  To release this file for general use, do the following:
+{*
+{*  	- Reserve this file from EVCMS$
+{*  	- Make and test your change
+{*  	- Replace this file in the CMS library.
+{*  	- Notify Walker Anderson, Lisa Noack, Deb Bernstein,
+{*	  Ernie Preisig and Mike Kantrowitz of the change.
+{*
+{*-
+
+    constant REVISION equals 47 prefix EV5$;		/* Revision number of this file
+
+{* Edit	  Date	   Who	     Description
+{* ---- ---------  ---	---------------------
+{*    1   2-Apr-92 CJS   Initial release to library.
+{*    2  17-Jun-92 CJS   Update to reflect IBOX IPR changes:
+{*                       IFAULT_VA, ITB_ASN, ICPERR_STAT, EXC_SUM,
+{* 			 ICSR, SIRR, HWINT_CLR, SL_XMIT, SL_RCV
+{*    3  30-Jun-92 CJS   Update MBOX IPRs: DTB_ASN, MCSR, DTB_PTE_TEMP
+{*    4  04-Aug-92 LMN   Update Cbox IPRs
+{*    5  01-Sep-92 cjs   Update Ibox IPRs: IVPTR, IFAULT_VA_FORM_NT, ITB_PTE(_TEMP)
+{*    6  02-Sep-92 cjs   Fixed problem with VPTB bitfields >32 (treat as constants)
+{*    7  04-Sep-92  mk   Add ISR, SICR registers and bitfields
+{*    8  17-Sep-92 cjs   Added BAD_VA bit to MM_STAT
+{*    9  28-Sep-92 lmn   Added DC_TEST_TAG_TEMP
+{*   10  08-Oct-92 lmn   updated cbox iprs with latest set of changes, removed
+{*			 dcfill_err_stat
+{*   11  21-Oct-92 lmn   moved bits in bc_config
+{*   12  28-Oct-92 cjs   added MAF_NO_BYPASS and DREAD_PENDING bits to MCSR
+{*   13  10-nov-92 dha   fix bc_config definition
+{*   14  12-nov-92 lmn   add dc_mode and maf_mode, change mmstat
+{*   15  17-nov-92 lmn   add lock to dcperr_stat, updates to dc_test_tag and test_tag_temp
+{*   16  03-dec-92 lmn   removed pt24-31
+{*   17  03-dec-92 lmn   changed index length of dc_test_ctl
+{*   18  03-dec-92 lmn   changed dc_perr_ena to dc_perr_dis
+{*   19  16-dec-92 lmn   update for latest cbox ipr changes
+{*   20  22-jan-93 lmn   add e_big_endian to mcsr
+{*   21  03-feb-93 lmn   fix alt_mode
+{*   22  11-feb-93 lmn   add wave_pipelining
+{*   23  12-feb-93 lmn   add ei_opt_cmd_mb
+{*   24  16-feb-93 lmn   fix sc_addr
+{*   25  18-feb-93 jdh   add PMCTR
+{*   26  04-mar-93 cjs   add cc_ena bit to cc_ctl
+{*   27  05-mar-93 lmn   add _NT for mbox
+{*   28  09-apr-93 lmn   fix dcperr_stat$v_se0 and add new mbox fields
+{*   29  12-apr-93 lmn   eliminate duplicate fill0 name
+{*   30  16-apr-93  mk   make ITB_PTE_TEMP correspond to read format
+{*   31  21-apr-93 sat   fix typo -- e1_par_err should be ei_par_err in EI_STAT
+{*   31  30-apr-93  mk   make mondo changes to Ibox IPRs - icsr,
+{*			 ic_perr_stat, isr, hwint_clr, sl_rcv, sl_txmit, sirr, 
+{*			 ifault_va_form, vptbr, astrr, aster
+{*			 remove sicr
+{*   32  17-may-93 lmn   fix icsr tmd bit
+{*   33  17-aug-93 lmn   cbox changes
+{*   34  17-aug-93 lmn   reset fillx to 0 in bc_ctl
+{*   35  26-aug-93  mk   updated PMCTR symbols to match new spec
+{*   36  07-sep-93  mk   fixed address on IFAULT_VA_FORM_NT (from 109 to 112)
+{*   37  14-oct-93  mk   eliminate conflicting fill on ICSR
+{*   38  14-feb-94 jdh   add pass2 def's
+{*   39  08-dec-94 jmh   add byte-word bit in ICSR for EV56
+{*   40  10-jan-95 jmh   add byte-word bit in BC_CTL for EV56
+{*   41  09-feb-95 jmh   add a plethora of new bits in BC_CTL for EV56
+{*   42  10-apr-95 jmh   add FMP bit in ICSR for EV5 pass 4; rename BC_CTL bits
+{*   43  19-apr-95 jmh   move wave_pipe<2> ipr bit
+{*   44  23-jun-95 jmh   add STCLK delay mode bit
+{*   45  21-jul-95 jmh   add CBox byte/word disable mode bit
+{*   46  04-feb-97 er    add PCA56 CBU IPRs, modify DC_TEST_CTL for Dcache soft repair,
+{*		         and MAF_MODE for read/write batching
+{*   47  06-mar-97 er	 add MVE bit in ICSR for PCA56
+{*
+{*
+/* In the definitions below, registers are annotated with one of the following
+/* symbols:
+/*
+/*      RW - The register may be read and written
+/*  	RO - The register may only be read
+/*  	WO - The register may only be written
+/*
+/* For RO and WO registers, all bits and fields within the register are also
+/* read-only or write-only.  For RW registers, each bit or field within
+/* the register is annotated with one of the following:
+/*
+/*  	RW - The bit/field may be read and written
+/*  	RO - The bit/field may be read; writes are ignored
+/*  	WO - The bit/field may be written; reads return an UNPREDICTABLE result.
+/*  	WZ - The bit/field may be written; reads return a 0
+/*  	WC - The bit/field may be read; writes cause state to clear
+/*  	RC - The bit/field may be read, which also causes state to clear; writes are ignored
+/* Architecturally-defined (SRM) registers for EVMS
+
+
+constant PT0 equals %x140  ;		/* PALtemp0
+constant PT1 equals %x141  ;		/* PALtemp1
+constant PT2 equals %x142  ;		/* PALtemp2
+constant PT3 equals %x143  ;		/* PALtemp3
+constant PT4 equals %x144  ;		/* PALtemp4
+constant PT5 equals %x145  ;		/* PALtemp5
+constant PT6 equals %x146  ;		/* PALtemp6
+constant PT7 equals %x147  ;		/* PALtemp7
+constant PT8 equals %x148  ;		/* PALtemp8
+constant PT9 equals %x149  ;		/* PALtemp9
+constant PT10 equals %x14A  ;		/* PALtemp10
+constant PT11 equals %x14B  ;		/* PALtemp11
+constant PT12 equals %x14C  ;		/* PALtemp12
+constant PT13 equals %x14D  ;		/* PALtemp13
+constant PT14 equals %x14E  ;		/* PALtemp14
+constant PT15 equals %x14F  ;		/* PALtemp15
+constant PT16 equals %x150  ;		/* PALtemp16
+constant PT17 equals %x151  ;		/* PALtemp17
+constant PT18 equals %x152  ;		/* PALtemp18
+constant PT19 equals %x153  ;		/* PALtemp19
+constant PT20 equals %x154  ;		/* PALtemp20
+constant PT21 equals %x155  ;		/* PALtemp21
+constant PT22 equals %x156  ;		/* PALtemp22
+constant PT23 equals %x157  ;		/* PALtemp23
+
+constant CBOX_IPR_OFFSET equals %xFFFFF0 ;  /* IPR offset for Cbox IPRs - must still be shifted left 16
+
+constant SC_CTL equals %xA8 ;		/* Scache Control register (RW)
+constant SC_STAT equals %xE8 ;		/* Scache Status register (RO)
+constant SC_ADDR equals %x188 ;		/* Scache address registor (RO)
+constant SC_ADDR_NM equals %x188 ;	/* Scache address registor (RO)
+constant SC_ADDR_FHM equals %x188 ;	/* Scache address registor (RO)
+constant BC_CTL equals %x128 ;		/* Bcache Control register (WO)
+constant BC_CONFIG equals %x1C8 ;	/* Bcache Configuration register (WO)
+constant EI_STAT equals %x168 ;		/* External Interface Status Register (RO)
+constant EI_ADDR equals %x148 ;		/* External Interface Address Register (RO)
+constant FILL_SYN equals %x68 ;		/* Fill_Syndrome register (RO)
+constant BC_TAG_ADDR equals %x108 ;	/* Bcache Tag Address Register (RO)
+constant LD_LOCK equals %x1E8 ;		/* Load Lock address register (RO)
+
+constant ASTER equals %x10A ;		/* Aync System Trap Enable (RW)
+constant ASTRR equals %x109 ;		/* Aync System Trap Request (RW)
+constant EXC_ADDR equals %x10B ;	/* Exception Address register (RW)
+constant EXC_SUM equals %x10C ;		/* Exception Summary register (RW)
+constant EXC_MASK equals %x10D ;	/* Exception Mask register (RW)
+constant HWINT_CLR equals %x115 ;	/* HW Interrupt Clear register (W)
+constant IC_FLUSH_CTL equals %x119 ;	/* Flushes entire Icache (WO)
+constant ICPERR_STAT equals %x11A  ;	/* Icache Parity Error status register (RW)
+constant IC_PERR_STAT equals %x11A  ;	/* Icache Parity Error status register (RW)
+constant IC_ROW_MAP equals %x11B ;	/* Bad Icache Mapping Data (RO)
+constant ICSR equals %x118 ;		/* Ibox control and status register (RW)
+constant IFAULT_VA_FORM equals %x112 ;	/* Formatted Faulting Virtual Address (R)
+constant INTID equals %x111 ;		/* Interrupt ID register (R)
+constant IPL equals %x110 ;		/* Interrupt Priority Level (RW)
+constant ISR equals %x100 ;		/* Interrupt Summary Register (R)
+constant ITB_IS equals %x107 ;		/* Istream TB Invalidate Single (W)
+constant ITB_ASN equals %x103 ;		/* Address Space Number (RW)
+constant ITB_IA equals %x105 ;		/* Istream TB Invalidate All (W)
+constant ITB_IAP equals %x106 ;		/* Istream TB Invalidate All Process (W)
+constant ITB_PTE equals %x102 ;		/* Istream TB PTE (RW)
+constant ITB_PTE_TEMP equals %x104 ;	/* Istream TB PTE Temp (R)
+constant ITB_TAG equals %x101 ;		/* Istream TB Tag (W)
+constant IVPTBR equals %x113 ;		/* Virtual Page Table Base Register (RW)
+constant PAL_BASE equals %x10E ;	/* PAL base register (RW)
+constant PMCTR equals %x11c ;		/* Performance counter register (RW)
+constant PS equals %x10F   ;		/* Processor Status Register (RW)
+constant SIRR equals %x108 ;		/* SW Interrupt Request Register (W)
+constant SL_TXMIT equals %x116 ;	/* Serial Line Transmit (W)
+constant SL_RCV equals %x117 ;		/* Serial Line Transmit (W)
+constant ALT_MODE equals %x20C ;	/* Alternate Mode (W)
+constant CC equals %x20D ;		/* Cycle Counter (R)
+constant CC_CTL equals %x20E ;		/* Cycle Counter Control (W)
+constant DC_FLUSH equals %x210 ;	/* Dcache Flush Register (W)
+constant DCPERR_STAT equals %x212  ;	/* Dcache Parity Error status register (RW)
+constant DC_TEST_CTL equals %x213  ;	/* Dcache Test Tag Control Register (RW)
+constant DC_TEST_TAG equals %x214  ;	/* Dcache Test TAG Register (RW)
+constant DC_TEST_TAG_TEMP equals %x215 ;/* Dcache Test TAG Register (RW)
+constant DTB_ASN equals %x200 ;		/* Address Space Number (W)
+constant DTB_CM equals %x201 ;		/* Dstream TB Current Mode (W)
+constant DTB_IA equals %x20A ;		/* Dstream TB Invalidate All (W)
+constant DTB_IAP equals %x209 ;		/* Dstream TB Invalidate All Process (W)
+constant DTB_IS equals %x20B ;		/* Dstream TB Invalidate Single (W)
+constant DTB_PTE equals %x203 ;		/* Dstream TB PTE (RW)
+constant DTB_PTE_TEMP equals %x204 ;	/* Istream TB PTE Temp (R)
+constant DTB_TAG equals %x202 ;		/* Dstream TB Tag (W)
+constant MCSR equals %x20F ;		/* Mbox control and status register (RW)
+constant DC_MODE equals  %x216 ;	/* Dcache Mode register (RW)
+constant MAF_MODE equals  %x217 ;	/* MAF Mode register (RW)
+constant MM_STAT equals %x205 ;		/* Dstream MM Fault Register
+constant MVPTBR equals %x208 ;		/* Mbox Virtual Page Table Base Register (W)
+constant VA equals %x206 ;		/* Faulting Virtual Address (R)
+constant VA_FORM  equals %x207 ;	/* Formatted Virtual Address (R)
+
+
+aggregate EV5_DEF union prefix EV5;
+
+constant PS equals %x  tag _SRM$;		/* Processor Status (RW)
+constant PC equals %x  tag _SRM$;		/* Program Counter
+constant ASTEN equals %x  tag _SRM$;		/* AST Enable (RW)
+constant ASTSR equals %x   tag _SRM$;		/* AST Summary (RW)
+constant IPIR equals %x   tag _SRM$;		/* Interproc. Interrupt (W)
+constant IPL equals %x    tag _SRM$;		/* Interrupt Priority Level (RW)
+constant MCES equals %x   tag _SRM$;		/* Machine Check Error Summary (RW)
+constant PCBB equals %x   tag _SRM$;		/* Privileged Context Block Bsse (R)
+constant PRBR equals %x   tag _SRM$;		/* Processor Base Register (RW)
+constant PTBR equals %x   tag _SRM$;		/* Page Table Bsse Register (R)
+constant SCBB equals %x   tag _SRM$;		/* Sys Control Block Base Register (RW)
+constant SIRR equals %x tag _SRM$;		/* SW Interrupt Request Register (W)
+constant SISR equals %x   tag _SRM$;		/* SW Interrupt Summary Register (R)
+constant TBCHK equals %x   tag _SRM$;		/* TB Check (R)
+constant TB1A equals %x   tag _SRM$;		/* TB Invalidate All (W)
+constant TB1AP equals %x   tag _SRM$;		/* TB Invalidate All Process (W)
+constant TB1AD equals %x   tag _SRM$;		/* TB Invalidate All Dstream (W)
+constant TB1AI equals %x   tag _SRM$;		/* TB Invalidate All Istream (W)
+constant TBIS equals %x   tag _SRM$;		/* TB Invalidate Single (W)
+constant KSP  equals %x   tag _SRM$;		/* Kernel Stack Pointer
+constant ESP  equals %x   tag _SRM$;		/* Executive Stack Pointer (RW)
+constant SSP  equals %x   tag _SRM$;		/* Supervisor Stack Pointer (RW)
+constant USP  equals %x   tag _SRM$;		/* User Stack Pointer (RW)
+constant VPTB equals %x   tag _SRM$;		/* Virtual Page Table Base (RW)
+constant WHAMI equals %x   tag _SRM$;		/* Who Am I (R)
+constant CC   equals %x   tag _SRM$;		/* Cycle Counter (RW)
+constant UNQ  equals %x   tag _SRM$;		/* Unique (RW)
+
+
+/* Processor-specific IPRS.
+/* Cbox registers.
+constant SC_CTL equals %xA8 tag $;			/* Scache Control register (RW)
+    EV5SC_CTL_BITS structure fill prefix SC_CTL$;
+	SC_FHIT bitfield length 1 ;			/* Force Scache hits (RW,0)
+	SC_FLUSH bitfield length 1 ;			/* Invalidates Scache tag store (RW,0)
+	SC_TAG_STAT bitfield length 6 ;			/* Value of tag status to write in forced mode (RW,0)
+	SC_FB_DP bitfield length 4 ;			/* Bad Scache Data Parity (RW,0)
+	SC_BLK_SIZE bitfield length 1 ;			/* Scache/Bcache Block size 32 or 64 byte (RW)
+	SC_SET_EN bitfield length 3 ;			/* Scache Set Enable (RW)
+	SC_SOFT_REPAIR	bitfield length 3 ;	        /* Soft SCache Tag repair bits
+	FILL_0 bitfield length 13 fill tag $$;
+	FILL_1 bitfield length 32 fill tag $$;
+    end EV5SC_CTL_BITS;
+
+constant SC_STAT equals %xE8    tag $;			/* Scache Status register (RO)
+    EV5SC_STAT_BITS structure fill prefix SC_STAT$;
+	SC_TPERR bitfield length 3 ;			/* Tag Lookup Error
+	SC_DPERR bitfield length 8 ;			/* Data Read Error
+	CBOX_CMD bitfield length 5 ;			/* Cbox Command that resulted in Error
+	SC_SCND_ERR bitfield length 1 ;			/* Scache Second Error Occurred
+	FILL_0 bitfield length 15 fill tag $$;
+	FILL_1 bitfield length 32 fill tag $$;
+    end EV5SC_STAT_BITS;
+
+constant SC_ADDR equals %x188 tag $;			/* Scache address registor (RO)
+    EV5SC_ADDR_FHM_BITS structure fill prefix SC_ADDR_FHM$;
+	FILL_0 bitfield length 4 fill tag $$;
+	SC_TAG_PARITY bitfield length 1 ;		/* Tag Parity
+	TAG_STAT_SB0 bitfield length 3 ;		/* Tag Status for Sub-block 0
+	TAG_STAT_SB1 bitfield length 3 ;		/* Tag Status for Sub-block 1
+	OW_MOD0 bitfield length 2 ;			/* Octaword modified bits for sublock 0
+	OW_MOD1 bitfield length 2 ;			/* Octaword modified bits for sublock 1
+	TAG_LO bitfield length 17 ;			/* Lo half of Tag
+	TAG_HI bitfield length 7 ;			/* Hi half of Tag
+	FILL_1 bitfield length 25 fill tag $$;
+    end EV5SC_ADDR_FHM_BITS;
+
+constant BC_CTL equals %x128    tag $;			/* Bcache Control register (WO)
+    EV5BC_CTL_BITS structure fill prefix BC_CTL$;
+	BC_ENABLED bitfield length 1 ;			/* External Bcache enabled (WO,0)
+	ALLOC_CYC bitfield length 1 ;			/* Allocate cycle for IPR  (WO,1)
+	EI_OPT_CMD bitfield length 1 ;			/* optional command group (WO,0)
+	EI_OPT_CMD_MB bitfield length 1 ;		/* optional command group for MB  (WO,0)
+	CORR_FILL_DAT bitfield length 1 ;		/* Correct fill data from bcache/memory (WO,1)
+	VTM_FIRST bitfield length 1 ;			/* Victim Buffer Present (WO,1)
+	EI_ECC_OR_PARITY bitfield length 1 ;		/* External Interface ECC/parity enable (WO)
+	BC_FHIT bitfield length 1 ;			/* Bcache Force Hit (WO,0)
+	BC_TAG_STAT bitfield length 5 ;			/* Tag Status to be written in BC Force Hit mode (WO)
+	BC_BAD_DAT bitfield length 2 ;			/* Force Bad data to be written (WO,0)
+	EI_DIS_ERR bitfield length 1 ;			/* Error enable (WO,0)
+	TL_PIPE_LATCH  bitfield length 1 ;		/* EV5 pipe control pins  (WO,0)
+	BC_WAVE_PIPE bitfield length 2 ;		/* wave pipelining value (WO,0)
+	PM_MUX_SEL bitfield length 6 ;			/* select BIU parameters for perf.mon.  (WO,0)
+	DBG_MUX_SEL  bitfield length 1 ;		/* Select cbox signals driven to mbox (WO,0)
+	DIS_BAF_BYP bitfield length 1 ;			/* disables specualtive bcache reads  (WO,0)
+	DIS_SC_VIC_BUF bitfield length 1 ;		/* disables scache victim buffer (WO,0)
+	DIS_SYS_ADDR_PAR bitfield length 1;		/* Disable system cmd/addr parity checking
+	READ_DIRTY_CLN_SHR bitfield length 1;		/* Enable EV56 read dirty -> shared clean
+	WRITE_READ_BUBBLE bitfield length 1;		/* Enable EV56 write_read_bubble
+	BC_WAVE_PIPE_2 bitfield length 1;		/* Bit <2> of BC_WAVE_PIPE
+	AUTO_DACK bitfield length 1;			/* Enable EV56 auto dack
+	DIS_BYTE_WORD bitfield length 1;		/* CBox Byte/Word disable
+	STCLK_DELAY bitfield length 1;			/* Enable STCLK delay
+	WRITE_UNDER_MISS bitfield length 1;		/* Enable EV56 victim writes under misses
+	FILL_0 bitfield length 28 fill tag $$;
+    end EV5BC_CTL_BITS;
+
+constant BC_CONFIG equals %x1C8    tag $;			/* Bcache Configuration register (WO)
+    EV5BC_CONFIG_BITS structure fill prefix BC_CONFIG$;
+	BC_SIZE bitfield length 3 ;			/* Bcache size (WO)
+	    constant SIZE_1MB equals 1;			/* Select 1MB Bcache
+	    constant SIZE_2MB equals 2;			/* Select 2MB Bcache
+	    constant SIZE_4MB equals 3;			/* Select 4MB Bcache
+	    constant SIZE_8MB equals 4;			/* Select 8MB Bcache
+	    constant SIZE_16MB equals 5;		/* Select 16MB Bcache
+	    constant SIZE_32MB equals 6;		/* Select 32MB Bcache
+	    constant SIZE_64MB equals 7;		/* Select 64MB Bcache
+	FILL_0 bitfield length 1 fill tag $$;
+	BC_RD_SPD bitfield length 4 ;			/* Bcache Read access speed (WO)
+	BC_WR_SPD bitfield length 4 ;			/* Bcache Write access speed (WO)
+	BC_RD_WR_SPC bitfield length 3 ;		/* Read/Write switch speed (WO)
+	FILL_1 bitfield length 1 fill tag $$;
+	FILL_WE_OFFSET bitfield length 3 ;		/* Bcache Write Enable Pulse Offset (WO)
+	FILL_2 bitfield length 1 fill tag $$;
+	BC_WE_CTL bitfield length 9 ;			/* Bcache Write enable control (WO)
+	FILL_3 bitfield length 3 fill tag $$;		/* MBZ Reserved bits
+	FILL_4 bitfield length 31 fill tag $$;
+    end EV5BC_CONFIG_BITS;
+
+
+/* Cbox registers, continued
+constant EI_STAT equals %x168 tag $;			/* External Interface Status Register (RO)
+    EV5EI_STAT_BITS structure fill prefix EI_STAT$;
+	FILL_0 bitfield length 24 fill tag $$;
+	SYS_ID bitfield length 4 ;			/* Hardwired chip revision number (pass2 = 2)
+	BC_TPERR bitfield length 1 ;			/* Tag Address Parity Error (RO)
+	BC_TC_PERR bitfield length 1 ;			/* Tag Control Parity Error Mode (WO)
+	EI_ES bitfield length 1 ;			/* External interface error source (RO)
+	COR_ECC_ERR bitfield length 1 ;			/* Correctable ECC Error (RO)
+	UNC_ECC_ERR bitfield length 1 ;			/* Uncorrectable ECC Error (RO)
+	EI_PAR_ERR bitfield length 1 ;			/* Fill Parity Error (RO)
+	FIL_IRD bitfield length 1 ;			/* Fill Error in Icache or Dcache (RO)
+	SEO_HRD_ERR bitfield length 1 ;			/* Second External Interface Hard Error (RO)
+	FILL_1 bitfield length 28 fill tag $$;
+    end EV5EI_STAT_BITS;
+
+/*
+constant EI_ADDR equals %x148 tag $;			/* External Interface Address Register (RO)
+constant FILL_SYN equals %x68 tag $;			/* Fill_Syndrome register (RO)
+
+constant BC_TAG_ADDR equals %x108 tag $;		/* Bcache Tag Address Register (RO)
+    EV5BC_TAG_ADDR_BITS structure fill prefix BC_TAG_ADDR$;
+	FILL_0 bitfield length 12 fill tag $$;
+	HIT bitfield length 1 ;				/* Tag Address Parity Error (RO)
+	TAGCTL_P bitfield length 1 ;			/* Tag Control 		(RO)
+	TAGCTL_D bitfield length 1 ;			/* Tag Control 		(RO)
+	TAGCTL_S bitfield length 1 ;			/* Tag Control  	(RO)
+	TAGCTL_V bitfield length 1 ;			/* Tag Control  	(RO)
+	TAG_P bitfield length 1 ;			/*
+	FILL_1 bitfield length 2 fill tag $$;
+	BC_TAG bitfield length 19 ;			/*
+	FILL_2 bitfield length 25 fill tag $$;
+    end EV5BC_TAG_ADDR_BITS;
+
+/* Ibox and Icache registers.
+
+constant ASTER equals %x10A tag $;			/* Aync System Trap Enable (RW)
+    EV5ASTER_BITS structure fill prefix ASTER$;
+	KAR bitfield length 1 ;				/*
+	EAR bitfield length 1 ;				/*
+	SAR bitfield length 1 ;				/*
+	UAR bitfield length 1 ;				/*
+	FILL_0 bitfield length 32 fill tag $$;
+	FILL_1 bitfield length 28 fill tag $$;
+    end EV5ASTER_BITS;
+
+constant ASTRR equals %x109 tag $;			/* Aync System Trap Request (RW)
+    EV5ASTRR_BITS structure fill prefix ASTRR$;
+	KAR bitfield length 1 ;				/*
+	EAR bitfield length 1 ;				/*
+	SAR bitfield length 1 ;				/*
+	UAR bitfield length 1 ;				/*
+	FILL_0 bitfield length 32 fill tag $$;
+	FILL_1 bitfield length 28 fill tag $$;
+    end EV5ASTRR_BITS;
+
+constant EXC_ADDR equals %x10B tag $;			/* Exception Address register (RW)
+    EV5EXC_ADDR_BITS structure fill prefix EXC_ADDR$;
+	PAL bitfield length 1 ;				/* PAL mode indicator (RW)
+	FILL_0 bitfield length 1 fill tag $$;
+{* Defined as constants - SDL complains about bitfields greater than 32 bits
+	    constant PA equals 2  tag V;
+            constant PA equals 62 tag S;
+    end EV5EXC_ADDR_BITS;
+
+constant EXC_SUM equals %x10C tag $;			/* Exception Summary register (RW)
+    EV5EXC_SUM_BITS structure fill prefix EXC_SUM$;
+	FILL_0 bitfield length 10 fill tag $$;
+	SWC bitfield length 1 ;				/* Software Completion Possible (WA)
+	INV bitfield length 1  ;				/* Invalid Operation (WA)
+	DZE bitfield length 1 ;				/* Divide by Zero (WA)
+	FOV bitfield length 1  ;				/* FP Overflow (WA)
+	UNF bitfield length 1 ;				/* FP Underflow (WA)
+	INE bitfield length 1  ;				/* FP Inexact Error (WA)
+	IOV bitfield length 1 ;				/* Integer Overflow (WA)
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 15 fill tag $$;
+    end EV5EXC_SUM_BITS;
+
+constant EXC_MASK equals %x10D tag $;			/* Exception Mask register (RW)
+
+constant HWINT_CLR equals %x115 tag $;			/* HW Interrupt Clear register (W)
+    EV5HWINT_CLR_BITS structure fill prefix HWINT_CLR$;
+	FILL_0 bitfield length 27 fill tag $$;
+	PC0C  bitfield length 1 ;				/* Clears Perf counter 0 interrupt (WO,0)
+	PC1C  bitfield length 1 ;				/* Clears Perf counter 1 interrupt (WO,0)
+	PC2C  bitfield length 1 ;				/* Clears Perf counter 2 interrupt (WO,0)
+	FILL_1 bitfield length 2 fill tag $$;
+	CRDC bitfield length 1 ;				/* Clears correctable read interrupt
+	SLC bitfield length 1 ;				/* Clears Serial Line Interrupts (WO,0)
+	FILL_2 bitfield length 29 fill tag $$;
+    end EV5HWINT_CLR_BITS;
+
+
+/* Ibox and Icache registers, continued
+
+constant IC_FLUSH_CTL equals %x119 tag $;		/* Flushes entire Icache (WO)
+
+constant ICPERR_STAT equals %x11A  tag $;			/* Icache Parity Error status register (RW)
+    EV5ICPERR_STAT_BITS structure fill prefix ICPERR_STAT$;
+	FILL_0 bitfield length 11 fill tag $$;
+	DPE bitfield length 1 ;				/* Data Parity Error (RW)
+	TPE bitfield length 1 ;				/* Tag Parity Error (RW)
+	TMR bitfield length 1 ;			/* timeout reset error 
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 18 fill tag $$;
+    end EV5ICPERR_STAT_BITS;
+
+constant IC_PERR_STAT equals %x11A  tag $;			/* Icache Parity Error status register (RW)
+    EV5IC_PERR_STAT_BITS structure fill prefix IC_PERR_STAT$;
+	FILL_0 bitfield length 11 fill tag $$;
+	DPE bitfield length 1 ;				/* Data Parity Error (RW)
+	TPE bitfield length 1 ;				/* Tag Parity Error (RW)
+	TMR bitfield length 1 ;			/* timeout reset error 
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 18 fill tag $$;
+    end EV5IC_PERR_STAT_BITS;
+
+constant IC_ROW_MAP equals %x11B tag $;			/* Bad Icache Mapping Data (RO)
+
+constant ICSR equals %x118 tag $;			/* Ibox control and status register (RW)
+    EV5ICSR_BITS structure fill prefix ICSR$;
+	FILL_0 bitfield length 8 fill tag $$;
+	PMA  bitfield length 1 ;				/* Peformance Monitor All process enable
+	PMP  bitfield length 1 ;				/* Performance Monitor Process enable
+	FILL_1 bitfield length 7 fill tag $$;
+	BYT  bitfield length 1 ;				/* Byte Word ECO enable
+	FMP  bitfield length 1 ;				/* Forced PC_Mispredict enable
+	MVE  bitfield length 1 ;				/* Motion Video instruction set enable
+	IM0  bitfield length 1 ;				/* IRQ 20 Mask
+	IM1  bitfield length 1 ;				/* IRQ 21 Mask
+	IM2  bitfield length 1 ;				/* IRQ 22 Mask
+	IM3  bitfield length 1 ;				/* IRQ 23 Mask
+	TMM  bitfield length 1 ;				/* Select timeout counter mode (short/long) (RW)
+	TMD  bitfield length 1 ;				/* Disable timeout counter (RW)
+	FPE  bitfield length 1 ;				/* Enable floating point instructions (RW)
+	HWE  bitfield length 1 ;				/* Enable PALRES in kernel mode (RW,0)
+	SPE  bitfield length 2 ;				/* Enable Istream super page mapping (RW,0)
+	SDE  bitfield length 1 ;				/* Enable PAL shadow registers (RW,0)
+	FILL_2 bitfield length 1 fill tag $$;
+	CRDE bitfield length 1 ;				/* Correctable Read Error Enable 
+	SLE  bitfield length 1 ;				/* Enable serial line interrupts (RW,0)
+	FMS  bitfield length 1 ;				/* Force Icache miss (RW,0)
+	FBT  bitfield length 1 ;				/* Force Bad Icache tag parity (RW,0)
+	FBD  bitfield length 1 ;				/* Force Bad Icache data parity  (RW,0)
+	DBS  bitfield length 1 ;				/* Debug Port Select 
+	ISTA bitfield length 1 ;
+   	TST  bitfield length 1 ;
+	FILL_3 bitfield length 24 fill tag $$;
+    end EV5ICSR_BITS;
+
+
+;/* removed 17-jun-1992  register removed from design cjs
+
+;/* constant IFAULT_VA equals %x108 tag $;			/* Faulting Virtual Address (R)
+;/*     EV5IFAULT_VA_BITS structure fill prefix IFAULT_VA$;
+;/* 	FILL_0 bitfield length 13 fill tag $$;
+;/* 	VA bitfield length 30 ;				/*
+;/* 	FILL_1 bitfield length 31 fill tag $$;
+;/*     end EV5IFAULT_VA_BITS;
+
+constant IFAULT_VA_FORM equals %x112 tag $;		/* Formatted Faulting Virtual Address (R)
+    EV5IFAULT_VA_FORM_BITS structure fill prefix IFAULT_VA_FORM$;
+	FILL_0 bitfield length 3 fill tag $$;
+	VA bitfield length 30 ;				/*
+	VPTB bitfield length 31 ;			/*
+    end EV5IFAULT_VA_FORM_BITS;
+
+constant IFAULT_VA_FORM_NT equals %x112 tag $;		/* Formatted Faulting Virtual Address - NT mode(R)
+    EV5IFAULT_VA_FORM_NT_BITS structure fill prefix IFAULT_VA_FORM_NT$;
+	FILL_0 bitfield length 3 fill tag $$;
+	VA bitfield length 19 ;				/*
+	FILL_1 bitfield length 8 fill tag $$;
+{* Defined as constants - SDL complains about bitfields greater than 32 bits
+	    constant VPTB equals 30 tag V;
+            constant VPTB equals 34 tag S;
+    end EV5IFAULT_VA_FORM_NT_BITS;
+
+constant INTID equals %x111 tag $;			/* Interrupt ID register (R)
+    EV5INTID_BITS structure fill prefix INTID$;
+	INTID bitfield length 5 ;				/* Interrupt ID (R)
+	FILL_0 bitfield length 32 fill tag $$;
+	FILL_1 bitfield length 27 fill tag $$;
+    end EV5INTID_BITS;
+
+/* Ibox and Icache registers, continued
+
+constant IPL equals %x110 tag $;		        /* Interrupt Priority Level (RW)
+    EV5IPL_BITS structure fill prefix IPL$;
+	IPL bitfield length 5 ;				/* Interrupt Priority Level
+    end EV5IPL_BITS;
+
+constant ITB_IS equals %x107 tag $;			/* Istream TB Invalidate Single (W)
+    EV5ITB_IS_BITS structure fill prefix ITB_IS$;
+	FILL_0 bitfield length 13 fill tag $$;
+	VA bitfield length 30 ;				/*
+	FILL_1 bitfield length 31 fill tag $$;
+    end EV5ITB_IS_BITS;
+
+constant ITB_ASN equals %x103 tag $;			/* Address Space Number (RW)
+    EV5ITB_ASN_BITS structure fill prefix ITB_ASN$;
+	FILL_0 bitfield length 4 fill tag $$;
+	ASN bitfield length 7 ;				/* Address Space Number
+	FILL_1 bitfield length 31 fill tag $$;
+    end EV5ITB_ASN_BITS;
+
+constant ITB_IA equals %x105 tag $;			/* Istream TB Invalidate All (W)
+constant ITB_IAP equals %x106 tag $;			/* Istream TB Invalidate All Process (W)
+
+constant ITB_PTE equals %x102 tag $;			/* Istream TB PTE (RW)
+    EV5ITB_PTE_BITS structure fill prefix ITB_PTE$;
+	FILL_0 bitfield length 4 fill tag $$;
+	ASM bitfield length 1 ;				/*
+	GH bitfield length 2 ;				/*
+	FILL_1 bitfield length 1 fill tag $$; 		/*
+	KRE bitfield length 1 ;				/*
+	ERE bitfield length 1 ;				/*
+	SRE bitfield length 1 ;				/*
+	URE bitfield length 1 ;				/*
+	FILL_2 bitfield length 20 fill tag $$;
+	PFN bitfield length 27 ;			/*
+	FILL_3 bitfield length 5 fill tag $$;
+    end EV5ITB_PTE_BITS;
+
+
+constant ITB_PTE_TEMP equals %x104 tag $;		/* Istream TB PTE Temp (R)
+    EV5ITB_PTE_TEMP_BITS structure fill prefix ITB_PTE_TEMP$;
+	FILL_0 bitfield length 13 fill tag $$;
+	ASM bitfield length 1 ;				/*
+	FILL_1 bitfield length 4 fill tag $$;
+	KRE bitfield length 1 ;				/*
+	ERE bitfield length 1 ;				/*
+	SRE bitfield length 1 ;				/*
+	URE bitfield length 1 ;				/*
+	FILL_2 bitfield length 7 fill tag $$; 		/*
+	GH bitfield length 3 ;				/*
+	PFN bitfield length 27 ;			/*
+	FILL_3 bitfield length 5 fill tag $$;
+    end EV5ITB_PTE_TEMP_BITS;
+
+
+/* Ibox and Icache registers, continued
+
+constant ITB_TAG equals %x101 tag $;			/* Istream TB Tag (W)
+    EV5ITB_TAG_BITS structure fill prefix ITB_TAG$;
+	FILL_0 bitfield length 13 fill tag $$;
+	VA bitfield length 30 ;				/* Virtual Address
+	FILL_1 bitfield length 21 fill tag $$;
+    end EV5ITB_TAG_BITS;
+
+constant IVPTBR equals %x113 tag $;			/* Virtual Page Table Base Register (RW)
+    EV5IVPTBR_BITS structure fill prefix IVPTBR$;
+	FILL_0 bitfield length 30 fill tag $$;
+{* Defined as constants - SDL complains about bitfields greater than 32 bits
+	    constant VPTB equals 30 tag V;
+            constant VPTB equals 34 tag S;
+    end EV5IVPTBR_BITS;
+
+constant PAL_BASE equals %x10E tag $;			/* PAL base register (RW)
+    EV5PAL_BASE_BITS structure fill prefix PAL_BASE$;
+	FILL_0 bitfield length 14 fill tag $$;
+	PAL_BASE bitfield length 26 ;		/* Base Address of PALcode
+	FILL_1 bitfield length 24 fill tag $$;
+    end EV5PAL_BASE_BITS;
+
+constant PMCTR equals %x11c tag $;			/* performance counter register
+    EV5PMCTR_BITS structure fill prefix PMCTR$;
+	SEL2 bitfield length 4 ;
+	SEL1 bitfield length 4 ;
+	KILLK bitfield length 1 ;
+	KILLP bitfield length 1 ;
+	CTL2 bitfield length 2 ;
+	CTL1 bitfield length 2 ;
+	CTL0 bitfield length 2 ;
+	CTR2 bitfield length 14 ;
+	KILLU bitfield length 1 ;
+	SEL0 bitfield length 1 ;
+	CTR1 bitfield length 16 ;
+	CTR0 bitfield length 16 ;
+    end EV5PMCTR_BITS;
+
+constant PS equals %x10F   tag $;				/* Processor Status Register (RW)
+    EV5PS_BITS structure fill prefix PS$;
+	FILL_0 bitfield length 3 fill tag $$;
+	CM0 bitfield length 1 ;				/*
+	CM1 bitfield length 1 ;				/*
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 27 fill tag $$;
+    end EV5PS_BITS;
+
+constant ISR equals %x100 tag $;			/* Interrupt Summary Register (R)
+    EV5ISR_BITS structure fill prefix ISR$;
+	ASTRR bitfield length 4 ;			/* AST request
+	SISR bitfield length 15 ;			/* Software Interrupt Summary requests
+	ATR bitfield length 1 ;				/* AST request
+	I20 bitfield length 1 ;				/* External HW Interrupt at IPL20
+	I21 bitfield length 1 ;				/* External HW Interrupt at IPL21
+	I22 bitfield length 1 ;				/* External HW Interrupt at IPL22
+	I23 bitfield length 1 ;				/* External HW Interrupt at IPL23
+	FILL_0 bitfield length 3 fill tag $$;
+	PC0 bitfield length 1 ;				/* External HW Interrupt - Performance Counter 0
+	PC1 bitfield length 1 ;				/* External HW Interrupt - Performance Counter 1
+	PC2 bitfield length 1 ;				/* External HW Interrupt - Performance Counter 2
+	PFL bitfield length 1 ;				/* External HW Interrupt - Power Fail
+	MCK bitfield length 1 ;				/* External HW Interrupt - System Machine Check
+	CRD bitfield length 1 ;				/*  
+	SLI bitfield length 1 ;				/* Serial Line interrupt 
+	HLT bitfield length 1 ;				/* External HW Interrupt - Halt
+	FILL_1 bitfield length 29 fill tag $$;
+    end EV5ISR_BITS;
+
+/* removed from spec - 5/1/93
+/*constant SICR equals %x108 tag $;			/* SW Interrupt clear Register (W)
+/*    EV5SICR_BITS structure fill prefix SICR$;
+/*	FILL_0 bitfield length 4 fill tag $$;
+/*	SICR bitfield length 15 ;				/* Software Interrupt request clears
+/*	FILL_1 bitfield length 13 fill tag $$;
+/*	FILL_2 bitfield length 32 fill tag $$;
+/*    end EV5SICR_BITS;
+
+constant SIRR equals %x108 tag $;			/* SW Interrupt Request Register (RW)
+    EV5SIRR_BITS structure fill prefix SIRR$;
+	FILL_0 bitfield length 4 fill tag $$;
+	SIRR bitfield length 15 ;				/* Software Interrupt requests
+	FILL_1 bitfield length 13 fill tag $$;
+	FILL_2 bitfield length 32 fill tag $$;
+    end EV5SIRR_BITS;
+
+
+
+/* Ibox and Icache registers, continued
+
+constant SL_TXMIT equals %x116 tag $;			/* Serial Line Transmit (W)
+    EV5SL_TXMIT_BITS structure fill prefix SL_TXMIT$;
+	FILL_0 bitfield length 7 fill tag $$;
+	TMT bitfield length 1 ;				/*
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 24 fill tag $$;
+    end EV5SL_TXMIT_BITS;
+
+constant SL_RCV equals %x117 tag $;			/* Serial Line Transmit (W)
+    EV5SL_RCV_BITS structure fill prefix SL_RCV$;
+	FILL_0 bitfield length 6 fill tag $$;
+	RCV bitfield length 1 ;				/*
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 25 fill tag $$;
+    end EV5SL_RCV_BITS;
+
+
+/* Mbox and Dcache registers.
+
+constant ALT_MODE equals %x20C tag $;			/* Alternate Mode (W)
+    EV5ALT_MODE structure fill prefix ALT_MODE$;
+	FILL_0 bitfield length 3 fill tag $$;
+	AM0 bitfield length 1 ;				/*
+	AM1 bitfield length 1 ;				/*
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 27 fill tag $$;
+    end EV5ALT_MODE_BITS;
+
+constant CC equals %x20D tag $;				/* Cycle Counter (R)
+constant CC_CTL equals %x20E tag $;			/* Cycle Counter Control (W)
+    EV5CCTL_BITS structure fill prefix CC_CTL$;
+	FILL_0 bitfield length 32 fill tag $$;
+	CC_ENA bitfield length 1 ;
+	FILL_1 bitfield length 31 fill tag $$;
+    end EV5CCTL_BITS;
+
+constant DC_FLUSH equals %x210 tag $;			/* Dcache Flush Register (W)
+
+constant DCPERR_STAT equals %x212  tag $;		/* Dcache Parity Error status register (RW)
+    EV5DCPERR_STAT_BITS structure fill prefix DCPERR_STAT$;
+	SEO bitfield length 1 ;				/* Second Error after Register Locked  (W1C)
+	LOCK bitfield length 1 ;			/* Set when register is locked against updates (W1C)
+	DP0 bitfield length 1 ;				/* Data Parity Error in Dcache Bank 0 (W1C)
+	DP1 bitfield length 1 ;				/* Data Parity Error in Dcache Bank 1 (W1C)
+	TP0 bitfield length 1 ;				/* Tag Parity Error in Dcache Bank 0 (W1C)
+	TP1 bitfield length 1 ;				/* Tag Parity Error in Dcache Bank 1 (W1C)
+	FILL_0 bitfield length 32 fill tag $$;
+	FILL_1 bitfield length 26 fill tag $$;
+    end EV5DCPERR_STAT_BITS;
+
+/* The following two registers are used exclusively for test and diagnostics.
+/* They should not be referenced in normal operation.
+constant DC_TEST_CTL equals %x213  tag $;		/* Dcache Test TAG Control Register (RW)
+    EV5DC_TEST_CTL_BITS structure fill prefix DC_TEST_CTL$;
+	BANK0 bitfield length 1 ;			/* Enable Dcache Bank0 (RW)
+	BANK1 bitfield length 1 ;			/* Enable Dcache Bank1 (RW)
+	FILL_0 bitfield length 1 ;	           /* Ignored bits
+	INDEX bitfield length 10 ;			/* Dcache Tag Index (RW)
+	DATA bitfield length 1 ;			/* Data for Dcache soft repair (RW - PCA56 only)
+	SHIFT bitfield length 1;			/* Shift signal for Dcache soft repair (RW/RAZ - PCA56 only)
+	LOAD bitfield length 1;				/* Load signal for Dcache soft repair (RW,0 - PCA56 only)
+	FILL_1 bitfield length 16 ;
+	FILL_2 bitfield length 32 ;
+    end EV5DC_TEST_CTL_BITS;
+
+/* Mbox and Dcache registers, continued.
+
+constant DC_TEST_TAG equals %x214  tag $;		/* Dcache Test TAG Register (RW)
+    EV5DC_TEST_TAG_BITS structure fill prefix DC_TEST_TAG$;
+	FILL_0 bitfield length 2 fill tag $$;           /* Ignored bits
+	TAG_PAR bitfield length 1 ;			/* Tag Parity
+	FILL_1 bitfield length 8 fill tag $$;           /* Ignored bits
+	OW0 bitfield length 1 ;				/* Octaword valid bit 0
+	OW1 bitfield length 1 ;				/* Octaword valid bit 1
+	TAG bitfield length 26 ;			/* Tag<38:13>
+	FILL_2 bitfield length 25 fill tag $$;		/* Ignored bits
+    end EV5DC_TEST_TAG_BITS;
+
+constant DC_TEST_TAG_TEMP equals %x215  tag $;		/* Dcache Test TAG Temp Register (RW)
+    EV5DC_TEST_TAG_TEMP_BITS structure fill prefix DC_TEST_TAG_TEMP$;
+	FILL_0 bitfield length 2 fill tag $$;           /* Ignored bits
+	TAG_PAR bitfield length 1 ;			/* Tag Parity
+	D0P0 bitfield length 1 ;			/* Data 0 parity bit 0
+	D0P1 bitfield length 1 ;			/* Data 0 parity bit 1
+	D1P0 bitfield length 1 ;			/* Data 1 parity bit 0
+	D1P1 bitfield length 1 ;			/* Data 1 parity bit 1
+	FILL_1 bitfield length 4 fill tag $$;           /* Ignored bits
+	OW0 bitfield length 1 ;				/* Octaword valid bit 0
+	OW1 bitfield length 1 ;				/* Octaword valid bit 1
+	TAG bitfield length 26 ;			/* Tag<38:13>
+	FILL_2 bitfield length 25 fill tag $$;		/* Ignored bits
+    end EV5DC_TEST_TAG_TEMP_BITS;
+
+constant DTB_ASN equals %x200 tag $;			/* Address Space Number (W)
+    EV5DTB_ASN_BITS structure fill prefix DTB_ASN$;
+	FILL_0 bitfield length 32 fill tag $$;
+	FILL_1 bitfield length 25 fill tag $$;
+	ASN bitfield length 7 ;				/* Address Space Number
+    end EV5DTB_ASN_BITS;
+
+constant DTB_CM equals %x201 tag $;			/* Dstream TB Current Mode (W)
+    EV5DTB_CM_BITS structure fill prefix DTB_CM$;
+	FILL_0 bitfield length 3 fill tag $$;
+	CM0 bitfield length 1 ;				/*
+	CM1 bitfield length 1 ;				/*
+	FILL_1 bitfield length 32 fill tag $$;
+	FILL_2 bitfield length 27 fill tag $$;
+    end EV5DTB_CM_BITS;
+
+constant DTB_IA equals %x20A tag $;		/* Dstream TB Invalidate All (W)
+constant DTB_IAP equals %x209 tag $;		/* Dstream TB Invalidate All Process (W)
+constant DTB_IS equals %x20B tag $;		/* Dstream TB Invalidate Single (W)
+    EV5DTBIS_BITS structure fill prefix DTBIS$;
+	FILL_0 bitfield length 13 fill tag $$;
+	VA0 bitfield length 30 ;			/*
+	FILL_1 bitfield length 21 fill tag $$;
+    end EV5DTBIS_BITS;
+
+constant DTB_PTE equals %x203 tag $;			/* Dstream TB PTE (RW)
+    EV5DTB_PTE_BITS structure fill prefix DTB_PTE$;
+	FILL_0 bitfield length 1 fill tag $$;
+	FOR bitfield length 1 ;				/*
+	FOW bitfield length 1 ;				/*
+	FILL_1 bitfield length 1 fill tag $$;
+	ASM bitfield length 1 ;				/*
+	GH bitfield length 2 ;				/*
+	FILL_2 bitfield length 1 fill tag $$; 		/*
+	KRE bitfield length 1 ;				/*
+	ERE bitfield length 1 ;				/*
+	SRE bitfield length 1 ;				/*
+	URE bitfield length 1 ;				/*
+	KWE bitfield length 1 ;				/*
+	EWE bitfield length 1 ;				/*
+	SWE bitfield length 1 ;				/*
+	UWE bitfield length 1 ;				/*
+	FILL_3 bitfield length 16 fill tag $$; 		/*
+	PFN bitfield length 27 ;			/*
+	FILL_4 bitfield length 5 fill tag $$;
+    end EV5DTB_PTE_BITS;
+
+/* Mbox and Dcache registers, continued.
+
+constant DTB_PTE_TEMP equals %x204 tag $;		/* Dstream TB PTE Temp (R)
+    EV5DTB_PTE_TEMP_BITS structure fill prefix DTB_PTE_TEMP$;
+	FOR bitfield length 1 ;				/*
+	FOW bitfield length 1 ;				/*
+	KRE bitfield length 1 ;				/*
+	ERE bitfield length 1 ;				/*
+	SRE bitfield length 1 ;				/*
+	URE bitfield length 1 ;				/*
+	KWE bitfield length 1 ;				/*
+	EWE bitfield length 1 ;				/*
+	SWE bitfield length 1 ;				/*
+	UWE bitfield length 1 ;				/*
+	ASM bitfield length 1 ;				/*
+	FILL_0 bitfield length 2 ;			/*
+	PFN bitfield length 27 ;			/*
+	FILL_1 bitfield length 26 fill tag $$;
+    end EV5DTB_PTE_TEMP_BITS;
+
+constant DTB_TAG equals %x202 tag $;			/* Dstream TB Tag (W)
+    EV5DTB_TAG_BITS structure fill prefix DTB_TAG$;
+	FILL_0 bitfield length 13 fill tag $$;
+	VA bitfield length 30 ;				/*
+	FILL_1 bitfield length 21 fill tag $$;
+    end EV5DTB_TAG_BITS;
+
+/* Most MCSR bits are used for testability and diagnostics only.
+/* For normal operation, they will be supported in the following configuration:
+/* SPLIT_DCACHE = 1, MAF_NOMERGE = 0, WB_FLUSH_ALWAYS = 0, WB_NOMERGE = 0,
+/* DC_ENA<1:0> = 1, DC_FHIT = 0, DC_BAD_PARITY = 0
+
+constant MCSR equals %x20F tag $;			/* Mbox control and status register (RW)
+    EV5MCSR_BITS structure fill prefix MCSR$;
+	BIG_ENDIAN bitfield length 1 ;			/* Enable Big Endian Mode (RW,0)
+	SP0 bitfield length 1 ;				/* Super Page Mode 1 Enable
+	SP1 bitfield length 1 ;				/* Super Page Mode 2 Enable
+	MBOX_SEL bitfield length 1 ;			/* MBOX Test select (RW,0)
+	E_BIG_ENDIAN bitfield length 1 ;		/* Ebox Enable Big Endian Mode (RW,0)
+	DBG_PACKET_SEL bitfield length 1 ;		/* Parallel port select (RW,0)
+	FILL_0 bitfield length 26 fill tag $$;
+	FILL_1 bitfield length 32 fill tag $$;
+    end EV5MCSR_BITS;
+
+constant DC_MODE equals %x216 tag $;			/* Dcache mode register (RW)
+    EV5DC_MODE_BITS structure fill prefix DC_MODE$;
+	DC_ENA bitfield length 1 ;				/* Dcache Enable (RW,0)
+	DC_FHIT bitfield length 1 ;				/* Dcache Force Hit (RW,0)
+	DC_BAD_PARITY bitfield length 1 ;			/* Invert Dcache Parity (RW,0)
+	DC_PERR_DIS bitfield length 1 ;				/* Disable Dcache parity error report (RW,0)
+	DC_DOA  bitfield length 1 ;				/* Hardware Dcache Disable (RO,0)
+	FILL_0 bitfield length 27 fill tag $$;
+	FILL_1 bitfield length 32 fill tag $$;
+    end EV5DC_MODE_BITS;
+
+constant MAF_MODE equals %x217 tag $;			/* Mbox MAF Mode register (RW)
+    EV5MAF_MODE_BITS structure fill prefix MAF_MODE$;
+	MAF_NOMERGE bitfield length 1 ;			/* MAF merge Disable (RW,0)
+	WB_FLUSH_ALWAYS bitfield length 1 ;		/* Flush Write Buffer (RW,0)
+	WB_NOMERGE bitfield length 1 ;			/* Disables Write Buffer Merging (RW,0)
+{*	MAF_NO_BYPASS bitfield length 1 ;		/* Disables Dread bypass requests (RW,0) (not in pass2)
+	IO_NOMERGE bitfield length 1;                   /* Disable MAF merging of non-cached space loads (replaces maf_no_bypass)
+	WB_CNT_DISABLE bitfield length 1 ;		/* Disables 64-cycle WB counter in the MAF Arb (RW,0)
+	MAF_ARB_DISABLE bitfield length 1 ;		/* Disables all Dread and WB Req. in the MAF Arb (RW,0)
+	DREAD_PENDING bitfield length 1 ;		/* MAF Dread status (R,0)
+	WB_PENDING  bitfield length 1 ;			/* MAF WB status (R,0)
+	WB_SET_LO_THRESHOLD bitfield length 2 ;		/* WB begin low priority arb threshold (RW,0 - PCA56 only)
+	WB_CLR_LO_THRESHOLD bitfield length 2 ;		/* WB stop low priority arb threshold (RW,0 - PCA56 only)
+	FILL_0 bitfield length 20 fill tag $$;
+	FILL_1 bitfield length 32 fill tag $$;
+    end EV5MAF_MODE_BITS;
+
+
+/* Mbox and Dcache registers, continued.
+
+constant MM_STAT equals %x205 tag $;			/* Dstream MM Fault Register
+    EV5MM_STAT_BITS structure fill prefix MM_STAT$;
+	WR bitfield length 1 ;				/* Error caused by WRITE
+	ACV bitfield length 1 ;				/* Access Violation
+	FOR bitfield length 1 ;				/* PTE's FOR bit set
+	FOW bitfield length 1 ;				/* PTE's FOW bit set
+	DTB_MISS bitfield length 1 ;			/* DTB miss
+	BAD_VA bitfield length 1;			/* Bad VA trap
+	RA bitfield length 5 ;				/* RA field of faulting address
+	OPCODE bitfield length 6 ;				/* Opcode field of faulting instruction
+	FILL_0 bitfield length 15 fill tag $$;
+	FILL_1 bitfield length 32 fill tag $$;
+    end EV5MM_STAT_BITS;
+
+constant MVPTBR equals %x208 tag $;			/* Mbox Virtual Page Table Base Register (W)
+    EV5MVPTBR_BITS structure fill prefix MVPTBR$;
+	FILL_0 bitfield length 32 fill tag $$;
+	FILL_1 bitfield length 1 fill tag $$;
+	VPTB bitfield length 31 ;			/* Virtual Page Table Base
+    end EV5MVPTBR_BITS;
+
+constant VA equals %x206 tag $;				/* Faulting Virtual Address (R)
+
+constant VA_FORM  equals %x207 tag $;			/* Formatted Virtual Address (R)
+    EV5VA_FORM_BITS structure fill prefix VA_FORM$;
+	FILL_0 bitfield length 3 fill tag $$;
+	VA bitfield length 30;				/* Virtual Address
+	VPTB bitfield length 31 ;			/* Virtual Page Table Base
+    end EV5VA_FORM_BITS;
+
+constant VA_FORM_NT  equals %x207 tag $;			/* Formatted Virtual Address (R)
+    EV5VA_FORM_NT_BITS structure fill prefix VA_FORM_NT$;
+	FILL_0 bitfield length 3 fill tag $$;
+	VA bitfield length 19;				/* Virtual Address
+            constant VA equals 19 tag S;
+	FILL_1 bitfield length 8 fill tag $$;
+{* Defined as constants - SDL complains about bitfields greater than 32 bits
+	    constant VPTB equals 30 tag V;
+            constant VPTB equals 34 tag S;
+    end EV5VA_FORM_NT_BITS;
+
+
+end EV5_DEF;
+
+constant CBOX_CFG equals %x08 ;		/* Bcache Configuration Register (RW)
+constant CBOX_ADDR equals %x88 ;	/* Bcache/External Interface Address Register (RO)
+constant CBOX_STAT equals %x108 ;	/* Bcache/External Interface Status Register (RO)
+constant CBOX_CFG2 equals %x188 ;	/* Bcache Configuration Register 2 (RW)
+
+aggregate PCA56_DEF union prefix PCA56;
+
+/* PCA56 External Interface (CBU) Registers
+
+constant CBOX_CFG equals %x08 tag $;			/* Bcache Configuration Register (RW)
+    PCA56CBOX_CFG_BITS structure fill prefix CBOX_CFG$;
+	FILL_0 bitfield length 4 fill tag $$;
+	BC_CLK_RATIO bitfield length 4 ;		/* Bcache clock period in CPU cycles (RW,3)
+	BC_LATENCY_OFF bitfield length 4 ;		/* Bcache latency offset in CPU cycles (RW,0)
+	BC_SIZE bitfield length 2 ;			/* Bcache size (RW,0)
+	    constant SIZE_512KB equals 0;		/* Select 512 KB Bcache
+	    constant SIZE_1MB equals 1;			/* Select 1 MB Bcache
+	    constant SIZE_2MB equals 2;			/* Select 2 MB Bcache
+	    constant SIZE_4MB equals 3;			/* Select 4 MB Bcache
+	BC_CLK_DELAY bitfield length 2 ;		/* Bcache clock delay in CPU cycles (RW,1)
+	BC_RW_OFF bitfield length 3 ;			/* Bcache read-to-write offset in CPU cycles (RW,0)
+	BC_PROBE_DURING_FILL bitfield length 1 ;	/* Enables Bcache tag probes under fills (RW,0)
+	BC_FILL_DLY_OFF bitfield length 3 ;		/* Bcache fill delay offset in CPU cycles (RW,1)
+	IO_PARITY_ENABLE bitfield length 1 ;		/* Enable parity checking on I/O reads (RW,0)
+	MEM_PARITY_ENABLE bitfield length 1 ;		/* Enable parity checking on memory reads (RW,0)
+	BC_FORCE_HIT bitfield length 1 ;		/* Force read/write hits in Bcache (RW,0)
+	BC_FORCE_ERR bitfield length 1 ;		/* Force Bcache errors (RW,0)
+	BC_BIG_DRV bitfield length 1 ;			/* Enable 50% more drive on selected pins (RW,0)
+	BC_TAG_DATA bitfield length 3 ;			/* Tag data to be written when BC_FORCE_HIT = 1 (RW,0)
+	BC_ENABLE bitfield length 1 ;			/* External Bcache enabled (RW,0)
+	FILL_1 bitfield length 32 fill tag $$;
+    end PCA56CBOX_CFG_BITS;
+
+constant CBOX_ADDR equals %x88 tag $;			/* Bcache/External Interface Address Register (RO)
+
+constant CBOX_STAT equals %x108 tag $;			/* Bcache/External Interface Status Register (RO)
+    PCA56CBOX_STAT_BITS structure fill prefix CBOX_STAT$;
+	FILL_0 bitfield length 4 fill tag $$;
+	SYS_CLK_RATIO bitfield length 4 ;		/* System clock period in CPU Cycles (RO,0)
+	CHIP_REV bitfield length 4 ;			/* Current revision of chip (RO,0)
+	DATA_PAR_ERR bitfield length 4 ;		/* Data read parity error (RO,0)
+	TAG_PAR_ERR bitfield length 1 ;			/* Bcache tag store parity error (RO,0)
+	TAG_DIRTY bitfield length 1 ;			/* Bcache data modified and not written to memory (RO,0)
+	MEMORY bitfield length 1 ;			/* Error on fill data from memory (RO,0)
+	MULTI_ERR bitfield length 1 ;			/* Multiple errors detected (RO,0)
+	FILL_1 bitfield length 12 fill tag $$;
+	FILL_2 bitfield length 32 fill tag $$;
+    end PCA56CBOX_STAT_BITS;
+
+constant CBOX_CFG2 equals %x188 tag $;			/* Bcache Configuration Register 2 (RW)
+    PCA56CBOX_CFG2_BITS structure fill prefix CBOX_CFG2$;
+	FILL_0 bitfield length 4 fill tag $$;
+	BC_REG_REG bitfield length 1 ;			/* Bcache is built from REG/REG SSRAM (RW,1)
+	DBG_SEL bitfield length 1 ;			/* Selects CBOX debug information (RW,0)
+	BC_THREE_MISS bitfield length 1 ;		/* Allow 3 read misses to be launched (RW,0)
+	PUF_DELAY bitfield length 1 ;			/* Used to determine tag_ram_output deassert (RW,0)
+	PM0_MUX bitfield length 3 ;			/* Select parameter for performance counter 0 (RW,0)
+	PM1_MUX bitfield length 3 ;			/* Select parameters for performance counter 1 (RW,0)
+	FILL_1 bitfield length 18 fill tag $$;
+	FILL_2 bitfield length 32 fill tag $$;
+    end PCA56CBOX_CFG2_BITS;
+
+end PCA56_DEF;
+
+end_module $EV5DEF;

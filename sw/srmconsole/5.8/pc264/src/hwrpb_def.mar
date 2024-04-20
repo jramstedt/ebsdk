@@ -1,0 +1,546 @@
+; ********************************************************************************************************************************
+;  Created: 21-AUG-2000 16:04:43 by OpenVMS SDL EV1-31     
+;  Source:  24-APR-2000 10:16:57 NIGHTRIDER:[CONSOLE.V58.COMMON.SRC]HWRPB_DEF.SD 
+; ********************************************************************************************************************************
+;  file:	hwrpb_def.sdl
+; 
+;  Copyright (C) 1990, 1991 by
+;  Digital Equipment Corporation, Maynard, Massachusetts.
+;  All rights reserved.
+; 
+;  This software is furnished under a license and may be used and copied
+;  only  in  accordance  of  the  terms  of  such  license  and with the
+;  inclusion of the above copyright notice. This software or  any  other
+;  copies thereof may not be provided or otherwise made available to any
+;  other person.  No title to and  ownership of the  software is  hereby
+;  transferred.
+; 
+;  The information in this software is  subject to change without notice
+;  and  should  not  be  construed  as a commitment by digital equipment
+;  corporation.
+; 
+;  Digital assumes no responsibility for the use  or  reliability of its
+;  software on equipment which is not supplied by digital.
+; 
+; 
+;  Abstract:	Hardware Restart Paramater Block (HWRPB) data structure 
+; 		definitions for Alpha firmware.
+; 
+;  Author:	David Mayo
+; 
+;  Modifications:
+; 
+; 	ajb	26-nov-1991	Create some constants that are needed in 
+; 				constructing the physical layout of the
+; 				bootstrap addres space.
+; 
+; 	jds	24-Oct-1991	Replaced TERM_IO CRB entry with separate entries for each GBUS UART.
+;  
+; 	jds	 2-Oct-1991	Updated to conform to Alpha Console Architecture Rev 3.2.
+;  
+; 	kl	27-Jun-1991	Update Reason_for_halt constants, add halt_requested
+; 				constants for console SRM ECO 3.1.
+; 
+; 	kl	17-Jun-1991	Replace quadword filler with RXRDY bitfield mask, 
+; 				add/modify SLOT STATE bits, replace ASTEN,ASTSR 
+; 				halt fields with ARGLIST and RETURN. Modify
+; 				Reason_for_Halt constants. This is a subset of the 
+; 				Console SRM ECO 3.1
+; 
+; 	jds	29-May-1991	Added some CRB/CTB defs; added prefix for
+; 				CTB defs.
+;  
+; 	jds	23-May-1991	Added some CRB defs; added prefix for CRB
+; 				defs.
+; 
+; 	dtm	 5-Dec-1990	CRB and MEMDSC updates
+; 
+; 	dtm	 9-Nov-1990	Updated for SRM Rev. 2.1
+; 
+; 	dtm	24-Aug-1990	Initial entry.
+; 
+ 
+	.MACRO	$hwrpbdef,..EQU=<=>,..COL=<:>
+;  CTB bus types
+TURBO_CHANNEL_BUS'..equ'0
+ISA_BUS'..equ'1
+EISA_BUS'..equ'2
+PCI_BUS'..equ'3
+HWRPB$_REVISION'..equ'13                ;  revision of this hwrpb definition
+; 
+;  Structure of HWRPB
+; 
+S_BASE'..equ'8
+BASE'..equ'0                            ;  Physical address of base of HWRPB
+S_IDENT'..equ'8
+IDENT'..equ'8                           ;  Identifying string 'HWRPB'
+S_REVISION'..equ'8
+REVISION'..equ'16                       ;  HWRPB version number
+S_HWRPB_SIZE'..equ'8
+HWRPB_SIZE'..equ'24                     ;  HWPRB size
+S_PRIMARY'..equ'8
+PRIMARY'..equ'32                        ;  ID of primary processor
+S_PAGESIZE'..equ'8
+PAGESIZE'..equ'40                       ;  System page size in bytes
+S_PA_SIZE'..equ'8
+PA_SIZE'..equ'48                        ;  Physical address size in bits
+S_ASN_MAX'..equ'8
+ASN_MAX'..equ'56                        ;  Maximum ASN value 
+S_SERIALNUM'..equ'16
+SERIALNUM'..equ'64                      ;  System serial number
+S_SYSTYPE'..equ'8
+SYSTYPE'..equ'80                        ;  Alpha system type (Laser)
+S_SYSVAR'..equ'8
+SYSVAR'..equ'88                         ;  Laser system subtype
+S_SYSREV'..equ'8
+SYSREV'..equ'96                         ;  System revision
+S_ICLK_FREQ'..equ'8
+ICLK_FREQ'..equ'104                     ;  Interval clock interrupt frequency
+S_CC_FREQ'..equ'8
+CC_FREQ'..equ'112                       ;  Cycle Counter frequency
+S_VPTBR'..equ'8
+VPTBR'..equ'120                         ;  Virtual page table base register
+S_RSVD_ARCH'..equ'8
+RSVD_ARCH'..equ'128                     ;  Reserved for architecture use, SBZ
+S_THB_OFFSET'..equ'8
+THB_OFFSET'..equ'136                    ;  Offset to Translation Buffer Hint Block
+S_NPROC'..equ'8
+NPROC'..equ'144                         ;  Number of processor supported
+S_SLOT_SIZE'..equ'8
+SLOT_SIZE'..equ'152                     ;  Size of Per-CPU Slots in bytes
+S_SLOT_OFFSET'..equ'8
+SLOT_OFFSET'..equ'160                   ;  Offset to Per-CPU Slots
+S_NUM_CTBS'..equ'8
+NUM_CTBS'..equ'168                      ;  Number of CTBs in CTB table
+S_CTB_SIZE'..equ'8
+CTB_SIZE'..equ'176                      ;  Size of largest CTB in CTB table
+S_CTB_OFFSET'..equ'8
+CTB_OFFSET'..equ'184                    ;  Offset to Console Terminal Block
+S_CRB_OFFSET'..equ'8
+CRB_OFFSET'..equ'192                    ;  Offset to Console Routine Block
+S_MEM_OFFSET'..equ'8
+MEM_OFFSET'..equ'200                    ;  Offset to Memory Data Descriptors
+S_CONFIG_OFFSET'..equ'8
+CONFIG_OFFSET'..equ'208                 ;  Offset to Configuration Data Table
+S_FRU_OFFSET'..equ'8
+FRU_OFFSET'..equ'216                    ;  Offset to FRU Table
+S_SAVE_TERM'..equ'8
+SAVE_TERM'..equ'224                     ;  Starting VA of SAVE_TERM routine
+S_SAVE_TERM_VALUE'..equ'8
+SAVE_TERM_VALUE'..equ'232               ;  Procedure Value of SAVE_TERM routine
+S_RESTORE_TERM'..equ'8
+RESTORE_TERM'..equ'240                  ;  Starting VA of RESTORE_TERM routine
+S_RESTORE_TERM_VALUE'..equ'8
+RESTORE_TERM_VALUE'..equ'248            ;  Procedure Value of RESTORE_TERM routine
+S_RESTART'..equ'8
+RESTART'..equ'256                       ;  VA of restart routine
+S_RESTART_VALUE'..equ'8
+RESTART_VALUE'..equ'264                 ;  Restart procedure value
+S_RSVD_SW'..equ'8
+RSVD_SW'..equ'272                       ;  Reserved to System Software
+S_RSVD_HW'..equ'8
+RSVD_HW'..equ'280                       ;  Reserved to Hardware
+S_CHKSUM'..equ'8
+CHKSUM'..equ'288                        ;  Checksum of HWRPB
+S_RXRDY'..equ'8
+RXRDY'..equ'296                         ;  RX Ready bitmask 
+S_TXRDY'..equ'8
+TXRDY'..equ'304                         ;  TX Ready bitmask     
+S_DSRDB_OFFSET'..equ'8
+DSRDB_OFFSET'..equ'312                  ;  Offset to Dynamic System Recognition Data Block
+	.ENDM
+ 
+	.MACRO	$dsrdbdef,..EQU=<=>,..COL=<:>
+; 
+;  Structure of Dynamic System Recognition Data Block
+; 
+S_SMM'..equ'8
+SMM'..equ'0                             ;  SMM value
+S_LURT_OFFSET'..equ'8
+LURT_OFFSET'..equ'8                     ;  Offset to LURT
+S_NAME_OFFSET'..equ'8
+NAME_OFFSET'..equ'16                    ;  Offset to NAME
+	.ENDM
+ 
+	.MACRO	$tbhintdef,..EQU=<=>,..COL=<:>
+; 
+;  Structure of Translation Buffer Granularity Hint Block
+; 
+S_itb'..equ'32
+itb'..equ'0                             ;  instruction cache xlation buf hints
+S_dtb'..equ'32
+dtb'..equ'32                            ;  data cache translation buf hints
+	.ENDM
+ 
+	.MACRO	$slotdef,..EQU=<=>,..COL=<:>
+; 
+;  Structure of Per-CPU Slots
+; 
+HALT_REQUEST$K_DEFAULT'..equ'0
+HALT_REQUEST$K_SV_RST_TERM'..equ'1
+HALT_REQUEST$K_COLD_BOOT'..equ'2
+HALT_REQUEST$K_WARM_BOOT'..equ'3
+HALT_REQUEST$K_REMAIN_HALTED'..equ'4
+HALT_REQUEST$K_POWER_OFF_SYSTEM'..equ'5
+HALT_REQUEST$K_RESERVED'..equ'6
+HALT_REQUEST$K_MIGRATE'..equ'7
+SLOT$M_BIP'..equ'^X1
+SLOT$M_RC'..equ'^X2
+SLOT$M_PA'..equ'^X4
+SLOT$M_PP'..equ'^X8
+SLOT$M_OH'..equ'^X10
+SLOT$M_CV'..equ'^X20
+SLOT$M_PV'..equ'^X40
+SLOT$M_PMV'..equ'^X80
+SLOT$M_PL'..equ'^X100
+SLOT$M_RSVD_MBZ0'..equ'^XFE00
+SLOT$M_HALT_REQUESTED'..equ'^XFF0000
+SLOT$M_RSVD_MBZ1'..equ'^XFF000000
+SLOT$V_BIP'..equ'0                      ;  Boot in progress
+SLOT$V_RC'..equ'1                       ;  Restart capable
+SLOT$V_PA'..equ'2                       ;  Processor available
+SLOT$V_PP'..equ'3                       ;  Processor present
+SLOT$V_OH'..equ'4                       ;  Operator halted
+SLOT$V_CV'..equ'5                       ;  Context valid
+SLOT$V_PV'..equ'6                       ;  Palcode valid
+SLOT$V_PMV'..equ'7                      ;  Palcode memory valid
+SLOT$V_PL'..equ'8                       ;  Palcode loaded
+SLOT$S_RSVD_MBZ0'..equ'7
+SLOT$V_RSVD_MBZ0'..equ'9                ;  Reserved MBZ
+SLOT$S_HALT_REQUESTED'..equ'8
+SLOT$V_HALT_REQUESTED'..equ'16          ;  Halt requested
+SLOT$S_RSVD_MBZ1'..equ'8
+SLOT$V_RSVD_MBZ1'..equ'24               ;  Reserved MBZ
+SLOT$L_RSVD_MBZ2'..equ'4                ;  Reserved MBZ
+S_KSP'..equ'8
+KSP'..equ'0
+S_ESP'..equ'8
+ESP'..equ'8
+S_SSP'..equ'8
+SSP'..equ'16
+S_USP'..equ'8
+USP'..equ'24
+S_PTBR'..equ'8
+PTBR'..equ'32
+S_ASN'..equ'8
+ASN'..equ'40
+S_ASTEN_SR'..equ'8
+ASTEN_SR'..equ'48
+S_FEN'..equ'8
+FEN'..equ'56
+S_CC'..equ'8
+CC'..equ'64
+S_UNQ'..equ'8
+UNQ'..equ'72
+S_SCRATCH'..equ'48
+SCRATCH'..equ'80
+S_KSP'..equ'8
+KSP'..equ'0
+S_USP'..equ'8
+USP'..equ'8
+S_PTBR'..equ'8
+PTBR'..equ'16
+CC'..equ'24
+ASN'..equ'28
+S_UNQ'..equ'8
+UNQ'..equ'32
+S_FEN'..equ'8
+FEN'..equ'40
+S_SCRATCH'..equ'80
+SCRATCH'..equ'48
+STATE'..equ'128
+S_PAL_MEM_LEN'..equ'8
+PAL_MEM_LEN'..equ'136
+S_PAL_SCR_LEN'..equ'8
+PAL_SCR_LEN'..equ'144
+S_PAL_MEM_ADR'..equ'8
+PAL_MEM_ADR'..equ'152
+S_PAL_SCR_ADR'..equ'8
+PAL_SCR_ADR'..equ'160
+S_PAL_REV'..equ'8
+PAL_REV'..equ'168
+S_CPU_TYPE'..equ'8
+CPU_TYPE'..equ'176
+S_CPU_VAR'..equ'8
+CPU_VAR'..equ'184
+S_CPU_REV'..equ'8
+CPU_REV'..equ'192
+S_SERIAL_NUM'..equ'16
+SERIAL_NUM'..equ'200
+S_PAL_LOGOUT'..equ'8
+PAL_LOGOUT'..equ'216
+S_PAL_LOGOUT_LEN'..equ'8
+PAL_LOGOUT_LEN'..equ'224
+S_HALT_PCBB'..equ'8
+HALT_PCBB'..equ'232
+S_HALT_PC'..equ'8
+HALT_PC'..equ'240
+S_HALT_PS'..equ'8
+HALT_PS'..equ'248
+S_HALT_ARGLIST'..equ'8
+HALT_ARGLIST'..equ'256
+S_HALT_RETURN'..equ'8
+HALT_RETURN'..equ'264
+S_HALT_VALUE'..equ'8
+HALT_VALUE'..equ'272
+S_HALTCODE'..equ'8
+HALTCODE'..equ'280
+S_RSVD_SW'..equ'8
+RSVD_SW'..equ'288
+RXLEN'..equ'296
+TXLEN'..equ'300
+S_RX'..equ'80
+RX'..equ'304
+S_TX'..equ'80
+TX'..equ'384
+S_PAL_REV_AVAIL'..equ'128
+PAL_REV_AVAIL'..equ'464
+S_CPU_COMP'..equ'8
+CPU_COMP'..equ'592
+S_CONSOLE_DATA_LOG'..equ'8
+CONSOLE_DATA_LOG'..equ'600
+S_CONSOLE_DATA_LOG_LEN'..equ'8
+CONSOLE_DATA_LOG_LEN'..equ'608
+S_BCACHE_INFO'..equ'8
+BCACHE_INFO'..equ'616
+S_CC_FREQ'..equ'8
+CC_FREQ'..equ'624
+S_RSVD_ARCH'..equ'8
+RSVD_ARCH'..equ'632
+HALT$K_POWERUP'..equ'0
+HALT$K_OPERATOR_REQUEST_CRASH'..equ'1
+HALT$K_KSTACK_NOTVALID'..equ'2
+HALT$K_SCBB_NOTVALID'..equ'3
+HALT$K_PTBR_NOTVALID'..equ'4
+HALT$K_CALL_PAL_HALT'..equ'5
+HALT$K_DOUBLE_ERROR'..equ'6
+	.ENDM
+ 
+	.MACRO	$memdscdef,..EQU=<=>,..COL=<:>
+; 
+;  Memory Descriptor definitions
+; 
+S_START_PFN'..equ'8
+START_PFN'..equ'0
+S_PFN_COUNT'..equ'8
+PFN_COUNT'..equ'8
+S_TEST_COUNT'..equ'8
+TEST_COUNT'..equ'16
+S_BITMAP_VA'..equ'8
+BITMAP_VA'..equ'24
+S_BITMAP_PA'..equ'8
+BITMAP_PA'..equ'32
+S_BITMAP_CHKSUM'..equ'8
+BITMAP_CHKSUM'..equ'40
+S_USAGE'..equ'8
+USAGE'..equ'48
+S_CHECKSUM'..equ'8
+CHECKSUM'..equ'0
+S_IMP_DATA_PA'..equ'8
+IMP_DATA_PA'..equ'8
+S_CLUSTER_COUNT'..equ'8
+CLUSTER_COUNT'..equ'16
+S_START_PFN'..equ'8
+START_PFN'..equ'24
+S_PFN_COUNT'..equ'8
+PFN_COUNT'..equ'32
+S_TEST_COUNT'..equ'8
+TEST_COUNT'..equ'40
+S_BITMAP_VA'..equ'8
+BITMAP_VA'..equ'48
+S_BITMAP_PA'..equ'8
+BITMAP_PA'..equ'56
+S_BITMAP_CHKSUM'..equ'8
+BITMAP_CHKSUM'..equ'64
+S_USAGE'..equ'8
+USAGE'..equ'72
+	.ENDM
+ 
+	.MACRO	$ctbdef,..EQU=<=>,..COL=<:>
+; 
+;  Console Terminal Block definitions
+; 
+CTB$K_NONE'..equ'0
+CTB$K_PROCESSOR'..equ'1
+CTB$K_DZ_VT'..equ'2
+CTB$K_DZ_GRAPHICS'..equ'3
+CTB$K_DZ_WS'..equ'4
+S_CTB_VT_table'..equ'20
+CTB_VT_table'..equ'0
+CSR'..equ'0                             ;  Base CSR address
+TX_IPL'..equ'4                          ;  TX interrupt IPL
+TX_SCB'..equ'8                          ;  TX interrupt SCB vector
+RX_IPL'..equ'12                         ;  RX interrupt IPL
+RX_SCB'..equ'16                         ;  RX interrupt SCB vector
+S_CTB_WS_table'..equ'24
+CTB_WS_table'..equ'0
+TERM_OUT_LOC'..equ'0                    ;  location/type of output terminal
+TERM_IN_LOC'..equ'4                     ;  location/type of input  terminal
+DEV_IPL'..equ'8                         ;  Device IPL
+TX_SCB'..equ'12                         ;  TX interrupt SCB vector
+RX_SCB'..equ'16                         ;  RX interrupt SCB vector
+TYPE'..equ'20                           ;  Terminal type
+CTB$VT_LEN'..equ'96                     ;  DL/DZ VT device dependent field
+CTB$WS_LEN'..equ'352                    ;  Workstation device dependent field
+TX$M_SCB_OFFSET_H'..equ'^X7FFFFFFF
+TX$M_IE'..equ'^X80000000
+RX$M_SCB_OFFSET_H'..equ'^X7FFFFFFF
+RX$M_IE'..equ'^X80000000
+CTB_VT$S_TYPE'..equ'8
+CTB_VT$Q_TYPE'..equ'0
+CTB_VT$S_ID'..equ'8
+CTB_VT$Q_ID'..equ'8
+CTB_VT$S_RSVD'..equ'8
+CTB_VT$Q_RSVD'..equ'16
+CTB_VT$S_DEV_DEP_LEN'..equ'8
+CTB_VT$Q_DEV_DEP_LEN'..equ'24
+CTB_VT$S_CSR'..equ'8
+CTB_VT$Q_CSR'..equ'32
+CTB_VT$L_TX_SCB_OFFSET_L'..equ'40
+TX$S_TX_INT'..equ'4
+CTB_VT$R_TX_INT'..equ'44
+TX$S_SCB_OFFSET_H'..equ'31
+TX$V_SCB_OFFSET_H'..equ'0
+TX$V_IE'..equ'31
+CTB_VT$L_RX_SCB_OFFSET_L'..equ'48
+RX$S_RX_INT'..equ'4
+CTB_VT$R_RX_INT'..equ'52
+RX$S_SCB_OFFSET_H'..equ'31
+RX$V_SCB_OFFSET_H'..equ'0
+RX$V_IE'..equ'31
+CTB_VT$S_BAUD'..equ'8
+CTB_VT$Q_BAUD'..equ'56
+CTB_VT$S_PUTS_STATUS'..equ'8
+CTB_VT$Q_PUTS_STATUS'..equ'64
+CTB_VT$S_GETC_STATUS'..equ'8
+CTB_VT$Q_GETC_STATUS'..equ'72
+CTB_VT$S_CON_RSVD'..equ'64
+CTB_VT$B_CON_RSVD'..equ'80
+TX$M_SCB_OFFSET_H'..equ'^X7FFFFFFF
+TX$M_IE'..equ'^X80000000
+RX$M_SCB_OFFSET_H'..equ'^X7FFFFFFF
+RX$M_IE'..equ'^X80000000
+CTB_WS$S_TYPE'..equ'8
+CTB_WS$Q_TYPE'..equ'0
+CTB_WS$S_ID'..equ'8
+CTB_WS$Q_ID'..equ'8
+CTB_WS$S_RSVD'..equ'8
+CTB_WS$Q_RSVD'..equ'16
+CTB_WS$S_DEV_DEP_LEN'..equ'8
+CTB_WS$Q_DEV_DEP_LEN'..equ'24
+CTB_WS$S_DEV_IPL'..equ'8
+CTB_WS$Q_DEV_IPL'..equ'32
+CTB_WS$L_TX_SCB_OFFSET_L'..equ'40
+TX$S_TX_INT'..equ'4
+CTB_WS$R_TX_INT'..equ'44
+TX$S_SCB_OFFSET_H'..equ'31
+TX$V_SCB_OFFSET_H'..equ'0
+TX$V_IE'..equ'31
+CTB_WS$L_RX_SCB_OFFSET_L'..equ'48
+RX$S_RX_INT'..equ'4
+CTB_WS$R_RX_INT'..equ'52
+RX$S_SCB_OFFSET_H'..equ'31
+RX$V_SCB_OFFSET_H'..equ'0
+RX$V_IE'..equ'31
+CTB_WS$S_TERM_TYPE'..equ'8
+CTB_WS$Q_TERM_TYPE'..equ'56
+CTB_WS$S_KB_TYPE'..equ'8
+CTB_WS$Q_KB_TYPE'..equ'64
+CTB_WS$S_KB_TRN_TBL'..equ'8
+CTB_WS$Q_KB_TRN_TBL'..equ'72
+CTB_WS$S_KB_MAP_TBL'..equ'8
+CTB_WS$Q_KB_MAP_TBL'..equ'80
+CTB_WS$S_KB_STATE'..equ'8
+CTB_WS$Q_KB_STATE'..equ'88
+CTB_WS$S_LAST_KEY'..equ'8
+CTB_WS$Q_LAST_KEY'..equ'96
+CTB_WS$S_US_FONT'..equ'8
+CTB_WS$Q_US_FONT'..equ'104
+CTB_WS$S_MCS_FONT'..equ'8
+CTB_WS$Q_MCS_FONT'..equ'112
+CTB_WS$S_FONT_WIDTH'..equ'8
+CTB_WS$Q_FONT_WIDTH'..equ'120
+CTB_WS$S_FONT_HEIGHT'..equ'8
+CTB_WS$Q_FONT_HEIGHT'..equ'128
+CTB_WS$S_MONITOR_WIDTH'..equ'8
+CTB_WS$Q_MONITOR_WIDTH'..equ'136
+CTB_WS$S_MONITOR_HEIGHT'..equ'8
+CTB_WS$Q_MONITOR_HEIGHT'..equ'144
+CTB_WS$S_MONITOR_DENSITY'..equ'8
+CTB_WS$Q_MONITOR_DENSITY'..equ'152
+CTB_WS$S_NUM_PLANES'..equ'8
+CTB_WS$Q_NUM_PLANES'..equ'160
+CTB_WS$S_CURSOR_WIDTH'..equ'8
+CTB_WS$Q_CURSOR_WIDTH'..equ'168
+CTB_WS$S_CURSOR_HEIGHT'..equ'8
+CTB_WS$Q_CURSOR_HEIGHT'..equ'176
+CTB_WS$S_NUM_HEADS'..equ'8
+CTB_WS$Q_NUM_HEADS'..equ'184
+CTB_WS$S_OPWIN'..equ'8
+CTB_WS$Q_OPWIN'..equ'192
+CTB_WS$S_HEAD_OFFSET'..equ'8
+CTB_WS$Q_HEAD_OFFSET'..equ'200
+CTB_WS$S_PUTCHAR_ROUTINE'..equ'8
+CTB_WS$Q_PUTCHAR_ROUTINE'..equ'208
+CTB_WS$S_IO_STATE'..equ'8
+CTB_WS$Q_IO_STATE'..equ'216
+CTB_WS$S_LISTENER_STATE'..equ'8
+CTB_WS$Q_LISTENER_STATE'..equ'224
+CTB_WS$S_EXT_INFO'..equ'8
+CTB_WS$Q_EXT_INFO'..equ'232
+CTB_WS$S_TERM_OUT_LOC'..equ'8
+CTB_WS$Q_TERM_OUT_LOC'..equ'240
+CTB_WS$S_SERVER_OFFSET'..equ'8
+CTB_WS$Q_SERVER_OFFSET'..equ'248
+CTB_WS$S_LINE_PARAM'..equ'8
+CTB_WS$Q_LINE_PARAM'..equ'256
+CTB_WS$S_TERM_IN_LOC'..equ'8
+CTB_WS$Q_TERM_IN_LOC'..equ'264
+CTB_WS$S_CON_RSVD'..equ'80
+CTB_WS$B_CON_RSVD'..equ'272
+	.ENDM
+ 
+	.MACRO	$crbdef,..EQU=<=>,..COL=<:>
+; 
+;  Structure of Console Routine Block (CRB)
+; 
+CRB$K_CODE'..equ'0                      ;  CRB entry for code.
+CRB$K_HEAP'..equ'1                      ;  CRB entry for heap.
+CRB$K_ENTRIES'..equ'2
+CRB_ENTRY$S_V_ADDRESS'..equ'8
+CRB_ENTRY$Q_V_ADDRESS'..equ'0
+CRB_ENTRY$S_P_ADDRESS'..equ'8
+CRB_ENTRY$Q_P_ADDRESS'..equ'8
+CRB_ENTRY$S_PAGE_COUNT'..equ'8
+CRB_ENTRY$Q_PAGE_COUNT'..equ'16
+CRB_ENTRY$K_SIZE'..equ'24
+CRB$S_VDISPATCH'..equ'8
+CRB$Q_VDISPATCH'..equ'0
+CRB$S_PDISPATCH'..equ'8
+CRB$Q_PDISPATCH'..equ'8
+CRB$S_VFIXUP'..equ'8
+CRB$Q_VFIXUP'..equ'16
+CRB$S_PFIXUP'..equ'8
+CRB$Q_PFIXUP'..equ'24
+CRB$S_ENTRIES'..equ'8
+CRB$Q_ENTRIES'..equ'32
+CRB$S_PAGES'..equ'8
+CRB$Q_PAGES'..equ'40
+CRB$R_ENTRY'..equ'48
+CRB$K_SIZE'..equ'96
+	.ENDM
+; 
+;  Definitions for the physical layout of the bootstrap space
+; 
+ 
+	.MACRO	$bootdef,..EQU=<=>,..COL=<:>
+BOOT_BSSPAGES'..equ'32
+BOOT_STACKPAGES'..equ'2
+BOOT_GUARDPAGES'..equ'1
+BOOT_L0PAGES'..equ'1                    ;  for alpha
+BOOT_L1PAGES'..equ'1                    ;  for alpha
+BOOT_L2PAGES'..equ'1                    ;  for alpha
+BOOT_L30PAGES'..equ'2                   ;  for alpha
+BOOT_L31PAGES'..equ'4                   ;  for alpha
+BOOT_PTEPAGES'..equ'9
+	.ENDM

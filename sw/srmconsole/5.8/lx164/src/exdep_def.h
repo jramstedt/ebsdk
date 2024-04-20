@@ -1,0 +1,84 @@
+/********************************************************************************************************************************/
+/* Created: 21-JUN-2000 10:31:18 by OpenVMS SDL EV1-33     */
+/* Source:  22-JAN-1992 12:01:44 AFW_USER$:[CONSOLE.V58.COMMON.SRC]EXDEP_DEF.SDL */
+/********************************************************************************************************************************/
+/* file:	exdep_def.sdl                                               */
+/*                                                                          */
+/* Copyright (C) 1990 by                                                    */
+/* Digital Equipment Corporation, Maynard, Massachusetts.                   */
+/* All rights reserved.                                                     */
+/*                                                                          */
+/* This software is furnished under a license and may be used and copied    */
+/* only  in  accordance  of  the  terms  of  such  license  and with the    */
+/* inclusion of the above copyright notice. This software or  any  other    */
+/* copies thereof may not be provided or otherwise made available to any    */
+/* other person.  No title to and  ownership of the  software is  hereby    */
+/* transferred.                                                             */
+/*                                                                          */
+/* The information in this software is  subject to change without notice    */
+/* and  should  not  be  construed  as a commitment by digital equipment    */
+/* corporation.                                                             */
+/*                                                                          */
+/* Digital assumes no responsibility for the use  or  reliability of its    */
+/* software on equipment which is not supplied by digital.                  */
+/*                                                                          */
+/*                                                                          */
+/* Abstract:	Examine/Deposit command constants and structure definitions */
+/*		for Alpha firmware.                                         */
+/*                                                                          */
+/* Author:	JDS - Jim Sawin                                             */
+/*                                                                          */
+/* Modifications:                                                           */
+/*                                                                          */
+/* 12	by PHK, Tue Dec 3 12:00:01 1991                                     */
+/*	Added  EV_EXDEP_DATA                                                */
+/*                                                                          */
+/* 11	by JDS, Mon Jul 29 10:14:57 1991                                    */
+/*	Removed hard-wired address spaces; added hooks for using protocol specifiers for address spaces. */
+/*                                                                          */
+/* 10	by DTM, 16-May-1991                                                 */
+/*	Added GBUS support.                                                 */
+/*                                                                          */
+/* 9	by JDS, Thu Mar 28 09:21:13 1991                                    */
+/*	Added Alpha FPR and Paltemp driver defs.  Removed U address space defs.  Removed obsolete symbol defs. */
+/*                                                                          */
+/* 8	by JDS, Thu Mar  7 08:40:56 1991                                    */
+/*	Removed architecture-specific defs, changed radix of -n and -s to hex, added PC bit to exdep struct. */
+/*                                                                          */
+/* 7	by SFS                                                              */
+/*	Expanded the size of the "data" field to 64 bytes (maximum VAX      */
+/*	instruction is larger than 32 but smaller than 64); added "Decode"  */
+/*	and "Instruction" data types.                                       */
+/*                                                                          */
+/* 6	by JDS, Thu Feb 21 15:50:10 1991                                    */
+/*	Fixed minor syntax error.                                           */
+/*                                                                          */
+/* 5	by JDS, Thu Feb 21 09:38:16 1991                                    */
+/*	Added incsize field to exdep structure to support -s switch.  Fixed up revision history. */
+/*                                                                          */
+/* 4	by JDS, Tue Feb 19 11:27:53 1991                                    */
+/*	Added octaword and hexaword data types.  Restructured data types.   */
+/*                                                                          */
+/* 3	by JDS, 13-FEB-1991 16:39:32                                        */
+/*	Added misc field to exdep structure to allow vmem examines to show physical */
+/* address.                                                                 */
+/*                                                                          */
+/* 2	by JDS, Wed Dec 12 13:24:48 1990                                    */
+/*	Modified QSCAN qualifier string to support -n qualifier (with decimal */
+/* value).                                                                  */
+/*                                                                          */
+/* 1	by JDS, Thu Sep 13 09:08:52 1990                                    */
+/*	Initial entry                                                       */
+/*                                                                          */
+/*** MODULE exdep_def ***/
+/*                                                                          */
+/* Data type definitions:                                                   */
+/*                                                                          */
+typedef unsigned char BYTE;
+typedef unsigned short int WORD;
+typedef unsigned int LONGWORD;
+typedef unsigned int QUADWORD [2];
+typedef unsigned int OCTAWORD [4];
+typedef unsigned char HEXAWORD [32];
+typedef unsigned char BIGCHUNK [256];
+ 

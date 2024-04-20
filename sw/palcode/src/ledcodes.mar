@@ -1,0 +1,106 @@
+;
+;        Copyright (c) 1999, Alpha Processor, Inc.
+; 
+;                         All Rights Reserved
+; 
+; Permission to use, copy, modify, and distribute this software 
+; and its documentation for any purpose and without fee is 
+; hereby granted, provided that the copyright notice and this 
+; permission notice appear in all copies of software and 
+; supporting documentation, and that the name of Alpha 
+; Processor not be used in advertising or publicity pertaining 
+; to distribution of the software without specific, written 
+; prior permission. Alpha Processor grants this permission 
+; provided that you prominently mark, as not part of the original, any
+; modifications made to this software or documentation.
+; 
+; Alpha Processor disclaims all warranties and/or guarantees 
+; with regard to this software, including all implied 
+; warranties of fitness for a particular purpose and 
+; merchantability, and makes no representations
+; regarding the use of, or the results of the use of, the 
+; software and documentation in terms of correctness, accuracy, 
+; reliability, currentness or otherwise; and you rely on the 
+; software, documentation and results solely at your own risk.
+;
+; Begun 29 June 1999 by Stig Telfer, Alpha Processor Inc.
+
+; This file contains some standard LED code numbers for PALcode debug.
+; Actually, it isn't really for LEDs since I pass code by variations in 
+; the addresses in high I/O space and just track the addresses written
+; to using a PCI bus analyser.  The result is that I can see a sequence
+; of addresses (each with a different meaning) and a sequence of data,
+; which can be passed out as 32-bit quantities.
+
+
+; initialisation and power-up signals 
+
+	LED__INIT0	= ^x6000
+	LED__INIT1	= ^x6008
+	LED__INIT2	= ^x6010
+
+; hot-switch of PALcode
+
+	LED__SWITCH0	= ^x6100
+	LED__SWITCH1	= ^x6108
+	LED__SWITCH2	= ^x6110
+	LED__SWITCH_ERR	= ^x6118
+
+; software errors
+
+	LED__ERR_KSP	= ^x6200	; kernel stack pointer was invalid
+	LED__ERR_DFLT	= ^x6208	; data fault occurred while in PAL
+	LED__ERR_IACV	= ^x6210	; I-stream access violation
+	LED__ERR_FOE	= ^x6218	; Fault-on-execute triggered
+	LED__ERR_UPAH	= ^x6220	; Update PCB and halt: game over man
+	LED__ERR_HLT	= ^x6228	; Halt called, perhaps executing zeros?
+	LED__ERR_CONS	= ^x6230	; Entering console
+	LED__ERR_OPCDEC = ^x6238	; Illegal instruction - opcode exception
+	LED__ERR_UNA	= ^x6240	; unaligned access
+
+; hardware errors (machine checks)
+
+	LED__MCHK	= ^x6300
+	LED__MCHK_CRD	= ^x6308
+	LED__MCHK_DBL	= ^x6310
+	LED__MCHK_NMI	= ^x6318	; System machine check via EI/NMI
+
+	LED__MCHK_POST	= ^x6380
+
+; interrupts (also system errors)
+
+	LED__INT	= ^x6400
+	LED__INT_SL	= ^x6408
+	LED__INT_HLT	= ^x6410	; UP2000 HW halt assertion
+	LED__INT_CLK	= ^x6420
+	LED__INT_CLK_USR= ^x6428	; clock interrupt occurred in user mode
+
+	LED__INT_POST	= ^x6480	; interrupt is being posted
+
+; VM D-stream faults and misses
+
+	LED__DMISS	= ^x6500	; d-stream miss
+	LED__DMISS1TO1	= ^x6508	; 1-1 miss recognised
+	LED__DMISSPC	= ^x6510	; 1-1 miss offending PC
+	LED__DMISS_POST = ^x6520	; on posting invalid DPTE to OS
+	LED__DMISS_DBL	= ^x6528
+
+; VM I-stream faults and misses
+
+	LED__IMISS1	= ^x6600	; 1-1 miss
+	LED__IMISS1TO1	= ^x6608	; 1-1 miss recognised
+	LED__ERR_IPTE	= ^x6610	; Invalid IPTE
+	LED__IMISS_FOE	= ^x6618
+
+
+; IPL change debug
+
+	LED__DBG_IPL	= ^x6700	; change of IPL: show old, new, PC
+
+; SWPPAL debug
+
+	LED__DBG_SWPPAL	= ^x6800
+
+; SWPCXT debug
+
+	LED__SWPCTX	= ^x6900

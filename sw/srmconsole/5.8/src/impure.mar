@@ -1,0 +1,194 @@
+;+
+; per cpu private pal scratch area
+;-
+	
+	.MACRO	$PAL_IMPURE
+
+
+
+t = 0
+.macro	def	name, unit
+	cns$'name'unit' == tt
+	tt = tt+8
+.endm	def
+
+
+	.list	me
+
+	tt = 0
+	def	flag
+	def	hlt
+
+
+	t = 0
+	.repeat	32
+	  def	r \t
+	  t = t + 1
+	.endr
+
+	t = 0
+	.repeat	32
+	  def	fr \t
+	  t = t + 1
+	.endr
+
+
+	ttt = tt
+
+	def 	mchkflag
+
+	t = 0
+	.repeat	32
+	  def	pt \t
+	  t = t + 1
+	.endr
+
+
+	def	exc_addr
+	def	pal_base
+	def	hirr
+	def	hier
+	def	mm_csr
+	def	va
+	def	biu_addr
+	def	biu_stat
+	def	dc_addr
+	def	fill_addr
+	def	dc_stat
+	def	fill_syndrome
+	def	bc_tag
+	def	abox_ctl
+	def	biu_ctl
+	def	fpcsr
+
+	def	pal_type
+	def	work_request
+	def	t1
+	def	t12
+	def	t13
+	def	t14
+	def	t15
+	def	t16
+	def	t17
+	def	t18
+	def	t19
+
+	def	size
+	tt = tt-ttt
+	def	mchksize
+
+
+
+	.nlist	me
+	.mdelete def
+	.ENDM
+
+
+
+;+
+; per cpu LOGOUT areas 
+;-
+	
+	.MACRO	$PAL_LOGOUT
+
+.macro	def	name, unit
+	las$'name'unit' == tt
+	tt = tt+8
+.endm	def
+
+
+	.list	me
+
+	t = 0
+	tt = 0
+	def	flag
+	def	off
+
+	def	mchk_code
+	las$cpu_base == tt
+	def	biu_stat
+	def	biu_addr
+	def	dc_stat
+	def	fill_syndrome
+	def	fill_addr
+	def	bc_tag
+
+	las$sys_base == -1
+	def	size
+
+	.nlist	me
+	.mdelete def
+
+
+
+
+
+
+
+.macro	def	name, unit
+	laf$'name'unit' == tt
+	tt = tt+8
+.endm	def
+
+
+	.list	me
+
+	t = 0
+	tt = 0
+	def	flag
+	def	off
+
+;;;	def	mchk_code
+	t = 0
+	.repeat	32
+	  def	pt \t
+	  t = t + 1
+	.endr
+
+
+
+	laf$cpu_base == tt
+	def	exc_addr
+	def	exc_sum
+	def	exc_msk
+	def	iccsr
+	def	pal_base
+	def	hier
+	def	hirr
+	def	mm_csr
+	def	dc_stat
+	def	dc_addr
+	def	abox_ctl
+	def	biu_stat
+	def	biu_addr
+	def	biu_ctl
+	def	fill_syndrome
+	def	fill_addr
+	def	va
+	def	bc_tag
+
+
+	; platform specific registers
+	t = 0
+	laf$sys_base == tt
+	.repeat	32
+	  def	plt \t
+	  t = t + 1
+	.endr
+
+
+	def	size
+
+	.nlist	me
+	.mdelete def
+
+
+	las$base		== 0
+	laf$base		== las$size
+	pal$logout_area		== 3*8192
+
+
+	.ENDM
+
+
+

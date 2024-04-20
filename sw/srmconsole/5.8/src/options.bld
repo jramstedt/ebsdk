@@ -1,0 +1,259 @@
+# options.bld
+#
+# This file defines the options which are used in the common console build
+# environment.  An include file is created for each option in cp$inc.  If
+# the option is defined but not invoked, the include file will set the option
+# to 0.
+#
+
+#
+# ALPHA_CONSOLE is always defined.  Use for conditionalizing sources which are
+# built in environments other than the common console build environment.
+#
+define option ALPHA_CONSOLE	# To prevent warning
+option ALPHA_CONSOLE
+
+#
+# Platform options
+#
+define option ALCOR		# Alcor Rom based image
+define option ALLOAD		# Alcor loadable image
+define option ALMIN		# Alcor minimum image ... srom console port
+define option ALUPDATE		# Alcor update image
+define option COMMON		# Common to all platforms
+define option EB164		# EB164 ROM image
+define option EB164LOAD		# EB164 loadable image
+define option EB164MIN		# EB164 small image
+define option SX164		# AlphaPC 164SX Rom based image
+define option SXUPDATE		# AlphaPC 164SX Update image
+define option LX164		# AlphaPC 164LX Rom based image
+define option LXUPDATE		# AlphaPC 164LX Update image
+define option PC264		# AlphaPC 264 Rom based image
+define option DPUPDATE		# AlphaPC 264DP Update image
+define option WEBBRICK		# Webbrick Rom based image
+define option WBUPDATE		# Webbrick update image
+define option APC_PLATFORM	# All inclusive tag for EBxxx platforms
+define option MEDULLA		# AXPvme's
+define option MEDULLAUPDATE	# AXPvme CD update build file
+define option MINTT		# mintt is in use
+define option K2		# DMCC K2 System
+define option K2LOAD		# K2 exerciser image
+define option K2UPDATE		# K2 update utility
+define option TAKARA		# DMCC Takara System
+define option TKLOAD		# Takara exerciser image
+define option TKUPDATE		# Takara update utility
+define option EIGER		# DMCC Eiger System
+define option EILOAD		# Eiger exerciser image
+define option EIUPDATE		# Eiger update utility
+define option AVANTI
+define option AVLOAD		# Avanti big image
+define option AVMIN		# minimum avanti/mustang image.
+define option MIKASA		# Mikasa Base Console Image
+define option MKLOAD		# Mikasa Loadable Image
+define option MKUPDATE		# Mikasa update image
+define option MTU		# MTU (MulTia Unix) basic image
+define option MTULOAD		# MTU (MulTia Unix) full image
+define option NORITAKE		# Noritake Base Console Image
+define option NRLOAD		# Noritake Loadable Image
+define option NRUPDATE		# Noritake update image
+define option PINNACLE		# Pinnacle (EV5)
+define option PKUPDATE		# Pinnacle-Mikasa update image
+define option PTUPDATE		# Pinnacle-Noritake update image
+define option PINKASA		# Pinnacle (EV5-Mikasa)
+define option PINTAKE		# Pinnacle (EV5-Noritake)
+define option PRIMCOR		# Primo/Pinnacle (PINTAKE) Alcor varient
+define option PAUPDATE		# Primo/Pinnacle (PINTAKE) Alcor update image
+define option CRLOAD 		# Corelle ROM image
+define option CORELLE		# Corelle ROM image
+define option CRUPDATE		# Corelle update image
+define option MONET		# Monet ROM image
+define option MONETLFU		# Monet LFU image
+define option MNUPDATE		# Monet update image 
+define option MNLOAD		# Monet Net image 
+define option REGATTA		# Regatta family option
+define option RGMIN
+define option WINDJAMMER	# Windjammer/Warhol ROM image 
+define option WJUPDATE		# Windjammer/Warhol update image
+define option CLIPPER		# Clipper ROM image 
+define option CLUNIX		# Clipper UNIX performance image
+define option CLUPDATE		# Clipper update image
+define option CLMIN		# Clipper min image(I/O through EV serial port)
+define option CLLOAD		# Clipper big image
+define option TURBO
+define option TL6		# TurboLaser EV6
+define option TL67		# TurboLaser EV67
+define option SECURE
+define option SABLE
+define option SBUPDATE		# Sable update image
+define option SBLOAD		# Sable big image
+define option SBFSAFE		# Sable fail safe image
+define option SBMIN		# Sable TDD small image
+define option SBQV		# Sable Memory QV image
+define option GAMMA
+define option GMUPDATE		# Gamma update image
+define option GMLOAD		# Gamma big image
+define option GMFSAFE		# Gamma fail safe image
+define option GMMIN		# Gamma TDD small image
+define option GMQV		# Gamma Memory QV image
+define option RAWHIDE
+define option LYNX		# LYNX 
+define option SLYNX		# Sable EV4 based Lynx
+define option SLUPDATE		# Sable Lynx update image
+define option SLLOAD		# Sable Lynx big image
+define option SLFSAFE		# Sable Lynx fail safe image
+define option GLYNX		# Gamma EV5 based Lynx
+define option GLUPDATE		# Gamma Lynx update image
+define option GLLOAD		# Gamma Lynx big image
+define option GLFSAFE		# Gamma Lynx fail safe image
+define option CORTEX		# Cortex normal rom-based image
+define option CORTEXUPDATE	# Cortex CD update build file
+define option YUKON		# Yukon normal rom-based image
+define option YUKONUPDATE	# Yukon CD update build file
+define option YUKONA		# YUKONA rom-based image
+define option YUKONAUPDATE	# YUKONA CD update image
+define option WILDFIRE		# WildFire ROM image
+define option WFDIAG		# WildFire srom/xsrom
+define option WFMIN		# WildFire min image(I/O through EV serial port)
+define option WFUPDATE		# WildFire update image
+define option WFLOAD		# WildFire big image
+define option MARVEL		# Marvel ROM image
+define option PRIVATEER		# Privateer ROM image
+define option PRMIN		# Privateer min image (I/O through EV serial port)
+define option PRUPDATE		# Privateer update image
+define option PRLOAD		# Privateer big image
+define option FALCON		# Falcon ROM image
+define option FALMIN		# Falcon min image (I/O through EV serial port)
+define option FALUPDATE		# Falcon update image
+define option FALLOAD		# Falcon big image
+define option TINOSA		# API Tinosa Motherboard
+define option NAUTILUS		# API Nautilus Motherboard
+define option SHARK             # API Shark Motherboard
+define option SWORDFISH		# API Swordfish Motherboard
+define option GLXYTRAIN         # API Galaxy Train Motherboard
+
+#
+# Architecture options
+#
+define option ALPHA
+define option VAX
+define option EV5
+define option EV6
+define option BWX		# support for byte/word architecture extensions
+define option FRU5		# indicates FRU5 (galaxy) fru tables
+define option GCT6
+
+#
+# Miscellaneous options
+#
+define option FWUPDATE		 # fw update target
+define option NO_LFU_FLOPPY	 # Don't look on a floppy for options fw
+define option ARC_SUPPORT	 #
+define option BACKING_STORE	 # graphics drivers use backing store for text
+define option IO_BUS_RESET	 # platform supports io bus resets
+define option BOOT_RESET	 # platform supports BOOT_RESET envar
+define option CONSOLE_DRIVER	 #
+define option DIAG_SUPPORT	 #
+define option DE200		 #
+define option EXTRA		 # Include extra stuff.
+define option HIGH_BOOT_PTEPAGES # Put boot page tables in high memory
+define option IMP		 # for Rawhide
+define option INTERACTIVE_SCREEN #
+define option MODE64		 # Full 64 bit mode.
+define option MODULAR		 # Modular console
+define option MSCP		 # client MSCP support
+define option MSCP_SERVER	 # server MSCP support
+define option RELEASE		 # This is a release version (?)
+define option SCAM		 #
+define option TGA		 #
+define option FULL_TGA		 #
+define option TGA_VMS_BUILD	 #
+define option UNIPROCESSOR	 # obsolete
+define option VALIDATE		 # Build "checked" version of code.
+define option XDELTA_ON		 # Turn XDELTA on.
+define option XDELTA_INITIAL	 # Modular, take initial Bpt
+define option RUNS_ON_EISA	 # EISA based system
+define option BOOTP_SUPPORT      # Turn on BOOTP, need to build inet driver
+define option SYMBOLS		 # Turn on Symbols, need to build vlist
+define option SIM		 # Simulation mode
+define option ISP		 # Turbo ISP model
+define option ISP_MODEL_SUPPORT  # ISP model support
+define option SPORT		 # SPORT environment
+define option FORCE		 # Force errors in diagnostics
+define option STARTSHUT		 # Driver Startup and Shutdown
+define option DRIVERSHUT	 # PB based Driver Startup and Shutdown
+define option DYNAMIC_TRAPPING	 # Trap on malloc/free
+define option DYNAMIC_PRINTING	 # Trace malloc/free requests 
+define option NONZERO_CONSOLE_BASE
+define option NET_EI_PORT	 # PCI Intel ETHERNET
+define option NET_EW_PORT	 # PCI Tulip ETHERNET
+define option NET_PDQ_PORT	 # PCI FDDI
+define option NET_FW_PORT	 # PCI FDDI
+define option NET_EX_PORT	 # DEMNA
+define option NET_FX_PORT	 # DEMFA
+define option NET_FF_PORT	 # DEFAA
+define option GALAXY
+define option SHOW_RAID
+define option ARC_CCI
+define option FIBRE_CHANNEL      # Fibre Channel support
+define option UNIVERSE		 # New Tundra chip for YUKONA 
+define option GALAXY_CALLBACKS
+define option EEROM_CALLBACKS
+define option NT_ONLY_SUPPORT
+define option USB_SUPPORT
+define option LOG_DRIVER_INIT
+define option SEPARATE_PAGE_TABLES
+define option CPQPHPC		 # CPQ Hot-plug controller (Yukon)
+define option BOOTBIOS		 # platform supports booting thru BIOS ROM's
+define option M1543C             # ALI M1543C Southbridge
+define option M1535C             # ALI M1535C Southbridge
+define option API_PLATFORM       # And API Platform
+
+# breaks kernel_alpha.mar
+# define option MACRO64$		 # Macro 64 compiles
+#
+#
+# Values
+#
+define value MAX_PROCESSOR_ID	1
+define value MIN_HEAP_SIZE	0x18000		# 96K
+define value HEAP_SIZE		0x100000	# 1024K
+define value HEAP_BASE		0
+define value MAX_MEMORY_CHUNK	1
+define value MAX_MEMORY_ARRAY	1
+define value MEMORY_CLUSTER_COUNT	11
+
+define value DEFAULT_PSEC_PER_CYCLE 2000
+define value DISCRETETIMER_BASE 0x4000
+define value ENET_ID_BASE	0x3800
+define value EEROM_LENGTH	8192
+define value NVRAM_EV_LEN	2048
+define value MAX_ELBUF		8192
+define value MAX_RECALL		16
+define value RTC_BASE		0x8000
+define value RTC_OFFSET_REG	0x70
+define value RTC_DATA_REG	0x71
+define value MAX_GRAPHICS	1
+define value MAX_PHYSMEM_MB	(2*1024)
+define value SYSTEM_TYPE	0x22
+string OPTIONS_FW_FILE	"pc264fw"
+
+#
+# Regular expressions for suppressing undefined options during option
+# scanning (see OPT.MMS).
+#
+suppress option /DEBUG/
+suppress option /TRACE/
+
+#
+# Messages
+#
+message file generic_messages.c
+
+message prefix msg_
+
+message value msg_success	0
+message value msg_failure	1
+message value msg_def		2
+message value msg_halt		3
+message value msg_loop		4
+message value msg_error		5

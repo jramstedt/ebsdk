@@ -1,0 +1,15 @@
+set >nl 2>nl t_cnt 0
+while eval >nl 0
+do
+  if eval >nl `echo $d_runtime` t_cnt \<=
+  then      
+    sleep 1
+    eval >nl t_cnt t_cnt 1 + =
+  else
+    set >nl 2>nl s_flag 1
+    sleep 1
+    echo "Test time has expired..."
+    break
+  fi
+done
+clear 2>nl >nl t_cnt

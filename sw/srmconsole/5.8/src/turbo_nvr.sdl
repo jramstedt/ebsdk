@@ -1,0 +1,102 @@
+/* file:	turbo_nvr.sdl
+/*
+/* Copyright (C) 1990 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Turbo 50 byte non-volatile RAM on GBUS Watch Chip
+/*
+/* Author:	Kevin LeMieux
+/*
+/* Modifications:
+/*
+/*
+module	$turbo_nvr;
+
+constant NVR$K_BASE equals %xB0000380;
+constant NVR$K_LENGTH equals 50;
+constant NVR$K_FLAG equals 1;
+constant NVR$K_VALUE equals 0;
+constant ADDRESS_INCREMENT equals %x40;
+
+constant NVR$K_BOOT_DONE equals %xFF;
+constant NVR$K_INIT_DONE equals %x00;
+constant NVR$K_BOOT equals %xBB;
+constant NVR$K_INIT equals %xC9;
+
+constant (
+	NVR_VALID,		/* 380 
+	SCACHE_MASK,		/* 3C0 
+	LO_MEM_MASK,		/* 400 
+	HI_MEM_MASK,		/* 440 
+	LO_TST_MASK,		/* 480 
+	MED_TST_MASK,		/* 4C0 
+	HI_TST_MASK,		/* 500 
+	TST_MASK_EN,		/* 540 
+	PCI_PARITY_DIS,		/* 580 
+	TEMP_STORAGE,		/* 5C0
+	BEGIN_VALID,		/* 600 To add items, move this down
+	,			/* 640 
+	,			/* 680 
+	,			/* 6C0 
+	,			/* 700 
+	,			/* 740 
+	,			/* 780 
+	,			/* 7C0 
+	,			/* 800 
+	,			/* 840 
+	,			/* 880 
+	,			/* 8C0 
+	,			/* 900 
+	,			/* 940 
+	,			/* 980 
+	END_VALID,		/* 9C0 To add items, move this up 
+	KZP_DELAY,		/* A00 
+	ALPHABIOS,		/* A40
+	IO_CONFIG_DISABLED,	/* A80
+	PRINT_0_7,		/* AC0 
+	PRINT_8_15,		/* B00 
+	GRAPHICS_DISABLED,	/* B40 
+	ENABLE_DIAG_STRING,	/* B80 
+	BPTEST_ENABLE,		/* BC0 
+	BAUD_CONSTANT,		/* C00 
+	DUMP_HW_STATE, 		/* C40 
+	PCI_DIAGS_DISABLE,	/* C80 
+	CPUTST_DIAGS_DISABLE,	/* CC0 
+	XDELTA_ENABLE,		/* D00 
+	XDELTA_ENTRY,	  	/* D40 
+	DBG_UART_EN,		/* D80 
+	RBA_DIAGS_DISABLE,	/* DC0 
+	DIAGS_PRINTF_EN,	/* E00 
+	EXPECTED_ENTRY,	    	/* E40 
+	CPU_START_DISABLE,	/* E80 
+	CPU_JUMP_DISABLE,	/* EC0 
+	CPUMEM_DIAGS_DISABLE,	/* F00 
+	IO_DIAGS_DISABLE,	/* F40 
+	DUAL_ENABLE,		/* F80 
+	ARCFW_FLAGS,		/* FC0 
+
+) equals 0 increment 1 prefix "NVR$K" tag "";
+
+aggregate "NVR_TABLE" structure prefix "" tag "";
+	type	longword;
+	key	longword;
+	name	address (byte);
+end NVR_TABLE;
+
+end_module;

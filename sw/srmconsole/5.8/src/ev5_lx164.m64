@@ -1,0 +1,15 @@
+.sbttl	"AlphaPC 164/LX PALcode Configuration-specific parameters"
+
+	real_mm	= 1			; standard memory management path
+	enable_physical_console	= 1	; 1-to-1 address mapping enabled
+	alpha_fw = 1			; Alpha Firmware interface
+        init_cbox = 0			; do not overwrite SROM cbox init code 
+
+	rax_mode = 0			; clear the HLO environment flags
+	egore = 0
+	acore = 0
+	beh_model = 0
+	restore_evms_palbase = 1
+
+	lx164_system = 1		; AlphaPC 164/LX platform
+

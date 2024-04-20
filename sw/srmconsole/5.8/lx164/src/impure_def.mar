@@ -1,0 +1,415 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:24:18 by OpenVMS SDL EV1-33     
+;  Source:  16-SEP-1998 15:36:26 AFW_USER$:[CONSOLE.V58.COMMON.SRC]EV5_LX164_IMP 
+; ********************************************************************************************************************************
+;  file:	ev5_lx164_impure.sdl
+; 
+;  Abstract:	PAL impure scratch area and logout area data structure definitions for
+; 		AlphaPC 164/LX SRM console firmware.
+; 
+; 
+ 
+	.MACRO	$pal_impure,..EQU=<=>,..COL=<:>
+IMPURE$K_REVISION'..equ'1               ;  Revision number of this file
+; 
+;  Structure of the processor-specific impure area
+; 
+cns$r0'..equ'16
+cns$r1'..equ'24
+cns$r2'..equ'32
+cns$r3'..equ'40
+cns$r4'..equ'48
+cns$r5'..equ'56
+cns$r6'..equ'64
+cns$r7'..equ'72
+cns$r8'..equ'80
+cns$r9'..equ'88
+cns$r10'..equ'96
+cns$r11'..equ'104
+cns$r12'..equ'112
+cns$r13'..equ'120
+cns$r14'..equ'128
+cns$r15'..equ'136
+cns$r16'..equ'144
+cns$r17'..equ'152
+cns$r18'..equ'160
+cns$r19'..equ'168
+cns$r20'..equ'176
+cns$r21'..equ'184
+cns$r22'..equ'192
+cns$r23'..equ'200
+cns$r24'..equ'208
+cns$r25'..equ'216
+cns$r26'..equ'224
+cns$r27'..equ'232
+cns$r28'..equ'240
+cns$r29'..equ'248
+cns$r30'..equ'256
+cns$r31'..equ'264
+cns$f0'..equ'272
+cns$f1'..equ'280
+cns$f2'..equ'288
+cns$f3'..equ'296
+cns$f4'..equ'304
+cns$f5'..equ'312
+cns$f6'..equ'320
+cns$f7'..equ'328
+cns$f8'..equ'336
+cns$f9'..equ'344
+cns$f10'..equ'352
+cns$f11'..equ'360
+cns$f12'..equ'368
+cns$f13'..equ'376
+cns$f14'..equ'384
+cns$f15'..equ'392
+cns$f16'..equ'400
+cns$f17'..equ'408
+cns$f18'..equ'416
+cns$f19'..equ'424
+cns$f20'..equ'432
+cns$f21'..equ'440
+cns$f22'..equ'448
+cns$f23'..equ'456
+cns$f24'..equ'464
+cns$f25'..equ'472
+cns$f26'..equ'480
+cns$f27'..equ'488
+cns$f28'..equ'496
+cns$f29'..equ'504
+cns$f30'..equ'512
+cns$f31'..equ'520
+cns$pt_offset'..equ'536
+cns$pt0'..equ'536
+cns$pt1'..equ'544
+cns$pt2'..equ'552
+cns$pt3'..equ'560
+cns$pt4'..equ'568
+cns$pt5'..equ'576
+cns$pt6'..equ'584
+cns$pt7'..equ'592
+cns$pt8'..equ'600
+cns$pt9'..equ'608
+cns$pt10'..equ'616
+cns$pt11'..equ'624
+cns$pt12'..equ'632
+cns$pt13'..equ'640
+cns$pt14'..equ'648
+cns$pt15'..equ'656
+cns$pt16'..equ'664
+cns$pt17'..equ'672
+cns$pt18'..equ'680
+cns$pt19'..equ'688
+cns$pt20'..equ'696
+cns$pt21'..equ'704
+cns$pt22'..equ'712
+cns$pt23'..equ'720
+cns$pt24'..equ'728
+cns$ipr_offset'..equ'792
+cns$size'..equ'1152
+cns$mchksize'..equ'624
+S_impure'..equ'1152
+impure'..equ'0
+S_cns$flag'..equ'8
+cns$flag'..equ'0
+S_cns$hlt'..equ'8
+cns$hlt'..equ'8
+S_cns$gpr'..equ'256
+cns$gpr'..equ'16
+S_cns$fpr'..equ'256
+cns$fpr'..equ'272
+S_cns$mchkflag'..equ'8
+cns$mchkflag'..equ'528
+S_cns$pt'..equ'192
+cns$pt'..equ'536
+S_cns$shadow8'..equ'8
+cns$shadow8'..equ'728
+S_cns$shadow9'..equ'8
+cns$shadow9'..equ'736
+S_cns$shadow10'..equ'8
+cns$shadow10'..equ'744
+S_cns$shadow11'..equ'8
+cns$shadow11'..equ'752
+S_cns$shadow12'..equ'8
+cns$shadow12'..equ'760
+S_cns$shadow13'..equ'8
+cns$shadow13'..equ'768
+S_cns$shadow14'..equ'8
+cns$shadow14'..equ'776
+S_cns$shadow25'..equ'8
+cns$shadow25'..equ'784
+S_cns$exc_addr'..equ'8
+cns$exc_addr'..equ'792
+S_cns$pal_base'..equ'8
+cns$pal_base'..equ'800
+S_cns$mm_stat'..equ'8
+cns$mm_stat'..equ'808
+S_cns$va'..equ'8
+cns$va'..equ'816
+S_cns$icsr'..equ'8
+cns$icsr'..equ'824
+S_cns$ipl'..equ'8
+cns$ipl'..equ'832
+S_cns$ps'..equ'8
+cns$ps'..equ'840                        ;  Ibox current mode
+S_cns$itb_asn'..equ'8
+cns$itb_asn'..equ'848
+S_cns$aster'..equ'8
+cns$aster'..equ'856
+S_cns$astrr'..equ'8
+cns$astrr'..equ'864
+S_cns$isr'..equ'8
+cns$isr'..equ'872
+S_cns$ivptbr'..equ'8
+cns$ivptbr'..equ'880
+S_cns$mcsr'..equ'8
+cns$mcsr'..equ'888
+S_cns$dc_mode'..equ'8
+cns$dc_mode'..equ'896
+S_cns$maf_mode'..equ'8
+cns$maf_mode'..equ'904
+S_cns$sirr'..equ'8
+cns$sirr'..equ'912
+S_cns$fpcsr'..equ'8
+cns$fpcsr'..equ'920
+S_cns$icperr_stat'..equ'8
+cns$icperr_stat'..equ'928
+S_cns$pmctr'..equ'8
+cns$pmctr'..equ'936
+S_cns$exc_sum'..equ'8
+cns$exc_sum'..equ'944
+S_cns$exc_mask'..equ'8
+cns$exc_mask'..equ'952
+S_cns$intid'..equ'8
+cns$intid'..equ'960
+S_cns$dcperr_stat'..equ'8
+cns$dcperr_stat'..equ'968
+S_cns$sc_stat'..equ'8
+cns$sc_stat'..equ'976
+S_cns$sc_addr'..equ'8
+cns$sc_addr'..equ'984
+S_cns$sc_ctl'..equ'8
+cns$sc_ctl'..equ'992
+S_cns$bc_tag_addr'..equ'8
+cns$bc_tag_addr'..equ'1000
+S_cns$ei_stat'..equ'8
+cns$ei_stat'..equ'1008
+S_cns$ei_addr'..equ'8
+cns$ei_addr'..equ'1016
+S_cns$fill_syn'..equ'8
+cns$fill_syn'..equ'1024
+S_cns$ld_lock'..equ'8
+cns$ld_lock'..equ'1032
+S_cns$bc_ctl'..equ'8
+cns$bc_ctl'..equ'1040                   ;  shadow of on chip bc_ctl 
+S_cns$pmctr_ctl'..equ'8
+cns$pmctr_ctl'..equ'1048                ;  saved frequency select info for pmctr
+S_cns$bc_config'..equ'8
+cns$bc_config'..equ'1056                ;  shadow of on chip bc_config
+S_cns$pal_type'..equ'8
+cns$pal_type'..equ'1064
+S_cns$intr_mask'..equ'8
+cns$intr_mask'..equ'1072                ;  shadow of PCI interrupt mask
+; 
+;  Parameters passed in from the SROM
+; 
+S_cns$srom_bc_ctl'..equ'8
+cns$srom_bc_ctl'..equ'1080              ;  Current BC_CTL value
+S_cns$srom_bc_cfg'..equ'8
+cns$srom_bc_cfg'..equ'1088              ;  Current BC_CONFIG value
+S_cns$srom_srom_rev'..equ'8
+cns$srom_srom_rev'..equ'1096            ;  SROM revision
+S_cns$srom_proc_id'..equ'8
+cns$srom_proc_id'..equ'1104             ;  Processor identifier
+S_cns$srom_mem_size'..equ'8
+cns$srom_mem_size'..equ'1112            ;  Size of contiguous good memory (bytes)
+S_cns$srom_cycle_cnt'..equ'8
+cns$srom_cycle_cnt'..equ'1120           ;  Cycle count (picoseconds)
+S_cns$srom_signature'..equ'8
+cns$srom_signature'..equ'1128           ;  Signature and system revision identifier
+S_cns$srom_proc_mask'..equ'8
+cns$srom_proc_mask'..equ'1136           ;  Active processor mask
+S_cns$srom_sysctx'..equ'8
+cns$srom_sysctx'..equ'1144              ;  System context value
+PMCTR_CTL$V_SPROCESS'..equ'0
+PMCTR_CTL$S_FRQ2'..equ'2
+PMCTR_CTL$V_FRQ2'..equ'4
+PMCTR_CTL$S_FRQ1'..equ'2
+PMCTR_CTL$V_FRQ1'..equ'6
+PMCTR_CTL$S_FRQ0'..equ'2
+PMCTR_CTL$V_FRQ0'..equ'8
+PMCTR_CTL$S_CTL2'..equ'2
+PMCTR_CTL$V_CTL2'..equ'10
+PMCTR_CTL$S_CTL1'..equ'2
+PMCTR_CTL$V_CTL1'..equ'12
+PMCTR_CTL$S_CTL0'..equ'2
+PMCTR_CTL$V_CTL0'..equ'14
+; 
+;  Hacks to make builds work.
+; 
+PT$_IMPURE'..equ'3                      ;  entry.c
+PT$_INTMASK'..equ'8                     ;  entry.c
+PT$_PS'..equ'9                          ;  hwrpb.c
+PT$_MCES'..equ'16                       ;  ipr_driver.c
+PT$_WHAMI'..equ'16                      ;  ipr_driver.c
+PT$_SCC'..equ'17                        ;  entry.c
+PT$_PRBR'..equ'18                       ;  ipr_driver.c
+PT$_PTBR'..equ'20                       ;  alphamm.c
+PT$_L3VIRT'..equ'21                     ;  boot.c
+PT$_SCBB'..equ'22                       ;  ipr_driver.c
+PT$_PCBB'..equ'23                       ;  hwrpb.c
+S_PALVERSION'..equ'4
+PALVERSION'..equ'0
+minor'..equ'0
+major'..equ'1
+is_v'..equ'2
+xxx'..equ'3
+	.ENDM
+ 
+	.MACRO	$pal_logout,..EQU=<=>,..COL=<:>
+; 
+;  Start definition of Corrected Error Frame
+; 
+mchk$crd_cpu_base'..equ'24
+mchk$crd_sys_base'..equ'56
+mchk$crd_size'..equ'104
+S_crd_logout'..equ'104
+crd_logout'..equ'0
+S_mchk$crd_flag'..equ'8
+mchk$crd_flag'..equ'0
+S_mchk$crd_offsets'..equ'8
+mchk$crd_offsets'..equ'8
+;  Pal-specific information	
+S_mchk$crd_mchk_code'..equ'8
+mchk$crd_mchk_code'..equ'16
+;  CPU-specific information
+S_mchk$crd_ei_addr'..equ'8
+mchk$crd_ei_addr'..equ'24
+S_mchk$crd_fill_syn'..equ'8
+mchk$crd_fill_syn'..equ'32
+S_mchk$crd_ei_stat'..equ'8
+mchk$crd_ei_stat'..equ'40
+S_mchk$crd_isr'..equ'8
+mchk$crd_isr'..equ'48
+;  System-specific information
+S_mchk$crd_pyxis_syn'..equ'8
+mchk$crd_pyxis_syn'..equ'56             ;  Syndrome register
+S_mchk$crd_pyxis_mear'..equ'8
+mchk$crd_pyxis_mear'..equ'64            ;  Memory error address register
+S_mchk$crd_pyxis_mesr'..equ'8
+mchk$crd_pyxis_mesr'..equ'72            ;  Memory error status register
+S_mchk$crd_pyxis_stat'..equ'8
+mchk$crd_pyxis_stat'..equ'80            ;  Status register
+S_mchk$crd_pyxis_err'..equ'8
+mchk$crd_pyxis_err'..equ'88             ;  Error register
+S_mchk$crd_pyxis_err_data'..equ'8
+mchk$crd_pyxis_err_data'..equ'96        ;  Error data CSR
+; 
+;  Start definition of Machine check logout Frame
+; 
+mchk$cpu_base'..equ'280
+mchk$sys_base'..equ'416
+mchk$size'..equ'616
+pal$logout_area'..equ'24576
+pal$logout_base'..equ'24576
+mchk$crd_base'..equ'0
+mchk$mchk_base'..equ'104
+S_logout'..equ'616
+logout'..equ'0
+S_mchk$flag'..equ'8
+mchk$flag'..equ'0
+S_mchk$offsets'..equ'8
+mchk$offsets'..equ'8
+;  Pal-specific information
+S_mchk$mchk_code'..equ'8
+mchk$mchk_code'..equ'16
+S_mchk$shadow'..equ'64
+mchk$shadow'..equ'24
+S_mchk$pt'..equ'192
+mchk$pt'..equ'88
+;  CPU-specific information
+S_mchk$exc_addr'..equ'8
+mchk$exc_addr'..equ'280
+S_mchk$exc_sum'..equ'8
+mchk$exc_sum'..equ'288
+S_mchk$exc_mask'..equ'8
+mchk$exc_mask'..equ'296
+S_mchk$pal_base'..equ'8
+mchk$pal_base'..equ'304
+S_mchk$isr'..equ'8
+mchk$isr'..equ'312
+S_mchk$icsr'..equ'8
+mchk$icsr'..equ'320
+S_mchk$ic_perr_stat'..equ'8
+mchk$ic_perr_stat'..equ'328
+S_mchk$dc_perr_stat'..equ'8
+mchk$dc_perr_stat'..equ'336
+S_mchk$va'..equ'8
+mchk$va'..equ'344
+S_mchk$mm_stat'..equ'8
+mchk$mm_stat'..equ'352
+S_mchk$sc_addr'..equ'8
+mchk$sc_addr'..equ'360
+S_mchk$sc_stat'..equ'8
+mchk$sc_stat'..equ'368
+S_mchk$bc_tag_addr'..equ'8
+mchk$bc_tag_addr'..equ'376
+S_mchk$ei_addr'..equ'8
+mchk$ei_addr'..equ'384
+S_mchk$fill_syn'..equ'8
+mchk$fill_syn'..equ'392
+S_mchk$ei_stat'..equ'8
+mchk$ei_stat'..equ'400
+S_mchk$ld_lock'..equ'8
+mchk$ld_lock'..equ'408
+;  System-specific information
+S_mchk$sys_reserved'..equ'8
+mchk$sys_reserved'..equ'416
+S_mchk$pyxis_err_data'..equ'8
+mchk$pyxis_err_data'..equ'424           ;  Error data CSR
+S_mchk$pyxis_err'..equ'8
+mchk$pyxis_err'..equ'432                ;  Error register
+S_mchk$pyxis_stat'..equ'8
+mchk$pyxis_stat'..equ'440               ;  Status register
+S_mchk$pyxis_err_mask'..equ'8
+mchk$pyxis_err_mask'..equ'448           ;  Error mask register
+S_mchk$pyxis_syn'..equ'8
+mchk$pyxis_syn'..equ'456                ;  Syndrome register
+S_mchk$pyxis_mear'..equ'8
+mchk$pyxis_mear'..equ'464               ;  Memory error address register
+S_mchk$pyxis_mesr'..equ'8
+mchk$pyxis_mesr'..equ'472               ;  Memory error status register
+S_mchk$pci_err0'..equ'8
+mchk$pci_err0'..equ'480                 ;  PCI error status register 0
+S_mchk$pci_err1'..equ'8
+mchk$pci_err1'..equ'488                 ;  PCI error status register 1
+S_mchk$sio_nmisc'..equ'8
+mchk$sio_nmisc'..equ'496                ;  NMI status and control register
+S_mchk$pci_err2'..equ'8
+mchk$pci_err2'..equ'504                 ;  PCI error status register 2
+S_mchk$pyxis_hae_mem'..equ'8
+mchk$pyxis_hae_mem'..equ'512            ;  Host Address Extension register
+S_mchk$sio_rev'..equ'8
+mchk$sio_rev'..equ'520                  ;  Revision identification
+S_mchk$sio_ubcsa'..equ'8
+mchk$sio_ubcsa'..equ'528                ;  Utility bus chip select enable A
+S_mchk$sio_ubcsb'..equ'8
+mchk$sio_ubcsb'..equ'536                ;  Utility bus chip select enable B
+S_mchk$sio_imr0'..equ'8
+mchk$sio_imr0'..equ'544                 ;  Interrupt mask register (master)
+S_mchk$sio_imr1'..equ'8
+mchk$sio_imr1'..equ'552                 ;  Interrupt mask register (slave)
+S_mchk$sio_irr0'..equ'8
+mchk$sio_irr0'..equ'560                 ;  Interrupt request register (master)
+S_mchk$sio_irr1'..equ'8
+mchk$sio_irr1'..equ'568                 ;  Interrupt request register (slave)
+S_mchk$sio_isr0'..equ'8
+mchk$sio_isr0'..equ'576                 ;  Interrupt status register (master)
+S_mchk$sio_isr1'..equ'8
+mchk$sio_isr1'..equ'584                 ;  Interrupt status register (slave)
+S_mchk$sio_dma_stat0'..equ'8
+mchk$sio_dma_stat0'..equ'592            ;  DMA status register 0
+S_mchk$sio_dma_stat1'..equ'8
+mchk$sio_dma_stat1'..equ'600            ;  DMA status register 1
+S_mchk$sio_status'..equ'8
+mchk$sio_status'..equ'608               ;  Device status
+	.ENDM

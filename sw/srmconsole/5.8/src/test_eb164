@@ -1,0 +1,236 @@
+#+
+# ============================================================================
+# = test - Test the system.						     =
+# ============================================================================
+#
+# OVERVIEW:
+#
+#	Test the entire system, including memory, disks, tapes, floppy,
+#	serial ports, parallel port, network and VGA.
+#
+#       All tests run serially for a minimum of 10 seconds per test. The run 
+#	time of a test is proportional to the amount of memory to be tested and 
+#	the number of disk drives to be tested.
+#
+#	The -lb option allows an external loopback test to be performed on the
+#	parallel port and on serial port 1.
+#
+#	Only one instance of test can be run at a time.  test can be run as
+#	either a background or foreground process.
+#
+#	Use the SET command to establish parameters, such as whether to halt, 
+#	loop, or continue on error.  The passcount environment variable,
+#	d_passes is ignored by test.             
+#
+#   COMMAND FORM:
+#
+#       test ( [-lb] )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       None
+#
+#   COMMAND OPTION(S):
+#
+#       -lb - external loopback tests are performed on the parallel port and
+#	      on serial port 1 
+#
+#   COMMAND EXAMPLE(S):
+#~
+#       >>>test &
+#       >>>show_status
+#	      ID      Program       Device   Pass Hard/Soft Bytes Written    Bytes Read
+#	-------- ------------ ------------ ------ --------- ------------- -------------
+#	00000001         idle       system      0    0    0             0             0
+#	0000009f      memtest       memory      0    0    0     100663296     100663296
+#	000000b4     exer_kid dub0.0.0.1.0      0    0    0             0        444416
+#	000000b5     exer_kid duc0.6.0.2.0    122    0    0             0       1249280
+#	000000b6     exer_kid dud0.7.0.3.0    122    0    0             0       1249280
+#	000000b7     exer_kid dka0.0.0.0.0      0    0    0             0        256000
+#	000000be      nettest ewa0.0.0.6.0     13    0    0         20888         20888
+#	000000be      nettest era0.0.0.7.0     13    0    0         17904         17904
+#       >>>
+#~
+#-
+#test the system
+set d_report full
+#date
+# Test the memory
+echo "Testing the Memory"
+memtest -bs 200000 -rb
+#
+# Test the Disks
+if (ls dk*.* >nl) then
+	echo "Testing the DK* Disks(read only)"
+	exer -a "?r-Rc" -sec 10 dk*
+else
+	echo "No DK* Disks available for testing"
+fi
+if (ls du*.* >nl) then
+	echo "Testing the DU* Disks(read only)"
+	exer -a "?r-Rc" -sec 10 du*
+else
+	echo "No DU* Disks available for testing"
+fi
+if (ls dr*.* >nl) then
+	echo "Testing the DR* Disks(read only)"
+	exer -a "?r-Rc" -sec 10 dr*
+else
+	echo "No DR* Disks available for testing"
+fi
+#
+# Test the Tapes
+if (ls mk*.* >nl) then
+	echo "Testing the MK* Tapes(read only)"
+	exer -sec 10 mk*
+else
+	echo "No MK* Tapes available for testing"
+fi
+#
+# Test the floppy
+if (ls dv*.* >nl) then
+	echo "Testing the DV* Floppy Disks(read only)"
+	exer -a "?r-Rc" -sec 10 dv*
+else
+	echo "No DV* Floppy Disks available for testing"
+fi
+#
+# If an input of lb is used try to run the external loopback tests on the
+# parallel port and serial port 1.
+if (eval $# > nl) then
+	set aa_ext_lp$$ 0 2>nl
+else
+	set aa_ext_lp$$ $1 2>nl
+fi
+#
+if (show aa_ext_lp$$ | grep lb >nl) then
+
+# Test the serial port 1
+	set tt_allow_login 0
+	if (exer tta1 -bs 1 -a 'wRc' -l 1 2>nl) then
+		echo "Testing the Serial Port 1(external loopback)"
+		exer tta1 -bs 1 -a 'wRc' -l 400 -p 10
+	else
+		echo "No Serial Port 1 loopback installed"
+		echo "Serial Port 1 Testing skipped"
+	fi
+	set tt_allow_login 1
+#
+# Test the Parallel Port
+	if (exer para -bs 1 -a 'wRc' -l 1 2>nl) then
+		echo "Testing the parallel Port(external loopback)"
+		exer para -bs 1 -a 'wRc' -l 400
+	else
+		echo "No Parallel port loopback installed"
+		echo "Parallel Port Testing skipped"
+	fi
+fi
+clear aa_ext_lp$$
+#
+if (ls vga0 >nl) then
+    echo -n "VGA" > ghead$$
+fi
+if (ls tga0 >nl) then
+    echo -n "TGA" > ghead$$
+fi
+if (ls ghead$$ >nl) then
+	if (show console | grep serial >nl) then
+		echo Testing the `cat ghead${p}`' (Alphanumeric Mode only)'
+		set aa_lp_cnt$$ 1500 2>nl
+		while (eval -id -d "aa_lp_cnt$$ 0 ==" > nl) do
+			echo -n 'digital' > `cat ghead${p}`0
+			eval -id -d "aa_lp_cnt$$ aa_lp_cnt$$ 1 - =" > nl
+		done
+		echo "" > `cat ghead${p}`0
+		clear aa_lp_cnt$$
+	else
+		echo `cat ghead${p}` used as main console - test bypassed
+	fi
+	rm ghead$$
+else
+	echo "No VGA/TGA available for testing"
+fi
+#
+# Test the Mouse
+# The mouse ignores all commands for now.  If the console resolves this
+# problem this test can be added back in.
+#echo "Testing the mouse"
+##set aa_lp_cnt$$ 10 2>nl
+#while (eval -id -d "aa_lp_cnt$$ 0 ==" > nl)
+#do
+#	set mice$$ 0 2>nl
+#	set mcnt$$ 5 2>nl
+#
+#	# enable the mouse port
+#	d -b eport:64 A8
+#
+#	# write the command to the mouse
+#	d -b eport:64 d4
+#	d -b eport:60 54
+#
+#	# tell the mouse to send data
+#	d -b eport:64 d4
+#	d -b eport:60 eb
+#
+#	# read 4 bytes worth of data keep track of the number 
+#	# the mouse actually sends
+#
+#	until eval "mcnt$$ mcnt$$ 1 - =" > nl
+#	do
+#		sleep 1
+#		if (eval `e -b eport:64|find 2` '1 &' '1 -' > nl) then 
+#			(eval "mice$$ mice$$ 1 + =" > nl)
+#		fi
+#		e -b eport:60 > nl
+#	done
+#
+#	if (eval "mice$$ 4 -" > nl) then 
+#	else 
+#		(echo "mouse bad or missing")
+#		set aa_lp_cnt$$ 1
+#	fi
+#
+#	# disable the mouse
+#	d -b eport:64 A7
+#
+#	# do a dummy read to clear the buffer
+#	e -b eport:60 > nl
+#
+#	# decrement the loop count
+#	eval -id -d "aa_lp_cnt$$ aa_lp_cnt$$ 1 - =" > nl
+#done
+#clear mice$$
+#clear mcnt$$
+#clear aa_lp_cnt$$
+
+echo "Testing the EW* Network"
+net -cm ex ewa0 2>nl
+net -sa ewa0 > ndbr/lp_nodes_ewa0 2>nl 
+
+set ewa0_loop_count  1
+set ewa0_loop_size   100
+set ewa0_lp_msg_node 1
+set d_softerr halt
+if (nettest ewa0 -mode nc -f lp_nodes_ewa0 -p 1 2>nl) then
+	set d_softerr continue
+	set ewa0_loop_count  2
+	set ewa0_loop_inc    1
+	set ewa0_loop_patt   ffffffff
+	set ewa0_loop_size   0e
+	set ewa0_lp_msg_node 1
+	nettest ewa0 -mode nc -f lp_nodes_ewa0 -p 1 -w 1
+
+	set ewa0_loop_count  2
+	set ewa0_loop_inc    d0
+	set ewa0_loop_patt   ffffffff
+	set ewa0_loop_size   100
+	set ewa0_lp_msg_node 8
+	nettest ewa0 -mode nc -f lp_nodes_ewa0 -p 1 -w 1 
+
+else
+	set d_softerr continue
+	echo
+	echo "External loopback Failed - Check network connection"
+	echo
+fi
+net -cm nm ewa0 2>nl

@@ -1,0 +1,268 @@
+{
+{ Module:	$PRDEF
+{
+{ Version:	'X-7'
+{
+{****************************************************************************
+{*									    *
+{*  COPYRIGHT (c) 1989, 1990 BY						    *
+{*  DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASSACHUSETTS.		    *
+{*  ALL RIGHTS RESERVED.						    *
+{* 									    *
+{*  THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND COPIED   *
+{*  ONLY IN  ACCORDANCE WITH  THE  TERMS  OF  SUCH  LICENSE  AND WITH THE   *
+{*  INCLUSION OF THE ABOVE COPYRIGHT NOTICE. THIS SOFTWARE OR  ANY  OTHER   *
+{*  COPIES THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY   *
+{*  OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE IS  HEREBY   *
+{*  TRANSFERRED.							    *
+{* 									    *
+{*  THE INFORMATION IN THIS SOFTWARE IS  SUBJECT TO CHANGE WITHOUT NOTICE   *
+{*  AND  SHOULD  NOT  BE  CONSTRUED AS  A COMMITMENT BY DIGITAL EQUIPMENT   *
+{*  CORPORATION.							    *
+{* 									    *
+{*  DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE  OR  RELIABILITY OF ITS   *
+{*  SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.		    *
+{* 									    *
+{*									    *
+{****************************************************************************
+
+{++
+{
+{ FACILITY:  VAX/VMS System Macro Libraries
+{
+{ ABSTRACT:
+{
+{	This file contains the SDL source for structure $PRDEF.
+{
+{ AUTHOR:  The VMS Group	 CREATION DATE:  1-Aug-1976
+{
+{ MODIFIED BY:
+{
+{	X-7	MSM0001		Mark S. McKenzie	26-Feb-1991
+{		Added NVAX+ support.
+{
+{	X-6	SCS0228		Sandra C. Scott		05-Dec-1990
+{		Add Cirrus II support.
+{
+{	X-5	ALT0003		Albert L. M. Ting	 8-Nov-1990
+{		Hiding NVAX/Omega related comments
+{
+{	X-4	SFS0383		Stephen F. Shirron	17-Aug-1990
+{		Add NVAX support.
+{
+{	X-3	SFS0231		Stephen F. Shirron	17-Nov-1989
+{		Add KA660 support.
+{		
+{	X-2	JJM0102		Jeff McLeman		05-Oct-1989
+{		Change SOC cpu designation label from TYPV20 to TYPV14 to
+{		remain consistant with hex usage.
+{		Also, add PVAX-Mariah cpu desgination subtype V12_46 and TYP46
+{
+{	X-1	RAB0018		Richard Bishop		 2-SEP-1989
+{		STARDEFMP.SDL broken up into its constituent modules.
+{
+{ SPECIAL NOTE:
+{
+{	The prior audit trail can be found in the latest mainline
+{	CMS generation of module STARDEFMP.SDL in facility [VMSLIB].
+{
+{--
+
+
+module $PRDEF;
+
+/*+
+/*  PROCESSOR REGISTER DEFINITIONS
+/*-
+
+
+constant KSP	equals 0  prefix PR tag $;		/*KERNEL STACK POINTER 
+constant ESP	equals 1  prefix PR tag $;		/*EXECUTIVE STACK POINTER 
+constant SSP	equals 2  prefix PR tag $;		/*SUPERVISOR STACK POINTER 
+constant USP	equals 3  prefix PR tag $;		/*USER STACK POINTER 
+constant ISP	equals 4  prefix PR tag $;		/*INTERRUPT STACK POINTER 
+constant ASN	equals 6  prefix PR tag $;		/*ADDRESS SPACE NUMBER REGISTER
+constant SPTEP	equals 7  prefix PR tag $;		/*SYSTEM PTE PROTOTYPE REGISTER
+constant P0BR	equals 8  prefix PR tag $;		/*P0 BASE REGISTER 
+constant P0LR	equals 9  prefix PR tag $;		/*P0 LIMIT REGISTER 
+constant P1BR	equals 10  prefix PR tag $;		/*P1 BASE REGISTER 
+constant P1LR	equals 11  prefix PR tag $;		/*P1 LIMIT REGISTER 
+constant SBR	equals 12  prefix PR tag $;		/*SYSTEM BASE REGISTER 
+constant SLR	equals 13  prefix PR tag $;		/*SYSTEM LIMIT REGISTER 
+constant CPUID	equals 14  prefix PR tag $;		/*CPU IDENTIFIER REGISTER
+constant WHAMI	equals 15  prefix PR tag $;		/*WHo AM I REGISTER
+constant PCBB	equals 16  prefix PR tag $;		/*PROCESS CONTROL BLOCK BASE 
+constant SCBB	equals 17  prefix PR tag $;		/*SYSTEM CONTROL BLOCK BASE 
+constant IPL	equals 18  prefix PR tag $;		/*INTERRUPT PRIORITY LEVEL REGISTER 
+constant ASTLVL	equals 19  prefix PR tag $;		/*AST LEVEL REGISTER 
+constant SIRR	equals 20  prefix PR tag $;		/*SOFTWARE INTERRUPT REQUEST REGISTER 
+constant SISR	equals 21  prefix PR tag $;		/*SOFTWARE INTERRUPT SUMMARY REGISTER 
+constant ICCS	equals 24  prefix PR tag $;		/* INTERVAL CLOCK CONTROL STATUS REGISTER 
+constant RXCS	equals 32  prefix PR tag $;		/* CONSOLE RECIEVER CONTROL STATUS REGISTER 
+constant RXDB	equals 33  prefix PR tag $;		/* CONSOLE RECEIVER DATA BUFFER REGISTER 
+constant TXCS	equals 34  prefix PR tag $;		/* CONSOLE TRANSMIT CONTROL STATUS REGISTER 
+constant TXDB	equals 35  prefix PR tag $;		/* CONSOLE TRANSMIT DATA BUFFER REGISTER 
+constant MAPEN	equals 56  prefix PR tag $;		/* MAPPING ENABLE REGISTER 
+constant TBIA	equals 57  prefix PR tag $;		/* TRANSLATION BUFFER INVALIDATE: ALL
+constant TBIS	equals 58  prefix PR tag $;		/*   TB INVALIDATE: SINGLE 
+constant TBIASN	equals 59  prefix PR tag $;		/*   TB INVALIDATE: ADDRESS SPACE NUMBER
+constant TBISYS	equals 60  prefix PR tag $;		/*   TB INVALIDATE: SYSTEM
+constant SID	equals 62  prefix PR tag $;		/* SYSTEM IDENTIFICATION REGISTER 
+constant TBCHK	equals 63  prefix PR tag $;		/* TRANSLATION BUFFER VALID CHECK 
+constant VPSR	equals 144 prefix PR tag $;		/* VECTOR PROCESSOR STATUS REGISTER
+constant VAER	equals 145 prefix PR tag $;		/* VECTOR ARITHMETIC EXCEPTION REGISTER
+constant VMAC	equals 146 prefix PR tag $;		/* VECTOR MEMORY ACCESS CHECK REGISTER
+constant VTBIA	equals 147 prefix PR tag $;		/* VECTOR TB INVALIDATE ALL
+constant VSAR	equals 148 prefix PR tag $;		/* VECTOR STATE ADDRESS REGISTER
+
+aggregate PRDEF  union prefix PR$;
+    PRDEF_BITS structure fill;
+        SID_SN bitfield length 12;			/* SERIAL NUMBER FIELD 
+        SID_PL bitfield length 3;			/* PLANT ID 
+        SID_ECO bitfield length 9;			/* ECO LEVEL 
+        SID_TYPE bitfield length 8;			/* CPU TYPE CODE 
+    end PRDEF_BITS;
+
+    PRDEF_XBITS structure fill;
+        FILL_XSID_BITS bitfield length 24 fill;		/* CPU-SPECIFIC XSID BITS
+        XSID_TYPE bitfield length 8;			/* CPU SUBTYPE CODE 
+    end PRDEF_XBITS;
+    	 						/* SYSTEM ID REGISTER CPU TYPES 
+    constant TYP780	equals 1  prefix PR$_S tag ID;	/* VAX 11/780 
+    constant TYP750	equals 2  prefix PR$_S tag ID;	/* VAX 11/750 
+    constant TYP730	equals 3  prefix PR$_S tag ID;	/* VAX 11/730 
+    constant TYP790	equals 4  prefix PR$_S tag ID;	/* VAX 11/790
+    constant TYP8SS	equals 5  prefix PR$_S TAG ID;	/* Scorpio for now
+    constant TYP8NN	equals 6  prefix PR$_S TAG ID;	/* Nautilus for now
+    constant TYPUV1	equals 7  prefix PR$_S tag ID;	/* MicroVAX I 
+    constant TYPUV2	equals 8  prefix PR$_S tag ID;	/* MicroVAX II 
+    constant TYP410	equals 8  prefix PR$_S tag ID;	/* VAXstar
+    constant TYP009	equals 9  prefix PR$_S tag ID;	/* Virtual VAX
+    constant TYP420	equals 10 prefix PR$_S tag ID;	/* PVAX
+    constant TYP520	equals 10 prefix PR$_S tag ID;	/* Cirrus I
+    constant TYP650	equals 10 prefix PR$_S tag ID;	/* Mayfair
+    constant TYP9CC	equals 10 prefix PR$_S tag ID;	/* Calypso/XCP
+    constant TYP9CI	equals 10 prefix PR$_S tag ID;	{ Calypso/ISIS
+    constant TYP60	equals 10 prefix PR$_S tag ID;	/* Firefox
+    constant TYP670	equals 11 prefix PR$_S tag ID;	/* KA670 (Pele)
+    constant TYP9RR	equals 11 prefix PR$_S tag ID;	/* XRP
+    constant TYP43	equals 11 prefix PR$_S tag ID;	/* KA43 (RigelMAX)
+    constant TYP9AQ	equals 14  prefix PR$_S tag ID;	/* Aquarius
+    constant TYP8PS	equals 17 prefix PR$_S tag ID;	/* Polarstar
+    constant TYP1202    equals 18 prefix PR$_S tag ID;  /* Mariah/XMP
+    constant TYP46      equals 18 prefix PR$_S tag ID;  /* PV-Mariah
+    constant TYP690     equals 19 prefix PR$_S tag ID;  { KA690 (Omega)
+    constant TYP1302    equals 19 prefix PR$_S tag ID;  { Calypso/XNP
+    constant TYP660     equals 20 prefix PR$_S tag ID;  /* KA660 (Spitfire)
+    constant TYP440     equals 20 prefix PR$_S tag ID;  /* PVAX2
+    constant TYP550	equals 20 prefix PR$_S tag ID;	/* Cirrus II
+    constant TYP1701    equals 23 prefix PR$_S tag ID;  /* Laser/Neon
+    constant TYPMAX	equals 23 prefix PR$_S tag ID;	/* MAX LEGAL CPU TYPE 
+
+							/*Chip CPU types
+    constant TYPUV	equals 8  prefix PR$_S tag ID;	/* MicroVAX chip
+							/*MicroVAX chip CPU Subtypes
+    constant UV_UV	equals 0  prefix PR$_XS tag ID; /* Generic MicroVAX (unused subtype)
+    constant UV_UV2	equals 1  prefix PR$_XS tag ID; /* MicroVAX II
+    constant UV_410	equals 4  prefix PR$_XS tag ID; /* VAXstar
+
+    constant TYPCV	equals 10 prefix PR$_S tag ID;	/* CVAX chip
+							/*CVAX chip CPU Subtypes
+    constant CV_CV	equals 0  prefix PR$_XS tag ID; /* Generic CVAX (unused subtype)
+    constant CV_650	equals 1  prefix PR$_XS tag ID; /* Mayfair
+    constant CV_9CC	equals 2  prefix PR$_XS tag ID; /* Calypso/XCP
+    constant CV_60	equals 3  prefix PR$_XS tag ID; /* Firefox
+    constant CV_420	equals 4  prefix PR$_XS tag ID; /* PVAX
+    constant CV_9CI	equals 5  prefix PR$_XS tag ID; { ISIS
+    constant CV_520	equals 7  prefix PR$_XS tag ID; /* CIRRUS I
+
+    constant TYPRV	equals 11 prefix PR$_S tag ID;	/* Rigel chip
+							/* Rigel chip CPU Subtypes
+    constant RV_RV	equals 0  prefix PR$_XS tag ID; /* Generic Rigel (unused subtype)
+    constant RV_670	equals 1  prefix PR$_XS tag ID;	/* KA670 (Pele)
+    constant RV_9RR	equals 2  prefix PR$_XS tag ID; /* Calypso/XRP
+    constant RV_43	equals 4  prefix PR$_XS tag ID;	/* KA43 (RigelMAX)
+
+    constant TYPV12	equals 18 prefix PR$_S tag ID;	/* Mariah chip set
+							/* Mariah chip CPU Subtypes
+    constant V12_V12	equals 0  prefix PR$_XS tag ID; /* Generic Mariah (unused subtype)
+    constant V12_1202	equals 2  prefix PR$_XS tag ID;	/* MARIAH/XMP
+    constant V12_46	equals 4  prefix PR$_XS tag ID;	/* PVAX- mariah subtype
+
+    constant TYPV13     equals 19 prefix PR$_S tag ID;  { NVAX chip set
+                                                        { NVAX chip CPU Subtypes
+    constant V13_V13    equals 0  prefix PR$_XS tag ID; { Generic NVAX (unused subtype)
+    constant V13_690    equals 1  prefix PR$_XS tag ID; { KA690 (Omega)
+    constant V13_1302	equals 2  prefix PR$_XS tag ID;	{ Calypso/XNP
+
+    constant TYPV14     equals 20 prefix PR$_S tag ID;  /* SOC Chip SID
+                                                        /* SOC chip CPU subtypes
+    constant V14_V14    equals 0  prefix PR$_XS tag ID; /* unused subtype
+    constant V14_660    equals 1  prefix PR$_XS tag ID; /* KA660 (Spitfire)
+    constant V14_440    equals 4  prefix PR$_XS tag ID; /* PVAX2 subtype
+    constant V14_550	equals 7  prefix PR$_XS tag ID; /* CIRRUS II
+
+    constant TYPV17     equals 23 prefix PR$_S tag ID;  /* NVAX+ Chip SID
+                                                        /* NVAX+ chip CPU subtypes
+    constant V17_V17    equals 0  prefix PR$_XS tag ID; /* unused subtype
+    constant V17_1701   equals 1  prefix PR$_XS tag ID; /* Laser/Neon
+
+							/*Nautilus CPU Subtypes
+							/* Number assignments are
+							/* based upon the jumpers
+							/* read by the console from
+							/* the MPS backplane
+    constant N8800	equals 0  prefix PR$_XS tag ID; /* VAX 8800
+    constant N8700	equals 1  prefix PR$_XS tag ID; /* VAX 8700
+    constant N2		equals 2  prefix PR$_XS tag ID; /* Undefined Nautilus CPU
+    constant N3		equals 3  prefix PR$_XS tag ID; /* Undefined Nautilus CPU
+    constant N4		equals 4  prefix PR$_XS tag ID; /* Undefined Nautilus CPU
+    constant N5		equals 5  prefix PR$_XS tag ID; /* Undefined Nautilus CPU
+    constant N8550	equals 6  prefix PR$_XS tag ID; /* VAX 8550
+    constant N8500	equals 7  prefix PR$_XS tag ID; /* VAX 8500
+    constant N8NNN	equals -1 prefix PR$_XS tag ID; /* Unknown Nautilus CPU
+                                    			/*VAX 11/780 IPR'S:
+    constant WCSA	equals 44  prefix PR tag $;	/* WCS ADDRESS REGISTER 
+    constant WCSD	equals 45  prefix PR tag $;	/* WCS DATA REGISTER 
+    constant SBIFS	equals 48  prefix PR tag $;	/* SBI FAULT STATUS REGISTER 
+    constant SBIS	equals 49  prefix PR tag $;	/* SBI SILO REGISTER 
+    constant SBISC	equals 50  prefix PR tag $;	/* SBI COMPARATOR REGISTER 
+    constant SBIMT	equals 51  prefix PR tag $;	/* SBI MAINTENANCE REGISTER 
+    constant SBIER	equals 52  prefix PR tag $;	/* SBI ERROR REGISTER 
+    constant SBITA	equals 53  prefix PR tag $;	/* SBI TIMEOUT ADDRESS REGISTER 
+    constant SBIQC	equals 54  prefix PR tag $;	/* SBI QUADWORD CLEAR REGISTER 
+                                    			/*END OF VAX 11/780-SPECIFIC IPR'S
+                                    			/*VAX 11/750 AND 11/730 IPR'S:
+    constant CMIERR	equals 23  prefix PR tag $;	/* CMI ERROR SUMMARY REGISTER 
+    constant CSRS	equals 28  prefix PR tag $;	/* CONSOLE BLK STORE RCV STATUS 
+    constant CSRD	equals 29  prefix PR tag $;	/* CONSOLE BLK STORE RCV DATA 
+    constant CSTS	equals 30  prefix PR tag $;	/* CONSOLE BLK STORE XMIT STATUS 
+    constant CSTD	equals 31  prefix PR tag $;	/* CONSOLE BLK STORE XMIT DATA 
+    constant TBDR	equals 36  prefix PR tag $;	/* TB DISABLE REGISTER 
+    constant CADR	equals 37  prefix PR tag $;	/* CACHE DISABLE REGISTER 
+    constant MCESR	equals 38  prefix PR tag $;	/* MACHINE CHECK ERROR SUMMARY REG 
+    constant CAER	equals 39  prefix PR tag $;	/* CACHE ERROR REGISTER 
+    constant UBRESET	equals 55  prefix PR tag $;	/* UNIBUS I/O RESET REGISTER 
+                                    			/*END OF 11/750 AND 11/730 IPR'S
+                                    			/*VAX 11/790 PROCESSOR-SPECIFIC IPRS
+    constant PAMACC	equals 64  prefix PR tag $;	/* PAMM ACCESS 
+    constant PAMLOC	equals 65  prefix PR tag $;	/* PAMM LOCATION 
+    constant CSWP	equals 66  prefix PR tag $;	/* CACHE SWEEP REGISTER 
+    constant MDECC	equals 67  prefix PR tag $;	/* MBOX DATA ECC REGISTER 
+    constant MENA	equals 68  prefix PR tag $;	/* MBOX ERROR ENABLE REGISTER 
+    constant MDCTL	equals 69  prefix PR tag $;	/* MBOX DATA CONTROL REGISTER 
+    constant MCCTL	equals 70  prefix PR tag $;	/* MBOX MCC CONTROL REGISTER 
+    constant MERG	equals 71  prefix PR tag $;	/* MBOX ERROR GENERATOR REGISTER 
+    constant CRBT	equals 72  prefix PR tag $;	/* CONSOLE REBOOT 
+    constant DFI	equals 73  prefix PR tag $;	/* DIAGNOSTIC FAULT INSERTION 
+    constant EHSR	equals 74  prefix PR tag $;	/* ERROR HANDLING STATUS REGISTER 
+    constant ACCS790	equals 75  prefix PR tag $;	/* ACCELERATOR STATUS REGISTER 
+    constant STXCS	equals 76  prefix PR tag $;	/* CONSOLE STORAGE CONTROL REG
+    constant STXDB	equals 77  prefix PR tag $;	/* CONSOLE STORAGE DATA REGISTER
+    constant LSPA	equals 78  prefix PR tag $;	/* SCRATCHPAD ADDRESS
+    constant RSPD	equals 79  prefix PR tag $;	/* SCRATCHPAD DATA
+                                    			/*END OF 11/790 PROCESSOR-SPECIFIC IPRS
+end PRDEF;
+
+end_module $PRDEF;
+

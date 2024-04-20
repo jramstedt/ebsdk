@@ -1,0 +1,649 @@
+;+
+; ev6_pal_macros.mar
+;-
+
+;+
+; Last Edit:	13-Dec-99
+;
+; Edit History
+; Who	When		What
+; ---	----		----
+; ES	17-Sep-96	Fixed PVC_VIOLATE macro.
+; ES	18-Dec-96	Added optional pad to align macros.
+;			Added ASSUME_FETCH_BLOCK.
+;			Added MAP_SHADOW_REGISTERS
+; ES	06-Mar-97	Add unaligned LOAD macros (for pass1 fp emulation)
+; ES	01-Aug-97	Add optional 'verify' parameter to GET_32CONS
+;				(suggested by Dave Mayo)
+; ES	29-Sep-97	Eliminate MAP_SHADOW_REGISTERS. You can find it
+;				in srom_macros.mar.
+; ES	11-Jan-99	Add add_extra_ret conditional in CALL_PAL macro,
+;				in case we ever want to use it.
+; ES	07-Oct-99	Applu fix.
+;			Add EV6_MTPR macro
+;			RESTORE_REG uses EV6_MTPR macro
+; ES	13-Dec-99	Change applu_fix use in the EV6_MTPR macro.
+;			The ev6/ev67/ev68 restriction that there be
+;			no trapable instruction in the same fetch
+;			block as a MTPR is no longer conditionalized
+;			on applu_fix and is solely controlled by the
+;			prealign and postalign parameters. The
+;			ev6/ev67 restriction that there be a
+;			non-trappable fetch block preceding a
+;			block with a MTPR is controlled by both
+;			the prealign parameter and the applu_fix
+;			conditional. If prealign = 1 and applu_fix = 1,
+;			the fetch block is added. If only prealign = 1,
+;			there is just an align_fetch_block inserted.
+;-
+
+;
+; APPLU FIX -- avoid scoreboard bits hanging around after a kill
+;
+; prealign=1	Ensure mtpr is in a new fetch block. If applu_fix = 1,
+;		an additional non-trapping fetch block is inserted before
+;		the fetch block with the mtpr.
+; postalign=1	Ensure mtpr does not have a trapping instruction in the block
+;		Also ensure that next block is aligned
+;
+.macro	EV6_MTPR gpr, ipr, prealign=1, postalign=1
+  .iif ndf applu_fix, applu_fix = 0
+	.if ne <prealign>
+	ALIGN_FETCH_BLOCK <^x47FF041F>
+	.if ne <applu_fix>
+	bis	r0, r0, r0
+	ALIGN_FETCH_BLOCK <^x47FF041F>
+	.endc
+	.endc
+	hw_mtpr	gpr, ipr
+	.if ne <postalign>
+	ALIGN_FETCH_BLOCK <^x47FF041F>
+	.endc
+.endm	EV6_MTPR
+
+;
+; On p2.3 (and maybe later), call_pal pushes the prediction stack
+; twice, so we might want to pop it an extra time. This causes a
+; mispredict, but the stack is back in synch. If the stack never
+; gets deep, the mispredict hit is not worth it. So right
+; now, we leave it around but turned off. It appears that it
+; the right choice.
+;
+.iif ndf add_extra_ret, add_extra_ret = 0
+
+.macro	START_HW_VECTOR func
+    .iif ndf _pal_func_in_prog, _pal_func_in_prog = 0
+    ASSUME <_pal_func_in_prog> eq 0
+    _pal_func_in_prog = 1
+    .if ndf _new_code_space
+        _new_code_space = ^x4000
+    .iff
+        _new_code_space = .
+    .endc
+    _pal_vec_cont = 0
+    .if ndf osfpal
+        . = <TRAP__START + EV6__'func'_ENTRY>
+TRAP__'func':
+    .iff
+        . = <TRAP__START + EV6__'func'_ENTRY>
+TRAP__'func':
+    .endc
+    _start_of_last_vec = .
+.endm	START_HW_VECTOR
+
+.macro	END_HW_VECTOR size=^x80
+    _pal_func_in_prog = 0
+    .if eq _pal_vec_cont
+        ASSUME <.-_start_of_last_vec> le <size>
+    .iff
+        _new_code_space = .
+    .endc
+    GOTO_FREE_CODE
+.endm	END_HW_VECTOR
+
+.macro	GOTO_FREE_CODE
+    .iif ndf _new_code_space, _new_code_space = ^x4000
+    . = _new_code_space
+    .align 6
+.endm	GOTO_FREE_CODE
+
+.macro	END_FREE_CODE
+    .iif ndf _new_code_space, _new_code_space = ^x4000
+    _new_code_space = .
+.endm	END_FREE_CODE
+
+.macro	CONT_HW_VECTOR func
+    ASSUME <_pal_vec_cont> eq 0
+    .if nb func
+        .if ndf osfpal
+	br	r31, TRAP__'func'_CONT
+        .iff
+	br	r31, TRAP__'func'_CONT
+        .endc
+    .endc
+    ASSUME <.-_start_of_last_vec> le <^x80>
+    _pal_vec_cont = 1
+    GOTO_FREE_CODE
+    .if nb func
+        .if ndf osfpal
+TRAP__'func'_CONT:
+        .iff
+TRAP__'func'_CONT:
+        .endc
+    .endc
+.endm	CONT_HW_VECTOR
+
+.if eq add_extra_ret				; add_extra_ret
+.macro	START_CALL_PAL func
+    .if ndf osfpal
+        ASSUME <<PAL_FUNC__'func'> & <^x40>> eq 0
+        new_func_code = -
+            <PAL_FUNC__'func' & ^x3F> -
+	        ! <<PAL_FUNC__'func'@-1>& ^x40>
+    .iff
+        ASSUME <<OSFPAL_FUNC__'func'> & <^x40>> eq 0
+        new_func_code = -
+            <OSFPAL_FUNC__'func' & ^x3F> -
+                ! <<OSFPAL_FUNC__'func'@-1>& ^x40>
+    .endc
+
+    .iif ndf _pal_func_in_prog, _pal_func_in_prog = 0
+    ASSUME <_pal_func_in_prog> eq 0
+    _pal_func_in_prog = 1
+    _new_code_space = .
+    _pal_func_cont = 0
+    .if ndf osfpal
+        . = <<CALL_PAL__START> + <new_func_code * <^x40>>>
+CALL_PAL__'func'::
+    .iff
+        . = <<CALL_PAL__START> + <new_func_code * <^x40>>>
+CALL_PAL__'func'::
+    .endc
+    _start_of_last_pal_func = .
+.endm	START_CALL_PAL
+.iff						; add_extra_ret
+;
+; Add 2 fetch blocks worth of hw_ret stuff, and then put in the
+; equivalent of CONT_CALL_PAL.
+;
+.macro	START_CALL_PAL func
+    .if ndf osfpal
+        ASSUME <<PAL_FUNC__'func'> & <^x40>> eq 0
+        new_func_code = -
+            <PAL_FUNC__'func' & ^x3F> -
+	        ! <<PAL_FUNC__'func'@-1>& ^x40>
+    .iff
+        ASSUME <<OSFPAL_FUNC__'func'> & <^x40>> eq 0
+        new_func_code = -
+            <OSFPAL_FUNC__'func' & ^x3F> -
+                ! <<OSFPAL_FUNC__'func'@-1>& ^x40>
+    .endc
+
+    .iif ndf _pal_func_in_prog, _pal_func_in_prog = 0
+    ASSUME <_pal_func_in_prog> eq 0
+    _pal_func_in_prog = 1
+    _new_code_space = .
+    _pal_func_cont = 0
+        . = <<CALL_PAL__START> + <new_func_code * <^x40>>>
+CALL_PAL__'func'::
+	_start_of_last_pal_func = .
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	br	p4, s_'func'
+s_'func':
+	addq	p4, #<<e_'func' - s_'func'>+1>, p4
+	PVC_JSR	p_'func'
+	hw_ret	(p4)
+	PVC_JSR p_'func', dest=1
+e_'func':
+	bis	r31, r31, r31
+	bis	r31, r31, r31
+	br	r31, CALL_PAL__'func'_CONT_EXTRA
+
+    _pal_func_cont = 1
+    GOTO_FREE_CODE
+CALL_PAL__'func'_CONT_EXTRA:
+.endm	START_CALL_PAL
+.endc						; add_extra_ret
+
+.macro	END_CALL_PAL
+    _pal_func_in_prog = 0
+    .if eq _pal_func_cont
+        ASSUME <.-_start_of_last_pal_func> le <^x40>
+    .iff
+	_new_code_space = .
+    .endc
+    GOTO_FREE_CODE
+.endm	END_CALL_PAL
+
+.if eq add_extra_ret				; add_extra_ret
+.macro	CONT_CALL_PAL func
+    ASSUME <_pal_func_cont> eq 0
+    .if nb func
+        .if ndf osfpal
+	br	r31, CALL_PAL__'func'_CONT
+        .iff
+	br	r31, CALL_PAL__'func'_CONT
+        .endc
+    .endc
+    ASSUME <.-_start_of_last_pal_func> le <^x40>
+    _pal_func_cont = 1
+    GOTO_FREE_CODE
+    .if nb func
+        .if ndf osfpal
+CALL_PAL__'func'_CONT:
+        .iff
+CALL_PAL__'func'_CONT:
+        .endc
+    .endc
+.endm	CONT_CALL_PAL
+.iff						; add_extra_ret
+;
+; Basically just turn this into a branch to the next fetch block
+;
+.macro	CONT_CALL_PAL func
+    .if nb func
+	br	r31, CALL_PAL__'func'_CONT
+    .endc
+    .if nb func
+    .align 4, <^x47FF041F>
+CALL_PAL__'func'_CONT:
+    .endc
+.endm	CONT_CALL_PAL
+.endc						; add_extra_ret
+
+;
+; GET_32ADDR	load register 'dest' with 'offset(base)' where
+;		offset can be a 32 bit literal
+;
+.macro	GET_32ADDR dest,offset,base
+	ASSUME <offset> le  <^x7FFFFFFF>
+	ldah	'dest',<<'offset'>+32768>@-16('base'); + xxx<31:16>
+	lda	'dest',<<'offset'> & ^xFFFF>('dest') ; base+xxx<15:0>
+.endm	GET_32ADDR
+
+;
+; GET_16ADDR	load register 'dest' with 'offset(base)' where
+;		offset can be a 16 bit literal
+;
+.macro	GET_16ADDR dest,offset,base
+	ASSUME <<offset>> le  <^x7FFF>
+	lda	'dest',<'offset'>('base') ; base+xxx<15:0>
+.endm	GET_16ADDR
+
+;
+; GET_32CONS	load register 'dest' with 'offset(base)' where
+;		offset can be a 32 bit literal
+;
+.macro	GET_32CONS dest,offset,base,verify=1
+	.iif ne verify, ASSUME <offset> le  <^x7FFFFFFF>
+	ldah	'dest',<<'offset'>+32768>@-16('base'); + xxx<31:16>
+	lda	'dest',<<'offset'> & ^XFFFF>('dest') ; base+xxx<15:0>
+.endm	GET_32CONS
+
+;
+; GET_16CONS	load register 'dest' with 'offset(base)' where
+;		offset can be a 16 bit literal
+;
+.macro	GET_16CONS dest,offset,base
+	ASSUME <<offset>> le  <^x7FFF>
+	lda	'dest',<'offset'>('base') ; base+xxx<15:0>
+.endm	GET_16CONS
+
+;
+; ASSUME	test that a relation is true
+;
+.macro	ASSUME exp1, relation, exp2
+    .if	relation <<exp1>-<exp2>>
+    .iff
+        .error	; ** exp1 must be relation exp2 **
+    .endc
+.endm	ASSUME
+
+.macro	ALIGN_FETCH_BLOCK pad
+    .if nb <pad>
+	.align 4, <pad>
+    .iff
+	.align 4
+    .endc
+.endm	ALIGN_FETCH_BLOCK
+
+.macro	ALIGN_CACHE_BLOCK pad
+    .if nb <pad>
+	.align 6, <pad>
+    .iff
+	.align 6
+    .endc
+.endm	ALIGN_CACHE_BLOCK
+
+;
+; NOP
+;
+.macro	NOP
+	bis	r31, r31, r31
+.endm
+
+;+
+; ASSUME_FETCH_BLOCK
+;-
+
+.macro	ASSUME_FETCH_BLOCK
+
+    .if ne <.  & ^xF>
+	.error	; ** not aligned on fetch block **
+    .endc
+.endm	ASSUME_FETCH_BLOCK
+
+.macro	LOAD_UNALIGNED_LONG reg, addr, scr1, scr2
+	lda	scr2, (addr)
+
+	ldq_u	reg, (scr2)
+	ldq_u	scr1, 3(scr2)
+	extll	reg, scr2, reg
+	extlh	scr1, scr2, scr1
+	or	scr1, reg, reg
+	addl	reg, r31, reg
+.endm
+
+.macro	LOAD_UNALIGNED_QUAD reg, addr, scr1, scr2
+	lda	scr2, (addr)
+	ldq_u	reg, (scr2)
+	ldq_u	scr1, 7(scr2)
+	extql	reg, scr2, reg
+	extqh	scr1, scr2, scr1
+	or	scr1, reg, reg
+.endm
+
+.macro	STORE_UNALIGNED_WORD reg, addr, scr1, scr2, scr3, lock=0, err,err1
+    .if eq lock
+	lda	scr3, (addr)
+
+	ldq_u	scr1, (scr3)
+	inswl	reg, scr3, scr2
+	mskwl	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, (scr3)
+
+	ldq_u	scr1, 1(scr3)
+	inswh	reg, scr3, scr2
+	mskwh	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, 1(scr3)
+
+    .iff
+
+	bic	addr, #7, scr3
+	ldq_l	scr1, (scr3)
+	inswl	reg, addr, scr2
+	mskwl	scr1, addr, scr1
+	bis	scr1, scr2, scr1
+	stq_c	scr1, (scr3)
+
+	.iif nb <err>, blbc scr1, err
+
+	lda	scr3, 1(addr)
+
+	bic	scr3, #7, scr3
+	ldq_l	scr1, (scr3)
+	inswh	reg, addr, scr2
+	mskwh	scr1, addr, scr1
+	bis	scr1, scr2, scr1
+	stq_c	scr1, (scr3)
+
+	.iif nb <err>, blbc scr1, err1
+
+    .endc
+.endm
+
+.macro	STORE_UNALIGNED_LONG reg, addr, scr1, scr2, scr3, lock=0, err,err1
+     .if eq lock
+	lda	scr3, (addr)
+
+	ldq_u	scr1, (scr3)
+	insll	reg, scr3, scr2
+	mskll	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, (scr3)
+
+	ldq_u	scr1, 3(scr3)
+	inslh	reg, scr3, scr2
+	msklh	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, 3(scr3)
+
+    .iff
+
+	bic	addr, #7, scr3
+	ldq_l	scr1, (scr3)
+	insll	reg, addr, scr2
+	mskll	scr1, addr, scr1
+	bis	scr1, scr2, scr1
+	stq_c	scr1, (scr3)
+
+	.iif nb <err>, blbc scr1, err
+
+	lda	scr3, 3(addr)
+
+	bic	scr3, #7, scr3
+	ldq_l	scr1, (scr3)
+	inslh	reg, addr, scr2
+	msklh	scr1, addr, scr1
+	bis	scr1, scr2, scr1
+	stq_c	scr1, (scr3)
+
+	.iif nb <err>, blbc scr1, err1
+    .endc
+.endm
+
+.macro	STORE_UNALIGNED_QUAD reg, addr, scr1, scr2, scr3, lock=0, err,err1
+    .if eq lock
+	lda	scr3, (addr)
+
+	ldq_u	scr1, (scr3)
+	insql	reg, scr3, scr2
+	mskql	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, (scr3)
+
+	ldq_u	scr1, 7(scr3)
+	insqh	reg, scr3, scr2
+	mskqh	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, 7(scr3)
+
+    .iff
+
+	bic	addr, #7, scr3
+	ldq_l	scr1, (scr3)
+	insql	reg, addr, scr2
+	mskql	scr1, addr, scr1
+	bis	scr1, scr2, scr1
+	stq_c	scr1, (scr3)
+
+	.iif nb <err>, blbc scr1, err
+
+	lda	scr3, 7(addr)
+
+	bic	scr3, #7, scr3
+	ldq_l	scr1, (scr3)
+	insqh	reg, addr, scr2
+	mskqh	scr1, addr, scr1
+	bis	scr1, scr2, scr1
+	stq_c	scr1, (scr3)
+
+	.iif nb <err>, blbc scr1, err1
+    .endc
+.endm
+
+;
+; For longword queue operations
+;
+.macro	QSTORE_UNALIGNED_LONG reg, disp, addr, scr1, scr2, scr3
+	lda	scr3, disp(addr)
+
+	ldq_u	scr1, disp(addr)
+	insll	reg, scr3, scr2
+	mskll	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, disp(addr)
+
+	ldq_u	scr1,<disp+3>(addr)
+	inslh	reg, scr3, scr2
+	msklh	scr1, scr3, scr1
+	bis	scr1, scr2, scr1
+	stq_u	scr1, <disp+3>(addr)
+.endm
+
+.macro	STORE_REG n, srn, irn, fpu=0, pal=0, ipr=0
+;
+; n = register number
+; srn = scratch register
+; irn = impure base register
+; 
+    ASSUME <fpu+pal+ipr> lt 2
+
+    .if eq fpu+pal+ipr
+	hw_stq/p r'n', CNS__R'n'(irn)
+    .endc
+
+    .if ne fpu
+	ftoit	f'n', srn
+	hw_stq/p srn, CNS__F'n'(irn)
+    .endc
+
+    .if ne pal
+	hw_ldq/p srn, PT__'n'(p_temp)
+	hw_stq/p srn, CNS__'n'(irn)
+    .endc
+
+    .if ne ipr
+	hw_mfpr	srn, EV6__'n'
+	hw_stq/p srn, CNS__'n'(irn)
+    .endc
+.endm
+
+.macro	RESTORE_REG n, srn, irn, fpu=0, pal=0, ipr=0
+;
+; n = register number
+; srn = scratch register
+; irn = impure base register
+; 
+    ASSUME <fpu+pal+ipr> lt 2
+
+    .if eq fpu+pal+ipr
+	hw_ldq/p r'n', CNS__R'n'(irn)
+    .endc
+
+    .if ne fpu
+	hw_ldq/p srn, CNS__F'n'(irn)
+	itoft	srn, f'n'
+    .endc
+
+    .if ne pal
+	hw_ldq/p srn, CNS__'n'(irn)
+	hw_stq/p srn, PT__'n'(p_temp)
+    .endc
+
+    .if ne ipr
+	hw_ldq/p srn, CNS__'n'(irn)
+	EV6_MTPR srn, EV6__'n'
+    .endc
+.endm
+
+;+
+; PVC macros
+;-
+.macro	PVC_JSR token, dest=0, bonus=0, bsr=0
+    .iif gt bsr-1, pcv__'token' == bsr
+    .if ndf osfpal
+	.iif ndf pcv_jsr_index, pcv_jsr_index = 2100
+    .iff
+	.iif ndf pcv_jsr_index, pcv_jsr_index = 3100
+    .endc
+    .iif ndf pcv_index, pcv_index = 100
+    tpcv_jsr_index = pcv_jsr_index
+    .iif ne bsr, pcv_jsr_index = pcv_jsr_index + 2000
+    .iif gt bsr-1, pcv_jsr_index = bsr
+    .iif ndf pcv_jsr_'token''bonus', pcv_jsr_'token''bonus' == pcv_jsr_index
+    .iif ndf pcv_jsr_'token''bonus'_inst, pcv_jsr_'token''bonus'_inst = 1
+
+    .if eq dest
+	.iif df osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', osf
+	.iif ndf osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', vms
+    .iff
+	.iif df osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', -
+			osf, \pcv_jsr_'token''bonus'_inst
+	.iif ndf osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', -
+			vms, \pcv_jsr_'token''bonus'_inst
+	pcv_jsr_'token''bonus'_inst = pcv_jsr_'token''bonus'_inst +1
+    .endc
+    pcv_jsr_index = tpcv_jsr_index
+    pcv_jsr_index = pcv_jsr_index + 1
+    pcv_index = pcv_index + 1
+.endm
+
+.macro	PVC_VIOLATE rule
+    .iif ndf pcv_index, pcv_index = 0
+    .iif nb <rule>, pcv_rule = rule
+    .iif df osfpal, pvc_lbl \pcv_index, \pcv_rule, osf
+    .iif ndf osfpal, pvc_lbl \pcv_index,\pcv_rule, vms
+    pcv_index = pcv_index +1
+.endm
+
+.macro	PVC_LBL indx, rule, os, inst=0, value
+    .if nb <value>
+	.iif eq inst, pvc$'os''indx'$'rule' == value
+	.iif ne inst, pvc$'os''indx'$'rule'.'inst' == value
+    .iff
+	.iif eq inst, pvc$'os''indx'$'rule' == .
+	.iif ne inst, pvc$'os''indx'$'rule'.'inst' == .
+    .endc
+.endm
+
+.macro	ev6_strings
+	.long	1,8				; 00000 = EV6 P1
+	.long	2,8				; 00001 = EV6 P2 and P2.1
+	.long	3,8				; 00010 = EV6 P2.2
+	.long	4,8				; 00011 = EV6 P2.3
+	.long	5,8				; 00100 = EV6 P3
+	.long	6,8				; 00101 = EV6 P2.4
+	.long	7,8				; 00110 = EV6 P2.5
+	.long	11,11				; 00111 = EV67 P2.5
+	.long	2,11				; 01000 = EV67 P2.1
+	.long	3,11				; 01001 = EV67 P2.2
+	.long	4,11				; 01010 = EV67 P2.1.1
+	.long	5,11				; 01011 = EV67 P2.2.1
+	.long	6,11				; 01100 = EV67 P2.3
+	.long	7,11				; 01101 = EV67 P2.1.2
+	.long	8,11				; 01110 = EV67 P2.2.2
+	.long	9,11				; 01111 = EV67 P2.2.3
+	.long	1,13				; 10000 = EV68AF P1
+	.long	2,13				; 10001 = EV68AF P2
+	.long	3,13				; 10010 = EV68AF P2.1 and P3.0
+	.long	12,11				; 10011 = EV67 P2.4.1
+	.long	1,12				; 10100 = EV68CB P1
+	.long	10,11				; 10101 = EV67 P2.2.4
+	.long	2,12				; 10110 = EV68CB P2
+	.long	0,8				; 10111 = 
+	.long	0,8				; 11000 = 
+	.long	0,8				; 11001 = 
+	.long	0,8				; 11010 = 
+	.long	0,8				; 11011 = 
+	.long	0,8				; 11100 = 
+	.long	0,8				; 11101 = 
+	.long	0,8				; 11110 = 
+	.long	0,8				; 11111 = 
+.endm
+
+.macro	LedWrite reg1, reg2, value, offset=^x80
+.if ne do_leds
+        lda     'reg1', ^x801(r31)				; Try without superpage
+        sll     'reg1', #8, 'reg1'				; 0x0000000000080100
+        bis     'reg1', #^xFC, 'reg1'			; 0x00000000000801FC
+        sll     'reg1', #24, 'reg1'				; 0x00000801FC000000
+        lda     'reg1', offset('reg1')			; mix in LED code address
+        bis     r31, 'value', 'reg2'			; Get a value
+        hw_stl/p  'reg2', 0('reg1')				; Store a value.
+        mb
+.endc
+.endm LedWrite

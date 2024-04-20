@@ -1,0 +1,392 @@
+;+
+; srom_macros.mar
+;-
+	.title	"SROM_MACROS"
+	.ident	"V1.2"
+;+
+; Last edit:	21-Jul-1998
+;-
+
+;+
+; GET_32CONS	load register 'dest' with 'offset(base)' where
+;		offset can be a 32 bit literal
+;-
+.macro	GET_32CONS dest,offset,base
+	ASSUME <offset> le  <^x7FFFFFFF>
+	ldah	'dest',<<'offset'>+32768>@-16('base'); + xxx<31:16>
+	lda	'dest',<<'offset'> & ^XFFFF>('dest') ; base+xxx<15:0>
+.endm	GET_32CONS
+
+;+
+; GET_16CONS	load register 'dest' with 'offset(base)' where
+;		offset can be a 16 bit literal
+;-
+.macro	GET_16CONS dest,offset,base
+	ASSUME <<offset>> le  <^x7FFF>
+	lda	'dest',<'offset'>('base') ; base+xxx<15:0>
+.endm	GET_16CONS
+
+;+
+; ASSUME	test that a relation is true
+;-
+.macro	ASSUME exp1, relation, exp2
+    .if	relation <<exp1>-<exp2>>
+    .iff
+        .error	; ** exp1 must be relation exp2 **
+    .endc
+.endm	ASSUME
+
+;+
+; ASSUME_FETCH_BLOCK
+;-
+
+.macro	ASSUME_FETCH_BLOCK
+
+    .if ne <.  & ^xF>
+	.error	; ** not aligned on fetch block **
+    .endc
+.endm	ASSUME_FETCH_BLOCK
+
+;+
+; ALIGN_FETCH_BLOCK
+;-
+.macro	ALIGN_FETCH_BLOCK pad
+    .if nb <pad>
+	.align 4, <pad>
+    .iff
+	.align 4
+    .endc
+.endm	ALIGN_FETCH_BLOCK
+
+;+
+; ALIGN_CACHE_BLOCK
+;-
+.macro	ALIGN_CACHE_BLOCK pad
+    .if nb <pad>
+	.align 6, <pad>
+    .iff
+	.align 6
+    .endc
+.endm	ALIGN_CACHE_BLOCK
+
+;+
+; PVC_VIOLATE
+;-
+.macro	PVC_VIOLATE rule
+    .iif ndf pcv_index, pcv_index = 0
+    .iif nb <rule>, pcv_rule = rule
+    .iif df osfpal, pvc_lbl \pcv_index, \pcv_rule, osf
+    .iif ndf osfpal, pvc_lbl \pcv_index,\pcv_rule, vms
+    pcv_index = pcv_index +1
+.endm
+
+;+
+; PVC_LBL
+;-
+.macro	PVC_LBL indx, rule, os, inst=0, value
+    .if nb <value>
+	.iif eq inst, pvc$'os''indx'$'rule' == value
+	.iif ne inst, pvc$'os''indx'$'rule'.'inst' == value
+    .iff
+	.iif eq inst, pvc$'os''indx'$'rule' == .
+	.iif ne inst, pvc$'os''indx'$'rule'.'inst' == .
+    .endc
+.endm
+
+;+
+; INITIALIZE_RETIRATOR_AND_MAPPER
+;
+; The retirator and mapper must be initialized in the
+; manner and order below. NO SOURCES other than
+; x31 may be used until "mapper source enable" is
+; turned on with a EV6_ITB_IA.
+;
+; (1) Initialize 80 retirator "done" status bits and
+; the integer and floating mapper destinations.
+; (2) Do A MTPR ITB_IA, which turns on the mapper source
+; enables.
+; (3) Create a map stall to complete the ITB_IA.
+; While we are at it, we use some convenient IPRs that
+; need initialization. BUT WE COULD USE OTHERS that
+; give us the same effect.
+;
+; State after execution of this code:
+;	retirator initialized
+;	destinations mapped
+;	source mapping enabled
+;	itb flushed
+;
+; The PALcode need not assume the following since the SROM is not
+; required to do these:
+;	dtb 		flushed
+;	dtb_asn0 	0
+;	dtb_asn1	0
+;	dtb_alt_mode	0
+;-
+
+.macro INITIALIZE_RETIRATOR_AND_MAPPER
+
+;
+; Initialize retirator and destination map, doing 80 retires.
+; To make this macro useful for fault-reset and wake from sleep,
+; grab the exc_addr and place in r1.
+;
+
+	ASSUME_FETCH_BLOCK
+
+	addq	r31, r31, r0
+	hw_mfpr	r1, EV6__EXC_ADDR
+	.if eq <ev6_p1>
+	PVC_VIOLATE <12>
+	addt	f31, f31, f0
+	mult	f31, f31, f1
+	.iff
+	addq	r31, r31, r0
+	addq	r31, r31, r0
+	.endc
+
+    i = 2
+    .repeat 14
+	addq	r31, r31, i
+	addq	r31, r31, <i+1>
+	.if eq <ev6_p1>
+	addt	f31, f31, i
+	mult	f31, f31, <i+1>
+	.iff
+	addq	r31, r31, i
+	addq	r31, r31, <i+1>
+	.endc
+	i = i+2
+    .endr
+
+	addq	r31, r31, r30
+    .if eq <ev6_p1>
+	addt	f31, f31, f30
+    .iff
+	addq	r31, r31, r30
+    .endc
+	addq	r31, r31, r0
+	addq	r31, r31, r0
+
+    .repeat 4
+	addq	r31, r31, r0
+	addq	r31, r31, r0
+	addq	r31, r31, r0
+	addq	r31, r31, r0
+    .endr
+
+;
+; Now turn on mapper source enables.
+;
+	hw_mtpr	r31, EV6__ITB_IA	; (4,0L) Flush ITB, enable source map
+	hw_mtpr	r31, EV6__DTB_IA	; (7,1L) Flush DTB
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+;
+; Create a stall outside the IQ until the mtpr EV6__ITB_IA retires.
+; We can use DTB_ASNx even though we don't seem to follow the restriction on
+; scoreboard bits (4-7).It's okay because there are no real dstream operations
+; happening.
+;
+	PVC_VIOLATE <21>		;
+	hw_mtpr r31, EV6__DTB_ASN0	; (4,0L) IQ stall. Clear DTB_ASN0
+	hw_mtpr	r31, EV6__DTB_ASN1	; (7,1L) Clear DTB_ASN1
+	hw_mtpr	r31, EV6__DTB_ALT_MODE	; (6,0L) Clear DTB_ALT_MODE
+	addq	r31, r31, r0		; nop
+;
+; We need 2 buffer fetch blocks to produce desired stalls..
+;
+	addq	r31, r31, r0		; 1st buffer fetch block. IMAP stall.
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+
+	addq	r31, r31, r0		; 2nd buffer fetch block. FMAP stall.
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+	addq	r31, r31, r0		; nop
+.endm	 INITIALIZE_RETIRATOR_AND_MAPPER
+
+;+
+; MAP_SHADOW_REGISTERS
+;
+; The shadow registers are mapped. This code may be done by the SROM
+; or the PALcode, but it must be done in the manner and order below.
+;
+; It assumes that the retirator has been initialized, that the
+; non-shadow registers are mapped, and that mapper source enables are on.
+;
+; Source enables are on. For fault-reset and wake from sleep, we need to
+; ensure we are in the icache so we don't fetch junk that touches the
+; shadow sources before we write the destinations. For normal reset,
+; we are already in the icache. However, so this macro is useful for
+; all cases, force the code into the icache before doing the mapping.
+;
+; Assume for fault-reset, and wake from sleep case, the exc_addr is
+; stored in r1.
+;-
+
+.macro	MAP_SHADOW_REGISTERS
+
+EV6__I_CTL__SHADOW_INIT = -
+	<<3@EV6__I_CTL__IC_EN__S> ! -
+	 <2@EV6__I_CTL__SDE__S> ! -
+	 <1@EV6__I_CTL__CALL_PAL_R23__S>>
+
+	GET_32CONS	r2, EV6__I_CTL__SHADOW_INIT, r31
+	br	r31, srom__touch0	; fetch in next block
+
+	ALIGN_FETCH_BLOCK <^x43FF0400>	; pad with addq r31, r31, r0
+
+srom__next0:				;
+	hw_mtpr	r2, EV6__I_CTL		; (4,0L) write I_CTL
+	addq	r31, r31, r0		; nop
+	br	r31, srom__next1	; continue in next block
+srom__touch0:				;
+	br	r31, srom__touch1	; fetch next block
+
+srom__next1:				;
+	hw_mtpr	r31, EV6__IER_CM	; (4,0L) create stall outside IQ
+	addq	r31, r31, r0		; nop
+	br	r31, srom__next2	; continue in next block
+srom__touch1:				;
+	br	r31, srom__touch2	; fetch next block
+
+;
+; We need 3 buffer fetch blocks to get the correct SDE bit for the
+; next fetch block. One for IMAP stall, one for FMAP stall, one more to allow
+; for the retire to proprogate for the fetch.
+;
+
+srom__next2:				;
+	addq	r31, r31, r0		; 1st buffer fetch block. IMAP stall.
+	addq	r31, r31, r0		; nop
+	br	r31, srom__next3	; continue in next block
+srom__touch2:				;
+	br	r31, srom__touch3	; fetch next block
+
+srom__next3:				;
+	addq	r31, r31, r0		; 2nd buffer fetch block. FMAP stall.
+	addq	r31, r31, r0		; nop
+	br	r31, srom__next4	; continue in next block
+srom__touch3:				;
+	br	r31, srom__touch4	; fetch next block
+
+srom__next4:				;
+	addq	r31, r31, r0		; 3rd buffer fetch block. Propagate.
+	addq	r31, r31, r0		; nop
+	br	r31, srom__next5	; continue in next block
+srom__touch4:				;
+	br	r31, srom__touch5	; fetch next block
+
+;
+; Now map the shadow registers
+;
+
+srom__next5:				;
+	addq	r31, r31, r4		;
+	addq	r31, r31, r5		;
+	br	r31, srom__next6	; continue in next block
+srom__touch5:				;
+	br	r31, srom__touch6	; fetch next block
+
+srom__next6:				;
+	addq	r31, r31, r6		;
+	addq	r31, r31, r7		;
+	br	r31, srom__next7	; continue in next block
+srom__touch6:				;
+	br	r31, srom__touch7	; fetch next block
+
+srom__next7:				;
+	addq	r31, r31, r20		;
+	addq	r31, r31, r21		;
+	br	r31, srom__next8	; continue in next block
+srom__touch7:				;
+	br	r31, srom__touch8	; fetch next block
+
+srom__next8:				;
+	addq	r31, r31, r22		;
+	addq	r31, r31, r23		;
+	br	r31, srom__sde_done	; done
+srom__touch8:				;
+	br	r31, srom__next0	; go back and start executing
+
+srom__sde_done:
+
+.endm	MAP_SHADOW_REGISTERS
+
+;+
+; INIT_WRITE_MANY
+;
+; Write the cbox write many chain, initializing the bcache configuration.
+;
+; This code be on a cache block boundary,
+;
+;	c_reg_csr->bc_enable_a = 1
+;	c_reg_csr->init_mode_a = 0
+;	c_reg_csr->bc_size_a = 15
+;	c_reg_csr->zeroblk_enable_a = 3
+;	c_reg_csr->enable_evict_a = 1
+;	c_reg_csr->set_dirty_enable_a = 6
+;	c_reg_csr->bc_bank_enable_a = 1
+;	c_reg_csr->bc_wrt_sts_a = 0
+;
+; The value for the write_many chain is based on the table in the spec, with
+; bc_enable<0> being the LSB, and with the duplicate bits as shown in the table.
+;
+; When we shift the bits in, they are sampled from the MSB.
+;
+; We transform the write_many chain to a value we can shift in by
+; doing a write to EV6_DATA, shifting our value right 6 bits, doing a
+; write to EV6_DATA, etc.
+;
+; So the following transformation is done on the write_many value:
+;
+; 	<35:30>|<29:24>|<23:18>|<17:12>|<11:06>|<05:00> =>
+; 	<05:00>|<11:06>|<17;12>|<23:18>|<29:24>|<35:30>
+;
+;	c_reg_ipr->write_many_a = 0x07FBFFFFD
+;	value to be shifted in  = 0xF7FFEFFC1
+;
+; Assume for fault-reset, and wake from sleep case, the exc_addr is
+; stored in r1.
+;
+; Because we aligned on and fit into a icache block, and because sbe=0,
+; and because we do an mb at the beginning (which blocks further progress
+; until the entire block has been fetched in), we don't have to
+; fool with pulling this code in before executing it.
+;-
+
+.macro	INIT_WRITE_MANY
+
+	ALIGN_CACHE_BLOCK <^x43FF0400>	; pad with addq r31, r31, r0
+
+	mb				; wait for istream/dstream to complete
+	lda	r2, ^xFFC1(r31)		; data<15:00> = 0xFFC1
+	ldah	r0, ^x7FFE(r31)		; data<31:16> = 0x7FFE
+	zap	r2, #^x0c,r2		; clear out bits <31:16>
+
+	bis	r2, r0, r2		; or in bits <31:16>
+	addq	r31, #6, r0		; shift in 6x 6-bits
+srom__write_many:			;
+	PVC_VIOLATE <30>		;
+	hw_mtpr	r2, EV6__DATA		; (6,0L) shift in 6 bits
+	subq	r0, #1, r0		; decrement R0
+
+	beq	r0, srom__many_done	; done if R0 is zero
+	srl	r2, #6, r2		; align next 6 bits
+	br	r31, srom__write_many	; continue shifting
+srom__many_done:			;
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x40>; dummy IPR write - sets SCBD bit 6
+
+	hw_mtpr	r31, <EV6__MM_STAT ! ^x40>; stalls until above write retires
+	beq	r31, srom__many_end	; predicts fall through in PALmode
+	PVC_VIOLATE <1006>
+	br	r31, .-4		; fools ibox predictor into infinite loop
+	addq	r31, r31, r2		; nop
+
+srom__many_end:
+
+.endm
+

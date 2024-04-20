@@ -1,0 +1,348 @@
+;/*
+;*****************************************************************************
+;**                                                                          *
+;**  Copyright © 1994							    *
+;**  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
+;**                                                                          *
+;**  All Rights Reserved						    *
+;**                                                                          *
+;**  Permission  is  hereby  granted  to  use, copy, modify and distribute   *
+;**  this  software  and  its  documentation,  in  both  source  code  and   *
+;**  object  code  form,  and without fee, for the purpose of distribution   *
+;**  of this software  or  modifications  of this software within products   *
+;**  incorporating  an  integrated   circuit  implementing  Digital's  AXP   *
+;**  architecture,  regardless  of the  source of such integrated circuit,   *
+;**  provided that the  above copyright  notice and this permission notice   *
+;**  appear  in  all copies,  and  that  the  name  of  Digital  Equipment   *
+;**  Corporation  not  be  used  in advertising or publicity pertaining to   *
+;**  distribution of the  document  or  software without specific, written   *
+;**  prior permission.							    *
+;**                                                                          *
+;**  Digital  Equipment  Corporation   disclaims  all   warranties  and/or   *
+;**  guarantees  with  regard  to  this  software,  including  all implied   *
+;**  warranties of fitness for  a  particular purpose and merchantability,   *
+;**  and makes  no  representations  regarding  the use of, or the results   *
+;**  of the use of, the software and documentation in terms of correctness,  *
+;**  accuracy,  reliability,  currentness  or  otherwise;  and you rely on   *
+;**  the software, documentation and results solely at your own risk.	    *
+;**                                                                          *
+;**  AXP is a trademark of Digital Equipment Corporation.		    *
+;**                                                                          *
+;*****************************************************************************
+;**
+;**  FACILITY:	
+;**
+;**	DECchip 21064/21066/211164 OSF/1 PALcode
+;**
+;**  MODULE:
+;**
+;** 	sromcsrv.s
+;** 
+;**  MODULE DESCRIPTION:
+;** 
+;**	Interface to SROM Serial Port I/O routines.
+;** 
+;**  AUTHOR: Franklin Hooker
+;** 
+;**  CREATION-DATE: 13-May-1996
+;**
+;**  $Id: sromcsrv.mar,v 1.10 2000/07/13 17:28:42 stig Exp $
+;**
+;**  MODIFICATION HISTORY: 
+;**
+;**  $Log: sromcsrv.mar,v $
+;**  Revision 1.10  2000/07/13 17:28:42  stig
+;**  Update for diags 1.41pre1
+;**
+;**  Revision 1.8  2000/06/29 21:02:24  stig
+;**  sync up for return to Bristol
+;**
+;**  Revision 1.7  2000/06/27 01:53:37  stig
+;**  Updates for diags 1.4-devel
+;**
+;**  Revision 1.6  2000/06/10 19:25:45  stig
+;**  Further aspects of processor mode made configurable - for debug the I_CTL
+;**  stream buffer and single issue bits can be twiddled.
+;**
+;**  Modified the layout of SROM putstr routine to be more space-efficient.
+;**  BUG(S) FIXED:
+;**  BACKEND RELATED:
+;**
+;**  Revision 1.5  2000/06/07 19:15:09  stig
+;**  Added framework support for building Tinosa/Caspian PALcode
+;**  More debugging points in the code
+;**  BUG(S) FIXED:
+;**  BACKEND RELATED:
+;**
+;**  Revision 1.4  2000/01/30 23:39:21  stig
+;**  For diagnostics release 1.2
+;**  BUG(S) FIXED:
+;**  BACKEND RELATED:
+;**
+;**  Revision 1.3  2000/01/23 19:10:26  stig
+;**  Fixed issue with swappal trashing the impure region pointer in system_pal
+;**  Implementation of higher-level SROM UART functions enabling debugging strings
+;**  and numbers to be dumped to the UART by PALcode.
+;**  BUG(S) FIXED:
+;**  BACKEND RELATED:
+;**
+;**  Revision 1.2  1999/08/18 14:12:08  stig
+;**  contains minor fixes for NXM on posting an interrupt to OS
+;**
+;**  Revision 1.2  1999/01/21 19:05:27  gries
+;**  First Release to cvs gries
+;**
+;** Revision 1.4  1998/12/29  16:30:57  samberg
+;** In srom_init, load mc_m_echo (^x100) into r0 instead of trying to use it as a literal.
+;**
+;** Revision 1.3  1997/11/12  15:31:21  samberg
+;** Make pvc clean
+;**
+;** Revision 1.2  1997/10/20  17:30:10  samberg
+;** checkin to my library
+;**
+;** Revision 1.1  1997/10/20  16:40:10  samberg
+;** Initial revision
+;**
+;**  Revision 1.2  1997/08/12  04:33:38  fdh
+;**  Modified register usage for compatibility with PALcode.
+;**
+;**  Revision 1.1  1997/08/07  14:35:53  fdh
+;**  Initial revision
+;**
+;# Revision 1.4  1997/05/02  13:45:24  pbell
+;# Updated to use the cpu.h include file instead of all
+;# the cpu type switches.
+;#
+;# Revision 1.3  1997/02/21  04:25:35  fdh
+;# Modified to save line status in a global variable
+;# instead of a PALtemp.
+;#
+;# Revision 1.2  1996/08/22  14:07:35  fdh
+;# Save/restore r15 to/from pt11.
+;#
+;# Revision 1.1  1996/05/22  22:25:47  fdh
+;# Initial revision
+;#
+;*/
+mc_m_echo		= ^x0100	; (1 << mc_v_echo)
+
+.macro	SROM_CSERVES func
+
+;/*
+;**
+;** FUNCTIONAL DESCRIPTION:
+;**
+;**      Initialize the SROM serial port for character I/O.
+;**
+;** INPUT PARAMETERS:
+;**
+;**      None
+;**
+;** OUTPUT PARAMETERS:
+;**
+;**	None
+;**
+;** SIDE EFFECTS:
+;**
+;*/
+	ALIGN_FETCH_BLOCK
+
+Sys_Cserve_Srom_Init:
+	PVC_JSR	auto, bsr=1
+	bsr	p7, autobaud_sync	; do the autobaud thing	
+
+	; if autobaud_sync returns 0, we timed out
+	beq	r24, autobaud_timed_out
+	lda	r0, mc_m_echo(r31)	; get ^x100
+	bis	r24, r0, r24		; Enable echo 	
+
+autobaud_timed_out:
+	bis	r24, r31, r0		; Return Line Status	
+	hw_ret	(p23)
+
+
+;/*
+;**
+;** FUNCTIONAL DESCRIPTION:
+;**
+;**      Output a character to the SROM serial port.
+;**
+;** INPUT PARAMETERS:
+;**
+;**      a1 (r17) - Output Character
+;**      a3 (r19) - SROM Autobaud calibration
+;**
+;** OUTPUT PARAMETERS:
+;**
+;**	None
+;**
+;** SIDE EFFECTS:
+;**
+;*/
+	ALIGN_FETCH_BLOCK
+
+Sys_Cserve_Srom_Putc:
+	bis	r19, r31, r24
+	PVC_JSR putchar, bsr=1
+	bsr	p7, putChar
+	hw_ret	(p23)
+
+
+;/*
+;**
+;** FUNCTIONAL DESCRIPTION:
+;**
+;**      Get a character from the SROM serial port
+;**
+;** INPUT PARAMETERS:
+;**
+;**      None
+;**
+;** OUTPUT PARAMETERS:
+;**
+;**	v0 (r0) - Input Character
+;**
+;** SIDE EFFECTS:
+;**
+;*/
+	ALIGN_FETCH_BLOCK
+
+Sys_Cserve_Srom_Getc:
+	bis	r19, r31, r24
+	PVC_JSR	getchar, bsr=1
+	bsr	p7, getChar
+	hw_ret	(p23)
+
+
+
+
+;+
+; API Extension:
+;
+; Higher-level routines for PALcode debug
+; These routines are for PALcode debug on PRIMARY CPU ONLY... unless the SROM
+; UART for a secondary CPU is used and has been calibrated.
+;-
+
+; Internal routine to put a carriage return out after a number or string
+
+sromcsrv_put_cr_and_quit:
+
+        lda     r17, ^x0A(r31)
+        bsr     p7, putChar
+
+        lda     r17, ^x0D(r31)
+        bsr     p7, putChar
+
+	; drop through...
+
+sromcsrv_quit_no_cr:
+        ; restore our temporary variables (r0, r1, r2, r3, r17, p20, r24)
+
+        hw_ldq/p r0,  PT__DBG0(p_temp)		;
+        hw_ldq/p r1,  PT__DBG1(p_temp)		;
+        hw_ldq/p r2,  PT__DBG2(p_temp)		;
+        hw_ldq/p r3,  PT__DBG3(p_temp)		;
+        hw_ldq/p r17, PT__DBG4(p_temp)		;
+        hw_ldq/p p20, PT__DBG5(p_temp)		;
+        hw_ldq/p r24, PT__DBG6(p_temp)		;
+        hw_ldq/p p7,  PT__DBG7(p_temp)		; restore return address
+
+        ret     r31, (p7)                       ; return to caller
+
+
+; display a register as an 8-character string
+; string to print is in r16 (a0)
+; return address is passed in through p7
+
+Sys_Cserve_Srom_Putstr:
+        ; save away our temporary variables (r0, r1, r2, r3, r17, p20, r24)
+	hw_stq/p r0,  PT__DBG0(p_temp)		; used here and in putChar
+	hw_stq/p r1,  PT__DBG1(p_temp)		; used in putChar
+	hw_stq/p r2,  PT__DBG2(p_temp)		; used in putChar
+	hw_stq/p r3,  PT__DBG3(p_temp)		; used in putChar
+	hw_stq/p r17, PT__DBG4(p_temp)		; argument to putChar
+	hw_stq/p p20, PT__DBG5(p_temp)		; used in putChar
+	hw_stq/p r24, PT__DBG6(p_temp)		; argument to putChar
+	hw_stq/p p7,  PT__DBG7(p_temp)		; return address
+
+	hw_ldq/p r17, PT__IMPURE(p_temp)        ; read impure pointer
+	hw_ldq/p r24, CNS__AUTOBAUD_CALIB(r17)  ; load calibration
+
+	; A dodgy autobaud value is indicated at various times by 0 or -1
+	beq	r24, sromcsrv_quit_no_cr	; if no autobaud, quit here
+	addq	r24, #1, r17
+	beq	r17, sromcsrv_quit_no_cr	; if no autobaud, quit here
+
+        ; print the characters, starting with the most significant byte...
+	; we keep shifting the input up so the most significant byte is always
+	; what is to be outputted next
+	
+Sys_Cserve_Srom_Putstr_charloop:
+	extbl	r16, #7, r17
+        bsr     p7, putChar
+	sll	r16, #8, r16			; move next byte up
+	bne	r16, Sys_Cserve_Srom_Putstr_charloop
+
+        br      r31, sromcsrv_put_cr_and_quit	; Add carriage return & back
+
+
+; display a register as a hex number
+; hex number to print is in r16 (a0)
+; return address is passed in through p7
+
+Sys_Cserve_Srom_Putnum:
+
+        ; save away our temporary variables (r0, r1, r2, r3, r17, p20, r24)
+        hw_stq/p r0,  PT__DBG0(p_temp)		; used here and in putChar
+        hw_stq/p r1,  PT__DBG1(p_temp)		; used in putChar
+        hw_stq/p r2,  PT__DBG2(p_temp)		; used in putChar
+        hw_stq/p r3,  PT__DBG3(p_temp)		; used in putChar
+        hw_stq/p r17, PT__DBG4(p_temp)		; argument to putChar
+        hw_stq/p p20, PT__DBG5(p_temp)		; used in putChar
+        hw_stq/p r24, PT__DBG6(p_temp)		; argument to putChar
+        hw_stq/p p7,  PT__DBG7(p_temp)		; return address
+
+        hw_ldq/p r17, PT__IMPURE(p_temp)        ; read impure pointer
+        hw_ldq/p r24, CNS__AUTOBAUD_CALIB(r17)  ; load calibration
+
+	; A dodgy autobaud value is indicated at various times by 0 or -1
+	beq	r24, sromcsrv_quit_no_cr	; if no autobaud, quit here
+	addq	r24, #1, r17
+	beq	r17, sromcsrv_quit_no_cr	; if no autobaud, quit here
+
+        ; print the hex digits of r16 one by one, starting with the top.
+        ; ASCII character code of '0' is 0x30
+
+        lda     r3, 64(r31)                     ; bits in a hex quadword
+
+sromcsrv_puthex_printbit:
+
+        subq    r3, #4, r3                      ; shift down a hex digit
+
+        srl     r16, r3, r1                     ; use r1 as scratch
+        and     r1, #^x0F, r1                   ; isolate single hex digit
+
+        lda     r2, ^x09(r31)                   ; Is it greater than 0x09?
+        subq    r1, r2, r2
+        bgt     r2, handle_letter
+        br      r31, handle_number              ; otherwise treat as a number
+
+handle_letter:                                  ; r2 contains offset from 0x09
+
+        addq    r2, #^x40, r17                  ; produces ASCII code (0x41='A')
+        br      r31, got_ascii_code             ; on to next stage...
+
+handle_number:
+
+        addq    r1, #^x30, r17                  ; map into ASCII code
+                                                ; ...and then drop through...
+got_ascii_code:
+        bsr     p7, putChar                     ; print contents of r17
+
+        bgt     r3, sromcsrv_puthex_printbit	; go back again if need be
+        br      r31, sromcsrv_put_cr_and_quit	; else carriage return & back
+
+
+.endm	SROM_CSERVES

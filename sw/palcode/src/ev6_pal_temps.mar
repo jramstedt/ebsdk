@@ -1,0 +1,91 @@
+; Alpha assembly macro (-m) output created by DEFNR
+;   
+;  EV6_PAL_TEMPS.DNR  
+;   
+;   
+;  LAST EDIT:	13-OCT-98  
+;   
+;  EDIT HISTORY  
+;  WHO	WHEN		WHAT  
+;  ---	----		----  
+;  ES	19-SEP-96	JUST HAVE M_CTL AND DC_CTL IN IMPURE ONLY.  
+;  ES	18-JUN-97	ADD P_MISC.  
+;  ES	01-AUG-97	PUT M_CTL BACK INTO PAL_TEMPS AND IMPURE.  
+;  ES	24-SEP-97	ADD A RESERVE LOCATION FOR DEBUGGING, ETC.  
+;  ES	29-JUN-98	ADDED PT__SYS_EVENT  
+;  ES	06-OCT-98	FOR SPINLOCK HACK, ADDED  
+; 				PT__PCTR_SAVE  
+; 				PT__PCTR_FLAG  
+; 				PT__PCTR_R4  
+; 				PT__PCTR_PEND  
+; 				PT__PCTR_VMS  
+;   
+;   
+;  DEFINE PREFIX AS PT  
+;   
+;   
+;  DEFINE OFFSETS  
+;   
+
+PT__VPTB = ^x000
+PT__PTBR = ^x008
+PT__PCBB = ^x010
+PT__KSP = ^x018
+PT__USP = ^x020
+PT__KGP = ^x028
+PT__PRBR = ^x030
+PT__TRAP = ^x038
+PT__ENT_ARITH = ^x040
+PT__ENT_IF = ^x048
+PT__ENT_MM = ^x050
+PT__ENT_SYS = ^x058
+PT__ENT_UNA = ^x060
+
+; API experiment - more diversity in kernel interrupt entry points
+; PT__ENT_INT now points to a code fragement for setting up kernel environment
+
+PT__ENT_INT = ^x068
+PT__ENTINT_DEV = ^x070
+PT__ENTINT_RTC = ^x078
+PT__ENTINT_IPI = ^x080
+PT__ENTINT_MCHK = ^x088
+PT__ENTINT_PERF = ^x090
+
+PT__STACK_PC = ^x098
+PT__NEW_A0 = ^x0A0
+PT__NEW_A1 = ^x0A8
+PT__NEW_A2 = ^x0B0
+PT__SYSVAL = ^x0B8
+PT__IMPURE = ^x0C0
+PT__P_MISC = ^x0C8
+PT__WHAMI = ^x0D0
+PT__SCC = ^x0D8
+PT__VA_CTL = ^x0E0
+PT__M_CTL = ^x0E8
+PT__HALT_CODE = ^x0F0
+PT__R0 = ^x0F8
+PT__R1 = ^x100
+PT__R2 = ^x108
+PT__R3 = ^x110
+PT__R8 = ^x118
+PT__R9 = ^x120
+PT__R25 = ^x128
+PT__R26 = ^x130
+PT__DTB_ALT_MODE = ^x138
+PT__FAULT_PC = ^x140
+PT__SCBB = ^x148
+PT__RSV_FOR_PAL = ^x150
+PT__I_STAT_MASK = ^x158
+
+; API extension: debug macro scratch registers
+
+PT__DBG0 = ^x160
+PT__DBG1 = ^x168
+PT__DBG2 = ^x170
+PT__DBG3 = ^x178
+PT__DBG4 = ^x180
+PT__DBG5 = ^x188
+PT__DBG6 = ^x190
+PT__DBG7 = ^x198
+
+

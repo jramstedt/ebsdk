@@ -1,0 +1,336 @@
+{ Copyright (c) 1993 by
+{ Digital Equipment Corporation, Maynard, Massachusetts.
+{ All rights reserved.
+{
+{ This software is furnished under a license and may be used and copied
+{ only  in  accordance  of  the  terms  of  such  license  and with the
+{ inclusion of the above copyright notice.  This software or any  other
+{ copies thereof may not be provided or otherwise made available to any
+{ other person.  No title to and  ownership of the  software is  hereby
+{ transferred.
+{
+{ The information in this software is  subject to change without notice
+{ and  should  not  be  construed  as a commitment by Digital Equipment
+{ Corporation.
+{
+{ Digital assumes no responsibility for the use  or  reliability of its
+{ software on equipment which is not supplied by Digital.
+{
+
+MODULE cia_main_csr_def IDENT "x0.1";
+
+/*
+/* The following is the base address of the system configuration registers in
+/* the CIA.  This value must be shifted left 28 places to yield the proper
+/* value, thus simplifying the load of the address into registers.
+/*
+CONSTANT cia_k_main_csr_base EQUALS %X874;	/* sysconfig base
+CONSTANT cia_v_main_csr_base EQUALS 28;		/* sysconfig base extent
+
+	
+/*
+/*  CIA Configuration Register
+/*
+aggregate CIA_CNFG union fill prefix cia_cnfg_;
+    displacement byte dimension 64;	/* space used by this register
+    whole longword;
+    field structure fill;
+	reserved_1  bitfield mask length 8-^;
+	pci_width   bitfield mask length 9-^;
+	reserved_2  bitfield mask length 16-^;
+	iod_width   bitfield mask length 17-^;
+	reserved_3  bitfield mask length 32-^;
+    end field;
+    bytefield structure fill;
+	fill	    byte;
+	pci_width   byte;
+	iod_width   byte;
+    end bytefield;
+end CIA_CNFG;
+
+
+/*
+/* CIA Control Register 
+/*
+/* suggested value is 2104fff3
+/*
+AGGREGATE CIA_CTRL union fill prefix cia_ctrl_;
+    displacement byte dimension 64;	/* space used by this register
+    whole longword;
+    field structure fill;
+	pci_en bitfield mask length 1-^;	/* [0]
+	pci_lock_en bitfield mask length 2-^;	/* [1]
+	pci_loop_en bitfield mask length 3-^;	/* [2]
+	fst_bb_en bitfield mask length 4-^;	/* [3]
+	pci_mst_en bitfield mask length 5-^;	/* [4]
+	pci_mem_en bitfield mask length 6-^;	/* [5]
+	pci_req64_en bitfield mask length 7-^;	/* [6]
+	pci_ack64_en bitfield mask length 8-^;	/* [7]
+	addr_pe_en bitfield mask length 9-^;	/* [8]
+	perr_en bitfield mask length 10-^;	/* [9]
+	fillerr_en bitfield mask length 11-^;   /* [10]
+	mchkerr_en  bitfield mask length 12-^;	/* [11]
+	ecc_chk_en bitfield mask length 13-^;	/* [12]
+	assert_idle_bc bitfield mask length 14-^;	/* [13]
+	con_idle_bc bitfield mask length 15-^;	/* [14]
+	csr_ioa_bypass bitfield mask length 16-^;  /* [15]
+	io_flushreq_en bitfield mask length 17-^;  /* [16]
+	cpu_flushreq_en bitfield mask length 18-^; /* [17]
+	arb_ev5_En bitfield mask length 19-^;	/* [18]
+	en_arb_link bitfield mask length 20-^;	/* [19]
+	rd_type bitfield mask length 22-^;	/* [20:21]
+	reserved_2 bitfield mask length 24-^;	/* [22:23]
+	rl_type bitfield mask length 26-^;	/* [24:25]
+	reserved_3 bitfield mask length 28-^;	/* [26:27]
+	rm_type bitfield mask length 30-^;	/* [28:29]
+	reserved_4 bitfield mask length 31-^;	/* [30]
+        en_dma_rd_perf bitfield mask length 32-^; /* [31]    
+    end field;
+end CIA_CTRL;	
+
+/*
+/* PCI configuration register 
+/*
+
+CONSTANT cfgtype0 EQUALS %x0 PREFIX pci_; 
+CONSTANT cfgtype1 EQUALS %x1 PREFIX pci_; 
+
+AGGREGATE PCI_CFG UNION
+    PREFIX cfg_;
+
+    by_field STRUCTURE;
+	cfg_type BITFIELD LENGTH 2-^ MASK;
+	unused_0 BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END PCI_CFG;
+
+/*
+/* Hardware Address extension register for memory
+/*
+AGGREGATE PCI_HAE_MEM UNION 
+    PREFIX haemem_;
+
+    by_field STRUCTURE;
+	unused_0 BITFIELD LENGTH 2-^ MASK;	/* [1:0]
+	addr_ext_3 BITFIELD LENGTH 8-^ MASK;	/* [7:2]
+	unused_1 BITFIELD LENGTH 11-^ MASK;	/* [10:8]
+	addr_ext_2 BITFIELD LENGTH 16-^ MASK;	/* [15:11]
+	unused_2 BITFIELD LENGTH 29-^ MASK;	/* [28:16]
+	addr_ext_1 BITFIELD LENGTH 32-^ MASK;	/* [31:29]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END PCI_HAE_MEM;
+
+/*
+/* Hardware Address extension register for I/O
+/*
+AGGREGATE PCI_HAE_IO UNION 
+    PREFIX haeio_;
+
+    by_field STRUCTURE;
+	unused_0 BITFIELD LENGTH 25-^ MASK;	/* [24:0]
+	addr_ext BITFIELD LENGTH 32-^ MASK;	/* [31:25]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END PCI_HAE_IO;
+
+
+/*
+/* PCI latency register
+/* 
+AGGREGATE PCI_LAT UNION 
+    PREFIX pci_lat_;
+
+    by_field STRUCTURE;
+	unused_0 BITFIELD LENGTH 8-^ MASK;
+	latency BITFIELD LENGTH 16-^ MASK;
+	unused_1 BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END PCI_LAT;
+
+/*
+/* CIA Revision register
+/* 
+AGGREGATE CIA_REV UNION 
+    PREFIX cia_rev_;
+
+    by_field STRUCTURE;
+	revision BITFIELD LENGTH 8-^ MASK;
+	unused_1 BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END CIA_REV;
+/*
+/* CIA diagnostic Force Error register
+/* 
+CONSTANT (none,
+	  lo_lwrd,
+	  hi_lwrd,
+	  addr) EQUALS %x0 INCREMENT %x10000000 PREFIX pci_err_;
+
+AGGREGATE CIA_DIAG UNION 
+    PREFIX cia_diag_;
+
+    by_field STRUCTURE;
+	from_wrt_en BITFIELD LENGTH 1-^ MASK;	/* [0]
+	use_check BITFIELD LENGTH 2-^ MASK;	/* [1]
+	unused_0 BITFIELD LENGTH 28-^ MASK;	/* [27:2]
+	fpe_pci_adr BITFIELD LENGTH 29-^ MASK;	/* [28]
+	fpe_pci_dat BITFIELD LENGTH 30-^ MASK;	/* [29]
+	unused_1 BITFIELD LENGTH 31-^ MASK;	/* [30]
+	fpe_to_ev5 BITFIELD LENGTH 32-^ MASK;	/* [31]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END CIA_DIAG;
+
+/*
+/* Diagnostic Check bit register
+/* 
+AGGREGATE DIAG_CHECK UNION 
+    PREFIX diag_check_;
+
+    by_field STRUCTURE;
+	ecc BITFIELD LENGTH 8-^ MASK;
+	unused_0 BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END DIAG_CHECK;
+
+/*
+/* CACK enable register - 0x8740000600 
+/*
+AGGREGATE EV5_CACK_EN UNION
+    PREFIX cack_;
+    
+    by_field STRUCTURE;
+	lock BITFIELD LENGTH 1 MASK;
+	mb BITFIELD LENGTH 1 MASK;
+	set_dirty BITFIELD LENGTH 1 MASK;
+	bcache_victim BITFIELD LENGTH 1 MASK; /* need to clear this for no cache 
+	unused_0 BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END EV5_CACK_EN;
+
+/*
+/* Performance Monitor register - 0x8740004000 
+/*
+AGGREGATE CIA_PERFMON UNION
+    PREFIX perfm_;
+    
+    by_field STRUCTURE;
+	low_cnt BITFIELD LENGTH 16-^ MASK;
+	high_cnt BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+END CIA_PERFMON;
+
+/*
+/* Performance Monitor Control register - 0x8740004040 
+/*
+CONSTANT clock EQUALS %X1 PREFIX psel_;
+CONSTANT ref EQUALS %X2 PREFIX psel_;
+CONSTANT cack EQUALS %X10 PREFIX psel_;
+CONSTANT cpu_reads EQUALS %X11 PREFIX psel_;
+CONSTANT cpu_rd EQUALS %X12 PREFIX psel_;
+CONSTANT cpu_rdm EQUALS %X13 PREFIX psel_;
+CONSTANT cpu_vic EQUALS %X14 PREFIX psel_;
+CONSTANT cpu_lock EQUALS %X15 PREFIX psel_;
+CONSTANT cpu_mb EQUALS %X16 PREFIX psel_;
+CONSTANT cpu_fetch EQUALS %X17 PREFIX psel_;
+CONSTANT cpu_wr EQUALS %X18 PREFIX psel_;
+CONSTANT cpu_mem EQUALS %X20 PREFIX psel_;
+CONSTANT cpu_io EQUALS %X21 PREFIX psel_;
+CONSTANT cpu_iord EQUALS %X22 PREFIX psel_;
+CONSTANT cpu_iowr EQUALS %X23 PREFIX psel_;
+CONSTANT cpu_sys EQUALS %X24 PREFIX psel_;
+CONSTANT cpu_sysrd EQUALS %X25 PREFIX psel_;
+CONSTANT cpu_sysfl EQUALS %X26 PREFIX psel_;
+CONSTANT cpu_noack EQUALS %X27 PREFIX psel_;
+CONSTANT cpu_sack EQUALS %X28 PREFIX psel_;
+CONSTANT cpu_back EQUALS %X29 PREFIX psel_;
+CONSTANT dma_rd EQUALS %X30 PREFIX psel_;
+CONSTANT dma_rd6 EQUALS %X31 PREFIX psel_;
+CONSTANT dma_rde EQUALS %X32 PREFIX psel_;
+CONSTANT dma_rdc EQUALS %X33 PREFIX psel_;
+CONSTANT dma_wr EQUALS %X34 PREFIX psel_;
+CONSTANT dma_wr7 EQUALS %X35 PREFIX psel_;
+CONSTANT dma_wrf EQUALS %X36 PREFIX psel_;
+CONSTANT dma_dac EQUALS %X37 PREFIX psel_;
+CONSTANT dma_retry EQUALS %X38 PREFIX psel_;
+CONSTANT lock EQUALS %X39 PREFIX psel_;
+CONSTANT lock_hit EQUALS %X40 PREFIX psel_;
+CONSTANT vic_hit EQUALS %X41 PREFIX psel_;
+CONSTANT tlb_miss EQUALS %X50 PREFIX psel_;
+CONSTANT ecc EQUALS %X60 PREFIX psel_;
+
+
+AGGREGATE CIA_PERFCTL UNION
+    PREFIX perfc_;
+    
+    by_field STRUCTURE;
+	low_sel BITFIELD LENGTH 8-^ MASK;
+	unused_0 BITFIELD LENGTH 13-^ MASK;
+	low_cnt_clr BITFIELD LENGTH 14-^ MASK;	    /* write only bit
+	low_err_stop BITFIELD LENGTH 15-^ MASK;
+	low_cnt_strt BITFIELD LENGTH 16-^ MASK;
+	high_sel BITFIELD LENGTH 24-^ MASK;
+	unused_1 BITFIELD LENGTH 29-^ MASK;
+	high_cnt_clr BITFIELD LENGTH 30-^ MASK;	    /* write only bit
+	high_err_stop BITFIELD LENGTH 31-^ MASK;
+	high_cnt_strt BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+END CIA_PERFCTL;
+
+/*
+/*  CIA Main CSR .....
+/*
+/*  This block of registers contains at all of the registers modelled in the
+/*  structures above in the address space order in which they will appear on the
+/*  machine.
+/*
+aggregate CIA_MAIN_CSR structure;
+    offset byte DIMENSION %x80-:;
+    cia_rev CIA_REV;		/* CIA revision - 0x80
+    pci_lat PCI_LAT;		/* PCI latency - 0xc0
+    cia_ctrl CIA_CTRL;		/* CIA control - 0x100
+    offset_1 byte DIMENSION %x200-:;
+    cia_cnfg CIA_CNFG;		/* CIA config - 0x200
+    offset_2 byte DIMENSION %x400-:;
+    hae_mem PCI_HAE_MEM;	/* MEM HAE - 0x400    
+    hae_io PCI_HAE_IO;		/* IO HAE -  0x440
+    cfg PCI_CFG	;		/* PCI Config - 0x480
+    offset_3 byte DIMENSION %x600-:;
+    cack_en EV5_CACK_EN;	/* CACK enable - 0x600
+    offset_4 byte DIMENSION %x2000-:;
+    cia_diag CIA_DIAG;		/* CIA Force error register - 0x2000
+    offset_5 byte DIMENSION %x3000-:;
+    diag_check DIAG_CHECK;	/* Diagnostic Check bit - 0x3000
+    offset_6 byte DIMENSION %x4000-:;
+    cia_perf_mon CIA_PERFMON;	/* Performance Monitor Ctr - 0x4000
+    cia_perf_cntl CIA_PERFCTL;	/* Performance monitor Ctl - 0x4040
+end CIA_MAIN_CSR;		
+
+
+END_MODULE cia_main_csr_def;

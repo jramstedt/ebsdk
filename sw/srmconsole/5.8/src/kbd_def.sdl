@@ -1,0 +1,78 @@
+/*
+/* Copyright (C) 1992 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by Digital Equipment
+/* Corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by Digital.
+/*
+/*
+/* Abstract:	keyboard register definitions
+/*
+/* Author:	Judith E. Gold
+/*
+/* Modifications:
+/*
+/*
+
+module	$kbddef;
+
+
+
+constant
+	KBD_DATA equals %x60,
+	KBD_STAT equals %x64,
+	KBD_CMD equals %x64;
+
+/* DATA 
+aggregate DATA struct prefix "DATA$";
+	EKI bitfield length 1 mask;	/* enable keyboard interrupt
+	EMI bitfield length 1 mask;	/* enable mouse interrupt
+	SYS bitfield length 1 mask;	/* system flag
+	UNUSED bitfield length 1 mask;	/* 
+	DKB bitfield length 1 mask;	/* disable keyboard
+	DMS bitfield length 1 mask;	/* disable mouse
+	KCC bitfield length 1 mask;	/* keycode conversion
+	UNUSED2 bitfield length 1 mask;	/* 
+end DATA;
+
+/* STAT
+aggregate STAT struct prefix "STAT$";
+	OBF bitfield length 1 mask;	/* output buffer full
+	IBF bitfield length 1 mask;	/* input buffer full
+	SYS bitfield length 1 mask;	/* system flag
+	CD bitfield length 1 mask;	/* command/data
+	KBEN bitfield length 1 mask;	/* keyboard enable
+	ODS bitfield length 1 mask;	/* output buffer source
+	GTO bitfield length 1 mask;	/* general time-out
+	PERR bitfield length 1 mask;	/* receive parity error
+end STAT;
+
+
+/* kbd ctl - command set 
+constant
+	CTL_RDMODE equals %x20,
+	CTL_WRMODE equals %x60,
+	CTL_TEST1 equals %xAA,
+	CTL_TEST2 equals %xAB,
+	CTL_ENABLE equals %xAE,
+	CTL_RDOUT equals %xD0,
+	CTL_WROUT equals %xD1,
+	CTL_WRMOUSE equals %xD4,
+	CTL_RESET equals %xff;
+
+
+constant
+	BUFLEN equals 32;		/* typeahead buffer length 
+end_module;

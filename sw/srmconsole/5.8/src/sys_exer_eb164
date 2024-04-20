@@ -1,0 +1,227 @@
+#+
+# ============================================================================
+# = sys_exer - exercise all the devices in the system concurrently.	     =
+# ============================================================================
+#
+# OVERVIEW:
+#
+#	Exercise the entire system.  A list of the subsystems and devices that 
+#	will be tested can be obtained from the SHOW CONFIG and SHOW DEVICE 
+#	commands.  When found in the system, the folleowing devices are tested:
+#	memory, disks, tapes, floppy, serial ports, parallel port, network and
+#	VGA.
+#
+#       All tests run concurrently forever until a kill_diags or init command
+#	is issued.
+#
+#	The -lb option allows an external loopback test to be performed on the
+#	parallel port and on serial port 1.
+#
+#	Use the SET command to establish parameters, such as whether to halt, 
+#	loop, or continue on error.  The passcount environment variable,
+#	d_passes is ignored by test.
+#
+#   COMMAND FORM:
+#
+#       sys_exer ( [-lb] )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       None
+#
+#   COMMAND OPTION(S):
+#
+#       -lb - external loopback tests are performed on the parallel port and
+#	      on serial port 1 
+#
+#   COMMAND EXAMPLE(S):
+#~
+#       >>>sys_exer &
+#       >>>show_status
+#	      ID      Program       Device   Pass Hard/Soft Bytes Written    Bytes Read
+#	-------- ------------ ------------ ------ --------- ------------- -------------
+#	00000001         idle       system      0    0    0             0             0
+#	0000009f      memtest       memory      0    0    0     100663296     100663296
+#	000000b4     exer_kid dub0.0.0.1.0      0    0    0             0        444416
+#	000000b5     exer_kid duc0.6.0.2.0    122    0    0             0       1249280
+#	000000b6     exer_kid dud0.7.0.3.0    122    0    0             0       1249280
+#	000000b7     exer_kid dka0.0.0.0.0      0    0    0             0        256000
+#	000000be      nettest ewa0.0.0.6.0     13    0    0         20888         20888
+#	000000be      nettest era0.0.0.7.0     13    0    0         17904         17904
+#       >>>
+#~
+#-
+#exercise the system
+dyn -extend 100000
+set d_report full
+#
+echo "Exercising the Memory"
+memexer 3
+#
+if (ls dz*.* >nl) then
+	echo "Exercising the DZ* Disks(read only)"
+	exer -a "?r-Rc" dz* -p 0&
+fi
+if (ls du*.* >nl) then
+	echo "Exercising the DU* Disks(read only)"
+	exer -a "?r-Rc" du* -p 0&
+fi
+if (ls dk*.* >nl) then
+	echo "Exercising the DK* Disks(read only)"
+	exer -a "?r-Rc" dk* -p 0&
+fi
+if (ls dr*.* >nl) then
+	echo "Exercising the DR* Disks(read only)"
+	exer -a "?r-Rc" dr* -p 0&
+fi
+if (ls dq*.* >nl) then
+	echo "Exercising the DQ* Disks(read only)"
+	exer -a "?r-Rc" dq* -p 0&
+fi
+#
+if (ls mk*.* >nl) then
+	echo "Exercising the MK* Tapes(read only)"	
+	exer mk* -p 0&
+fi
+#
+#echo "Exercising the Disks(read/write)"
+#exer -bc 4 -a "?r-w-Rc" dk* -p 0&
+#exer -bc 4 -a "?r-w-Rc" dr* -p 0&
+#
+# Test the floppy
+#echo "Exercising the Floppy(read/write)"
+#chmod +w dv*
+#exer -sb 2 -a "?r-w-Rc" dv* -p 0&
+#
+if (ls dv*.* >nl) then
+	echo "Exercising the Floppy(read only)"
+	exer -a "?r-Rc" dv* -p 0&
+fi
+#
+# If an input of lb is used try to run the external loopback tests on the
+# parallel port and serial port 1.
+if (eval $# > nl) then
+	set aa_ext_lp$$ 0 2>nl
+else
+	set aa_ext_lp$$ $1 2>nl
+fi
+#
+if (show aa_ext_lp$$ | grep lb >nl) then
+	set tt_allow_login 0
+	if (exer tta1 -bs 1 -a 'wRc' -l 1 2>nl) then
+		echo "Exercising the Serial Port 1(external loopback)"
+		exer tta1 -bs 1 -a 'wRc' -l 400 -p 0&
+	fi
+	#
+	if (exer para -bs 1 -a 'wRc' -l 1 2>nl) then
+		echo "Exercising the parallel Port(external loopback)"
+		exer para -bs 1 -a 'wRc' -l 400 -p 0&
+	fi
+fi
+#
+if (ls vga0 >nl) then
+    echo -n "VGA" > aa_ghead
+fi
+if (ls tga0 >nl) then
+    echo -n "TGA" > aa_ghead
+fi
+if (ls aa_ghead >nl) then
+	if (show console | grep serial >nl) then
+		if (ls tga0 >nl) then
+			echo Testing the `cat aa_ghead`' (Graphics Mode)'
+			tgax &
+		fi
+		if (ls vga0 >nl) then
+			echo Testing the `cat aa_ghead`' (Alphanumeric Mode)'
+			while (true) do
+				echo -n 'Compaq' > `cat aa_ghead`0
+			done &
+		fi
+	fi
+fi
+# Exercise the Mouse
+# The mouse ignores all commands for now.  If the console resolves this
+# problem this test can be added back in.
+#echo "Exercising the mouse"
+#while (true)
+#do
+#	set mice$$ 0 2>nl
+#	set mcnt$$ 5 2>nl
+#
+#	# enable the mouse port
+#	d -b eport:64 A8
+#
+#	# write the command to the mouse
+#	d -b eport:64 d4
+#	d -b eport:60 54
+#
+#	# tell the mouse to send data
+#	d -b eport:64 d4
+#	d -b eport:60 eb
+#
+#	# read 4 bytes worth of data keep track of the number 
+#	# the mouse actually sends
+#
+#	until eval "mcnt$$ mcnt$$ 1 - =" > nl
+#	do
+#		sleep 1
+#		if (eval `e -b eport:64|find 2` '1 &' '1 -' > nl) then 
+#			(eval "mice$$ mice$$ 1 + =" > nl)
+#		fi
+#		e -b eport:60 > nl
+#	done
+#
+#	if (eval "mice$$ 4 -" > nl) then 
+#	else 
+#		(echo "mouse bad or missing")
+#		exit
+#	fi
+#
+#	# disable the mouse
+#	d -b eport:64 A7
+#
+#	# do a dummy read to clear the buffer
+#	e -b eport:60 > nl
+#
+#	# wait 1 minute before next test
+#	sleep 60
+#clear mice$$
+#clear mcnt$$
+#done &
+for k in I W
+do
+  for i in A B C D E F G
+  do
+    if (ls e"$k""$i"0 > nl) then
+	set netdev `show dev | grep -i e"$k""$i"0|cat -l 4` 2>nl
+	net -cm in "$netdev"
+	net -sa "$netdev" > ndbr/lp_nodes_"$netdev" 
+
+	set "$netdev"_loop_count  1 2>nl
+	set "$netdev"_loop_size   100 2>nl
+	set "$netdev"_lp_msg_node 1 2>nl
+
+	if (nettest "$netdev" -mode nc -f lp_nodes_"$netdev" -p 1 2>nl) then
+	    echo "Exercising the E"$k""$i"0 Network"
+	    set d_softerr continue
+	    set "$netdev"_loop_count  2
+	    set "$netdev"_loop_inc    1 2>nl
+	    set "$netdev"_loop_patt   ffffffff 2>nl
+	    set "$netdev"_loop_size   0e
+	    set "$netdev"_lp_msg_node 1
+	    nettest "$netdev" -mode nc -f lp_nodes_"$netdev" -p 1 -w 1
+
+	    set "$netdev"_loop_count  4
+	    set "$netdev"_loop_inc    20
+	    set "$netdev"_loop_patt   ffffffff
+	    set "$netdev"_loop_size   80
+	    set "$netdev"_lp_msg_node 4
+	    nettest "$netdev" -mode nc -f lp_nodes_"$netdev" -p 0 -w 1 -to 10 & 
+	fi
+    fi
+  done
+done
+#date
+echo 
+echo "Type init in order to boot the operating system"
+echo 

@@ -1,0 +1,44 @@
+# file: lxupdate_files.bld --  LFU utility build file for AlphaPC 164LX.
+
+include cp$src:lx164_files.bld
+configuration LXUPDATE
+option FWUPDATE
+
+file    lfu.c				group command
+file    lfu_support_apc.c		group base
+#
+# Lfu drivers are started by lfu.. phase 7
+#
+driver	lfu_lx164_driver.c	 7	group driver
+driver	lfu_kzpsa_driver.c	 7	group driver
+driver	lfu_defpa_defea_driver.c 7	group driver
+#
+driver	iso9660_driver.c	 5	group driver
+#
+# start this last!!!!
+#
+driver	lfu_startup_driver.c	 5	group base
+#
+encapsulate	cp$src:save_nvram_lx164		save_nvram	ATTR$M_READ|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:restore_nvram_lx164	restore_nvram	ATTR$M_READ|ATTR$M_EXECUTE	-script
+#
+# These files are not needed
+#
+delete file cp$src:test_eb164
+delete file cp$src:sys_exer_eb164
+delete file cp$src:memexer_eb164
+delete file cp$src:floppy_write
+delete file cp$src:show_status
+delete file cp$src:kill_diags_eb164
+delete file cp$src:showit
+delete file nettest.c
+delete file memtest.c
+delete file memtest_gray_lw.c
+delete file memtest_alpha.mar
+delete file memtest_march.c
+delete file memtest_random.c
+delete file memtest_victim.c
+delete file isp1020_edit.c
+delete file exer.c
+delete file help.c
+delete file net.c

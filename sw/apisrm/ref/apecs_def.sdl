@@ -1,0 +1,374 @@
+{ Copyright (c) 1994 by
+{ Digital Equipment Corporation, Maynard, Massachusetts.
+{ All rights reserved.
+{
+{ This software is furnished under a license and may be used and copied
+{ only  in  accordance  of  the  terms  of  such  license  and with the
+{ inclusion of the above copyright notice.  This software or any  other
+{ copies thereof may not be provided or otherwise made available to any
+{ other person.  No title to and  ownership of the  software is  hereby
+{ transferred.
+{
+{ The information in this software is  subject to change without notice
+{ and  should  not  be  construed  as a commitment by Digital Equipment
+{ Corporation.
+{
+{ Digital assumes no responsibility for the use  or  reliability of its
+{ software on equipment which is not supplied by Digital.
+{
+MODULE APECS_DEF IDENT "V1.0";
+
+/*
+/* DECchip 21071-DA (EPIC) Register Definitions
+/*
+
+/*
+/* Diagnostic Control and Status - 0x1A0000000
+/*
+AGGREGATE epic_dcsr UNION
+    PREFIX dcsr_;
+
+    by_field STRUCTURE;
+	tlb_en BITFIELD LENGTH 1-^ MASK;	    /* [0]
+	reserved_0 BITFIELD LENGTH 2-^ MASK;	    /* [1]
+	prefetch_en BITFIELD LENGTH 3-^ MASK;	    /* [2]
+	disable_cei BITFIELD LENGTH 4-^ MASK;	    /* [3]
+	reserved_1 BITFIELD LENGTH  5-^ MASK;	    /* [4]
+	ior_timeout BITFIELD LENGTH  6-^ MASK;	    /* [5]
+	lost_err BITFIELD LENGTH  7-^ MASK;	    /* [6]
+	reserved_2 BITFIELD LENGTH  8-^ MASK;	    /* [7]
+	dma_perr BITFIELD LENGTH  9-^ MASK;	    /* [8]
+	io_perr BITFIELD LENGTH 10-^ MASK;	    /* [9]
+	t_abort BITFIELD LENGTH 11-^ MASK;	    /* [10]
+	ndev_err BITFIELD LENGTH 12-^ MASK;	    /* [11]
+	corr_mrd_err BITFIELD LENGTH 13-^ MASK;	    /* [12]
+	unc_mrd_err BITFIELD LENGTH 14-^ MASK;	    /* [13]
+	ptl_inv BITFIELD LENGTH 15-^ MASK;	    /* [14]
+	mem_err BITFIELD LENGTH 16-^ MASK;	    /* [15]
+	disable_byp BITFIELD LENGTH 18-^ MASK;	    /* [17:16]
+	pci_cmd BITFIELD LENGTH  22-^ MASK;	    /* [21:18]
+	reserved_3 BITFIELD LENGTH  31-^ MASK;	    /* [30:22]
+	pass2 BITFIELD LENGTH  32-^ MASK;	    /* [31]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_dcsr;
+
+/*
+/* PCI Error Address - 0x1A0000020
+/*
+AGGREGATE epic_pear UNION 
+    PREFIX pear_;
+
+    by_field STRUCTURE;
+	pci_err BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_pear;
+
+/*
+/* sysBus Error Address - 0x1A0000040
+/*
+AGGREGATE epic_sear UNION 
+    PREFIX sear_;
+
+    by_field STRUCTURE;
+	reserved BITFIELD LENGTH 4-^ MASK;	    /* [3:0]
+	sys_err BITFIELD LENGTH 32-^ MASK;	    /* [31:4]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_sear;
+
+/*
+/* Translated Base 1-2 - 0x1A00000C0, 0x1A00000E0
+/*
+AGGREGATE epic_tbr UNION 
+    PREFIX tbr_;
+
+    by_field STRUCTURE;
+	reserved BITFIELD LENGTH 9-^ MASK;	    /* [8:0]
+	t_base BITFIELD LENGTH 32-^ MASK;	    /* [31:9]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_tbr;
+
+/*
+/* PCI Base 1-2 - 0x1A0000100, 0x1A0000120
+/*
+AGGREGATE epic_pbr UNION 
+    PREFIX pbr_;
+
+    by_field STRUCTURE;
+	reserved BITFIELD LENGTH 18-^ MASK;	    /* [17:0]
+	sgen BITFIELD LENGTH 19-^ MASK;		    /* [18]
+	wenb BITFIELD LENGTH 20-^ MASK;		    /* [19]
+	pci_base BITFIELD LENGTH 32-^ MASK;	    /* [31:20]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_pbr;
+
+/*
+/* PCI Mask 1-2 - 0x1A0000140, 0x1A0000160
+/*
+AGGREGATE epic_pmr UNION 
+    PREFIX pmr_;
+
+    by_field STRUCTURE;
+	reserved BITFIELD LENGTH 20-^ MASK;	    /* [19:0]
+	pci_mask BITFIELD LENGTH 32-^ MASK;	    /* [31:20]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_pmr;
+
+/*
+/* Host Address Extension 1 - 0x1A00001A0
+/*
+AGGREGATE epic_haxr1 UNION 
+    PREFIX haxr1_;
+
+    by_field STRUCTURE;
+	reserved BITFIELD LENGTH 27-^ MASK;	    /* [26:0]
+	e_addr BITFIELD LENGTH 32-^ MASK;	    /* [31:27]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_haxr1;
+
+/*
+/* Host Address Extension 2 - 0x1A00001C0
+/*
+AGGREGATE epic_haxr2 UNION 
+    PREFIX haxr2_;
+
+    by_field STRUCTURE;
+	conf_addr BITFIELD LENGTH 2-^ MASK;	    /* [1:0]
+	reserved BITFIELD LENGTH 24-^ MASK;	    /* [23:2]
+	e_addr BITFIELD LENGTH 32-^ MASK;	    /* [31:24]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END epic_haxr2;
+
+/* Define constants to build the base address at 0x1A0000000
+
+CONSTANT epic_a_addr EQUALS %X1A000;
+CONSTANT epic_v_addr EQUALS 12;
+CONSTANT epic_k_offset EQUALS %x000;
+
+/*
+/* DECchip 21071-DA (EPIC) registers .....
+/*
+
+AGGREGATE epic_regs STRUCTURE ;
+    dcsr epic_dcsr;			/* 1A0000000
+    pear epic_pear;			/* 1A0000020
+    sear epic_sear;			/* 1A0000040
+    offset_0 byte DIMENSION %xC0-: FILL;
+    tbr1 epic_tbr;			/* 1A00000C0
+    tbr2 epic_tbr;			/* 1A00000E0
+    pbr1 epic_pbr;			/* 1A0000100
+    pbr2 epic_pbr;			/* 1A0000120
+    pmr1 epic_pmr;			/* 1A0000140
+    pmr2 epic_pmr;			/* 1A0000160
+    offset_1 byte DIMENSION %x1A0-: FILL;
+    haxr1 epic_haxr1;			/* 1A00001A0
+    haxr2 epic_haxr2;			/* 1A00001C0
+    
+END epic_regs;
+
+/*
+/* DECchip 21071-CA (COMMANCHE) Register Definitions
+/*
+
+/*
+/* General Control - 0x180000000
+/*
+AGGREGATE coma_gcr UNION 
+    PREFIX gcr_;
+
+    by_field STRUCTURE;
+	reserved_0 BITFIELD LENGTH 1-^ MASK;	    /* [0]
+	sys_arb BITFIELD LENGTH 3-^ MASK;	    /* [2:1]
+	reserved_1 BITFIELD LENGTH 4-^ MASK;	    /* [3]
+	wide_mem BITFIELD LENGTH 5-^ MASK;	    /* [4]
+	bc_en BITFIELD LENGTH 6-^ MASK;		    /* [5]
+	bc_no_alloc BITFIELD LENGTH 7-^ MASK;	    /* [6]
+	bc_long_wr BITFIELD LENGTH 8-^ MASK;	    /* [7]
+	bc_ign_tag BITFIELD LENGTH 9-^ MASK;	    /* [8]
+	bc_frc_tag BITFIELD LENGTH 10-^ MASK;	    /* [9]
+	bc_frc_dirty BITFIELD LENGTH 11-^ MASK;	    /* [10]
+	bc_frc_valid BITFIELD LENGTH 12-^ MASK;	    /* [11]
+	bc_frc_parity BITFIELD LENGTH 13-^ MASK;    /* [12]
+	bc_bad_ap BITFIELD LENGTH 14-^ MASK;	    /* [13]
+	reserved_2 BITFIELD LENGTH 16-^ MASK;	    /* [15:14]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_gcr;
+
+/*
+/* Error and Diagnostic Status - 0x180000040
+/*
+AGGREGATE coma_edsr UNION 
+    PREFIX edsr_;
+
+    by_field STRUCTURE;
+	lost_err BITFIELD LENGTH 1-^ MASK;	    /* [0]
+	bc_ta_perr BITFIELD LENGTH 2-^ MASK;	    /* [1]
+	bc_tc_perr BITFIELD LENGTH 3-^ MASK;	    /* [2]
+	nxm_err BITFIELD LENGTH 4-^ MASK;	    /* [3]
+	dma_err BITFIELD LENGTH 5-^ MASK;	    /* [4]
+	vic_err BITFIELD LENGTH 6-^ MASK;	    /* [5]
+	creq_err BITFIELD LENGTH 9-^ MASK;	    /* [8:6]
+	reserved BITFIELD LENGTH 13-^ MASK;	    /* [12:9]
+	pass2 BITFIELD LENGTH 14-^ MASK;	    /* [13]
+	ldxl_lock BITFIELD LENGTH 15-^ MASK;	    /* [14]
+	wr_pend BITFIELD LENGTH 16-^ MASK;	    /* [15]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_edsr;
+
+/*
+/* Error Low Address - 0x180000080
+/*
+AGGREGATE coma_elar UNION 
+    PREFIX elar_;
+
+    by_field STRUCTURE;
+	err_ladr BITFIELD LENGTH 16-^ MASK;	    /* [15:0]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_elar;
+
+/*
+/* Error High Address - 0x1800000A0
+/*
+AGGREGATE coma_ehar UNION 
+    PREFIX ehar_;
+
+    by_field STRUCTURE;
+	err_hadr BITFIELD LENGTH 13-^ MASK;	    /* [12:0]
+	reserved BITFIELD LENGTH 16-^ MASK;	    /* [15:13]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_ehar;
+
+/*
+/* LDx_L Low Address - 0x1800000C0
+/*
+AGGREGATE coma_ldlr UNION 
+    PREFIX ldlr_;
+
+    by_field STRUCTURE;
+	ldlr_addr BITFIELD LENGTH 16-^ MASK;	    /* [15:0]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_ldlr;
+
+/*
+/* LDx_L High Address - 0x1800000E0
+/*
+AGGREGATE coma_ldhr UNION 
+    PREFIX ldhr_;
+
+    by_field STRUCTURE;
+	ldhr_addr BITFIELD LENGTH 13-^ MASK;	    /* [12:0]
+	reserved BITFIELD LENGTH 16-^ MASK;	    /* [15:13]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_ldhr;
+
+/*
+/* BankSet0 Base - 0x180000800
+/*
+AGGREGATE coma_base0 UNION 
+    PREFIX base0_;
+
+    by_field STRUCTURE;
+	reserved BITFIELD LENGTH 5-^ MASK;	    /* [4:0]
+	base_addr BITFIELD LENGTH 16-^ MASK;	    /* [15:5]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_base0;
+
+/*
+/* BankSet0 Configuration - 0x180000A00
+/*
+AGGREGATE coma_cnfg0 UNION 
+    PREFIX cnfg0_;
+
+    by_field STRUCTURE;
+	valid BITFIELD LENGTH 1-^ MASK;		    /* [0]
+	size BITFIELD LENGTH 5-^ MASK;		    /* [4:0]
+	sub_ena BITFIELD LENGTH 6-^ MASK;	    /* [5]
+	col_sel BITFIELD LENGTH 9-^ MASK;	    /* [8:6]
+	reserved BITFIELD LENGTH 16-^ MASK;	    /* [15:9]
+	unused BITFIELD LENGTH 32-^ MASK;	    /* [31:16]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 32;
+
+END coma_cnfg0;
+
+/* Define constants to build the base address at 0x180000000
+
+CONSTANT coma_a_addr EQUALS %X18000;
+CONSTANT coma_v_addr EQUALS 12;
+CONSTANT coma_k_offset EQUALS %x000;
+
+/*
+/* DECchip 21071-CA (COMMANCHE) registers .....
+/*
+
+AGGREGATE coma_regs STRUCTURE ;
+    gcr coma_gcr;			/* 180000000
+    offset_0 byte DIMENSION %x40-: FILL;
+    edsr coma_edsr;			/* 180000040
+    offset_1 byte DIMENSION %x80-: FILL;
+    elar coma_elar;			/* 180000080
+    ehar coma_ehar;			/* 1800000A0
+    ldlr coma_ldlr;			/* 1800000C0
+    ldhr coma_ldhr;			/* 1800000E0
+    offset_2 byte DIMENSION %x800-: FILL;
+    base0 coma_base0;			/* 180000800
+    base1 coma_base0;			/* 180000800
+    offset_3 byte DIMENSION %xA00-: FILL;
+    cnfg0 coma_cnfg0;			/* 180000A00
+    cnfg1 coma_cnfg0;			/* 180000A20
+    
+END coma_regs;
+
+END_MODULE APECS_DEF;

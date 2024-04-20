@@ -1,0 +1,148 @@
+;+
+; ev6_alpha_defs.mar
+;
+; This file is for ev6 specific definitions not covered by
+; ev6_defs.mar and ev6_redefine_defs.mar
+;-
+
+;+
+; Last Edit:	21-Oct-98
+;
+; Edit History
+;
+; Who	Rev	When		What
+; ---	---	----		----
+; ES		12-Sep-96	Added 'jump through 0' halt code
+; ES		21-Nov-96	Took out cbox shift chain values
+; ES		10-Apr-97	Redefined cbox status register
+; ES		31-Oct-97	Add HALT__DC_TAG_PERR_FROM_PAL
+;				Fixed machine check codes
+; ES		03-Feb-98	Added C_STAT bit
+; ES		19-Mar-98	Added MCHK__SYS_CORR_ECC
+; ES		29-Jun-98	Added HALT__LFU_START and
+;					MCHK__SYS_EVENT
+; ES		21-Oct-98	Added MCHK__ISTREAM_CMOV,
+;					MCHK__ISTREAM_CMOV_FAULT
+;-
+
+;
+; PAL_SHADOW_DEF
+;
+.macro	PAL_SHADOW_DEFS
+	p4	=   4
+	p5	=   5
+	p6	=   6
+	p7	=   7
+	p20	=  20
+	p21	=  21
+	p_temp	=  21
+	p22	=  22
+	p_misc	=  22
+	p23	=  23
+.endm	PAL_SHADOW_DEFS
+
+;
+; Machine Check Error Summary Register Defintion
+;
+.macro	MCES_DEFS
+	MCES__MCHK__S	= 0
+	MCES__SCE__S	= 1
+	MCES__PCE__S	= 2
+	MCES__DPC__S	= 3
+	MCES__DSC__S	= 4
+.endm	MCES_DEFS
+
+;
+; Halt codes
+;
+.macro	HALT_DEFS
+	HALT__RESET		= 0	; bootstrap
+	HALT__HW_HALT		= 1	; console requested halt
+	HALT__KSP_INVAL		= 2	; kernel stack not valid
+	HALT__SCBB_INVAL	= 3	; invalid SCBB	
+	HALT__PTBR_INVAL	= 4	; invalid PTBR or other page table err
+	HALT__SW_HALT		= 5	; CALL_PAL HALT executed
+	HALT__DBL_MCHK		= 6	; double error abort
+	HALT__MCHK_FROM_PAL	= 7	; machine check while in PALmode
+	HALT__DC_TAG_PERR_FROM_PAL = 8	; dc_tag_perr while in PALmode
+
+	HALT__START		= ^x20
+	HALT__CALLBACK		= ^x21
+	HALT__MPSTART		= ^x22
+	HALT__LFU_START		= ^x23
+
+	HALT__JUMP0		= ^x40	; jump through 0
+
+.endm	HALT_DEFS
+
+;
+; Machine Check codes
+;
+.macro	MCHK_DEFS
+	MCHK__CORR_ECC		= 67@1		; catch-all corrected mchk/crd
+	MCHK__UNKNOWN		= 69@1
+	MCHK__BUGCHECK		= 71@1
+	MCHK__OS_BUGCHECK	= 72@1
+	MCHK__PROC_HRD_ERR	= 76@1		; catch-all uncorrected mchk
+	MCHK__DC_TAG_PERR	= 79@1		; corrected dc_tag_perr
+	MCHK__ISTREAM_CMOV	= 80@1		; cmov at pc-4 on istream mchk
+	MCHK__ISTREAM_CMOV_FAULT= 81@1		; unable to get instruction
+						;	at pc-4 on istream mchk
+
+	MCHK__SYS_HRD_ERR	= 257@1
+	MCHK__SYS_CORR_ECC	= 258@1
+	MCHK__SYS_EVENT		= 259@1
+
+.endm	MCHK_DEFS
+
+;
+; Memory Management sizes
+;
+.macro	MM_DEFS
+	level_bits		= 10
+	page_offset_size_bits	= 13
+	page_size_bytes		= 8192
+	va_bits_3		= 43
+	va_bits_4		= 48
+	pa_bits			= 44
+.endm	MM_DEFS
+
+;
+; MM_STAT_DEFS
+;	MM_STAT will contain munged opcodes for HW_LD and HW_ST.
+;	These codes are unique from all other opcodes, so we
+;	can distinguish these from any others.
+;
+.macro	MM_STAT_DEFS
+	OPCODE__HW_LD		= ^X3
+	OPCODE__HW_ST		= ^X7
+.endm	MM_STAT_DEFS
+
+;
+; CBOX_IPR_DEFS
+;
+.macro	CBOX_IPR_DEFS
+;
+; ERR_CODE bit definitions
+;
+	EV6__C_STAT__TYPE__S	= 0
+	EV6__C_STAT__TYPE__M	= ^x7
+	EV6__C_STAT__ISTREAM__S	= 3
+	EV6__C_STAT__ISTREAM__M	= ^x1
+	EV6__C_STAT__DOUBLE__S 	= 4
+	EV6__C_STAT__DOUBLE__M 	= ^x1
+
+.endm	CBOX_IPR_DEFS
+
+
+
+
+
+
+
+
+
+
+
+
+

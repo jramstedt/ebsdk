@@ -1,0 +1,261 @@
+/* file:	medulla.sdl
+/*
+/* Copyright (C) 1993 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Medulla HWRPB specific definitions for Alpha firmware.
+/*
+/* Author:	Joe Smyth
+/*
+/* Modifications:
+/*
+/*      danh    24-Jan-1995     Added Nvram structure.  Includes all flags
+/*				in table 7-1 of F/W spec V2.0
+/*
+/*	bobf	24-Jan-1995	Added a longword pad between the VERSION and
+/*				CPU_VERSION to allow for OS backward 
+/*				compatibility.
+/*
+/*	bobf	12-Jan-1995	Modified the CONFIG data structure to be
+/*				consistent with the new PCI configuration
+/*
+/*	bobf	25-Oct-1994	Changed HWRPB$_SYSVAR from 1 to 0 to correctly
+/*				indicate uniprocessor system variation
+/*
+/*	joes	 16-Nov-1993	remove all io definitions to medulla_io.h
+/*				Please restrict additions here to hwrpb and
+/*				related stuff
+/*	bobf	 26-Oct-1993	Added device name irq definitions 
+/*
+/*	bobf	 22-Oct-1993	Added 8259 Interrupt Mask Register addresses
+/*
+/*	bobf	 21-Oct-1993	Added 8259 interrupt request level definitions
+/*
+/*	bobf	 5-Oct-1993	Added 8254 Timer register/bit definitions
+/*
+/*	joes	11-Aug-1993	Initial entry - from cobra.sdl and sable.sdl
+/*
+module	$machdep;
+
+/*
+/* Medulla specific parameters of the HWRPB for EV4-DCard
+/*
+constant HWRPB$_PAGESIZE equals %x2000;	/* System page size in bytes
+constant HWRPB$_PAGEBITS equals 13;	/* System page size in bits
+constant HWRPB$_PA_SIZE equals 34;	/* Physical address size in bits
+constant HWRPB$_ASN_MAX equals 63; 	/* Maximum ASN value 
+constant HWRPB$_SYSTYPE equals 10;	/* Alpha system type (Medulla)
+constant HWRPB$_SYSVAR equals 0;	/* System variation 
+constant HWRPB$_NPROC equals 1;		/* Number of processor supported
+constant HWRPB$_ICLK_FREQ equals 4096*1024; /* Interval timer frequency
+constant HWRPB$_CC_FREQ equals 100000000; /* Cycle counter frequency (@10ns)
+constant HWRPB$_CC_FREQ_50 equals 200000000; /* Cycle counter frequency (@5ns)
+constant HWRPB$_CC_FREQ_60 equals 166666667; /* Cycle counter frequency (@6ns)
+constant HWRPB$_CC_FREQ_66 equals 151515152; /* Cycle counter frequency (@6.6ns)
+constant HWRPB$_CC_FREQ_70 equals 142857143; /* Cycle counter frequency (@7ns)
+
+constant SLOT$_CPU_TYPE equals 4;	/* Processor type (LCA)
+constant SLOT$_CPU_VAR equals 3;	/* Processor Variation (VAX/IEEE FP)
+constant SLOT$_PAL_LOGOUT equals %x6000; /* PAL logout area
+constant SLOT$_PAL_LOGOUT_CORR equals %x20000; /* PAL logout area
+constant SLOT$_PAL_LOGOUT_LEN equals %x2A0; /* PAL logout area length
+constant SLOT$_PAL_LOGOUT_LEN_CORR equals %x48; /* PAL logout corr area length
+
+constant CTB$MAX_UNITS equals 2;	/* 1 console terminal UART
+                                          
+constant CTB$CSR0 equals 0;		/* Base CSR address for LOC port
+constant CTB$TX_IPL0 equals 20;		/* Transmit interrupt IPL for LOC port
+constant CTB$TX_SCB0 equals %x690;	/* Transmit vector for LOC port
+constant CTB$RX_IPL0 equals 20;		/* Receive interrupt IPL for LOC port
+constant CTB$RX_SCB0 equals %x680;	/* Receive vector for LOC port
+
+constant CTB$CSR1 equals 0;		/* Base CSR address for RD port
+constant CTB$TX_IPL1 equals 20;		/* Transmit interrupt for RD port
+constant CTB$TX_SCB1 equals %x6b0;	/* Transmit vector for RD port
+constant CTB$RX_IPL1 equals 20;		/* Receive interrupt IPL for RD port
+constant CTB$RX_SCB1 equals %x6a0;	/* Receive vector for RD port
+
+constant MEDULLA$PRIMARY_CPU equals 0;	/* Medulla primary cpu
+
+constant MEDULLA$DISPLAY_EV  	equals %x01; /* Display ev registers
+constant MEDULLA$DISPLAY_CB  	equals %x02; /* Display cobra registers
+constant MEDULLA$DISPLAY_PC  	equals %x04; /* Display Process info
+constant MEDULLA$MEM_TOTAL	equals 1;    /* Total memory boards for Medulla
+constant MEDULLA$MED_CACHE	equals (1024*256);
+constant MEDULLA$M224_CACHE	equals (1024*512);
+
+
+aggregate MCHK$LOGOUT structure prefix "" tag "" fill;
+	mem_esr			quadword unsigned; 
+	mem_ear			quadword unsigned; 
+	mem_car			quadword unsigned; 
+	ioc_stat0		quadword unsigned; 
+	ioc_stat1		quadword unsigned; 
+end MCHK$LOGOUT;
+
+aggregate PAL$LOGOUT structure prefix "" tag "" fill;	/*offset
+	r_byte_count		quadword unsigned;	/* 0
+	sys_proc$$offset	quadword unsigned;	/* 8
+	mchk_code		quadword unsigned;	/* 10
+	pt1			quadword unsigned;	/* 18
+	pt2			quadword unsigned;	/* 20
+	pt3			quadword unsigned;	/* 28
+	pt4			quadword unsigned;	/* 30
+	pt5			quadword unsigned;	/* 38
+	pt6			quadword unsigned;	/* 40
+	pt7			quadword unsigned;	/* 48
+	pt8			quadword unsigned;	/* 50
+	pt9			quadword unsigned;	/* 58
+	pt10			quadword unsigned;	/* 60
+	pt11			quadword unsigned;	/* 68
+	pt12			quadword unsigned;	/* 70
+	pt13			quadword unsigned;	/* 78
+	pt14			quadword unsigned;	/* 80
+	pt15			quadword unsigned;	/* 88
+	pt16			quadword unsigned;	/* 90
+	pt17			quadword unsigned;	/* 98
+	pt18			quadword unsigned;	/* A0
+	pt19			quadword unsigned;	/* A8
+	pt20			quadword unsigned;	/* B0
+	pt21			quadword unsigned;	/* B8
+	pt22			quadword unsigned;	/* C0
+	pt23			quadword unsigned;	/* C8
+	pt24			quadword unsigned;	/* D0
+	pt25			quadword unsigned;	/* D8
+	pt26			quadword unsigned;	/* E0
+	pt27			quadword unsigned;	/* E8
+	pt28			quadword unsigned;	/* F0
+	pt29			quadword unsigned;	/* F8
+	pt30			quadword unsigned;	/* 100
+	pt31			quadword unsigned;	/* 108
+	exc_addr		quadword unsigned;	/* 110
+	exc_sum			quadword unsigned;	/* 118 filler for LCA
+	exc_msk			quadword unsigned;	/* 120 filler for LCA
+	iccsr			quadword unsigned;	/* 128 filler for LCA
+	pal_base		quadword unsigned;	/* 130
+	hier			quadword unsigned;	/* 138
+	hirr			quadword unsigned;	/* 140
+	mm_csr			quadword unsigned;	/* 148
+	dc_stat			quadword unsigned;	/* 150
+	dc_addr			quadword unsigned;	/* 158
+	abox_ctl		quadword unsigned;	/* 160 
+	mem_esr			quadword unsigned;	/* 168 start of diff from EV4
+	mem_ear			quadword unsigned;	/* 170
+	mem_car			quadword unsigned;	/* 178
+	ioc_stat0		quadword unsigned;	/* 180
+	ioc_stat1		quadword unsigned;	/* 188
+end PAL$LOGOUT;
+
+/* 620 mcheck not possible on Medulla, included for completeness, same as 630
+aggregate PAL$LOGOUT_620 structure prefix "" tag "" fill;/*offset 
+	r_byte_count		quadword unsigned;      /* 0
+	sys_proc$$offset	quadword unsigned;      /* 8
+	mchk_code		quadword unsigned;      /* 10
+	mem_esr			quadword unsigned;	/* 18
+	mem_ear			quadword unsigned;	/* 20
+	dc_stat			quadword unsigned;	/* 28
+	ioc_stat0		quadword unsigned;	/* 30
+	ioc_stat1		quadword unsigned;      /* 38
+end PAL$LOGOUT_620;
+
+aggregate PAL$LOGOUT_630 structure prefix "" tag "" fill;/*offset
+	r_byte_count		quadword unsigned;	/* 0
+	sys_proc$$offset	quadword unsigned;	/* 8
+ 	mchk_code		quadword unsigned;	/* 10
+	mem_esr			quadword unsigned;	/* 18
+	mem_ear			quadword unsigned;	/* 20
+	dc_stat			quadword unsigned;	/* 28
+	ioc_stat0		quadword unsigned;	/* 30
+	ioc_stat1		quadword unsigned;      /* 38
+end PAL$LOGOUT_630;
+
+aggregate DEVICE structure prefix "" tag "";
+    HOSE byte unsigned;
+    BUS byte unsigned;
+    SLOT byte unsigned;
+    FUNCTION byte unsigned;
+    NUM_VECTOR word unsigned;
+    VMS_VECTOR word unsigned;
+    OSF_VECTOR word unsigned;
+    TYPE longword unsigned;
+	constant TYPE_NONE equals 0;
+    VERSION longword unsigned;
+    SPECIFIC union fill;
+	SPECIFIC_MAX quadword unsigned dimension 2;
+	TULIP_SPECIFIC structure fill;
+	    SA byte unsigned dimension 6;
+	    MODE structure fill;
+		SA bitfield mask;
+		SE bitfield mask;
+		HW bitfield mask;
+	    end MODE;
+	    BURST byte unsigned;
+	end TULIP_SPECIFIC;
+	NCR53C810_SPECIFIC structure fill;
+	    BUS_ID byte unsigned;
+	    FAST byte unsigned;
+	    SPEED word unsigned;
+	end NCR53C810_SPECIFIC;
+    end SPECIFIC;
+end DEVICE;
+
+
+aggregate CONFIG structure prefix "" tag "" fill;
+	SIZE quadword unsigned;
+	CHECKSUM quadword unsigned;
+	VERSION longword unsigned;
+	PAD1 longword unsigned;
+	CPU_VERSION longword unsigned;
+	CPU_SPEED longword unsigned;
+	SA byte unsigned dimension 6;
+	SCSIID byte unsigned;
+	PAD byte unsigned;
+	console_version byte dimension 256;
+end CONFIG;
+
+aggregate DSRDB_INFO structure prefix "" tag "";
+	smm		longword ;
+	lurt		longword dimension 9;
+        name		ADDRESS (byte);  
+end DSRDB_INFO;
+
+aggregate CONSOLE_NVRAM structure prefix "" tag "";
+   m_psec_per_cycle byte unsigned;
+   l_psec_per_cycle byte unsigned;
+   psec_checksum byte unsigned;
+   unused_1 byte unsigned;
+   wr13_uart byte unsigned;
+   wr12_uart byte unsigned;
+   uart_checksum byte unsigned;
+   clk_multiplier byte unsigned;
+   m_halt_at_srom_flag byte unsigned;
+   l_halt_at_srom_flag byte unsigned;
+   unused_2 byte unsigned;
+   unused_3 byte unsigned;
+   unused_4 longword unsigned;
+   fastboot_flag longword unsigned;
+   p2_count longword unsigned;
+   chk_spare1 longword unsigned;
+   chk_spare2 longword unsigned;
+   chk_spare3 longword unsigned;
+   nvram_checksum longword unsigned;
+   test_spare longword unsigned;
+end CONSOLE_NVRAM;
+
+end_module;

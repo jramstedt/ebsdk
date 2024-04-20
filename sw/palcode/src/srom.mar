@@ -1,0 +1,102 @@
+;+
+; srom.mar
+;-
+	.title	"SROM"
+	.ident	"V1.2"
+;+
+; Last edit:	26-May-1998
+;-
+
+;+
+; "SROM" will be loaded at ^x780 in  memory.
+;
+; This SROM is for simulation purposes.
+;-
+
+;
+; Configuration options
+;
+.iif ndf ev6_p1, ev6_p1 = 0
+.iif ndf ev6_p2, ev6_p2 = 1
+
+.if ne ev6_p1
+	.iif ndf dcache_set_en, dcache_set_en = 1
+.iff
+	.iif ndf dcache_set_en, dcache_set_en = 3
+.endc
+
+ASSUME <ev6_p1+ev6_p2> eq 1
+
+;
+; EV6 exits hardware reset with FPE=1 and IC_EN=3.
+;
+; Initialize 80 retirator "done" status bits and mapper.
+; They must be initialized in the manner and order below.
+; NO SOURCES other than x31 may be used until
+; "mapper source enables" are turned on with a MTPR ITB_IA.
+;
+; On pass1, we maps only integer registers. On later passes,
+; we map integer and floating registers.
+;
+; For fault-reset and wake from sleep, this macro places
+; EXC_ADDR into r1.
+
+	INITIALIZE_RETIRATOR_AND_MAPPER
+
+;
+; Now enable and map the shadow registers. This might be in
+; SROM. It might be in PALcode. But it must be in this exact order.
+;
+
+	MAP_SHADOW_REGISTERS
+
+;
+; Now do the write many chain.
+;
+
+	INIT_WRITE_MANY
+
+;
+; Note that the SROM standard as of 25-Jan-1996 uses
+; r15 - r21 for information to be passed up to the PALcode.
+; Also, whami might be passed in r0.
+;
+; For now, pass signature 0xDECB in r19<31:16>.
+; And pass dc_ctl in r1.
+;
+; Then pass the write many chain in r1<15:16>.
+;
+; Now jump to palcode at ^x10000
+;
+.if ne ev6_p1
+	EV6__DC_CTL__INIT = -
+		<<dcache_set_en@EV6__DC_CTL__SET_EN__S> ! -
+		 <0@EV6__DC_CTL__DCTAG_PAR_EN__S> ! -
+		 <0@EV6__DC_CTL__DCDAT_ERR_EN__S>>
+.iff
+	EV6__DC_CTL__INIT = -
+		<<dcache_set_en@EV6__DC_CTL__SET_EN__S> ! -
+		 <1@EV6__DC_CTL__DCTAG_PAR_EN__S> ! -
+		 <1@EV6__DC_CTL__DCDAT_ERR_EN__S>>
+.endc
+
+paladdr = ^x10000
+
+	GET_32CONS r19,<^xDECB>, r31		; validation pattern
+	sll	r19, #16, r19			; stick in <31:16>
+
+	GET_16CONS r1, EV6__DC_CTL__INIT, r31	; dc_ctl value
+	hw_mtpr	r1, EV6__DC_CTL			; (6,0L) write it
+
+	lda	r2, ^xFFC1(r31)		; data<15:00> = 0xFFC1
+	ldah	r0, ^x7FFE(r31)		; data<31:16> = 0x7FFE
+	zap	r2, #^x0c,r2		; clear out bits <31:16>
+	bis	r2, r0, r2		; OR in bits <31:16>
+	sll	r2, #16, r2		; move into place
+	bis	r1, r2, r1		; OR into the dc_ctl parameter
+
+	ldah	r2, <paladdr+32768>@-16(r31)
+	lda	r2, <paladdr & ^xFFFF>(r2)
+	PVC_VIOLATE <29>
+	PVC_VIOLATE <1007>
+	jmp	r31, (r2)

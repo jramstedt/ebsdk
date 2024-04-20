@@ -1,0 +1,457 @@
+/*
+/* file: 	tlsb.sdl
+/*
+/* Copyright (C) 1992 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	TLSB required CSRs definition
+/*
+/* Author:	Chuck Olson
+/*
+/* Modifications:
+/*
+/*	kbr	06-Oct-1993	Fix DTYPE for ITIOP
+/*                              The ITIOP device type is defined as 2020 hex.
+/*
+/*      cto	22-Sep-1993	Add CWDE2 to TLBER
+/*
+/*      cto	13-Sep-1993	Add some TLESR masks, other
+/*				masks for error polling
+/*                                       
+/*      cto	21-Jul-1993	Remove duplicate defs
+/*                                       
+/*      djm	20-Jul-1993	Reworking file to new standard
+/*                                       
+/*	jpo	13-May-1993	TLMMR bit defs
+/*
+/*	jpo	10-May-1993	Update TLFADR and TLESRn regs
+/*
+/*	cto	 5-May-1993	Updates from updated TIOP spec (v0.6)
+/*
+/*	cto	18-Mar-1993	Separate from TLEP_TLSB.SDL (initial entry)
+/*				started by emp (Ernie).
+
+/*+
+/* TLSB required registers
+/*-
+
+Module TLSB;
+
+   /*
+   /* TLDEV - Device type register
+   /*
+   aggregate TLDEV union prefix TLDEV$ fill;
+         FIELD	structure prefix TLDEV$ fill;
+		DTYPE		bitfield length 16;	/* Device Type 
+		DREV		bitfield length 16;	/* Device Revision 
+		end FIELD;
+         REG	longword unsigned;
+   end TLDEV;
+
+
+   /*
+   /* TLBER - device error register
+   /* 
+   aggregate TLBER union prefix TLBER$ fill;
+         FIELD	structure prefix TLBER$ fill;
+	 	ATCE		bitfield mask;		/* Addr transmit check error
+		APE		bitfield mask;		/* Addr parity error
+		BBE		bitfield mask;		/* Bank Busy error
+		LKTO		bitfield mask;		/* Bank lock timeout (memory)
+		NAE		bitfield mask;		/* No Acknowledge error
+		RTCE		bitfield mask;		/* Request Transmit Check error
+		ACKTCE		bitfield mask;		/* Ack Transmit Check error
+		MMRE		bitfield mask;		/* Memory Mapping reg error
+		FNAE		bitfield mask;		/* Fatal No Acknowledge error
+		REQDE		bitfield mask;		/* Request deassertion error
+		ATDE		bitfield mask;		/* Address Trans During error
+		TLBER_Fill1	bitfield length 5 fill;	/* Reserved
+		UDE		bitfield mask;		/* Uncorrectable Data error
+		CWDE		bitfield mask;		/* Correctable Write Data error
+		CRDE		bitfield mask;		/* Correctable Read Data error
+		CWDE2		bitfield mask;		/* Second CWDE
+		DS0		bitfield mask;		/* Data Syndrome 0
+		DS1		bitfield mask;		/* Data Syndrome 1
+		DS2		bitfield mask;		/* Data Syndrome 2
+		DS3		bitfield mask;		/* Data Syndrome 3
+		DTDE 		bitfield mask;		/* Data Trans During error
+		FDTCE		bitfield mask;		/* Fatal Data Trans Chk Error
+		UACKE		bitfield mask;		/* Unexpected Acknowledge
+		ABTCE		bitfield mask;		/* Address Bus Trans Chk error
+		DCTCE		bitfield mask;		/* Data Control Trans Chk error
+		SEQE		bitfield mask;		/* Sequence error
+		DSE		bitfield mask;		/* Data Status error
+		DTO		bitfield mask;		/* Data Timeout
+		end FIELD;
+	REG	longword unsigned;
+   end TLBER;
+
+
+
+   /*
+   /* TLCNR - Configuration Register
+   /*
+   aggregate TLCNR union prefix TLCNR$ fill;
+         FIELD	structure prefix TLCNR$ fill;
+		CWDD		bitfield mask;		/* Cor Write Data error Int Dis
+		CRDD		bitfield mask;		/* Cor Read Data error Int Dis
+		TLCNR_fill1	bitfield mask;		/* Reserved
+		DTOD		bitfield mask;		/* Data Timeout Disable
+		NODE_ID		bitfield length 4;	/* Node ID (Physical)
+		VCNT		bitfield length 4;	/* Virtual Unit Count
+		STF_A		bitfield mask;		/* Self Test Fail 0
+		STF_B		bitfield mask;		/* Self Test Fail 1
+		TLCNR_fill2	bitfield length 6 fill;	/* Reserved
+		HALT_A		bitfield mask;		/* Halt CPU 0
+		HALT_B		bitfield mask;		/* Halt CPU 1
+		TLCNR_fill3	bitfield length 6 fill;	/* Reserved
+		RSTSTAT		bitfield mask;		/* Reset Status
+		TLCNR_fill4	bitfield mask;		/* Reserved
+		NRST		bitfield mask;		/* Node Reset
+		LOFE		bitfield mask;		/* Lock on First error
+		end FIELD;
+         REG	longword unsigned;
+   end TLCNR;
+
+
+   /*
+   /* TLVID - Virtual ID
+   /*
+   aggregate TLVID union prefix TLVID$ fill;
+         FIELD	structure prefix TLVID$ fill;
+		VID_A		bitfield length 4;	/* Virtual ID for CPU 0
+		VID_B		bitfield length 4;	/* Virtual ID for CPU 1
+		TLVID_fill1	bitfield length 24 fill;/* Reserved
+		end FIELD;
+         REG	longword unsigned;
+   end TLVID;
+
+                
+   /*
+   /* TLMMR - Memory Mapping
+   /*
+   aggregate TLMMR union prefix TLMMR$ fill;
+         FIELD	structure prefix TLMMR$ fill;
+		INTMASK		bitfield length 2;	/* Interleave Mask 
+		rsvd0		bitfield length 2;	/* reserved, MBZ 
+		ADRMASK		bitfield length 4;	/* Address mask
+		INTLV		bitfield length 3;	/* Lower bits used in compare
+		SBANK		bitfield mask;		/* Single Bank identifier
+		ADDRESS		bitfield length 14;	/* Bank Address cmp to <39:26>
+		rsvd1		bitfield length 5;	/* reserved, MBZ
+		VALID		bitfield mask;		/* Valid bit
+		end FIELD;
+         REG	longword unsigned;
+   end TLMMR;
+
+                
+   /*
+   /* TLFADR0 - Failing address
+   /*
+   aggregate TLFADR0 union prefix TLFADR0$ fill;
+         FIELD	structure prefix TLFADR0$ fill;
+		rsvd0		bitfield length 3 fill;
+		fadr31_3	bitfield mask length 29;
+		end FIELD;
+         REG	longword unsigned;
+   end TLFADR0;
+
+
+   /*
+   /* TLFADR1 - Failing address
+   /*
+   aggregate TLFADR1 union prefix TLFADR1$ fill;
+         FIELD	structure prefix TLFADR1$ fill;
+		FADR39_32	bitfield mask length 8; 
+		rsvd1		bitfield length 8 fill; 
+		FCMD		bitfield mask length 3; 
+		rsvd2		bitfield mask; 
+		FBANK 		bitfield mask length 4; 
+		ADRV		bitfield mask; 
+		CMDV		bitfield mask; 
+		BANKV		bitfield mask; 
+		rsvd3		bitfield length 5;	
+		end FIELD;
+         REG	longword unsigned;
+   end TLFADR1;
+
+
+   /*
+   /* TLESR - Error syndrome
+   /*
+   aggregate TLESR union prefix TLESR$ fill;
+         FIELD	structure prefix TLESR$ fill;
+		SYND0		bitfield mask length 8;
+		SYND1		bitfield mask length 8;
+		TDE		bitfield mask;
+		TCE		bitfield mask;
+		rsvd0		bitfield mask;
+		UECC		bitfield mask;
+		CWECC		bitfield mask;
+		CRECC		bitfield mask;
+		rsvd1		bitfield length 9 fill;
+		LOFSYN		bitfield mask;
+ 		end FIELD;
+         REG	longword unsigned;
+   end TLESR;
+
+   /*
+   /* TLILID - Interrupt Level ID
+   /*
+   aggregate TLILID union prefix TLILID$ fill;
+         REG	longword unsigned;
+   end TLILID;
+
+
+   /*
+   /* TLCPUMASK - CPU interrupt mask
+   /*
+   aggregate TLCPUMASK union prefix TLCPUMASK$ fill;
+         REG	longword unsigned;
+   end TLCPUMASK;
+
+
+   /*
+   /* TLMBPR - Mailbox pointer register
+   /*
+   aggregate TLMBPR union prefix TLMBPR$ fill;
+         REG	longword unsigned;
+   end TLMBPR;
+
+   /*
+   /* RMRR  - Reflective memory range register
+   /*
+   aggregate RMRR  union prefix RMRR$ fill;
+         FIELD	structure prefix RMRR$ fill;
+		MASK		bitfield length 4;  /* Extent Mask 
+		INTE		bitfield mask;	/* Interleave Enable
+		RAZ		bitfield length 3;
+		BASEA		bitfield length 20; /* Base address
+		RAZ1		bitfield length 3;
+		V		bitfield mask;	/* Valid bit
+		end FIELD;
+         REG	longword unsigned;
+   end RMRR;
+
+
+aggregate TLSB structure	prefix TLSB_	fill;
+  TLDEV TLDEV;  
+  fill1 		longword dimension 15 fill;
+  TLBER TLBER;
+  fill2 		longword dimension 15 fill;
+  TLCNR TLCNR;
+  fill2A		longword dimension 15 fill;
+  TLVID TLVID;
+  fill3 		longword dimension 79 fill;
+  TLMMR0 TLMMR;
+  fill4 		longword dimension 15 fill;
+  TLMMR1 TLMMR;
+  fill5 		longword dimension 15 fill;
+  TLMMR2 TLMMR;
+  fill6 		longword dimension 15 fill;
+  TLMMR3 TLMMR;
+  fill7 		longword dimension 15 fill;
+  TLMMR4 TLMMR;
+  fill8 		longword dimension 15 fill;
+  TLMMR5 TLMMR;
+  fill9 		longword dimension 15 fill;
+  TLMMR6 TLMMR;
+  fill10 		longword dimension 15 fill;
+  TLMMR7 TLMMR;
+  fill10A		longword dimension 143 fill;
+  TLFADR0 TLFADR0;
+  fill10B		longword dimension 15 fill;
+  TLFADR1 TLFADR1;
+  fill11 		longword dimension 15 fill;
+  TLESR0 TLESR;
+  fill12 		longword dimension 15 fill;
+  TLESR1 TLESR;
+  fill13 		longword dimension 15 fill;
+  TLESR2 TLESR;
+  fill14 		longword dimension 15 fill;
+  TLESR3 TLESR;
+  fill15		longword dimension 175 fill;
+  TLILID0 TLILID;
+  fill16		longword dimension 15 fill;
+  TLILID1 TLILID;
+  fill17		longword dimension 15 fill;
+  TLILID2 TLILID;
+  fill18		longword dimension 15 fill;
+  TLILID3 TLILID;
+  fill19		longword dimension 15 fill;
+  TLCPUMASK  TLCPUMASK;
+  fill20		longword dimension 63 fill;
+  TLMBPR  TLMBPR;
+  fill21		longword dimension 1151 fill;
+  RMRR0A  RMRR;
+  fill22		longword dimension 15 fill;
+  RMRR0B  RMRR;
+  fill23		longword dimension 15 fill;
+  RMRR1A  RMRR;
+  fill24		longword dimension 15 fill;
+  RMRR1B  RMRR;
+  
+end TLSB;
+
+
+
+/*
+/*#define tlsb_r_tldev TLSB_R_TLDEV.TLDEV$L_REG
+/*#define tlsb_v_tldev TLSB_R_TLDEV.TLDEV$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlber	TLSB_R_TLBER.TLBER$L_REG
+/*#define tlsb_v_tlber	TLSB_R_TLBER.TLBER$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlcnr	TLSB_R_TLCNR.TLCNR$L_REG  
+/*#define tlsb_v_tlcnr	TLSB_R_TLCNR.TLCNR$R_FIELD
+/*                                       
+/*
+/*#define tlsb_r_tlvid	TLSB_R_TLVID.TLVID$L_REG  
+/*#define tlsb_v_tlvid	TLSB_R_TLVID.TLVID$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlmmr0	TLSB_R_TLMMR0.TLMMR$L_REG   
+/*#define tlsb_v_tlmmr0	TLSB_R_TLMMR0.TLMMR$R_FIELD      
+/*
+/*
+/*#define tlsb_r_tlmmr1	TLSB_R_TLMMR1.TLMMR$L_REG   
+/*#define tlsb_v_tlmmr1	TLSB_R_TLMMR1.TLMMR$R_FIELD      
+/*
+/*
+/*#define tlsb_r_tlmmr2	TLSB_R_TLMMR2.TLMMR$L_REG   
+/*#define tlsb_v_tlmmr2	TLSB_R_TLMMR2.TLMMR$R_FIELD       
+/*
+/*
+/*#define tlsb_r_tlmmr3	TLSB_R_TLMMR3.TLMMR$L_REG    
+/*#define tlsb_v_tlmmr3	TLSB_R_TLMMR3.TLMMR$R_FIELD      
+/*
+/*
+/*#define tlsb_r_tlmmr4	TLSB_R_TLMMR4.TLMMR$L_REG   
+/*#define tlsb_v_tlmmr4	TLSB_R_TLMMR4.TLMMR$R_FIELD      
+/*
+/*
+/*#define tlsb_r_tlmmr5	TLSB_R_TLMMR5.TLMMR$L_REG   
+/*#define tlsb_v_tlmmr5	TLSB_R_TLMMR5.TLMMR$R_FIELD      
+/*
+/*
+/*#define tlsb_r_tlmmr6	TLSB_R_TLMMR6.TLMMR$L_REG   
+/*#define tlsb_v_tlmmr6	TLSB_R_TLMMR6.TLMMR$R_FIELD      
+/*
+/*
+/*#define tlsb_r_tlmmr7	TLSB_R_TLMMR7.TLMMR$L_REG   
+/*#define tlsb_v_tlmmr7	TLSB_R_TLMMR7.TLMMR$R_FIELD      
+/*
+/*
+/*#define tlsb_r_tlfadr0	TLSB_R_TLFADR0.TLFADR0$L_REG
+/*#define tlsb_v_tlfadr0	TLSB_R_TLFADR0.TLFADR0$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlfadr1 TLSB_R_TLFADR1.TLFADR1$L_REG
+/*#define tlsb_v_tlfadr1 TLSB_R_TLFADR1.TLFADR1$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlesr0	TLSB_R_TLESR0.TLESR$L_REG
+/*#define tlsb_v_tlesr0	TLSB_R_TLESR0.TLESR$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlesr1	TLSB_R_TLESR1.TLESR$L_REG
+/*#define tlsb_v_tlesr1	TLSB_R_TLESR1.TLESR$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlesr2	TLSB_R_TLESR2.TLESR$L_REG
+/*#define tlsb_v_tlesr2	TLSB_R_TLESR2.TLESR$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlesr3	TLSB_R_TLESR3.TLESR$L_REG
+/*#define tlsb_v_tlesr3	TLSB_R_TLESR3.TLESR$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlilid0 TLSB_R_TLILID0.TLILID$L_REG
+/*#define tlsb_v_tlilid0 TLSB_R_TLILID0.TLILID$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlilid1 TLSB_R_TLILID1.TLILID$L_REG
+/*#define tlsb_v_tlilid1 TLSB_R_TLILID1.TLILID$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlilid2 TLSB_R_TLILID2.TLILID$L_REG
+/*#define tlsb_v_tlilid2 TLSB_R_TLILID2.TLILID$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlilid3 TLSB_R_TLILID3.TLILID$L_REG
+/*#define tlsb_v_tlilid3 TLSB_R_TLILID3.TLILID$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlcpumask TLSB_R_TLCPUMASK.TLCPUMASK$L_REG
+/*#define tlsb_v_tlcpumask TLSB_R_TLCPUMASK.TLCPUMASK$R_FIELD
+/*
+/*
+/*#define tlsb_r_tlmbpr TLSB_R_TLMBPR.TLMBPR$L_REG
+/*#define tlsb_v_tlmbpr TLSB_R_TLMBPR.TLMBPR$R_FIELD
+/*
+/*
+/*#define tlsb_r_rmrr0a TLSB_R_RMRR0A.RMRR$L_REG
+/*#define tlsb_v_rmrr0a TLSB_R_RMRR0A.RMRR$R_FIELD
+/*
+/*
+/*#define tlsb_r_rmrr0b TLSB_R_RMRR0B.RMRR$L_REG
+/*#define tlsb_v_rmrr0b TLSB_R_RMRR0B.RMRR$R_FIELD
+/*
+/*
+/*#define tlsb_r_rmrr1a TLSB_R_RMRR1A.RMRR$L_REG
+/*#define tlsb_v_rmrr1a TLSB_R_RMRR1A.RMRR$R_FIELD
+/*
+/*
+/*#define tlsb_r_rmrr1b TLSB_R_RMRR1B.RMRR$L_REG
+/*#define tlsb_v_rmrr1b TLSB_R_RMRR1B.RMRR$R_FIELD
+/*
+
+/* Valid error bits to use for polling errors
+/*#define TLBER$M_ERRS	~(TLBER$M_DS0|TLBER$M_DS1|TLBER$M_DS2|TLBER$M_DS3)
+/* This is for TLESR$M_LOFSYN 0x80000000
+/*#define TLESR$M_ERRS	(~(0x80000000|TLESR$M_SYND0|TLESR$M_SYND1))
+/*#define TLFADR$M_ERRS (TLFADR1$M_ADRV|TLFADR1$M_CMDV|TLFADR1$M_BANKV)
+
+
+
+/* Known device type codes for TurboLaser in XDEV_DTYPE
+constant DTYPE_CPU equals %x8000 prefix TLSB$;		/* generic cpu
+constant DTYPE_TLEP1 equals %x8010 prefix TLSB$;
+constant DTYPE_TLEP4 equals %x8011 prefix TLSB$;
+constant DTYPE_TLEP16 equals %x8012 prefix TLSB$;
+constant DTYPE_TLEP1D equals %x8013 prefix TLSB$;
+constant DTYPE_TLEP4D equals %x8014 prefix TLSB$;
+constant DTYPE_TLEP16D equals %x8015 prefix TLSB$;
+constant DTYPE_TLEPTL6 equals %x8024 prefix TLSB$;
+constant DTYPE_TLEPTL6D equals %x8025 prefix TLSB$;
+constant DTYPE_TLEPTL67 equals %x8026 prefix TLSB$;
+constant DTYPE_TLEPTL67D equals %x8027 prefix TLSB$;
+
+constant DTYPE_MIC equals %x5000 prefix TLSB$;
+constant DTYPE_TLMEM equals %x5000 prefix TLSB$;
+constant DTYPE_4GBMEM equals %x5800 prefix TLSB$;
+constant DTYPE_BBM equals %x4400 prefix TLSB$;
+constant DTYPE_TIOP equals %x2000 prefix TLSB$;
+constant DTYPE_ITIOP equals %x2020 prefix TLSB$;
+constant CSR_SPACE equals %x88000000 prefix TLSB$;
+constant CSR_PRIV equals %x1000 prefix TLSB$;
+
+end_module TLSB;

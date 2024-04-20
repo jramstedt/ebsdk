@@ -1,0 +1,23 @@
+echo "Testing ZLXp"
+while (true) 
+do 
+tgatest init e
+tgatest simz 
+tgatest reg 
+tgatest int 
+tgatest plane 
+tgatest pshift 
+tgatest vram 
+tgatest line 
+tgatest line -dz
+tgatest bool 
+tgatest stip 
+tgatest copy 
+tgatest pack 
+tgatest vdac 
+tgatest box 
+tgatest patt 
+tgatest stereo
+tgatest font
+sleep 1
+done;   

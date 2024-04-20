@@ -1,0 +1,156 @@
+; ********************************************************************************************************************************
+;  Created: 21-AUG-2000 16:04:43 by OpenVMS SDL EV1-31     
+;  Source:  20-MAR-2000 16:23:09 NIGHTRIDER:[CONSOLE.V58.COMMON.SRC]EV_DEF.SDL;1 
+; ********************************************************************************************************************************
+;  file:	ev_def.sdl
+; 
+;  Copyright (C) 1990 by
+;  Digital Equipment Corporation, Maynard, Massachusetts.
+;  All rights reserved.
+; 
+;  This software is furnished under a license and may be used and copied
+;  only  in  accordance  of  the  terms  of  such  license  and with the
+;  inclusion of the above copyright notice. This software or  any  other
+;  copies thereof may not be provided or otherwise made available to any
+;  other person.  No title to and  ownership of the  software is  hereby
+;  transferred.
+; 
+;  The information in this software is  subject to change without notice
+;  and  should  not  be  construed  as a commitment by digital equipment
+;  corporation.
+; 
+;  Digital assumes no responsibility for the use  or  reliability of its
+;  software on equipment which is not supplied by digital.
+; 
+; 
+;  Abstract:	Environment Variable data structure definitions for
+; 		Alpha firmware.
+; 
+;  Authors:	David Mayo
+; 		jds - Jim Sawin
+; 
+;  Modifications:
+; 
+; 	jrk	29-Apr-1998	Removed saved_value string.
+; 	jds	23-May-1991	Added NOMALLOC option defs for ev_write.
+; 	phk	08-May-1991	Split the action field in wr_ & rd_action fields
+; 	dtm	14-Feb-1991	Add EVNODE size field and SRM/UNUSED attributes
+; 	dtm	20-Dec-1990	Add default value field
+; 	dtm	12-Oct-1990	Add ev attributes and validation table formats
+; 	dtm	30-Jul-1990	Initial entry.
+; 
+ 
+	.MACRO	$evdef,..EQU=<=>,..COL=<:>
+EV_NAME_LEN'..equ'32                    ;  max size of an identifier
+EV_VALUE_LEN'..equ'256                  ;  max size of a value + save_value + 2
+EV$K_STRING'..equ'0
+EV$K_INTEGER'..equ'1
+EV$K_LOCAL'..equ'0
+EV$K_GLOBAL'..equ'2
+EV$K_VOLATILE'..equ'0
+EV$K_NONVOLATILE'..equ'4
+EV$K_READ'..equ'0
+EV$K_NOREAD'..equ'8
+EV$K_WRITE'..equ'0
+EV$K_NOWRITE'..equ'16
+EV$K_DELETE'..equ'0
+EV$K_NODELETE'..equ'32
+EV$K_SYSTEM'..equ'0
+EV$K_USER'..equ'64
+EV$K_TABLE'..equ'0
+EV$K_ROUTINE'..equ'128
+EV$K_DEF_STRING'..equ'0
+EV$K_DEF_INTEGER'..equ'256
+EV$K_USER_DEF'..equ'0
+EV$K_SRM_DEF'..equ'512
+EV$K_IN_USE'..equ'0
+EV$K_UNUSED'..equ'1024
+EV$K_MALLOC'..equ'0
+EV$K_NOMALLOC'..equ'2048
+EV$K_UNMODIFIED'..equ'0
+EV$K_MODIFIED'..equ'4096
+EV$K_ARC'..equ'8192
+EV$M_TYPE'..equ'^X1
+EV$M_CLASS'..equ'^X2
+EV$M_VOLATILE'..equ'^X4
+EV$M_READ'..equ'^X8
+EV$M_WRITE'..equ'^X10
+EV$M_DELETE'..equ'^X20
+EV$M_USER'..equ'^X40
+EV$M_VALIDATE'..equ'^X80
+EV$M_DEFAULT'..equ'^X100
+EV$M_SRM'..equ'^X200
+EV$M_UNUSED'..equ'^X400
+EV$M_NOMALLOC'..equ'^X800
+EV$M_MODIFIED'..equ'^X1000
+EV$M_ARC'..equ'^X2000
+EV$S_EV_OPTIONS'..equ'2
+EV_OPTIONS'..equ'0
+EV$V_TYPE'..equ'0
+EV$V_CLASS'..equ'1
+EV$V_VOLATILE'..equ'2
+EV$V_READ'..equ'3
+EV$V_WRITE'..equ'4
+EV$V_DELETE'..equ'5
+EV$V_USER'..equ'6
+EV$V_VALIDATE'..equ'7
+EV$V_DEFAULT'..equ'8
+EV$V_SRM'..equ'9
+EV$V_UNUSED'..equ'10
+EV$V_NOMALLOC'..equ'11
+EV$V_MODIFIED'..equ'12
+EV$V_ARC'..equ'13
+; 
+;  Structure of a predefined environment variable table entry
+; 
+S_env_table'..equ'28
+env_table'..equ'0
+ev_name'..equ'0                         ;  pointer to parameter name
+ev_value'..equ'4                        ;  pointer to parameter value
+ev_options'..equ'8                      ;  environment variable attributes
+validate'..equ'12                       ;  code associated with value
+ev_wr_action'..equ'16                   ;  address of action routine
+ev_rd_action'..equ'20                   ;  address of action routine
+ev_init'..equ'24                        ;  address of init routine
+; 
+;  Structure of a predefined environment variable validation table
+; 
+;  ajbfix:  we shouldn't rely on hard coded abbreviations, let the program
+;  figure it out!!!!
+S_set_param_table'..equ'8
+set_param_table'..equ'0
+param'..equ'0                           ;  pointer to parmeter value name
+code'..equ'4                            ;  code associated with value
+; 
+;  Structure of an environment variable entry
+; 
+S_EVNODE'..equ'320
+EVNODE'..equ'0
+flink'..equ'0                           ;  linked list flink
+blink'..equ'4                           ;  linked list blink
+S_name'..equ'32
+name'..equ'8                            ;  variable name
+attributes'..equ'40                     ;  EV attributes field
+S_validate'..equ'4
+validate'..equ'44                       ;  union of validate entries
+table'..equ'44                          ;  table of valid entries
+routine'..equ'44                        ;  routine to validate entries
+wr_action'..equ'48                      ;  EV action routine
+rd_action'..equ'52                      ;  EV action routine
+misc'..equ'56                           ;  miscellaneous field
+size'..equ'60                           ;  length of value field
+S_value'..equ'256
+value'..equ'64                          ;  union of values
+S_string'..equ'256
+string'..equ'64
+integer'..equ'64
+EV$K_LENGTH'..equ'256
+EV$L_SIZE'..equ'60
+EV$L_ATTRIBUTES'..equ'40
+EV$R_VALUE'..equ'64
+S_evar_table'..equ'36
+evar_table'..equ'0
+S_name'..equ'32
+name'..equ'0                            ;  variable name
+var'..equ'32                            ;  pointer to input param value
+	.ENDM

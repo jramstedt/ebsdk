@@ -1,0 +1,89 @@
+; ********************************************************************************************************************************
+;  Created: 21-AUG-2000 16:04:28 by OpenVMS SDL EV1-31     
+;  Source:  30-NOV-1999 10:38:03 NIGHTRIDER:[CONSOLE.V58.COMMON.SRC]EV6_PC264_PA 
+; ********************************************************************************************************************************
+;  file:     	ev6_pc264_pal_defs.sdl	
+; 
+;  History:	
+; 	E. Goehl	5-Oct-1996 	Port of ev5_eb164_paldef.sdl
+;                                   
+;  Abstract:	Cserve defintions  for
+; 		the ev6 PAlcode on PC264 .....
+; 
+; 
+ 
+	.MACRO	$pal_def,..EQU=<=>,..COL=<:>
+PAL$CPU0_START_BASE'..equ'256
+PAL$CPU1_START_BASE'..equ'264
+PAL$PRIMARY'..equ'512
+PAL$CALLBACK'..equ'528
+PAL$HALT_SWITCH_IN'..equ'544
+PAL$HWRPB_BASE'..equ'8192
+PAL$IMPURE_BASE'..equ'16384
+PAL$IMPURE_COMMON_SIZE'..equ'512
+PAL$IMPURE_SPECIFIC_SIZE'..equ'1536
+PAL__IMPURE_BASE'..equ'16384
+PAL__IMPURE_COMMON_SIZE'..equ'512
+PAL__IMPURE_SPECIFIC_SIZE'..equ'1536
+PAL$LOGOUT_BASE'..equ'24576
+PAL$LOGOUT_SPECIFIC_SIZE'..equ'1024
+PAL$TEMPS_BASE'..equ'28672
+PAL$TEMPS_SPECIFIC_SIZE'..equ'512
+PAL__TEMPS_BASE'..equ'28672
+PAL__TEMPS_SPECIFIC_SIZE'..equ'512
+PAL$PAL_BASE'..equ'32768
+PAL$OSFPAL_BASE'..equ'98304
+PAL$CONSOLE_BASE'..equ'147456
+PAL$PAL_SIZE'..equ'65536
+PAL$OSFPAL_SIZE'..equ'49152
+PAL__PAL_BASE'..equ'32768
+PAL__OSFPAL_BASE'..equ'98304
+PAL__CONSOLE_BASE'..equ'147456
+;  
+;  DEFINE ADDRESSES OF LOCATIONS IN THE IMPURE 
+;  COMMON AREA. ASSUMES BASE AT 0X4000 AND LOCATIONS 
+;  STARTING AT 0X100. 
+PAL$EVMSVERSION'..equ'16640
+PAL$EVMSBUILD_BITMASK'..equ'16648
+PAL$OSFVERSION'..equ'16656
+PAL$ENTER_CONSOLE_PTR'..equ'16704
+PAL$ENTER_OSF'..equ'16768
+PAL__ENTER_OSF'..equ'16768
+;    
+;   DEFINE DEVICE INTERRUPT IRQ(S) AS A MASK IN ISUM<EI> FIELD  
+;                          
+IRQ_DEV__M'..equ'2                      ;  IRQ1 
+IMPURE$PCB_OFFSET'..equ'16
+IMPURE$PROF_OFFSET'..equ'64
+IMPURE$QUILT_OFFSET'..equ'64
+IMPURE$UART_OFFSET'..equ'112
+IMPURE$CPU_TYPE_OFFSET'..equ'128
+MP$RESTART'..equ'1
+MP$HALT'..equ'2
+MP$CONTROL_P'..equ'3
+MP$BREAK'..equ'4
+	.ENDM
+; =======================
+;  Define cserve funtions
+; =======================
+ 
+	.MACRO	$cserve_def,..EQU=<=>,..COL=<:>
+CSERVE$SET_HWE'..equ'8
+CSERVE$CLEAR_HWE'..equ'9
+CSERVE$LDLP'..equ'16
+CSERVE$STLP'..equ'17
+CSERVE$LDBP'..equ'18
+CSERVE$STBP'..equ'19
+CSERVE$HALT'..equ'64
+CSERVE$WHAMI'..equ'65
+CSERVE$START'..equ'66
+CSERVE$CALLBACK'..equ'67
+CSERVE$MTPR_EXC_ADDR'..equ'68
+CSERVE$JUMP_TO_ARC'..equ'69
+CSERVE$IIC_WRITE'..equ'70
+CSERVE$SROM_WRITE'..equ'71
+CSERVE$SROM_INIT'..equ'72
+CSERVE$MP_WORK_REQUEST'..equ'101
+CSERVE__START'..equ'66
+CSERVE__CALLBACK'..equ'67
+	.ENDM

@@ -1,0 +1,104 @@
+/* file:     	ev6_pc264_pal_defs.sdl	
+/*
+/* History:	
+/*	E. Goehl	5-Oct-1996 	Port of ev5_eb164_paldef.sdl
+/*                                  
+/* Abstract:	Cserve defintions  for
+/*		the ev6 PAlcode on PC264 .....
+/*
+/*
+{*	To convert to macro:                                                                      
+{*      SDL/LANGUAGE=MACRO/COPYRIGHT/LIST ev6_pc264_pal_defs.sdl
+{*                                                           
+module	$pal_def;                        
+
+constant PAL$CPU0_START_BASE			equals %x100;
+constant PAL$CPU1_START_BASE			equals %x108;
+constant PAL$PRIMARY                            equals %x200; 
+constant PAL$CALLBACK                           equals %x210; 
+constant PAL$HALT_SWITCH_IN			equals %x220;
+   
+constant PAL$HWRPB_BASE			       	equals %x2000;
+
+constant PAL$IMPURE_BASE			equals %x4000;
+constant PAL$IMPURE_COMMON_SIZE			equals %x200;
+constant PAL$IMPURE_SPECIFIC_SIZE	    	equals %x600;
+constant PAL__IMPURE_BASE	       		equals PAL$IMPURE_BASE;
+constant PAL__IMPURE_COMMON_SIZE	   	equals PAL$IMPURE_COMMON_SIZE;
+constant PAL__IMPURE_SPECIFIC_SIZE	    	equals PAL$IMPURE_SPECIFIC_SIZE;
+
+constant PAL$LOGOUT_BASE			equals %x6000;
+constant PAL$LOGOUT_SPECIFIC_SIZE		equals %x400;
+
+constant PAL$TEMPS_BASE				equals %x7000;
+constant PAL$TEMPS_SPECIFIC_SIZE		equals %x200;
+constant PAL__TEMPS_BASE			equals PAL$TEMPS_BASE;
+constant PAL__TEMPS_SPECIFIC_SIZE		equals PAL$TEMPS_SPECIFIC_SIZE;
+                                              
+constant PAL$PAL_BASE				equals %x8000;
+constant PAL$OSFPAL_BASE		 	equals %x18000;
+constant PAL$CONSOLE_BASE		       	equals %x24000;
+
+constant PAL$PAL_SIZE				equals PAL$OSFPAL_BASE - PAL$PAL_BASE;
+constant PAL$OSFPAL_SIZE			equals PAL$CONSOLE_BASE - PAL$OSFPAL_BASE;
+
+constant PAL__PAL_BASE			       	equals PAL$PAL_BASE;
+constant PAL__OSFPAL_BASE		 	equals PAL$OSFPAL_BASE;
+constant PAL__CONSOLE_BASE			equals PAL$CONSOLE_BASE;
+                                                               
+/* 
+/* DEFINE ADDRESSES OF LOCATIONS IN THE IMPURE 
+/* COMMON AREA. ASSUMES BASE AT 0X4000 AND LOCATIONS 
+/* STARTING AT 0X100. 
+                 
+constant PAL$EVMSVERSION			equals PAL$IMPURE_BASE + %x100;
+constant PAL$EVMSBUILD_BITMASK			equals PAL$IMPURE_BASE + %x108;
+constant PAL$OSFVERSION				equals PAL$IMPURE_BASE + %x110;
+constant PAL$ENTER_CONSOLE_PTR			equals PAL$IMPURE_BASE + %x140;
+constant PAL$ENTER_OSF         			equals PAL$IMPURE_BASE + %x180;
+constant PAL__ENTER_OSF         		equals PAL$ENTER_OSF;
+ 
+/*   
+/*  DEFINE DEVICE INTERRUPT IRQ(S) AS A MASK IN ISUM<EI> FIELD  
+/*                         
+
+constant IRQ_DEV__M 				equals %x2;	/* IRQ1 
+                                                             
+ 
+constant IMPURE$PCB_OFFSET			equals %x10;
+constant IMPURE$PROF_OFFSET			equals %x40;
+constant IMPURE$QUILT_OFFSET			equals %x40;
+constant IMPURE$UART_OFFSET			equals %x70;
+constant IMPURE$CPU_TYPE_OFFSET			equals %x80;
+
+constant MP$RESTART				equals 1;
+constant MP$HALT				equals 2;
+constant MP$CONTROL_P				equals 3;
+constant MP$BREAK				equals 4;
+
+end_module $pal_def;
+
+  /*=======================
+  /* Define cserve funtions
+  /*=======================
+module $cserve_def;
+            
+constant CSERVE$SET_HWE				equals 8;
+constant CSERVE$CLEAR_HWE			equals 9;
+constant CSERVE$LDLP				equals 16;
+constant CSERVE$STLP				equals 17;
+constant CSERVE$LDBP				equals 18;
+constant CSERVE$STBP				equals 19;
+constant CSERVE$HALT				equals 64;
+constant CSERVE$WHAMI				equals 65;
+constant CSERVE$START				equals 66;
+constant CSERVE$CALLBACK			equals 67;
+constant CSERVE$MTPR_EXC_ADDR			equals 68;
+constant CSERVE$JUMP_TO_ARC			equals 69;
+constant CSERVE$IIC_WRITE 			equals 70;
+constant CSERVE$MP_WORK_REQUEST			equals 101;
+
+constant CSERVE__START				equals CSERVE$START;            
+constant CSERVE__CALLBACK			equals CSERVE$CALLBACK;
+
+end_module $cserve_def;

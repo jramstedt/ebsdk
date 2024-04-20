@@ -1,0 +1,481 @@
+;
+; Copyright (C) 1990 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by Digital Equipment
+; Corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by Digital.
+;
+;
+; Abstract:	NCR53C810 script macros
+;
+; Author:	Stephen F. Shirron
+;
+; Modifications:
+;
+;	sfs	06-Jun-1990	Initial entry.
+;
+
+.macro	begin	port
+ok = 0
+scsi = 1
+dssi = 2
+selected = 3
+reselected = 4
+timeout = 5
+busy = 6
+got_msg_in = 7
+dat_out_done = 8
+dat_in_done = 9
+err101 = 101
+err102 = 102
+err103 = 103
+err104 = 104
+err105 = 105
+err106 = 106
+err107 = 107
+err108 = 108
+err109 = 109
+err110 = 110
+err111 = 111
+err112 = 112
+err113 = 113
+err114 = 114
+err115 = 115
+err116 = 116
+err117 = 117
+err118 = 118
+err119 = 119
+.psect	'port'_patches,long,noexe
+'port'_patches::
+.psect	'port'_csr_patches,long,noexe
+'port'_csr_patches::
+.psect	'port'_scripts,quad,noexe
+'port'_scripts::
+$$$script_base = .
+.macro	.patches_psect
+.psect	'port'_patches,long,noexe
+.endm
+.macro	.csr_patches_psect
+.psect	'port'_csr_patches,long,noexe
+.endm
+.endm
+
+.macro	end	port
+.align	quad
+'port'_scripts_size == . - 'port'_scripts
+.psect	'port'_patches
+.align	long
+'port'_patches_size == < . - 'port'_patches > / 4
+.psect	'port'_csr_patches
+.align	long
+'port'_csr_patches_size == < . - 'port'_csr_patches > / 4
+.endm
+
+.macro	movi	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x78
+	.long	0
+.endm
+
+.macro	ori	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x7a
+	.long	0
+.endm
+
+.macro	andi	a,b
+	.byte	^x00
+	.byte	<'a' & ^xff>
+	.byte	'b'
+	.byte	^x7c
+	.long	0
+.endm
+
+.macro	bisi	a,b
+	ori	<a>,<b>
+.endm
+
+.macro	bici	a,b
+	andi	<^c<a>>,<b>
+.endm
+
+.macro	addi	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x7e
+	.long	0
+.endm
+
+.macro	movt	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x70
+	.long	0
+.endm
+
+.macro	ort	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x72
+	.long	0
+.endm
+
+.macro	andt	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x74
+	.long	0
+.endm
+
+.macro	bist	a,b
+	ort	<a>,<b>
+.endm
+
+.macro	bict	a,b
+	andt	<^c<a>>,<b>
+.endm
+
+.macro	addt	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x76
+	.long	0
+.endm
+
+.macro	movf	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x68
+	.long	0
+.endm
+
+.macro	orf	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x6a
+	.long	0
+.endm
+
+.macro	andf	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x6c
+	.long	0
+.endm
+
+.macro	bisf	a,b
+	orf	<a>,<b>
+.endm
+
+.macro	bicf	a,b
+	andf	<^c<a>>,<b>
+.endm
+
+.macro	addf	a,b
+	.byte	^x00
+	.byte	'a'
+	.byte	'b'
+	.byte	^x6e
+	.long	0
+.endm
+
+.macro	and	p1,p2,p3
+.if idn <p1> <sfbr>
+	andf	<p2>,<p3>
+.iff
+.if idn <p3> <sfbr>
+	andt	<p1>,<p2>
+.iff
+.if b <p3>
+	andi	<p1>,<p2>
+.iff
+.error
+.endc
+.endc
+.endc
+.endm
+
+.macro	or	p1,p2,p3
+.if idn <p1> <sfbr>
+	orf	<p2>,<p3>
+.iff
+.if idn <p3> <sfbr>
+	ort	<p1>,<p2>
+.iff
+.if b <p3>
+	ori	<p1>,<p2>
+.iff
+.error
+.endc
+.endc
+.endc
+.endm
+
+.macro	bis	p1,p2,p3
+.if idn <p1> <sfbr>
+	bisf	<p2>,<p3>
+.iff
+.if idn <p3> <sfbr>
+	bist	<p1>,<p2>
+.iff
+.if b <p3>
+	bisi	<p1>,<p2>
+.iff
+.error
+.endc
+.endc
+.endc
+.endm
+
+.macro	bic	p1,p2,p3
+.if idn <p1> <sfbr>
+	bicf	<p2>,<p3>
+.iff
+.if idn <p3> <sfbr>
+	bict	<p1>,<p2>
+.iff
+.if b <p3>
+	bici	<p1>,<p2>
+.iff
+.error
+.endc
+.endc
+.endc
+.endm
+
+.macro	mov	src,dst
+.if idn <src> <sfbr>
+	orf	0,<dst>
+.iff
+.if idn <dst> <sfbr>
+	ort	0,<src>
+.iff
+.if idn <%extract(0,5,src)> <n810$>
+.if idn <%extract(0,5,dst)> <n810$>
+	movr	<src>,sfbr
+	movr	sfbr,<dst>
+.iff
+.error
+.endc
+.iff
+	movi	<src>,<dst>
+.endc
+.endc
+.endc
+.endm
+
+.macro	cop	n,src,dst
+	.long	0 -
+		! < 'n' @ n810$v_mm_byte_count > -
+		! < n810$k_mm @ n810$v_mm_type >
+.if idn <%extract(0,5,src)> <n810$>
+$$$p = .
+.save_psect
+.csr_patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'src'
+.iff
+$$$p = .
+.save_psect
+.patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'src'-$$$script_base
+.endc
+.if idn <%extract(0,5,dst)> <n810$>
+$$$p = .
+.save_psect
+.csr_patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'dst'
+.iff
+$$$p = .
+.save_psect
+.patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'dst'-$$$script_base
+.endc
+.endm
+
+.macro	sel	wait,atn,resel
+$$$a = <n810$k_sel@n810$v_io_opcode>
+.if idn <wait> <yes>
+$$$a = <n810$k_wait_sel@n810$v_io_opcode>
+.endc
+$$$b = 0
+.if idn <atn> <yes>
+$$$b = n810$m_io_watn
+.endc
+	.long	$$$a ! $$$b -
+		! < n810$k_io @ n810$v_io_type >
+$$$p = .
+.save_psect
+.patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'resel'-$$$script_base
+.endm
+
+.macro	disc	wait
+$$$a = <n810$k_disc@n810$v_io_opcode>
+.if idn <wait> <yes>
+$$$a = <n810$k_wait_disc@n810$v_io_opcode>
+.endc
+	.long	$$$a -
+		! < n810$k_io @ n810$v_io_type >
+	.long	0
+.endm
+
+.macro	jmp	to,wait,phase,data,mask,sense
+$$$a = 0
+.if idn <wait> <yes>
+$$$a = n810$m_tc_wait
+.endc
+$$$b = 0
+.if nb <phase>
+$$$b = <n810$k_'phase'@n810$v_tc_phase>!n810$m_tc_cmp_phase
+.endc
+$$$c = 0
+.if nb <data>
+$$$c = <'data'@n810$v_tc_data>!<'mask'@n810$v_tc_mask>!n810$m_tc_cmp_data
+.endc
+$$$d = 0
+.if idn <sense> <true>
+$$$d = n810$m_tc_jmp_true
+.endc
+	.long	$$$a ! $$$b ! $$$c ! $$$d -
+		! < n810$k_jmp @ n810$v_tc_opcode > -
+		! < n810$k_tc @ n810$v_tc_type >
+$$$p = .
+.save_psect
+.patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'to'-$$$script_base
+.endm
+
+.macro	int	number,wait,phase,data,mask,sense
+$$$a = 0
+.if idn <wait> <yes>
+$$$a = n810$m_tc_wait
+.endc
+$$$b = 0
+.if nb <phase>
+$$$b = <n810$k_'phase'@n810$v_tc_phase>!n810$m_tc_cmp_phase
+.endc
+$$$c = 0
+.if nb <data>
+$$$c = <'data'@n810$v_tc_data>!<'mask'@n810$v_tc_mask>!n810$m_tc_cmp_data
+.endc
+$$$d = 0
+.if idn <sense> <true>
+$$$d = n810$m_tc_jmp_true
+.endc
+	.long	$$$a ! $$$b ! $$$c ! $$$d -
+		! < n810$k_int @ n810$v_tc_opcode > -
+		! < n810$k_tc @ n810$v_tc_type >
+	.long	'number'
+.endm
+
+.macro	dma	p1,p2,wait,phase,indirect=-1
+$$$a = n810$k_move@n810$v_bm_opcode
+.if idn <wait> <yes>
+$$$a = n810$k_wait_move@n810$v_bm_opcode
+.endc
+.if ne <indirect+1>
+	.long	$$$a -
+		! < n810$k_'phase' @ n810$v_bm_phase > -
+		! < n810$m_bm_tab > -
+		! < n810$k_bm @ n810$v_bm_type >
+	.long	'indirect'
+.iff
+	.long	$$$a -
+		! < 'p2' @ n810$v_bm_byte_count > -
+		! < n810$k_'phase' @ n810$v_bm_phase > -
+		! < n810$k_bm @ n810$v_bm_type >
+.if idn <%extract(0,2,p1)> <^x>
+	.long	'p1'
+.iff
+.if idn <%extract(0,5,p1)> <n810$>
+$$$p = .
+.save_psect
+.csr_patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'p1'
+.iff
+$$$p = .
+.save_psect
+.patches_psect
+	.long	$$$p-$$$script_base
+.restore_psect
+	.long	'p1'-$$$script_base
+.endc
+.endc
+.endc
+.endm
+
+.macro	set	tgt,ack,atn
+$$$a = 0
+.if idn <tgt> <yes>
+$$$a = n810$m_io_tgt
+.endc
+$$$b = 0
+.if idn <ack> <yes>
+$$$b = n810$m_io_ack
+.endc
+$$$c = 0
+.if idn <atn> <yes>
+$$$c = n810$m_io_atn
+.endc
+	.long	$$$a ! $$$b ! $$$c -
+		! < n810$k_set @ n810$v_io_opcode > -
+		! < n810$k_io @ n810$v_io_type >
+	.long	0
+.endm
+
+.macro	clr	tgt,ack,atn
+$$$a = 0
+.if idn <tgt> <yes>
+$$$a = n810$m_io_tgt
+.endc
+$$$b = 0
+.if idn <ack> <yes>
+$$$b = n810$m_io_ack
+.endc
+$$$c = 0
+.if idn <atn> <yes>
+$$$c = n810$m_io_atn
+.endc
+	.long	$$$a ! $$$b ! $$$c -
+		! < n810$k_clear @ n810$v_io_opcode > -
+		! < n810$k_io @ n810$v_io_type >
+	.long	0
+.endm

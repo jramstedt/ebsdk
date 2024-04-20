@@ -1,0 +1,671 @@
+#
+# file: nautilus_files.bld --  build file for API GOBY 21264 PCI motherboard.
+#
+#
+# start include of cp$src:options.bld (depth 1)
+# options.bld
+#
+# This file defines the options which are used in the common console build
+# environment.  An include file is created for each option in cp$inc.  If
+# the option is defined but not invoked, the include file will set the option
+# to 0.
+#
+
+#
+# ALPHA_CONSOLE is always defined.  Use for conditionalizing sources which are
+# built in environments other than the common console build environment.
+#
+define option ALPHA_CONSOLE	# To prevent warning
+option ALPHA_CONSOLE
+
+#
+# Platform options
+#
+define option ALCOR		# Alcor Rom based image
+define option ALLOAD		# Alcor loadable image
+define option ALMIN		# Alcor minimum image ... srom console port
+define option ALUPDATE		# Alcor update image
+define option COMMON		# Common to all platforms
+define option EB164		# EB164 ROM image
+define option EB164LOAD		# EB164 loadable image
+define option EB164MIN		# EB164 small image
+define option SX164		# AlphaPC 164SX Rom based image
+define option SXUPDATE		# AlphaPC 164SX Update image
+define option LX164		# AlphaPC 164LX Rom based image
+define option LXUPDATE		# AlphaPC 164LX Update image
+define option PC264		# AlphaPC 264 Rom based image
+define option DPUPDATE		# AlphaPC 264DP Update image
+define option WEBBRICK		# Webbrick Rom based image
+define option WBUPDATE		# Webbrick update image
+define option APC_PLATFORM	# All inclusive tag for EBxxx platforms
+define option MEDULLA		# AXPvme's
+define option MEDULLAUPDATE	# AXPvme CD update build file
+define option MINTT		# mintt is in use
+define option K2		# DMCC K2 System
+define option K2LOAD		# K2 exerciser image
+define option K2UPDATE		# K2 update utility
+define option TAKARA		# DMCC Takara System
+define option TKLOAD		# Takara exerciser image
+define option TKUPDATE		# Takara update utility
+define option EIGER		# DMCC Eiger System
+define option EILOAD		# Eiger exerciser image
+define option EIUPDATE		# Eiger update utility
+define option AVANTI
+define option AVLOAD		# Avanti big image
+define option AVMIN		# minimum avanti/mustang image.
+define option MIKASA		# Mikasa Base Console Image
+define option MKLOAD		# Mikasa Loadable Image
+define option MKUPDATE		# Mikasa update image
+define option MTU		# MTU (MulTia Unix) basic image
+define option MTULOAD		# MTU (MulTia Unix) full image
+define option NORITAKE		# Noritake Base Console Image
+define option NRLOAD		# Noritake Loadable Image
+define option NRUPDATE		# Noritake update image
+define option PINNACLE		# Pinnacle (EV5)
+define option PKUPDATE		# Pinnacle-Mikasa update image
+define option PTUPDATE		# Pinnacle-Noritake update image
+define option PINKASA		# Pinnacle (EV5-Mikasa)
+define option PINTAKE		# Pinnacle (EV5-Noritake)
+define option PRIMCOR		# Primo/Pinnacle (PINTAKE) Alcor varient
+define option PAUPDATE		# Primo/Pinnacle (PINTAKE) Alcor update image
+define option CRLOAD 		# Corelle ROM image
+define option CORELLE		# Corelle ROM image
+define option CRUPDATE		# Corelle update image
+define option MONET		# Monet ROM image
+define option MONETLFU		# Monet LFU image
+define option MNUPDATE		# Monet update image 
+define option MNLOAD		# Monet Net image 
+define option REGATTA		# Regatta family option
+define option RGMIN
+define option WINDJAMMER	# Windjammer/Warhol ROM image 
+define option WJUPDATE		# Windjammer/Warhol update image
+define option CLIPPER		# Clipper ROM image 
+define option CLUNIX		# Clipper UNIX performance image
+define option CLUPDATE		# Clipper update image
+define option CLMIN		# Clipper min image(I/O through EV serial port)
+define option CLLOAD		# Clipper big image
+define option TURBO
+define option TL6		# TurboLaser EV6
+define option TL67		# TurboLaser EV67
+define option SECURE
+define option SABLE
+define option SBUPDATE		# Sable update image
+define option SBLOAD		# Sable big image
+define option SBFSAFE		# Sable fail safe image
+define option SBMIN		# Sable TDD small image
+define option SBQV		# Sable Memory QV image
+define option GAMMA
+define option GMUPDATE		# Gamma update image
+define option GMLOAD		# Gamma big image
+define option GMFSAFE		# Gamma fail safe image
+define option GMMIN		# Gamma TDD small image
+define option GMQV		# Gamma Memory QV image
+define option RAWHIDE
+define option LYNX		# LYNX 
+define option SLYNX		# Sable EV4 based Lynx
+define option SLUPDATE		# Sable Lynx update image
+define option SLLOAD		# Sable Lynx big image
+define option SLFSAFE		# Sable Lynx fail safe image
+define option GLYNX		# Gamma EV5 based Lynx
+define option GLUPDATE		# Gamma Lynx update image
+define option GLLOAD		# Gamma Lynx big image
+define option GLFSAFE		# Gamma Lynx fail safe image
+define option CORTEX		# Cortex normal rom-based image
+define option CORTEXUPDATE	# Cortex CD update build file
+define option YUKON		# Yukon normal rom-based image
+define option YUKONUPDATE	# Yukon CD update build file
+define option YUKONA		# YUKONA rom-based image
+define option YUKONAUPDATE	# YUKONA CD update image
+define option WILDFIRE		# WildFire ROM image
+define option WFDIAG		# WildFire srom/xsrom
+define option WFMIN		# WildFire min image(I/O through EV serial port)
+define option WFUPDATE		# WildFire update image
+define option WFLOAD		# WildFire big image
+define option MARVEL		# Marvel ROM image
+define option PRIVATEER		# Privateer ROM image
+define option PRMIN		# Privateer min image (I/O through EV serial port)
+define option PRUPDATE		# Privateer update image
+define option PRLOAD		# Privateer big image
+define option FALCON		# Falcon ROM image
+define option FALMIN		# Falcon min image (I/O through EV serial port)
+define option FALUPDATE		# Falcon update image
+define option FALLOAD		# Falcon big image
+define option TINOSA		# API Tinosa Motherboard
+define option NAUTILUS		# API Nautilus Motherboard
+define option SHARK             # API Shark Motherboard
+define option SWORDFISH		# API Swordfish Motherboard
+define option GLXYTRAIN         # API Galaxy Train Motherboard
+
+#
+# Architecture options
+#
+define option ALPHA
+define option VAX
+define option EV5
+define option EV6
+define option BWX		# support for byte/word architecture extensions
+define option FRU5		# indicates FRU5 (galaxy) fru tables
+define option GCT6
+
+#
+# Miscellaneous options
+#
+define option FWUPDATE		 # fw update target
+define option NO_LFU_FLOPPY	 # Don't look on a floppy for options fw
+define option ARC_SUPPORT	 #
+define option BACKING_STORE	 # graphics drivers use backing store for text
+define option IO_BUS_RESET	 # platform supports io bus resets
+define option BOOT_RESET	 # platform supports BOOT_RESET envar
+define option CONSOLE_DRIVER	 #
+define option DIAG_SUPPORT	 #
+define option DE200		 #
+define option EXTRA		 # Include extra stuff.
+define option HIGH_BOOT_PTEPAGES # Put boot page tables in high memory
+define option IMP		 # for Rawhide
+define option INTERACTIVE_SCREEN #
+define option MODE64		 # Full 64 bit mode.
+define option MODULAR		 # Modular console
+define option MSCP		 # client MSCP support
+define option MSCP_SERVER	 # server MSCP support
+define option RELEASE		 # This is a release version (?)
+define option SCAM		 #
+define option TGA		 #
+define option FULL_TGA		 #
+define option TGA_VMS_BUILD	 #
+define option UNIPROCESSOR	 # obsolete
+define option VALIDATE		 # Build "checked" version of code.
+define option XDELTA_ON		 # Turn XDELTA on.
+define option XDELTA_INITIAL	 # Modular, take initial Bpt
+define option RUNS_ON_EISA	 # EISA based system
+define option BOOTP_SUPPORT      # Turn on BOOTP, need to build inet driver
+define option SYMBOLS		 # Turn on Symbols, need to build vlist
+define option SIM		 # Simulation mode
+define option ISP		 # Turbo ISP model
+define option ISP_MODEL_SUPPORT  # ISP model support
+define option SPORT		 # SPORT environment
+define option FORCE		 # Force errors in diagnostics
+define option STARTSHUT		 # Driver Startup and Shutdown
+define option DRIVERSHUT	 # PB based Driver Startup and Shutdown
+define option DYNAMIC_TRAPPING	 # Trap on malloc/free
+define option DYNAMIC_PRINTING	 # Trace malloc/free requests 
+define option NONZERO_CONSOLE_BASE
+define option NET_EI_PORT	 # PCI Intel ETHERNET
+define option NET_EW_PORT	 # PCI Tulip ETHERNET
+define option NET_PDQ_PORT	 # PCI FDDI
+define option NET_FW_PORT	 # PCI FDDI
+define option NET_EX_PORT	 # DEMNA
+define option NET_FX_PORT	 # DEMFA
+define option NET_FF_PORT	 # DEFAA
+define option GALAXY
+define option SHOW_RAID
+define option ARC_CCI
+define option FIBRE_CHANNEL      # Fibre Channel support
+define option UNIVERSE		 # New Tundra chip for YUKONA 
+define option GALAXY_CALLBACKS
+define option EEROM_CALLBACKS
+define option NT_ONLY_SUPPORT
+define option USB_SUPPORT
+define option LOG_DRIVER_INIT
+define option SEPARATE_PAGE_TABLES
+define option CPQPHPC		 # CPQ Hot-plug controller (Yukon)
+define option BOOTBIOS		 # platform supports booting thru BIOS ROM's
+define option M1543C             # ALI M1543C Southbridge
+define option M1535C             # ALI M1535C Southbridge
+define option API_PLATFORM       # And API Platform
+define option SIMPLE_COM_DEBUG   # Simple pre driver com debug.
+
+# breaks kernel_alpha.mar
+# define option MACRO64$		 # Macro 64 compiles
+#
+#
+# Values
+#
+define value MAX_PROCESSOR_ID	1
+define value MIN_HEAP_SIZE	0x18000		# 96K
+define value HEAP_SIZE		0x100000	# 1024K
+define value HEAP_BASE		0
+define value MAX_MEMORY_CHUNK	1
+define value MAX_MEMORY_ARRAY	1
+define value MEMORY_CLUSTER_COUNT	11
+
+define value DEFAULT_PSEC_PER_CYCLE 2000
+define value DISCRETETIMER_BASE 0x4000
+define value ENET_ID_BASE	0x3800
+define value EEROM_LENGTH	8192
+define value NVRAM_EV_LEN	2048
+define value MAX_ELBUF		8192
+define value MAX_RECALL		16
+define value RTC_BASE		0x8000
+define value RTC_OFFSET_REG	0x70
+define value RTC_DATA_REG	0x71
+define value MAX_GRAPHICS	1
+define value MAX_PHYSMEM_MB	(2*1024)
+define value SYSTEM_TYPE	0x22
+string OPTIONS_FW_FILE	"pc264fw"
+
+#
+# Regular expressions for suppressing undefined options during option
+# scanning (see OPT.MMS).
+#
+suppress option /DEBUG/
+suppress option /TRACE/
+
+#
+# Messages
+#
+message file generic_messages.c
+
+message prefix msg_
+
+message value msg_success	0
+message value msg_failure	1
+message value msg_def		2
+message value msg_halt		3
+message value msg_loop		4
+message value msg_error		5
+# end include of cp$src:options.bld (depth 1)
+
+platform PC264
+architecture ALPHA
+configuration GLXYTRAIN
+
+option EV6 1
+option APC_PLATFORM 1
+option SECURE           
+option BOOTP_SUPPORT
+option DIAG_SUPPORT
+option SYMBOLS 0
+option XDELTA_ON 0
+option HIGH_BOOT_PTEPAGES 1
+option DRIVERSHUT 0
+option FRU5 1
+option MSCP
+option IO_BUS_RESET
+option FIBRE_CHANNEL
+option BACKING_STORE
+option NT_ONLY_SUPPORT
+option M1535C 1
+option API_PLATFORM 1
+option BOOTBIOS
+
+value MAX_PROCESSOR_ID		1
+value MAX_MEMORY_ARRAY		3
+value MAX_MEMORY_CHUNK		1
+value HEAP_SIZE			0x100000		# 1 Meg.
+value EEROM_BASE		65536
+value EEROM_LENGTH		65536
+value DEFAULT_PSEC_PER_CYCLE	2000
+value SYSTEM_TYPE        	0xc9
+                                                                       
+file 	alphamm.c		 group base
+file	ansi.c			 group base
+file	aputchar.c		 group base                         
+file	atoi.c			 group base
+#
+# There are two shells available, a full featured Bourne shell (blex.c),
+# and a minimal command line tokeninzer (ash.c).  Pick only one.
+#
+file	blex.c			 group command
+file	bshell.c		 group command
+file	bshell_cmd.c		 group command
+#
+file	boot.c			 group command
+file	builtins.c		 group command
+file	build_fru.c		 group command
+file	call_backs.c		 group base
+file	callbacks_alpha.mar	
+file    date.c			 group base	
+file    date_cmd.c		 group command
+file	dynamic.c           	 group base
+file	entry.c			 group base
+file	ev_action.c		 group base
+file	exdep.c			 group command
+file	externdata.c		 group base
+file	filesys.c   		 group base
+file	hwrpb.c			 group base
+file	hwrpbtt_driver.c	 group driver
+file	ie.c			 group base
+file	iobq_cmd.c		 group command
+file	isacfg.c		 group command
+file	isp1020_edit.c		 group command
+file	kernel.c		 group base
+file	kernel_support.c	 group base
+file	kernel_alpha.mar
+file	memset.c		 group base
+file	mopdl_driver.c		 group driver
+file	moplp_driver.c		 group driver
+file	msgtxt.c		 group data
+file	ni_datalink.c		 group driver
+file	printf.c		 group base
+file	probe_io.c		 group base
+file	process.c		 group base
+file	powerup.c    		 group base
+file	qscan.c			 group base
+file	queue.c			 group base
+file	random.c		 group base
+file	readline.c		 group command
+file	regexp.c      		 group base
+file	run_cmd.c		 group command
+file	runbios.c		 group base
+file	scsi.c 			 group base
+file	scs.c 			 group base
+file	semaphore.c		 group base
+file	show_hwrpb.c		 group command
+file	show_map.c		 group command
+file	setshow.c	    	 group command
+file	shellsort.c	    	 group base
+file	startstop.c	    	 group command
+file	strfunc.c	    	 group base
+file	timer.c		    	 group base
+file	tr.c			 group command
+file	uptime.c		 group command
+file	xlate.c		    	 group command
+#                           
+# Platform-specific files   
+#                           
+file 	nautilus.c 		 group base
+file	nautilus_init.c		 group base
+file	irongate_io.c		 group base
+file	nautilus_io.c		 group base
+file	nautilus_mcheck.c	 group base
+file    nautilus_nbridge.c	 group command
+file	pc264_util.mar      
+file	memconfig_nautilus.c	 group base
+file	show_config_nautilus.c	 group base
+file    amdflash_support.c	 group base
+file    m1543c_sbridge.c	 group base
+file    m1543c_iic.c		 group base
+file	m5229_ide.c              group base
+file	api_debug.c              group command
+file	nautilus_info.c		 group command
+file	dp264_fru.c		 group command
+#
+# Files needed for the extended command set
+#
+file	allocfree.c              group command
+file	bpt.c			 group command
+file	cat.c			 group command
+file	check.c			 group command
+file	chmod.c			 group command
+file	cmp.c			 group command
+file	decode_alpha.c		 group base
+file	diag_support.c		 group base
+file	diag_evs.c		 group base
+file	element.c		 group command
+file	echo.c			 group command
+file	edit.c			 group command
+file	eval.c			 group command
+file	exer.c			 group command
+file	find_field.c		 group command
+file	grep.c			 group command
+
+file    galaxy.c		group command   ; Galaxy console file
+file    galaxy_nautilus.c	group command   ; Galaxy console file
+file    galaxy_config_tree.c	group command 	; Galaxy console file
+
+file	hd.c			 group command
+file	help.c			 group command
+file	inst_alpha.mar
+file	line.c			 group command
+file	login_cmd.c		 group command
+file	ls.c			 group command
+file	moprc_driver.c		 group driver
+file	moprctt_driver.c	 group driver
+file	more.c			 group command
+file	net.c			 group command
+file	prcache.c		 group command
+file	prcache_pci.c		 group command
+file	ps.c			 group command
+file	rm.c			 group command
+file	secure.c		 group base
+
+file	sem_cmd.c		 group command
+file	simport.c		 group driver
+file	sleep.c			 group command
+file	sort.c			 group command
+file	sound.c			 group command
+file 	symbols.c		 group base
+#file	tms380fw.c		 group command
+file	truefalse.c		 group command
+file	validate.c		 group command
+file	wc.c			 group command
+#
+# Option Files 
+#
+
+#
+# Xdelta Debugger
+#
+#file	xdelta.mar
+#file	xdelta_isrs.mar
+#
+# Memory and Network Diagnostics
+#                               
+file	memtest.c		 group base
+file	memtest_gray_lw.c	 group base
+file	memtest_alpha.mar
+file	memtest_march.c		 group base
+file	memtest_random.c	 group base
+file	memtest_victim.c	 group base
+file	nettest.c		 group base
+#
+# LFU
+#
+file    lfu.c			group command
+file    lfu_support_apc.c	group base
+#
+# Driver Initialization
+#
+# Lines that have a name in column 0 and a value as the second
+# field are entered into the Driver Startup Table (dst).  The 
+# second field indicates what phase the driver is started in.
+#
+# Start up the phase 0 drivers.
+# Initialize the toy drivers and low level stuff that must be 
+# started at this point.
+#
+driver	nl_driver.c		0	 group driver
+driver	rd_driver.c		0	 group driver
+driver 	toy_driver.c		0	 group driver
+#
+# Start up the phase 1 drivers.
+#              
+driver	pci_driver.c		1	 group driver
+driver	from_driver.c		1	 group driver
+driver	nvram_driver.c     	1	 group driver
+driver  api_iic.c		1	 group driver
+#
+# Phase 2 drivers
+#                                
+
+#
+# Start up the phase 3 drivers.
+# Terminal class driver must start before the terminal port drivers.
+# kbd_driver MUST be started after graphics drivers & before serial port driver
+#
+driver	tt_driver.c     	3	 group driver
+# Floppy disk driver for the Intel 82077AA chip
+#                         
+driver	dv_driver.c	  	3	 group driver
+driver	vga_bios_driver.c	3	 group driver
+driver  kbd_driver.c		3	 group driver
+driver	combo_driver.c		3	 group driver
+#
+# Start up the phase 4 drivers.
+#
+driver	ev_driver.c     	4	 group driver
+driver	el_driver.c		4	 group driver
+driver	pmem_driver.c		4	 group driver
+driver	vmem_driver.c		4	 group driver
+driver	examine_driver.c	4	 group driver
+driver	ev6_ipr_driver.c	4	 group driver
+driver	gpr_driver.c    	4	 group driver
+driver	ps_driver.c     	4	 group driver
+driver	ndbr_driver.c		4	 group driver
+driver	mop_driver.c		4	 group driver
+driver	fpr_driver.c    	4	 group driver
+driver  pi_driver.c		4	 group driver
+driver	decode_driver.c		4	 group driver
+driver  tee_driver.c		4	 group driver
+driver  dup.c                   4       group base
+#
+# Start up the phase 5 drivers.
+#
+driver	para_driver.c		5	 group driver
+driver	inet_driver.c		5	 group driver
+driver	fat_driver.c		5	 group driver
+driver	m1543c_driver.c		5	 group driver
+#
+# IDE/ATAPI driver
+#
+driver	dq_driver.c		5	group driver
+#
+# ISA ethernet driver for adapter with the LEMAC chip
+#
+driver	de205_driver.c 		5	group driver
+#                         
+# SCSI bus poller for NCR/Symbios 810/875 controllers
+#                         
+driver	n810_driver.c	  	5	group driver
+file	pke_driver.c	  		group driver
+file	pke_script.mar    
+#                         
+# PCI NVRAM Driver
+#
+driver  pci_nvram_driver.c      5       group driver
+#
+# PCI FDDI driver for the DEFPA adapter
+#
+driver  pdq_driver.c            5       group driver
+#
+# PCI Token ring driver
+#
+#driver  dw_driver.c             5       group driver
+#
+# PCI SCSI RAID driver for the Mylex DAC960 adapter
+#
+driver dac960_driver.c          5       group driver
+#
+# PCI SCSI driver for the KZPSA adapter
+#
+driver pks_driver.c             5       group driver
+#
+# SCSI driver for adapters employing Qlogic ISP1020 chips
+#
+driver isp1020_driver.c		5       group driver
+#
+# PCI ethernet driver for the DECchip 2104x/2114x adapters
+#                       
+driver ew_driver.c		5       group driver
+#
+# Intel 82558 ethernet adapter
+#
+driver	ei_driver.c		5	group driver
+#
+# CIPCA - PCI to CI driver
+#
+file	nport_q.c			group driver
+file	cipca_common.c			group driver
+file	cipca_response.c		group driver
+file	cipca_support.c			group driver
+file	cipca_io.c			group driver
+driver 	mscp.c			5	group driver
+driver	cipca_driver.c		5	group driver
+#
+# KGPSA - Fibre Channel driver
+#
+driver kgpsa_driver.c		5	group driver
+file	wwidmgr.c			group driver
+#
+# KFPSA - PCI DSSI driver
+#
+driver pue_driver.c		5	group driver
+file	pue_script.mar
+#
+# Memory Channel driver
+#
+driver mc_driver.c		5	group driver
+#
+# PCI I2O driver
+#
+driver	i2o_driver.c		5	group driver
+file	i2oexec.c			group driver
+file	i2omsg.c			group driver
+file	i2outil.c			group driver
+file	i2o_bsa.c			group driver
+file	i2o_bsa_osm.c			group driver
+file	i2o_scsi_osm.c			group driver
+# 
+# ISO 9660 CDROM driver
+#
+driver	iso9660_driver.c	 5	 group driver
+#
+# SCSI driver for Adaptec AIC78xx adapters
+#
+driver	aic78xx_driver.c	5	group driver
+file	aic78xx_him_hwm.c		group driver
+file	aic78xx_him_rsm.c		group driver
+file	aic78xx_him_xlm.c		group driver
+#
+# BIOS disk driver
+#
+driver	bios_disk_driver.c	5	group driver
+#
+# LFU drivers
+#
+driver	lfu_nautilus_driver.c	 7	 group driver
+#
+# put these lfu drivers in phase 8 so we have the option
+# not to start them ( as in unattended updates)
+#
+driver	lfu_kzpsa_driver.c	 8	 group driver
+driver	lfu_defpa_defea_driver.c 8	 group driver
+driver  lfu_cipca_driver.c	 8	 group driver
+driver  lfu_mc2_driver.c	 8	 group driver
+#
+# The built in file system.
+#
+# Encapsulated files are taken from their VMS sources and put 
+# directly into the firmware's file system as a named file.  
+# To add a new file, use the keyword "encapsulate", the VMS 
+# filename, and the name you want the file to have in the 
+# firmware.
+#
+# ISA configuration scripts to facilitate adding known devices
+#
+encapsulate	cp$src:isacfg_de205	 add_de205	 ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+#
+# Diagnostic scripts
+#
+encapsulate	cp$src:memexer_dp264	memexer		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:testmem_dp264	testmem		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:sys_exer_eb164	sys_exer	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:show_status	show_status	ATTR$M_READ|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:kill_diags_eb164 kill_diags	ATTR$M_READ|ATTR$M_EXECUTE	-script
+encapsulate     cp$src:showit           showit          ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:pwrup_nautilus	pwrup		ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:dp264_test	test		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:nautilus_mfgtest	mfgtest		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:set_flag_apc	set_flag	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+#
+# LFU scripts
+#
+encapsulate	cp$src:dp_fwupdate		fwupdate	ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:pc264_readme		readme		ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:save_nvram_pc264		save_nvram	ATTR$M_READ|ATTR$M_EXECUTE -script
+encapsulate	cp$src:restore_nvram_pc264	restore_nvram	ATTR$M_READ|ATTR$M_EXECUTE -script
+#
+# When you want the symbol table driver in your image, you have to have
+# the driver itself, the variable list (i.e. the symbol table), and
+# a list of symbols that you want included/excluded.  The inclusion
+# exclusion commands take as arguments regular expressions that are
+# applied to the symbol table.
+#
+# NOTE: regular expressions are AWK style regular expressions, which
+# are NOT the same as regular expressions in other contexts!
+#
+#driver	sym_driver.c		0
+#file	vlist.c
+#sym_include	[a-zA-Z0-9_\$]+
+#sym_exclude	vlist msg_.*
+# end include of  (depth 0)

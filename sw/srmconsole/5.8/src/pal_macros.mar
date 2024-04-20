@@ -1,0 +1,1058 @@
+	.title	EV4 - ALPHA PALcode MACROS
+	.ident	/V1.0/
+;
+;****************************************************************************
+;*									    *
+;*  Copyright (c) 1989, 1990, 1991, 1992				    *
+;*  by DIGITAL Equipment Corporation, Maynard, Mass.			    *
+;* 									    *
+;*  This software is furnished under a license and may be used and  copied  *
+;*  only  in  accordance  with  the  terms  of  such  license and with the  *
+;*  inclusion of the above copyright notice.  This software or  any  other  *
+;*  copies  thereof may not be provided or otherwise made available to any  *
+;*  other person.  No title to and ownership of  the  software  is  hereby  *
+;*  transferred.							    *
+;* 									    *
+;*  The information in this software is subject to change  without  notice  *
+;*  and  should  not  be  construed  as  a commitment by DIGITAL Equipment  *
+;*  Corporation.							    *
+;* 									    *
+;*  DIGITAL assumes no responsibility for the use or  reliability  of  its  *
+;*  software on equipment which is not supplied by DIGITAL.		    *
+;*									    *
+;****************************************************************************
+
+.sbttl	Macros	- Define local macros
+
+;+
+; The following macros are used to place the CALL_PAL code
+; in the dispatch slots the code that runs over 
+; after the dispatch slots.
+;-
+
+
+;+
+;
+; This macro is used to force code to align to a cache block boundary.
+; Commonly used to force alignment for branch targets.
+;
+;-
+	.macro ALIGN_TO_CACHE_BLOCK
+	.align 5
+	.endm
+
+	.macro ALIGN_TO_DOUBLE_CACHE_BLOCK
+	  .if ne enable_2x_cache_block_alignment
+	    .align 6
+	  .iff
+	    ALIGN_TO_CACHE_BLOCK
+	  .endc
+	.endm
+
+	.macro 	align_branch_target  odd=0
+	$$$current_dot = .
+	.if eq odd
+	  .iif NE <$$$current_dot & 7>, or	r31, r31, r31
+	.iff
+	  .iif EQ <$$$current_dot & 7>, or	r31, r31, r31
+	.endc
+	.endm
+
+
+
+;+
+;
+; This macro is used to get to unused code space
+;
+;-
+	.macro	GOTO_NEW_CODE
+	.if eq ev4_pass3
+	  .IIF NDF $$$new_code_space, $$$new_code_space = <PAL_HW_FREE_BASE+^x2000>
+	.iff
+	  .IIF NDF $$$new_code_space, $$$new_code_space = PAL_HW_FREE_BASE
+	.endc
+	. = $$$new_code_space
+	align_to_cache_block
+	.endm
+
+;+
+;
+; This macro is used to mark the end of the current unused code space
+;
+;-
+	.macro	END_NEW_CODE
+	.IIF NDF $$$new_code_space, $$$new_code_space = PAL_HW_FREE_BASE
+	$$$new_code_space = .
+	.endm
+
+
+
+
+
+
+;+
+;
+; This macro is used to start a new PAL code instruction. It saves the current
+; "." and moves to the correct offset for the HW dispatch. It clears
+; a flag so we can tell later if the PAL instruction was "continued"
+;
+;-
+	.macro START_PAL_ROUTINE	FNC,nofixup=0, longflow=0
+	.if ndf osfpal
+	new_func_code = PAL_FUNC_'FNC'
+	.if ne <ev4_pass2!ev4_pass3>
+	  assume <<PAL_FUNC_'FNC'> & <^x40>> eq <0>; illegal pal func def
+	  new_func_code = <PAL_FUNC_'FNC' & ^x3f> ! <<PAL_FUNC_'FNC'@-1> & ^x40>
+	.endc
+	.iff
+	new_func_code = OSFPAL_FUNC_'FNC'
+	.if ne <ev4_pass2!ev4_pass3>
+	  assume <<OSFPAL_FUNC_'FNC'> & <^x40>> eq <0>; illegal pal func def
+	  new_func_code = <OSFPAL_FUNC_'FNC' & ^x3f> ! <<OSFPAL_FUNC_'FNC'@-1> & ^x40>
+	.endc
+	.endc
+
+	.IIF NDF $$$pal_func_in_progress, $$$pal_func_in_progress = 0
+	assume <$$$pal_func_in_progress> eq <0> ; Previous function not ended
+	$$$pal_func_in_progress = 1
+
+	$$$new_code_space = .
+	$$$pal_func_continued = 0
+	.if ndf osfpal
+	. = <PAL$HW_ENTRY_CALLPAL+ <<<new_func_code*4>*pfunc_size>>>
+	.iff
+	. = <OSFPAL$HW_ENTRY_CALLPAL+ <<<new_func_code*4>*pfunc_size>>>
+	.endc
+	$$$start_of_last_pal_func = .
+	.if ndf osfpal
+PAL$ENTRY_'FNC'::
+	.iff
+OSFPAL$ENTRY_'FNC'::
+	.endc
+	.enable	lsb
+
+	.if ne ev4_pass1
+	  .if eq nofixup
+	    .iif ndf osfpal, inc_pc
+	    .iif df  osfpal, inc_pc 0
+	    .iif ndf osfpal, br	r31, PAL$RENTRY_'FNC'
+	    .iif df osfpal,  br	r31, OSFPAL$RENTRY_'FNC'
+	    GOTO_NEW_CODE
+	    .if ndf osfpal
+PAL$RENTRY_'FNC'::
+	    .iff
+OSFPAL$RENTRY_'FNC'::
+	    .endc
+	    $$$pal_func_continued = 1
+	    .endc
+	.iff
+	  .if eq <<longflow+ <enable_debug_pctrace ! enable_debug_pcevent>>-2>
+	    .iif ndf osfpal, br	r31, PAL$RENTRY_'FNC'
+	    .iif df osfpal,  br	r31, OSFPAL$RENTRY_'FNC'
+	    GOTO_NEW_CODE
+	    .if ndf osfpal
+PAL$RENTRY_'FNC'::
+	    .iff
+OSFPAL$RENTRY_'FNC'::
+	    .endc
+	    $$$pal_func_continued = 1
+	    .endc
+	.endc
+	 trace_pc	<CallPAL 'FNC'>
+	.endm
+
+
+
+;+
+;
+; This macro is used to end a PAL instruction. If necessary it restores
+; "." to the original value.
+;
+;-
+	.macro	END_PAL_ROUTINE	FNC
+	$$$pal_func_in_progress = 0
+	.if eq	$$$pal_func_continued
+	  ASSUME <.-$$$start_of_last_pal_func> LE <pfunc_size*4> ; PAL function too long
+	.iff
+	  $$$new_code_space = .
+	.endc
+	.disable lsb
+	.if ndf osfpal
+PAL$END_'FNC'::
+	.iff
+OSFPAL$END_'FNC'::
+	.endc
+	GOTO_NEW_CODE
+	.endm
+
+;+
+;
+; This macro is used for PAL instructions that execeded the space allocated
+; to the direct HW dispatch area. It restores "." to the original value,
+; and sets a flag showing that the instruction is being continued.
+;
+;-
+	.macro	CONT_PAL_ROUTINE	 FNC, ibr=1, double=0
+	.if eq $$$pal_func_continued
+	  .if ndf osfpal
+	  .iif ne ibr, br r31, PAL$CONT_'FNC'
+	  .iff
+	  .iif ne ibr, br r31, OSFPAL$CONT_'FNC'
+	  .endc
+	  ASSUME <.-$$$start_of_last_pal_func> LE <pfunc_size*4> ; PAL function too long
+	  GOTO_NEW_CODE
+	  .iif ne double, align_to_double_cache_block
+	  $$$pal_func_continued = 1
+	  .if ndf osfpal
+PAL$CONT_'FNC'::
+	  .iff
+OSFPAL$CONT_'FNC'::
+	  .endc
+	.iff
+	  stall 1
+	.endc
+	.endm
+
+
+;+
+;
+; This macro is used to start a new PAL code instruction. It saves the current
+; "." and moves to the correct offset for the HW dispatch. It clears
+; a flag so we can tell later if the PAL instruction was "continued"
+;
+;-
+
+
+	.macro START_HW_VECTOR	FNC, no_trace=0,longflow=0,noshift=0,?five$,?ten$
+	.IIF NDF $$$pal_func_in_progress, $$$pal_func_in_progress = 0
+	assume <$$$pal_func_in_progress> eq <0> ; Previous function not ended
+	$$$pal_func_in_progress = 1
+
+	$$$new_code_space = .
+	$$$pal_vector_continued = 0
+	.if ndf osfpal
+	. = <pal$start+ PAL_HW_'FNC'_BASE>
+	.iff
+	. = <osfpal$start+ PAL_HW_'FNC'_BASE>
+	.endc
+	$$$start_of_last_vector = .
+	.if ndf osfpal
+PAL$HW_ENTRY_'FNC'::
+	.iff
+OSFPAL$HW_ENTRY_'FNC'::
+	.endc
+
+	.if eq <ev4_pass3!noshift>
+	  tpc = .
+	  .if ndf osfpal
+	    .if ne <enable_debug_pctrace ! enable_debug_pcevent>
+	      .iif eq no_trace, trace_pc	<HWentry 'FNC'>
+	    .endc
+	    mt	r0, pt0		; get a scratch reg
+	    br	r0, ten$	; fetch current pc
+	    pvc$jsr	hwe_'fnc', dest=1
+	    five$: mf	r0, pt0	; restore scratch reg
+	    br	r31, PAL$HW_RENTRY1_'FNC' ; goto real code
+
+	    pvc$jsr	hwe_'fnc'
+	    ten$: jmp	r31, (r0), five$; resume at correct code
+	    . = tpc + ^x4000
+	    $$$start_of_last_vector = .
+	    . = . + 32
+	    PAL$HW_RENTRY1_'FNC'::
+	  .iff
+
+	    .if ne <enable_debug_pctrace ! enable_debug_pcevent>
+	      .iif eq no_trace, trace_pc	<HWentry 'FNC'>
+	    .endc
+	    mt	r0, pt6		; get a scratch reg
+	    br	r0, ten$	; fetch current pc
+	    pvc$jsr	ohwe_'fnc', dest=1
+	    five$: mf	r0, pt6	; restore scratch reg
+	    br	r31, OSFPAL$HW_RENTRY1_'FNC' ; goto real code
+
+	    pvc$jsr	ohwe_'fnc'
+	    ten$: jmp	r31, (r0), five$; resume at correct code
+	    . = tpc + ^x4000
+	    $$$start_of_last_vector = .
+	    . = . + 32
+	    OSFPAL$HW_RENTRY1_'FNC'::
+	  .endc
+	.iff
+
+
+	.if eq longflow
+	  .if ne <enable_debug_pctrace ! enable_debug_pcevent>
+	    .iif eq no_trace, trace_pc	<HWentry 'FNC'>
+	  .endc
+	.endc
+
+	.if eq <<longflow+ <enable_debug_pctrace ! enable_debug_pcevent>>-2>
+	  .iif eq no_trace, trace_pc	<HWentry 'FNC'>
+	  .iif ndf osfpal, br	r31, PAL$HW_RENTRY_'FNC'
+	  .iif df osfpal, br	r31, OSFPAL$HW_RENTRY_'FNC'
+	  GOTO_NEW_CODE
+	  .if ndf osfpal
+PAL$HW_RENTRY_'FNC'::
+	  .iff
+OSFPAL$HW_RENTRY_'FNC'::
+	 .endc
+	  $$$pal_VECTOR_continued = 1
+	.endc
+	.endc
+
+	.endm
+
+
+
+;+
+;
+; This macro is used to end a PAL instruction. If necessary it restores
+; "." to the original value.
+;
+;-
+	.macro	END_HW_VECTOR	FNC
+	$$$pal_func_in_progress = 0
+	.if eq	$$$pal_vector_continued
+	  ASSUME <.-$$$start_of_last_vector> LE <PAL_HW_'FNC'_SIZE> ; PAL HW vector too long
+	.iff
+	  $$$new_code_space = .
+	.endc
+
+
+	.if ndf osfpal
+PAL$HW_END_'FNC'::
+	.iff
+OSFPAL$HW_END_'FNC'::
+	.endc
+	GOTO_NEW_CODE
+	.endm
+
+;+
+;
+; This macro is used for PAL instructions that execeded the space allocated
+; to the direct HW dispatch area. It restores "." to the original value,
+; and sets a flag showing that the instruction is being continued.
+;
+;-
+	.macro	CONT_HW_VECTOR	 FNC,ibr=1, double=0
+	.if eq $$$pal_VECTOR_continued
+	.if ndf osfpal
+	.iif ne ibr, br r31, pal$hw_cont_'fnc'
+	.iff
+	.iif ne ibr, br r31, osfpal$hw_cont_'fnc'
+	.endc
+	ASSUME <.-$$$start_of_last_vector> LE <PAL_HW_'FNC'_SIZE> ; PAL HW vector too long
+	$$$pal_vector_continued = 1
+	GOTO_NEW_CODE
+	.iif ne double, align_to_double_cache_block
+	.if ndf osfpal
+PAL$HW_CONT_'FNC'::
+	.iff
+OSFPAL$HW_CONT_'FNC'::
+	.endc
+	.iff
+	  stall 1
+	.endc
+	.endm
+
+
+
+;+
+;
+; This macro is used to initiate machine check sequences
+;
+;-
+
+; macro to generate machine checks
+
+	.macro MCHK	reason, halt=0, save_pt=0
+	  .if ne halt
+	    .iif ne save_pt, mt	r0, pt0			; save r0
+	    .iif ne save_pt, stall	1
+	    lda	r0,<hlt$c_'reason'>(r31)		; set halt code
+	    bsr	r31, pal$enter_console			; enter the console
+	  .endc
+	  .if eq halt
+	    .iif ne save_pt, mt	r0, pt0			; save r0
+	    .iif ne save_pt, mt	r1, pt1			; save r0
+	    .iif ne save_pt, mt	r3, pt3			; save r0
+	    .iif ne save_pt, stall	1
+	    lda	r3,<mchk$c_'reason'>(r31)		; set mchk code
+	    .iif df osfpal, br	r31, osfmchk_log_known	; go log the mchk
+	    .iif ndf osfpal, br	r31, mchk_log_known	; go log the mchk
+	  .endc
+	.endm
+
+
+
+;+
+;
+; This macro is used to generate relative addresses
+; it generates the correct LDA, LDAH's to compute the address
+;
+; Inputs:
+;	dest 	= destination register
+;	offset	= offset from base register
+;	base	= base register (typically this codes base, i.e. pal_base) 
+;-
+
+	.macro	get_addr	dest,offset,base,safe=0,vfy=0
+	  lda	'dest',<<'offset'> & ^xFFFF>('base') ; base+xxx<15:0>
+	  .if ne safe
+	    .iif ne vfy, assume <'offset'> lt <^x8000>     ; address too big!
+	  .iff
+	    ldah	'dest',<<'offset'>+32768>@-16('dest'); + xxx<31:16>
+	  .endc
+	.endm	get_addr
+
+
+	.macro	sget_addr	dest,offset,base, verify=1
+	  get_addr	<dest>,<offset>,<base>,safe=1, vfy=verify
+	.endm	sget_addr
+
+
+;+
+; This macro is used in the dispatch to special hander routine.
+; It does fast compare and branch's, it has constraints on it's
+; alignment, that are check.
+;-
+
+	.macro	pal_special_handler addr,handler
+	  $$$current_dot = .
+	  .iif eq <$$$current_dot & 7>, .error	; special handler mis-aligned
+	  lda	r0, <<'addr'-pal$start>@-2>(r1) ; add +offset to -offset
+	  beq	r0, 'handler'		; if eql, then is a match
+	.endm	
+	
+	
+;+
+;
+; This macro is used to virtualize memory addresses
+; it addes the virtual memory base to the arg.
+; it requires one scratch register to use for the add.
+;
+; Inputs:
+;	addr 	= the un-virtualized addr
+;	reg	= a scratch reg
+;
+; Outputs:
+;
+;	addr	= contains virtualized addr if swap = 0
+;	reg	= contains virtualized addr if swap = 1
+;-
+
+	.macro	virtualize	addr, reg,swap=0,noload=0
+	  .if ne virtualize_memory
+	    .if ne 'swap'
+	      .iif eq noload, mf	'reg', pt8
+	      addq 'addr','reg', 'reg'
+	    .iff
+	      .iif eq noload, mf	'reg', pt8
+	      addq 'addr','reg', 'addr'
+	    .endc
+	  .endc
+	.endm	virtualize
+
+	.macro	unvirtualize	addr, reg,swap=0,noload=0
+	  .if ne virtualize_memory
+	    .if ne 'swap'
+	      .iif eq noload, mf	'reg', pt8
+	      subq 'addr','reg', 'reg'
+	    .iff
+	      .iif eq noload, mf	'reg', pt8
+	      subq 'addr','reg', 'addr'
+	    .endc
+	  .endc
+	.endm	unvirtualize
+
+
+
+
+
+
+;+
+;
+; These macros are used to perform unaligned loads and stores
+;
+; Inputs:
+;	reg 	= source or destination register of data
+;	addr	= register address of possible unaligned data
+;	sr[n]	= scratch registers to use
+;
+; These macros may not be the most optimal way to perform there functions
+; as no code scheduling is performed, thus they should only be used in
+; non critical code sections.
+;
+;-
+
+	.macro	load_unaligned_long	reg, addr, sr1, sr2
+	  lda	sr2, addr
+	  ldq_u	reg, (sr2)
+	  ldq_u sr1, 3(sr2)
+	  extll	reg, sr2, reg
+	  extlh	sr1, sr2, sr1
+	  or	sr1, reg, reg
+	  addl	reg, r31, reg
+	.endm
+
+
+	.macro	load_unaligned_quad	reg, addr, sr1, sr2
+	  lda	sr2, addr
+	  ldq_u	reg, (sr2)
+	  ldq_u sr1, 7(sr2)
+	  extql	reg, sr2, reg
+	  extqh	sr1, sr2, sr1
+	  or	sr1, reg, reg
+	.endm
+
+
+	.macro	store_unaligned_word	reg, addr, sr1, sr2, sr3, lock=0, err,err1
+	  .if eq lock
+	    lda		sr3, addr
+	    ldq_u	sr1, (sr3)
+	    inswl	reg, sr3, sr2
+	    mskwl	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, (sr3)
+
+	    ldq_u	sr1, 1(sr3)
+	    inswh	reg, sr3, sr2
+	    mskwh	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, 1(sr3)
+	  .iff
+	    bic		addr, #7, sr3
+	    ldq_l	sr1, (sr3)
+	    inswl	reg, addr, sr2
+	    mskwl	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+	    debug_mp_store sr1, sr2     ; if mp debug, sometimes fail the _c
+	    stq_c	sr1, (sr3)
+	    .iif nb <err>, blbc sr1, err
+
+	    lda		sr3, 1(addr)
+	    bic		sr3, #7, sr3
+	    ldq_l	sr1, (sr3)
+	    inswh	reg, addr, sr2
+	    mskwh	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+	    debug_mp_store sr1, sr2     ; if mp debug, sometimes fail the _c
+	    stq_c	sr1, (sr3)
+	    .iif nb <err>, blbc sr1, err1
+	  .endc
+	.endm
+
+	.macro	store_unaligned_long	reg, addr, sr1, sr2, sr3, lock=0, err,err1
+	  .if eq lock
+	    lda		sr3, addr
+	    ldq_u	sr1, (sr3)
+	    insll	reg, sr3, sr2
+	    mskll	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, (sr3)
+
+	    ldq_u	sr1, 3(sr3)
+	    inslh	reg, sr3, sr2
+	    msklh	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, 3(sr3)
+	  .iff
+	    bic		addr, #7, sr3
+	    ldq_l	sr1, (sr3)
+	    insll	reg, addr, sr2
+	    mskll	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+	    debug_mp_store sr1, sr2     ; if mp debug, sometimes fail the _c
+	    stq_c	sr1, (sr3)
+	    .iif nb <err>, blbc sr1, err
+
+	    lda		sr3, 3(addr)
+	    bic		sr3, #7, sr3
+	    ldq_l	sr1, (sr3)
+	    inslh	reg, addr, sr2
+	    msklh	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+	    debug_mp_store sr1, sr2     ; if mp debug, sometimes fail the _c
+	    stq_c	sr1, (sr3)
+	    .iif nb <err>, blbc sr1, err1
+	  .endc
+	.endm
+
+	.macro	store_unaligned_quad	reg, addr, sr1, sr2, sr3, lock=0, err,err1
+	  .if eq lock
+	    lda		sr3, addr
+	    ldq_u	sr1, (sr3)
+	    insql	reg, sr3, sr2
+	    mskql	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, (sr3)
+
+	    ldq_u	sr1, 7(sr3)
+	    insqh	reg, sr3, sr2
+	    mskqh	sr1, sr3, sr1
+	    or		sr1, sr2, sr1
+	    stq_u	sr1, 7(sr3)
+	  .iff
+	    bic		addr, #7, sr3
+	    ldq_l	sr1, (sr3)
+	    insql	reg, addr, sr2
+	    mskql	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+	    debug_mp_store sr1, sr2     ; if mp debug, sometimes fail the _c
+	    stq_c	sr1, (sr3)
+	    .iif nb <err>, blbc sr1, err
+
+	    lda		sr3, 7(addr)
+	    bic		sr3, #7, sr3
+	    ldq_l	sr1, (sr3)
+	    insqh	reg, addr, sr2
+	    mskqh	sr1, addr, sr1
+	    or		sr1, sr2, sr1
+	    debug_mp_store sr1, sr2     ; if mp debug, sometimes fail the _c
+	    stq_c	sr1, (sr3)
+	    .iif nb <err>, blbc sr1, err1
+	  .endc
+	.endm
+
+
+
+;+
+; These macros are used to load and store various reg's and IPR's into
+; and out of the console save are
+;-
+	.macro store_reg n, fpu=0, pal=0, ipr=0, unvirt=0, nodata=0
+	assume <fpu+pal+ipr> lt 2	; Only one of fpu, pal, ipr may be selected
+
+	.if eq fpu+pal+ipr
+	  .if ne unvirt
+	    unvirtualize r'n', r0, swap=1
+	    stq/p r0, cns$r'n'(r1)
+	  .iff
+	    stq/p r'n', cns$r'n'(r1)
+	  .endc
+	.endc
+
+	.if ne fpu
+	  stt	f'n', cns$fr'n'(r1)
+	.endc
+
+	.if ne pal
+	  mf	r0, pt'n'
+	  .iif ne unvirt, unvirtualize r0, r2
+	  stq/p	r0, cns$pt'n'(r1)
+	.endc
+
+	.if ne ipr
+	  .iif eq nodata, mf	r0, 'n'
+	  .iif ne nodata, lda	r0, (r31)
+	  .iif ne unvirt, unvirtualize r0, r2
+	  stq/p	r0, cns$'n'(r1)
+	.endc
+	.endm
+
+
+
+	.macro restore_reg n, fpu=0, pal=0, ipr=0, virt=0
+	assume <fpu+pal+ipr> lt 2	; Only one of fpu, pal, ipr may be selected
+
+	.if  eq fpu+pal+ipr
+	  ldq/p r'n', cns$r'n'(r1)
+	  .iif ne virt,virtualize r'n', r0
+	.endc
+
+	.if ne fpu
+	  ldt	f'n', cns$fr'n'(r1)
+	.endc
+
+
+
+
+	.if ne pal
+	  ldq/p	r0, cns$pt'n'(r1)
+	  .iif ne virt, virtualize r0, r2
+	  mt	r0, pt'n'
+	.endc
+
+	.if ne ipr
+	  ldq/p	r0, cns$'n'(r1)
+	  .iif ne virt,virtualize r0, r2
+	  .if IDN <n> <pal_base>
+	   mb
+	   mb
+	  .endc
+	  mt	r0, 'n'
+	.endc
+	.endm
+
+;+
+;
+; This macro is for debugging only, and causes the register of interest
+; to be written to low physical address, presumable this should have
+; minimal side effects once we have made it past the first instruction
+;
+;-
+
+	.macro	DEBUG_BOOT reg, data
+	.if ne enable_debug_boot
+	  lda	'reg', $$debug_boot$$(r31)
+	  stq/p	'reg',^x100(r31)
+	  .iif nb <data>, stq/p data, ^x108(r31)
+	  mb
+	  $$debug_boot$$ = $$debug_boot$$ + 1
+	.endc
+	.endm
+
+
+	.macro	DEBUG_BOOT2 reg, data
+	.if ne enable_debug_boot
+	  lda	'reg', $$debug_boot$$(r31)
+	  stq/p	'reg',^x110(r31)
+	  .iif nb <data>, stq/p data, ^x118(r31)
+	  mb
+	  $$debug_boot$$ = $$debug_boot$$ + 1
+	.endc
+	.endm
+
+
+
+	.macro	DEBUG_BOOT3 reg, data
+	.if ne enable_debug_boot
+	  lda	'reg', $$debug_boot$$(r31)
+	  stq/p	'reg',^x120(r31)
+	  .iif nb <data>, stq/p data, ^x128(r31)
+	  mb
+	  $$debug_boot$$ = $$debug_boot$$ + 1
+	.endc
+	.endm
+
+
+
+
+	.macro	TRACE_PC label
+	  .if ne <enable_debug_pctrace ! enable_debug_pcevent>
+	    .if eq disable_tracepc
+	      .iif df osfpal, .iif ndf MACRO64$, .external pal$trace_pc
+	      .if eq enable_debug_pcevent
+	        .if df osfpal
+		  mt	r0, pt6
+		  mt	r1, pt8
+		  pvc$jsr   traceo, bsr=4001
+		  bsr	r0, pal$trace_pc
+		  mf	r0, pt6
+		  mf	r1, pt8
+		  or	r31, r31, r31
+		.iff
+		  mt	r0, pt0
+		  mt	r1, pt1
+		  pvc$jsr   tracev, bsr=4001
+		  bsr	r0, pal$trace_pc
+		  mf	r0, pt0
+		  mf	r1, pt1
+		  or	r31, r31, r31
+		.endc
+	      .iff
+	        .if df osfpal
+		  mt	r0, pt6
+		  mt	r1, pt8
+		  lda	r1, <$$debug_boot$$*16>(r31)
+		  pvc$jsr   traceo, bsr=4001
+		  bsr	r0, pal$trace_pc
+		  mf	r0, pt6
+		  mf	r1, pt8
+	        .iff
+		  mt	r0, pt0
+		  mt	r1, pt1
+		  lda	r1, <$$debug_boot$$*16>(r31)
+		  pvc$jsr   tracev, bsr=4001
+		  bsr	r0, pal$trace_pc
+		  mf	r0, pt0
+		  mf	r1, pt1
+		.endc
+
+		.save_psect	local_block
+
+		.if ndf osfpal
+		  .psect	psect_98_Perftext
+		  . = pal$perftext+ <$$debug_boot$$*32>
+	.if ndf MACRO64$
+		  .quad 0
+		  .quad 0
+		  .quad 0
+		  .quad 0
+	.endc
+		  . = pal$perftext+ <$$debug_boot$$*32>
+		.iff
+		  .psect	psect_99_Perftext
+		  . = osfpal$perftext+ <$$debug_boot$$*32>
+	.if ndf MACRO64$
+		  .quad 0
+		  .quad 0
+		  .quad 0
+		  .quad 0
+	.endc
+		  . = osfpal$perftext+ <$$debug_boot$$*32>
+		.endc
+		.asciz	/'label'/
+		.restore_psect
+		$$debug_boot$$ = $$debug_boot$$ + 1
+	      .endc
+	    .endc
+	  .endc
+	.endm
+
+
+
+
+
+;+
+;
+; This macro is for debugging only, and causes the dtb to be zaped.
+; It is used to test the multi-processor interractions to the queue 
+; instructions. This is a PAL debuging feature only, and should not
+; be used or enabled on released code.
+;
+;-
+	.macro	debug_mp_queue
+	  .if ne  enable_debug_mp
+	    mt	r31, dtbzap	; zap dtb
+	    stall 3
+	  .endc
+	.endm
+
+
+
+	.macro	mtpt a,b
+	  mt	a, pt'b'
+	.endm
+
+	.macro	mfpt a,b
+	  mf	a, pt'b'
+	.endm
+
+
+	.macro	debug_mp_store rg,sr,?ok, ?bad
+	  .if ne enable_debug_mp
+	    srn = %extract(1,2,sr)
+
+	    mtpt   sr, \srn; save a work reg
+	    rpcc   sr		; get the ticker
+	    and    sr, #^x3F,  sr; get some low bits
+	    cmplt  sr, #7,  sr	; failing? (give it a 8 in 64 chance to fail)
+	    cmovne sr, r31, rg	; set stx_c to failure
+	    bne    sr, bad	; br if failure
+
+	    mfpt	sr, \srn; restore work reg
+	    br   r31, ok	; br if success
+
+bad:	    mfpt sr, \srn; restore work reg
+	    br   r31, ok+4	; br if failure
+ok:
+	    .long 0 ; stx_c	; gets br over in the failure case
+	    . = . - 4
+	  .endc
+	.endm
+
+
+
+
+;+
+; insert n stall cycles into the pipe
+; useing either ib0, or ib1 nop's
+;-
+
+	.macro	stall	n,mxpr=1
+	  .if eq mxpr-1
+	    .repeat n
+	      mt	r31,0
+	    .endr
+	  .iff
+	    .repeat n
+	      or	r31, r31, r31
+	    .endr
+	  .endc
+	.endm	stall
+
+
+;+
+; macro's to conditionally handle differences between ev4 pass1 and pass2
+;-
+	.macro	ev4_p1 arg
+	.iif ne ev4_pass1, arg 
+	.endm
+
+	.macro	ev4_p2 arg
+	.iif ne <ev4_pass2!ev4_pass3>, arg
+	.endm
+
+	.macro	ev4_p1_or_p2	arg1, arg2
+	  .iif ne ev4_pass1, arg1
+	  .iif ne <ev4_pass2!ev4_pass3>, arg2
+	.endm
+
+
+
+	.macro inc_pc	regn=12
+	  .if ne ev4_pass1
+	   mt	r'regn', pt'regn'
+	   mf	r'regn', exc_addr
+	   addq	r'regn', #4, r'regn'
+	   mt	r'regn', exc_addr
+	   mf	r'regn', pt'regn'
+	  .endc
+	.endm
+
+
+;+
+; macro to tell the palcode violation checker to "ignore" a rule here...
+;-
+
+
+	.macro	pvc$jsr	token, dest=0, bonus=0, bsr=0
+	  .iif gt bsr-1, pcv__'token' == bsr
+	  .if ndf osfpal
+	    .iif ndf pcv_jsr_index, pcv_jsr_index = 2100
+	  .iff
+	    .iif ndf pcv_jsr_index, pcv_jsr_index = 3100
+	  .endc
+	  .iif ndf pcv_index, pcv_index = 100
+	  tpcv_jsr_index = pcv_jsr_index
+	  .iif ne bsr, pcv_jsr_index = pcv_jsr_index + 2000
+	  .iif gt bsr-1, pcv_jsr_index = bsr
+	  .iif ndf pcv_jsr_'token''bonus', pcv_jsr_'token''bonus' == pcv_jsr_index
+	  .iif ndf pcv_jsr_'token''bonus'_inst, pcv_jsr_'token''bonus'_inst = 1
+
+	  .if eq dest
+	    .iif df osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', osf
+	    .iif ndf osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', vms
+	  .iff
+	    .iif df osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', osf, \pcv_jsr_'token''bonus'_inst
+	    .iif ndf osfpal, pvc_lbl \pcv_index, \pcv_jsr_'token''bonus', vms, \pcv_jsr_'token''bonus'_inst
+	    pcv_jsr_'token''bonus'_inst = pcv_jsr_'token''bonus'_inst +1
+	  .endc
+	  pcv_jsr_index = tpcv_jsr_index
+	  pcv_jsr_index = pcv_jsr_index + 1
+	  pcv_index = pcv_index + 1
+	.endm
+
+
+	.macro	pvc$violate	rule
+	  .iif ndf pcv_index, pcv_index = 0
+	  .iif nb <rule>, pcv$rule = rule
+	  .iif df osfpal, pvc_lbl \pcv_index, \pcv$rule, osf
+	  .iif ndf osfpal, pvc_lbl \pcv_index,\ pcv$rule, vms
+	  pcv_index = pcv_index +1
+	.endm
+
+
+	.macro	pvc_lbl indx, rule, os, inst=0, value
+	  .if nb <value>
+	    .iif eq inst, pvc$'os''indx'$'rule' == value
+	    .iif ne inst, pvc$'os''indx'$'rule'.'inst' == value
+	  .iff
+	    .iif eq inst, pvc$'os''indx'$'rule' == .
+	    .iif ne inst, pvc$'os''indx'$'rule'.'inst' == .
+	  .endc
+	.endm
+
+
+
+
+;+
+; 
+; FFS
+; this macro takes a nn bit integer as input (RS) and returns the number
+; of the highest bit set (RD)
+;
+; Input:
+;	Pos = bit position to start scan (must be 64,32,16, 8)
+;	Rs = data<63:nn+1>mbz! data<nn:0>
+;	Rd = junk
+;	t0 = junk
+;	t1 = junk
+;
+; Output:
+;	Rs = junk
+;	Rd = Bit position of highest bit set
+;	t0 = junk
+;	t1 = junk
+;
+;- 
+
+
+	.macro	ffs rs, rd, t0, t1, size=64
+
+
+	; reduce to 32 bits
+	or	r31, r31, 'rd'		; init result
+	or	r31, r31, 't1'		; init partial result
+	.if gt size-32
+	 srl	'rs', #32, 't0'		; check bits that set <5>
+	 cmovne	't0', 't0', 'rs'	; keep correct half
+	 cmovne	't0', #^X20, 'rd'	; set bit <5> of answer
+	.endc
+	; reduce to 16 bits
+	.if gt size-16
+	 srl	'rs', #16, 't0'		; check bits that set <4>
+	 cmovne	't0', 't0', 'rs'	; keep correct half
+	 cmovne	't0', #^X10, 't1'	; set bit <4> of answer
+	 or	't1', 'rd', 'rd'	; merge into result
+	.endc
+	; reduce to 8 bits
+	.if gt size-8
+	 srl	'rs', #8, 't0'		; check bits that set <3>
+	 cmovne	't0', 't0', 'rs'	; keep correct half
+	 cmovne	't0', #8, 't1'		; set bit <3> of answer
+	 or	't1', 'rd', 'rd'	; merge into result
+	.endc
+	; reduce to 4 bits
+	; now that down to byte use AND in place of SRL
+	and	'rs', #^xF0, 't0'	; check the bits that set <2>
+	cmovne	't0', 't0', 'rs'	; keep the correct half
+	cmovne	't0', #4, 't1'		; gen up <2>	
+	or	't1', 'rd', 'rd'	; merge into result
+	; reduce to 2 bits
+	and	'rs', #^xCC, 't0'	; check the bits that set <1>
+	cmovne	't0', 't0', 'rs'	; keep the correct half
+	cmovne	't0', #2, 't1'		; gen up <1>	
+	or	't1', 'rd', 'rd'	; merge into result
+	; reduce to 1 bit
+	and	'rs', #^xAA, 't0'	; check the bits that set <0>
+	cmovne	't0', 't0', 'rs'	; keep the correct half
+	cmovne	't0', #1, 't1'		; gen up <0>	
+	or	't1', 'rd', 'rd'	; merge into result
+	.endm
+
+
+;+
+;
+; Macro to replace the hw_rei system macro.. just to make sure
+; we get the new one. This one has Ra and Rb set to 31 instead of 0
+;
+;-
+
+.MACRO	HW_REI
+  .list meb
+  .iif ndf EVX$OPC_HW_MFPR, EVX_IPR_DEF
+  .long <evx$opc_hw_rei@26> ! <31@21> ! <31@16> ! <1@15>
+  .nlist meb
+.ENDM
+
+;+
+; Macro to load a high memory address. 
+; Computes ((offset + base) << shift)
+;-
+	.macro get_high_addr 	dest, offset, base=r31, shift=28
+	  lda	'dest', <<'offset'> & ^xffff>('base')
+	  sll	'dest', 'shift', 'dest'
+	.endm
+
+.if not_defined MACRO64$
+	.macro jsr ra, rb, abshint=.
+	  $jsr	'ra', <abshint-.>'rb'
+	.endm
+
+	.macro jmp ra, rb, abshint=.
+	  $jmp	'ra', <abshint-.>'rb'
+	.endm
+.endc

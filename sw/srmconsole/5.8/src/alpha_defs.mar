@@ -1,0 +1,298 @@
+	.MACRO	$ALPHADEFS
+	  ALPHADEF_VER == 3	; Flag the version number of this file.
+	.ENDM
+
+
+	.MACRO	$PSDEF,$GBL
+	$DEFINI	PS,$GBL
+;+
+; PS Layout - PS
+;	Loc	Size	name 	function
+;	------	------	______	-----------------------------------
+;	<31:29>	3	SA	stack alignment
+;	<31:13>	24	RES	Reserved MBZ
+;	<12:8>	5	IPL	Priority level
+;	<7>	1	VMM	Virtual Mach Monitor
+;	<6:5>	2	RES	Reserved MBZ
+;	<4:3>	2	CM	Current Mode
+;	<2:0>	3	SW	Software bits
+;-
+
+$EQU	PS$V_SW		0
+$EQU	PS$M_SW		<7@PS$V_SW>
+
+$EQU	PS$V_CM		3
+$EQU	PS$M_CM		<3@PS$V_CM>
+
+$EQU	PS$V_VMM	7
+$EQU	PS$M_VMM	<1@PS$V_VMM>
+
+$EQU	PS$V_IPL	8
+$EQU	PS$M_IPL	<^x1F@PS$V_IPL>
+
+$EQU	PS$V_SP		<^X38>
+$EQU	PS$M_SP		<^X3F@PS$V_SP>
+
+
+$EQU	PS$C_KERN	<^X00>
+$EQU	PS$C_EXEC	<^X08>
+$EQU	PS$C_SUPR	<^X10>
+$EQU	PS$C_USER	<^X18>
+$EQU	PS$C_IPL0	<^X0000>
+$EQU	PS$C_IPL1	<^X0100>
+$EQU	PS$C_IPL2	<^X0200>
+$EQU	PS$C_IPL3	<^X0300>
+$EQU	PS$C_IPL4	<^X0400>
+$EQU	PS$C_IPL5	<^X0500>
+$EQU	PS$C_IPL6	<^X0600>
+$EQU	PS$C_IPL7	<^X0700>
+$EQU	PS$C_IPL8	<^X0800>
+$EQU	PS$C_IPL9	<^X0900>
+$EQU	PS$C_IPL10	<^X0A00>
+$EQU	PS$C_IPL11	<^X0B00>
+$EQU	PS$C_IPL12	<^X0C00>
+$EQU	PS$C_IPL13	<^X0D00>
+$EQU	PS$C_IPL14	<^X0E00>
+$EQU	PS$C_IPL15	<^X0F00>
+$EQU	PS$C_IPL16	<^X1000>
+$EQU	PS$C_IPL17	<^X1100>
+$EQU	PS$C_IPL18	<^X1200>
+$EQU	PS$C_IPL19	<^X1300>
+$EQU	PS$C_IPL20	<^X1400>
+$EQU	PS$C_IPL21	<^X1500>
+$EQU	PS$C_IPL22	<^X1600>
+$EQU	PS$C_IPL23	<^X1700>
+$EQU	PS$C_IPL24	<^X1800>
+$EQU	PS$C_IPL25	<^X1900>
+$EQU	PS$C_IPL26	<^X1A00>
+$EQU	PS$C_IPL27	<^X1B00>
+$EQU	PS$C_IPL28	<^X1C00>
+$EQU	PS$C_IPL29	<^X1D00>
+$EQU	PS$C_IPL30	<^X1E00>
+$EQU	PS$C_IPL31	<^X1F00>
+
+	$DEFEND	PS,$GBL,DEF
+	.ENDM
+
+
+;+
+; PTE layout - symbol prefix PTE$
+;
+;	Loc	Size	name 	function
+;	------	------	------	-----------------------------------
+;	<63:32>	32	PFN	Page Frame Number
+;	<31:16>	16	SOFT	Bits reserved for software use
+;	<15>	1	UWE	User write enable
+;	<14>	1	SWE	Super write enable
+;	<13>	1	EWE	Exec write enable
+;	<12>	1	KWE	Kernel write enable
+;	<11>	1	URE	User read enable
+;	<10>	1	SRE	Super read enable
+;	<9>	1	ERE	Exec read enable
+;	<8>	1	KRE	Kernel read enable
+;	<7:6>	2	RES	Reserved SBZ 
+;	<5>	1	HPF	Huge Page Flag
+;	<4>	1	ASM	Wild card address space number match
+;	<3>	1	FOE	Fault On execute
+;	<2>	1	FOW	Fault On Write
+;	<1>	1	FOR	Fault On Read
+; 	<0>	1	V	valid bit
+;-
+
+	.MACRO	$PTEDEF,$GBL
+	$DEFINI	PTE,$GBL
+
+$EQU	PTE$V_PFN	32
+$EQU	PTE$M_SOFT	<^XFFFF0000>
+$EQU	PTE$V_SOFT	16
+$EQU	PTE$M_UWE	<^X8000>
+$EQU	PTE$V_UWE	15
+$EQU	PTE$M_SWE	<^X4000>
+$EQU	PTE$V_SWE	14
+$EQU	PTE$M_EWE	<^X2000>
+$EQU	PTE$V_EWE	13
+$EQU	PTE$M_KWE	<^X1000>
+$EQU	PTE$V_KWE	12
+$EQU	PTE$M_URE	<^X0800>
+$EQU	PTE$V_URE	11
+$EQU	PTE$M_SRE	<^X0400>
+$EQU	PTE$V_SRE	10
+$EQU	PTE$M_ERE	<^X0200>
+$EQU	PTE$V_ERE	 9
+$EQU	PTE$M_KRE	<^X0100>
+$EQU	PTE$V_KRE	 8
+$EQU	PTE$M_HPF	<^X0020>
+$EQU	PTE$V_HPF	5
+$EQU	PTE$M_ASM	<^X0010>
+$EQU	PTE$V_ASM	4
+$EQU	PTE$M_FOE	<^X0008>
+$EQU	PTE$V_FOE	3
+$EQU	PTE$M_FOW	<^X0004>
+$EQU	PTE$V_FOW	2
+$EQU	PTE$M_FOR	<^X0002>
+$EQU	PTE$V_FOR	1
+$EQU	PTE$M_V		<^X0001>
+$EQU	PTE$V_V		0
+
+	$DEFEND	PTE,$GBL,DEF
+	.ENDM
+
+
+;+
+; VA layout - symbol prefix VA$
+;
+;	Loc	Size	name 	function
+;	------	------	-------	-----------------------------------
+;	<42:33>	10	SEG1	First seg table offset for mapping
+;	<32:23>	10	SEG2	Second seg table offset for mapping
+;	<22:13>	10	SEG3	Third seg table offset for mapping
+;	<12:0>	13	OFFSET	Byte within page
+;-
+	.MACRO	$VADEF,$GBL
+	$DEFINI	VA,$GBL
+$EQU	VA$M_OFFSET	<^X000000001FFF>
+$EQU	VA$V_OFFSET	0
+$EQU	VA$M_SEG3	<^X0000007FE000>
+$EQU	VA$V_SEG3	13
+$EQU	VA$M_SEG2	<^X0001FF800000>
+$EQU	VA$V_SEG2	23	
+$EQU	VA$M_SEG1	<^X7FE00000000>
+$EQU	VA$V_SEG1	33	
+
+	$DEFEND	VA,$GBL,DEF
+	.ENDM
+
+;+
+; PRIVILEGED CONTEXT BLOCK (PCB)
+;-
+	.MACRO	$PCBDEF,$GBL
+	$DEFINI	PCB,$GBL
+$DEF	PCB$Q_KSP
+	.BLKQ	1
+$DEF	PCB$Q_ESP
+	.BLKQ	1
+$DEF	PCB$Q_SSP
+	.BLKQ	1
+$DEF	PCB$Q_USP
+	.BLKQ	1
+$DEF	PCB$Q_PTBR
+	.BLKQ	1
+$DEF	PCB$Q_ASN
+	.BLKQ	1
+$DEF	PCB$Q_AST
+	.BLKQ	1
+$DEF	PCB$Q_FEN
+	.BLKQ	1
+$DEF	PCB$Q_CC
+	.BLKQ	1
+$DEF	PCB$Q_UNQ
+	.BLKQ	1
+$DEF	PCB$Q_SCT
+	.BLKQ	6
+
+$EQU	PCB$V_ASTEN	0
+$EQU	PCB$M_ASTEN	<^X0F@PCB$V_ASTEN>
+$EQU	PCB$V_ASTSR	4
+$EQU	PCB$M_ASTSR	<^X0F@PCB$V_ASTSR>
+
+	$DEFEND	PCB,$GBL,DEF
+	.ENDM
+
+
+
+;+
+; SYSTEM CONTROL BLOCK (SCB)
+;-
+	.MACRO	$SCBDEF,$GBL
+	$DEFINI	SCB,$GBL
+
+
+$EQU	SCB$V_FEN		<^X0010>
+$EQU	SCB$V_ACV		<^X0080>
+$EQU	SCB$V_TNV		<^X0090>
+$EQU	SCB$V_FOR		<^X00A0>
+$EQU	SCB$V_FOW		<^X00B0>
+$EQU	SCB$V_FOE		<^X00C0>
+$EQU	SCB$V_ARITH		<^X0200>
+$EQU	SCB$V_KAST		<^X0240>
+$EQU	SCB$V_EAST		<^X0250>
+$EQU	SCB$V_SAST		<^X0260>
+$EQU	SCB$V_UAST		<^X0270>
+$EQU	SCB$V_UNALIGN		<^X0280>
+$EQU	SCB$V_BPT		<^X0400>
+$EQU	SCB$V_BUGCHK		<^X0410>
+$EQU	SCB$V_OPCDEC		<^X0420>
+$EQU	SCB$V_ILLPAL		<^X0430>
+$EQU	SCB$V_TRAP		<^X0440>
+$EQU	SCB$V_CHMK		<^X0480>
+$EQU	SCB$V_CHME		<^X0490>
+$EQU	SCB$V_CHMS		<^X04A0>
+$EQU	SCB$V_CHMU		<^X04B0>
+$EQU	SCB$V_SW1		<^X0510>
+$EQU	SCB$V_SW2		<^X0520>
+$EQU	SCB$V_SW3		<^X0530>
+$EQU	SCB$V_SW4		<^X0540>
+$EQU	SCB$V_SW5		<^X0550>
+$EQU	SCB$V_SW6		<^X0560>
+$EQU	SCB$V_SW7		<^X0570>
+$EQU	SCB$V_SW8		<^X0580>
+$EQU	SCB$V_SW9		<^X0590>
+$EQU	SCB$V_SW10		<^X05A0>
+$EQU	SCB$V_SW11		<^X05B0>
+$EQU	SCB$V_SW12		<^X05C0>
+$EQU	SCB$V_SW13		<^X05D0>
+$EQU	SCB$V_SW14		<^X05E0>
+$EQU	SCB$V_SW15		<^X05F0>
+$EQU	SCB$V_CLOCK		<^X0600>
+$EQU	SCB$V_INTER		<^X0610>
+$EQU	SCB$V_SYSERR		<^X0620>
+$EQU	SCB$V_PROCERR		<^X0630>
+$EQU	SCB$V_PWRFAIL		<^X0640>
+$EQU	SCB$V_PERFMON		<^X0650>
+$EQU	SCB$V_SYSMCHK		<^X0660>
+$EQU	SCB$V_PROCMCHK		<^X0670>
+
+	$DEFEND	SCB,$GBL,DEF
+	.ENDM
+
+;+
+; Stack frame (FRM)
+;-
+	.MACRO	$FRMDEF,$GBL
+	$DEFINI	FRM,$GBL
+
+$EQU	FRM$V_R2		<^X0000>
+$EQU	FRM$V_R3		<^X0008>
+$EQU	FRM$V_R4		<^X0010>
+$EQU	FRM$V_R5		<^X0018>
+$EQU	FRM$V_R6		<^X0020>
+$EQU	FRM$V_R7		<^X0028>
+$EQU	FRM$V_PC		<^X0030>
+$EQU	FRM$V_PS		<^X0038>
+
+	$DEFEND	FRM,$GBL,DEF
+	.ENDM
+
+;+
+; Exeception summary register (EXS)
+;-
+	.MACRO	$EXSDEF,$GBL
+	$DEFINI	EXS,$GBL
+$EQU	EXS$V_SWC		<0>	; Software completion
+$EQU	EXS$V_INV		<1>	; Ivalid operation
+$EQU	EXS$V_DZE		<2>	; Div by zero
+$EQU	EXS$V_FOV		<3>	; Floating point overflow
+$EQU	EXS$V_UNF		<4>	; Floating point underflow
+$EQU	EXS$V_INE		<5>	; Floating point inexact
+$EQU	EXS$V_IOV		<6>	; Floating convert to integer overflow
+
+$EQU	EXS$M_SWC               <1@EXS$V_SWC>
+$EQU	EXS$M_INV               <1@EXS$V_INV>
+$EQU	EXS$M_DZE               <1@EXS$V_DZE>
+$EQU	EXS$M_FOV               <1@EXS$V_FOV>
+$EQU	EXS$M_UNF               <1@EXS$V_UNF>
+$EQU	EXS$M_INE               <1@EXS$V_INE>
+$EQU	EXS$M_IOV               <1@EXS$V_IOV>
+
+	$DEFEND	EXS,$GBL,DEF
+	.ENDM

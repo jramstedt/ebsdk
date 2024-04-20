@@ -1,0 +1,11 @@
+Instructions for building PALcode and configuring PALcode
+
+
+When building a set of PALcode, there are two main files - firstly,
+the OSF palcode file which contains all the hardware entry points
+and is largely platform independent.  Secondly a system PALcode file
+which contains the flesh of the implementation and has many areas where
+different actions must be taken for different platforms.
+
+These files are configured by setting predicate variables and definitions
+in platform and target configuration files, which contain no code.

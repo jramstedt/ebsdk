@@ -1,0 +1,442 @@
+; file:		pc264_util.mar
+;
+; Copyright (C) 1997 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;      
+
+;++
+;  FACILITY:
+;
+;      Alpha SRM Console Firmware
+;                                                             
+;  MODULE DESCRIPTION:
+;
+;	Platform specific Alpha Macro firmware functions.
+;
+;  AUTHORS:
+;
+;	Eric Rasmussen
+;
+;  CREATION DATE:
+;                                                    
+;	20-Nov-1996
+;
+;  MODIFICATION HISTORY:                                 
+;
+;	EG 	06-Feb-1998	Fixed io_base access (for ISA i/o)
+;	ER	28-Aug-1997	Fix to work with EV6/Tsunami.
+;	EG 	26-Mar-1997	Removed STB and STW macros.
+;	EG 	10-Jan-1997	Ported lx164_util.mar to this file; 
+;				pc264_util.mar.            
+;                                     
+;	ER	03-Dec-1996	Added ldbu, ldwu, stb, and stw functions.
+;                    
+;--                  
+                     
+	.title	pc264_util
+
+;Libraries
+
+;	$mxr
+;	$pal_func
+;EGG        $PALTEMP                ; expand definitions in alphamac.mlb
+;EGG        $EV5DEF                 ; :
+
+
+	.show	expansions
+
+;+
+;
+; Macro section.
+;
+;-
+
+.macro	pd	name,alias
+.if df macro64$
+	.procedure_descriptor	name, _'name'_
+.if nb alias
+	.procedure_descriptor	alias, _'name'_
+.endc
+.iff
+name::                                         
+.if nb alias
+alias::
+.endc
+.endc
+	.quad	8
+	.quad	_'name'_
+.endm
+
+.macro	ref	name
+'name'_:
+_'name' = . - linkage
+	.quad	name
+.endm
+
+;+
+;
+; This macro is used to put a character to the COM1 serial port.
+;
+; Inputs:
+;	ascchar	= Character to be displayed
+;	rcom,rs	= Scratch registers
+;-
+
+com1 = ^x3f8
+com2 = ^x2f8
+thr = 0
+rbr = 0
+dll = 0
+ier = 1
+iir = 2
+lcr = 3
+mcr = 4
+lsr = 5
+msr = 6
+scr = 7
+lsr$v_dr == 0
+lsr$m_dr == 1
+lsr$v_thre == 5
+lcr$m_sbs  == ^x04
+lcr$m_dla  == ^x80
+mcr$m_dtr  == ^x01
+mcr$m_rts  == ^x02
+mcr$m_out1 == ^x04
+mcr$m_out2 == ^x08
+baud_9600  == ^x0c
+char_8bit  == ^x03
+
+;
+; Addressing definitions
+;                         
+io_base_l == ^x801FC        
+io_base_h == ^x801FC @-16       
+                          
+.macro	combott_putc 	ascchar,rcom,rs,?lab1,?lab2 
+	ldah	'rcom',io_base_h(r31)	; I/O base address 	
+	lda	'rcom', io_base_l('rcom')   
+	sll	'rcom',#24,'rcom'
+	lda	'rcom',com1('rcom')	; COM1 port address
+lab1:        			
+	ldbu	'rs',lsr('rcom')	; get line status register
+	srl	'rs',#lsr$v_thre,'rs'	; extract the ready bit
+	blbc    'rs',lab1               ; if not ready to txmit, spin.
+	and	'ascchar',#^xff,'rs'
+	stbu	'rs',thr('rcom')	; xmit the character
+	mb				; wait for the write
+.endm  combott_putc
+
+.macro	combo_write port, datum, raddr, rdata, rs
+	ldah	'raddr', io_base_h(r31)	; get base address for ISA
+	lda	'raddr', io_base_l('raddr')	; get base address for ISA
+	sll	'raddr', #24, 'raddr'
+	lda	'raddr', port('raddr')	;
+	lda	'rdata', datum(r31)
+	and	'rdata',#^xff,'rdata'
+	stbu	'rdata', ('raddr')
+	mb
+.endm combo_write
+
+.macro	combo_read port, raddr, rdata
+	ldah	'raddr', io_base_h(r31)
+	lda	'raddr', io_base_l('raddr')
+	sll	'raddr', #24, 'raddr'
+	lda	'raddr', port('raddr')
+	ldbu	'rdata', ('raddr')
+	and	'rdata', #^xff, 'rdata'
+.endm combo_read
+
+;+
+;
+; This macro is used to put a register to the COM1 serial port.
+;
+; Inputs:
+;	rd = Register to be displayed
+;	r12,r13,r14,r15 = Scratch registers
+;-
+
+.macro	combott_rputc 	rd,?slp,?blp
+	lda	r12,64(r31)		; Load the shift count
+slp:	subq	r12,4,r12		; Get the new count
+	srl	'rd',r12,r13		; Shift the nibble into position
+	and	r13,^xf,r13		; Use only the nibble
+	cmplt	r13,#10,r14		; If greater = ^xa	
+	blbs	r14,blp               	; Don't branch
+	addq	r13,#7,r13		; Add some extra for ^x and over
+blp:	addq	r13,#48,r13		; Add for ascii
+	combott_putc r13,r14,r15	; rs = character to be displayed
+	bne	r12,slp			; Branch until we're finished
+.endm  combott_rputc
+
+;+
+;
+; This macro is used to get a character from the COM1 serial port.
+;
+; Inputs:
+;	rr = register where the character is to be returned
+;	rcom,rs	= Scratch registers
+;-
+
+.macro	combott_getc 	rr,rcom,rs,?lab1
+
+	ldah	'rcom',io_base_h(r31)	; get ISA base address 	
+	lda	'rcom',io_base_l('rcom')	; get ISA base address 	
+	sll	'rcom',#24,'rcom'                          
+	lda	'rcom',com1('rcom')	; COM1 port address
+lab1:        			
+	ldbu	'rs',lsr('rcom')	; read the status register
+	srl	'rs',#lsr$v_dr,'rs'	; extract data ready bit  
+	blbc    'rs',lab1               ; if no character yet, spin.
+
+	ldbu	'rr',rbr('rcom')	; get the character
+	;
+	; no need to shift data into position
+	;
+	; it is at byte 0
+	;
+	and	'rr',#^xff,'rr'		; and only the character
+
+.endm  combott_getc
+
+;+
+;
+; This macro is used to generate a LDBU (Load Zero-Extended Byte from Memory
+; to Register) instruction.
+;
+; Inputs:
+;	dest = Destination register operand
+;	src  = Source address operand
+;-
+.macro	ldbu	dest, src
+
+        dest_reg_length = %LENGTH( dest ) - 1
+        dest_reg_num = %EXTRACT( 1, dest_reg_length, dest )
+
+	lp_pos = %LOCATE( <(>, src )			; find left parenthesis
+	lp_pos2 = lp_pos + 2				; skip parenthesis and R
+	reg_length = %LOCATE( <)>, src ) - lp_pos2	; get size of reg number 
+	base = %EXTRACT( lp_pos2, reg_length, src )
+
+	disp = %EXTRACT( 0, lp_pos, src )
+	assume  disp le <^x7FFF>
+	assume  disp ge -<^x8000>
+
+	exp = <dest_reg_num@21> ! <base@16> ! <disp&^xffff>
+	resopc0a exp
+
+.endm ldbu
+
+;+
+;
+; This macro is used to generate a STB (Store Byte from Register to
+; Memory) instruction.
+;
+; Inputs:
+;	data = Source register operand 
+;	addr = Destination address operand
+;-
+.macro	stbu	data, addr
+
+        data_reg_length = %LENGTH( data ) - 1
+        data_reg_num = %EXTRACT( 1, data_reg_length, data )
+
+	sp_pos = %LOCATE( <(>, addr )			; find left parenthesis
+	sp_pos2 = sp_pos + 2				; skip parenthesis and R
+	reg_length = %LOCATE( <)>, addr ) - sp_pos2	; get size of reg number 
+	base = %EXTRACT( sp_pos2, reg_length, addr )
+
+	disp = %EXTRACT( 0, sp_pos, addr )
+	assume  disp le <^x7FFF>
+	assume  disp ge -<^x8000>
+
+	exp = <data_reg_num@21> ! <base@16> ! <disp&^x7fff>
+	resopc0e exp
+
+.endm stbu
+
+;+
+;
+; This macro is used to output an 8-bit hex POST code to an LED card
+; at ISA I/O port address 80h.
+;
+; Inputs:
+;	rs, rcom = Scratch registers
+;-
+led_port == ^x80
+
+.macro	LED_WRITE 	rs, rcom
+	ldah  	'rcom', io_base_h(r31)
+	lda	'rcom', io_base_l('rcom')   
+	sll	'rcom', #24, 'rcom'
+	lda	'rcom', led_port('rcom')
+	and	'rs', ^xFF, 'rs'         
+	stbu	'rs', 0('rcom') 
+	mb                      
+.endm                                    
+
+;+
+;
+; Data section.
+;
+;-
+
+	.psect	kernel$data, 4, noexe
+
+pd	jputc
+pd	jgetc
+pd	jxgetc
+pd	j_rx_ready
+pd	ldbu
+pd	stbu
+pd	outLEDPort
+
+;+
+;
+; Code section.
+;
+;-
+.if df macro64$
+	.psect	kernel$code, 6, exe, mix
+.iff
+	.psect	kernel$code, 6, exe
+.endc
+
+	.subtitle	jputc
+;+
+; ============================================================================
+; = jputc - Display a character to the COM1 serial port.                     =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	This routine displays a character to the COM1 serial port.
+;	It simply uses the macro combott_putc.
+;-
+_jputc_:
+
+;Display the character
+	combott_putc r16,r0,r1
+    	ret	r31,(r26)
+
+	.subtitle	jgetc
+;+
+; ============================================================================
+; = jgetc - Get a character from the COM1 serial port.                       =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	This routine simply gets a character from the COM1 serial port.
+;	It simply gets the character from the combo chip.
+;-
+
+_jgetc_:
+
+	ldah	r16,io_base_h(r31)	; ISA bus base address 	
+	lda	r16,io_base_l(r16)	; ISA bus base address 	
+	sll	r16,#24,r16
+	lda	r16,com1(r16)		; COM1 port address
+	ldbu	r0,rbr(r16)		; get the character
+	and	r0,#^xff,r0		; and only the character
+
+    	ret	r31,(r26)
+
+	.subtitle	jxgetc
+;+
+; ============================================================================
+; = jxgetc - Get a character from the COM1 serial port.                      =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	This routine simply gets a character from the COM1 serial port.
+;	It simply gets the character from the combo chip. This routine
+;	blocks until the character is available.
+;-
+
+_jxgetc_:
+	combott_getc r0,r16,r17
+    	ret	r31,(r26)
+
+
+	.subtitle	j_rx_ready
+;+
+; ============================================================================
+; = j_rx_ready - Check for input character.                                  =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	This routine simply tests the line status register for an
+;	input character ready.
+;-
+
+_j_rx_ready_:
+
+	ldah	r16,io_base_h(r31)	; I/O and ISA bus address 	
+	lda	r16,io_base_l(r16)	; I/O and ISA bus address 	
+	sll	r16,#24,r16
+	lda	r16,com1(r16)		; COM1 port address
+
+	ldbu	r0,lsr(r16)
+	srl	r0,#lsr$v_dr,r0		; extract data ready bit  
+	and	r0,#lsr$m_dr,r0		; Mask data ready bit  
+    	ret	r31,(r26)
+
+	.subtitle	ldbu
+;+
+; ============================================================================
+; = LDBU - Load Zero-Extended Byte from Memory to Register                   =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	This routine implements the load byte function
+;-
+_ldbu_:
+	ldbu	r0, 0(r16)
+	ret	r31, (r26)
+
+;+
+; ============================================================================
+; = STB - Store Byte from Register to Memory				     =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	This routine implements the store byte function
+;-
+_stbu_:
+	stbu	r17, 0(r16)
+	ret	r31, (r26)
+
+	.subtitle	outLEDPort
+;+
+; ============================================================================
+; = outLEDPort - Output an 8-bit hex POST code                               =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	This routine will output an 8-bit hex POST code to an LED port.
+;-
+
+_outLEDPort_:
+
+	LED_WRITE r16, r0
+    	ret	r31, (r26)

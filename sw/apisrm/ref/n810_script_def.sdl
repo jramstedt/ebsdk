@@ -1,0 +1,126 @@
+/*
+/* Copyright (C) 1993 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Definitions for NCR53C810 scripts
+/*
+/* Author:	Stephen F. Shirron
+/*
+/* Modifications:
+/*
+/*	sfs	14-Apr-1993	Initial entry.
+/*
+
+module $n810scriptdef;
+
+constant dat_out equals 0 prefix "n810$";
+constant dat_in equals 1 prefix "n810$";
+constant cmd equals 2 prefix "n810$";
+constant sts equals 3 prefix "n810$";
+constant msg_out equals 6 prefix "n810$";
+constant msg_in equals 7 prefix "n810$";
+
+aggregate n810_bm structure prefix "n810$" fill;
+    bm_byte_count bitfield length 24 mask;
+    bm_phase bitfield length 3 mask;
+    constant move equals 0 prefix "n810$";
+    constant wait_move equals 1 prefix "n810$";
+    bm_opcode bitfield mask;
+    bm_tab bitfield mask;
+    bm_ind bitfield mask;
+    constant bm equals 0 prefix "n810$";
+    bm_type bitfield length 2 mask;
+    bm_addr longword unsigned;
+end n810_bm;
+
+aggregate n810_io structure prefix "n810$" fill;
+    io_fill1 bitfield length 3 fill;
+    io_atn bitfield mask;
+    io_fill2 bitfield length 2 fill;
+    io_ack bitfield mask;
+    io_fill3 bitfield length 2 fill;
+    io_tgt bitfield mask;
+    io_fill4 bitfield length 6 fill;
+    io_id bitfield length 3 mask;
+    io_fill5 bitfield length 5 fill;
+    io_watn bitfield mask;
+    io_tab bitfield mask;
+    io_rel bitfield mask;
+    constant resel equals 0 prefix "n810$";
+    constant sel equals 0 prefix "n810$";
+    constant disc equals 1 prefix "n810$";
+    constant wait_disc equals 1 prefix "n810$";
+    constant wait_sel equals 2 prefix "n810$";
+    constant wait_resel equals 2 prefix "n810$";
+    constant set equals 3 prefix "n810$";
+    constant clear equals 4 prefix "n810$";
+    io_opcode bitfield length 3 mask;
+    constant io equals 1 prefix "n810$";
+    io_type bitfield length 2 mask;
+    io_addr longword unsigned;
+end n810_io;
+
+aggregate n810_rw structure prefix "n810$" fill;
+    rw_fill1 bitfield length 8 fill;
+    rw_data bitfield length 8 mask;
+    rw_reg bitfield length 8 mask;
+    constant copy equals 0 prefix "n810$";
+    constant or equals 2 prefix "n810$";
+    constant and equals 4 prefix "n810$";
+    constant add equals 6 prefix "n810$";
+    rw_operation bitfield length 3 mask;
+    constant write equals 5 prefix "n810$";
+    constant "read" equals 6 prefix "n810$";
+    constant modify equals 7 prefix "n810$";
+    rw_opcode bitfield length 3 mask;
+    constant rw equals 1 prefix "n810$";
+    rw_type bitfield length 2 mask;
+    rw_fill2 longword fill;
+end n810_rw;
+
+aggregate n810_tc structure prefix "n810$" fill;
+    tc_data bitfield length 8 mask;
+    tc_mask bitfield length 8 mask;
+    tc_wait bitfield mask;
+    tc_cmp_phase bitfield mask;
+    tc_cmp_data bitfield mask;
+    tc_jmp_true bitfield mask;
+    tc_fill1 bitfield length 4 fill;
+    tc_phase bitfield length 3 mask;
+    constant jmp equals 0 prefix "n810$";
+    constant call equals 1 prefix "n810$";
+    constant ret equals 2 prefix "n810$";
+    constant int equals 3 prefix "n810$";
+    tc_opcode bitfield length 2 mask;
+    tc_rel bitfield mask;
+    constant tc equals 2 prefix "n810$";
+    tc_type bitfield length 2 mask;
+    tc_addr longword unsigned;
+end n810_tc;
+
+aggregate n810_mm structure prefix "n810$" fill;
+    mm_byte_count bitfield length 24 mask;
+    mm_fill1 bitfield length 6 fill;
+    constant mm equals 3 prefix "n810$";
+    mm_type bitfield length 2 mask;
+    mm_src longword unsigned;
+    mm_dst longword unsigned;
+end n810_mm;
+
+end_module $n810scriptdef;

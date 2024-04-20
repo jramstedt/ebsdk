@@ -1,0 +1,264 @@
+/* file:	ev5_lx164_impure.sdl
+/*
+/* Abstract:	PAL impure scratch area and logout area data structure definitions for
+/*		AlphaPC 164/LX SRM console firmware.
+/*
+/*
+{*	To convert to source (.MAR, .H):
+{*      SDL/LANGUAGE=(MACRO,CC)/COPYRIGHT/LIST EV5_LX164_IMPURE.SDL
+{*
+{*
+module	$pal_impure;
+
+iflanguage cc
+literal;
+
+#ifndef EV5_LX164_IMPURE_DEF
+#define EV5_LX164_IMPURE_DEF 1
+
+end_literal;
+end_iflanguage cc;
+
+{* Edit   Date     Who       Description
+{* ---- ---------  ---  ---------------------
+{*    1	20-Nov-96  ER	Initial revision
+{*
+    constant REVISION equals 1 prefix IMPURE$;            /* Revision number of this file
+/*
+/* Structure of the processor-specific impure area
+/*
+aggregate impure struct prefix "" tag "";
+	cns$flag	quadword;
+	cns$hlt		quadword;
+constant (
+	cns$r0,cns$r1,cns$r2,cns$r3,cns$r4,cns$r5,cns$r6,cns$r7,
+	cns$r8,cns$r9,cns$r10,cns$r11,cns$r12,cns$r13,cns$r14,cns$r15,
+	cns$r16,cns$r17,cns$r18,cns$r19,cns$r20,cns$r21,cns$r22,cns$r23,
+	cns$r24,cns$r25,cns$r26,cns$r27,cns$r28,cns$r29,cns$r30,cns$r31
+	) equals . increment 8 prefix "" tag "";
+	cns$gpr	quadword dimension 32;
+constant (
+	cns$f0,cns$f1,cns$f2,cns$f3,cns$f4,cns$f5,cns$f6,cns$f7,
+	cns$f8,cns$f9,cns$f10,cns$f11,cns$f12,cns$f13,cns$f14,cns$f15,
+	cns$f16,cns$f17,cns$f18,cns$f19,cns$f20,cns$f21,cns$f22,cns$f23,
+	cns$f24,cns$f25,cns$f26,cns$f27,cns$f28,cns$f29,cns$f30,cns$f31
+	) equals . increment 8 prefix "" tag "";
+	cns$fpr	quadword dimension 32;
+	#t=.;
+	cns$mchkflag quadword;
+	constant cns$pt_offset equals .;
+constant (
+	cns$pt0,cns$pt1,cns$pt2,cns$pt3,cns$pt4,cns$pt5,cns$pt6,
+	cns$pt7,cns$pt8,cns$pt9,cns$pt10,cns$pt11,cns$pt12,cns$pt13,
+	cns$pt14,cns$pt15,cns$pt16,cns$pt17,cns$pt18,cns$pt19,cns$pt20,
+	cns$pt21,cns$pt22,cns$pt23,cns$pt24
+	) equals . increment 8 prefix "" tag "";
+	cns$pt	quadword dimension 24;
+	cns$shadow8	quadword;
+	cns$shadow9	quadword;
+	cns$shadow10	quadword;
+	cns$shadow11	quadword;
+	cns$shadow12	quadword;
+	cns$shadow13	quadword;
+	cns$shadow14	quadword;
+	cns$shadow25	quadword;
+	constant cns$ipr_offset equals .;
+	cns$exc_addr	quadword;
+	cns$pal_base	quadword;
+	cns$mm_stat	quadword;
+	cns$va		quadword;
+	cns$icsr	quadword;
+	cns$ipl		quadword;
+	cns$ps		quadword;	/* Ibox current mode
+	cns$itb_asn	quadword;
+	cns$aster	quadword;
+	cns$astrr	quadword;
+	cns$isr		quadword;
+	cns$ivptbr	quadword;
+	cns$mcsr	quadword;
+	cns$dc_mode	quadword;
+	cns$maf_mode	quadword;
+	cns$sirr	quadword;
+	cns$fpcsr	quadword;
+	cns$icperr_stat	quadword;
+	cns$pmctr	quadword;
+	cns$exc_sum	quadword;
+	cns$exc_mask	quadword;
+	cns$intid	quadword;
+	cns$dcperr_stat quadword;
+	cns$sc_stat	quadword;
+	cns$sc_addr	quadword;
+	cns$sc_ctl	quadword;
+	cns$bc_tag_addr	quadword;
+	cns$ei_stat	quadword;
+	cns$ei_addr	quadword;
+	cns$fill_syn	quadword;
+	cns$ld_lock	quadword;
+	cns$bc_ctl	quadword;	/* shadow of on chip bc_ctl 
+	cns$pmctr_ctl   quadword;	/* saved frequency select info for pmctr
+	cns$bc_config	quadword;	/* shadow of on chip bc_config
+	cns$pal_type	quadword;
+	cns$intr_mask	quadword;	/* shadow of PCI interrupt mask
+/*
+/* Parameters passed in from the SROM
+/*
+	cns$srom_bc_ctl	    quadword;	/* Current BC_CTL value
+	cns$srom_bc_cfg	    quadword;   /* Current BC_CONFIG value
+	cns$srom_srom_rev   quadword;   /* SROM revision
+	cns$srom_proc_id    quadword;   /* Processor identifier
+	cns$srom_mem_size   quadword;   /* Size of contiguous good memory (bytes)
+	cns$srom_cycle_cnt  quadword;   /* Cycle count (picoseconds)
+	cns$srom_signature  quadword;   /* Signature and system revision identifier
+	cns$srom_proc_mask  quadword;   /* Active processor mask
+	cns$srom_sysctx	    quadword;   /* System context value
+	constant cns$size equals .;
+
+	constant cns$mchksize equals (.+7-#t) & %xfff8;
+end impure;
+
+aggregate EV5PMCTRCTL_BITS structure fill prefix PMCTR_CTL$;
+	SPROCESS bitfield length 1 ;
+	FILL_0 bitfield length 3 fill tag $$;
+	FRQ2 bitfield length 2 ;
+	FRQ1 bitfield length 2 ;
+	FRQ0 bitfield length 2 ;
+	CTL2 bitfield length 2 ;
+	CTL1 bitfield length 2 ;
+	CTL0 bitfield length 2 ;
+	FILL_1 bitfield length 16 fill tag $$;
+	FILL_2 bitfield length 32 fill tag $$;
+end EV5PMCTRCTL_BITS;
+
+/*
+/* Hacks to make builds work.
+/*
+constant PT$_IMPURE equals 3;		/* entry.c
+constant PT$_INTMASK equals 8;		/* entry.c
+constant PT$_PS equals 9;		/* hwrpb.c
+constant PT$_MCES equals 16;		/* ipr_driver.c
+constant PT$_WHAMI equals 16;		/* ipr_driver.c
+constant PT$_SCC equals 17;		/* entry.c
+constant PT$_PRBR equals 18;		/* ipr_driver.c
+constant PT$_PTBR equals 20;		/* alphamm.c
+constant PT$_L3VIRT equals 21;		/* boot.c
+constant PT$_SCBB equals 22;		/* ipr_driver.c
+constant PT$_PCBB equals 23;		/* hwrpb.c
+
+aggregate PALVERSION struct prefix "" tag "";
+	minor	byte unsigned;
+	major	byte unsigned;
+	is_v	byte unsigned;
+	xxx	byte unsigned;
+end PALVERSION;
+
+end_module $pal_impure;
+
+module	$pal_logout;
+
+/*
+/* Start definition of Corrected Error Frame
+/*
+aggregate crd_logout struct prefix "" tag "";
+	mchk$crd_flag		quadword;
+	mchk$crd_offsets	quadword;
+	
+	/* Pal-specific information	
+	mchk$crd_mchk_code	quadword;
+
+	/* CPU-specific information
+	constant mchk$crd_cpu_base equals . ;
+	mchk$crd_ei_addr	quadword;
+	mchk$crd_fill_syn	quadword;
+	mchk$crd_ei_stat	quadword;
+	mchk$crd_isr		quadword;
+	
+	/* System-specific information
+	constant mchk$crd_sys_base equals . ;
+	mchk$crd_pyxis_syn	quadword;   /* Syndrome register
+	mchk$crd_pyxis_mear	quadword;   /* Memory error address register
+	mchk$crd_pyxis_mesr	quadword;   /* Memory error status register
+	mchk$crd_pyxis_stat	quadword;   /* Status register
+	mchk$crd_pyxis_err	quadword;   /* Error register
+	mchk$crd_pyxis_err_data	quadword;   /* Error data CSR
+	constant mchk$crd_size equals (.+7) & %xfff8;
+
+end crd_logout;
+/*
+/* Start definition of Machine check logout Frame
+/*
+aggregate logout struct prefix "" tag "";
+	mchk$flag		quadword;
+	mchk$offsets		quadword;
+
+        /* Pal-specific information
+	mchk$mchk_code		quadword;
+	mchk$shadow quadword dimension 8;
+	mchk$pt	quadword dimension 24;
+
+        /* CPU-specific information
+	constant mchk$cpu_base equals . ;
+	mchk$exc_addr		quadword;
+	mchk$exc_sum		quadword;
+	mchk$exc_mask		quadword;
+	mchk$pal_base		quadword;
+	mchk$isr		quadword;
+	mchk$icsr		quadword;
+	mchk$ic_perr_stat		quadword;
+	mchk$dc_perr_stat		quadword;
+	mchk$va		quadword;
+	mchk$mm_stat		quadword;
+	mchk$sc_addr		quadword;
+	mchk$sc_stat		quadword;
+	mchk$bc_tag_addr		quadword;
+	mchk$ei_addr		quadword;
+	mchk$fill_syn		quadword;
+	mchk$ei_stat		quadword;
+	mchk$ld_lock		quadword;
+
+        /* System-specific information
+
+	constant mchk$sys_base equals . ;
+	mchk$sys_reserved	quadword;
+	mchk$pyxis_err_data	quadword;   /* Error data CSR
+	mchk$pyxis_err		quadword;   /* Error register
+	mchk$pyxis_stat		quadword;   /* Status register
+	mchk$pyxis_err_mask	quadword;   /* Error mask register
+	mchk$pyxis_syn		quadword;   /* Syndrome register
+	mchk$pyxis_mear		quadword;   /* Memory error address register
+	mchk$pyxis_mesr		quadword;   /* Memory error status register
+	mchk$pci_err0		quadword;   /* PCI error status register 0
+	mchk$pci_err1		quadword;   /* PCI error status register 1
+	mchk$sio_nmisc		quadword;   /* NMI status and control register
+	mchk$pci_err2		quadword;   /* PCI error status register 2
+	mchk$pyxis_hae_mem	quadword;   /* Host Address Extension register
+	mchk$sio_rev		quadword;   /* Revision identification
+	mchk$sio_ubcsa		quadword;   /* Utility bus chip select enable A
+	mchk$sio_ubcsb		quadword;   /* Utility bus chip select enable B
+	mchk$sio_imr0		quadword;   /* Interrupt mask register (master)
+	mchk$sio_imr1		quadword;   /* Interrupt mask register (slave)
+	mchk$sio_irr0		quadword;   /* Interrupt request register (master)
+	mchk$sio_irr1		quadword;   /* Interrupt request register (slave)
+	mchk$sio_isr0		quadword;   /* Interrupt status register (master)
+	mchk$sio_isr1		quadword;   /* Interrupt status register (slave)
+	mchk$sio_dma_stat0	quadword;   /* DMA status register 0
+	mchk$sio_dma_stat1	quadword;   /* DMA status register 1
+	mchk$sio_status		quadword;   /* Device status
+	constant mchk$size equals (.+7) & %xfff8;
+
+
+	constant pal$logout_area equals %x6000;
+	constant pal$logout_base equals %x6000;
+	constant mchk$crd_base	equals 0 ;
+	constant mchk$mchk_base	equals mchk$crd_size ;
+	
+
+end logout;
+
+iflanguage cc
+literal;
+
+#endif
+end_literal;
+end_iflanguage cc;
+
+end_module $pal_logout;

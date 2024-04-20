@@ -1,0 +1,55 @@
+;; Alpha assembly macro (-m) output created by DEFNR
+;   
+;  EV6_SYSTEM_PAL_DEFS.DNR  
+;   
+;   
+;  LAST EDIT:	09-JUL-97  
+;   
+;  EDIT HISTORY  
+;  WHO	WHEN		WHAT  
+;  ---	----		----  
+;  ES	09-JUL-97	ADD CSERVES  
+;   
+
+; messed around with by STIG
+; PAL data layout is now all squeezed into the first page of memory,
+; along with the HWRPB etc. (allocated the bottom 4K, uses just over 1K)
+
+PAL__PAL_BASE = ^x200000		; was PAL__PAL_BASE = ^x10000	
+PAL__OSFPAL_BASE = ^x200000		; was PAL__OSFPAL_BASE = ^x20000	
+PAL__CONSOLE_BASE = ^x10000		; Diagnostics preserved in mem here 
+PAL__EMUL_BASE = ^xE0000		; this points to randomness at present
+
+PAL__IMPURE_BASE = ^x1000		; 
+PAL__IMPURE_SPECIFIC_SIZE = ^x400	; 
+
+PAL__LOGOUT_BASE = ^x1800		;
+PAL__LOGOUT_SPECIFIC_SIZE = ^x200	;
+
+PAL__TEMPS_BASE = ^x1c00		;
+PAL__TEMPS_SPECIFIC_SIZE = ^x200	
+
+
+
+; STIG: this address is used by the PALcode as a default address to jump to
+; on entering OSF PALcode.  Changed to be the default entry point for Linux,
+; although it doesn't actually get used.  I just don't want to leave it dangling
+; at this address.
+
+PAL__ENTER_OSF = ^x310000
+
+;   
+;  DEFINE DEVICE INTERRUPT IRQ(S) AS A MASK IN ISUM<EI> FIELD  
+;   
+
+IRQ_DEV__M = ^x2	; IRQ1 
+; 
+; DEFINE CSERVE FUNCTIONS 
+; 
+CSERVE__START = ^x1	
+CSERVE__CALLBACK = ^x2	
+; 
+; FOR DP264 DEBUG MONITOR 
+; 
+CSERVE__JTOPAL = ^x9	
+CSERVE__RD_IMPURE = ^xb	

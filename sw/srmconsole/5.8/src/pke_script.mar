@@ -1,0 +1,192 @@
+;
+; Copyright (C) 1993 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by Digital Equipment
+; Corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by Digital.
+;
+;
+; Abstract:	NCR53C810 scripts for SCSI
+;
+; Author:	Stephen F. Shirron
+;
+; Modifications:
+;
+;	sfs	14-Apr-1993	Initial entry.
+;
+
+n810$m_scntl2_sdu = ^x80
+n810$b_scntl2 = ^x02
+n810$m_scid_rre = ^x40
+n810$b_scid = ^x04
+
+	.library	"cp$src:n810_script"
+
+	$n810scriptdef
+
+	.mcall	begin,bic,bis,sel,disc,jmp,int,dma,set,clr,end
+
+	begin	pke
+
+.enable lsb
+
+pke_script::
+
+pke_sel::
+	sel	wait=no,atn=yes,resel=pke_resel
+	int	err101,wait=yes,phase=msg_out,sense=false
+pke_msg_out::
+	dma	indirect=4,wait=yes,phase=msg_out
+	jmp	pke_cmd,wait=yes,phase=cmd,sense=true
+	jmp	pke_sts,wait=yes,phase=sts,sense=true
+	jmp	pke_msg_in,wait=yes,phase=msg_in,sense=true
+	int	err102,sense=true
+pke_cmd::
+	dma	indirect=12,wait=yes,phase=cmd
+	jmp	pke_dat_out,wait=yes,phase=dat_out,sense=true
+	jmp	pke_dat_in,wait=yes,phase=dat_in,sense=true
+	jmp	pke_sts,wait=yes,phase=sts,sense=true
+	jmp	pke_msg_in,wait=yes,phase=msg_in,sense=true
+	int	err103,sense=true
+pke_dat_out::
+	dma	indirect=20,wait=yes,phase=dat_out
+	int	dat_out_done,sense=true
+pke_dat_in::
+	dma	indirect=28,wait=yes,phase=dat_in
+	int	dat_in_done,sense=true
+pke_check_sts::
+	jmp	pke_msg_in,wait=yes,phase=msg_in,sense=true
+	int	err104,wait=yes,phase=sts,sense=false
+pke_sts::
+	dma	indirect=36,wait=yes,phase=sts
+	int	err105,wait=yes,phase=msg_in,sense=false
+	dma	p1=pke_msg_in_buf,p2=1,wait=yes,phase=msg_in
+	int	err106,data=<^x00>,mask=<^x00>,sense=false
+	bic	n810$m_scntl2_sdu,n810$b_scntl2
+	clr	ack=yes
+	disc	wait=yes
+	int	ok,sense=true
+pke_msg_in::
+	dma	p1=pke_msg_in_buf,p2=1,wait=yes,phase=msg_in
+	jmp	pke_disconnect,data=<^x04>,mask=<^x00>,sense=true
+	jmp	pke_msg_in_continue,data=<^x80>,mask=<^x7f>,sense=true
+	jmp	40$,data=<^x01>,mask=<^x00>,sense=true
+	jmp	60$,data=<^x20>,mask=<^x0f>,sense=true
+	int	got_msg_in,sense=true
+40$:	clr	ack=yes
+	dma	p1=pke_msg_in_ext,p2=1,wait=yes,phase=msg_in
+	clr	ack=yes
+	jmp	50$,data=<^x00>,mask=<^x00>,sense=true
+pke_msg_in_ext::
+	dma	p1=pke_msg_in_buf+1,p2=0,wait=yes,phase=msg_in
+	int	got_msg_in,sense=true
+50$:	dma	p1=pke_msg_in_buf+1,p2=256,wait=yes,phase=msg_in
+	int	got_msg_in,sense=true
+60$:	clr	ack=yes
+	dma	p1=pke_msg_in_buf+1,p2=1,wait=yes,phase=msg_in
+	int	got_msg_in,sense=true
+pke_msg_in_continue::
+	clr	ack=yes
+	jmp	70$,sense=true
+pke_msg_in_reject::
+	set	atn=yes
+	clr	ack=yes
+	int	err112,wait=yes,phase=msg_out,sense=false
+	clr	atn=yes
+	dma	p1=pke_msg_out_buf,p2=1,wait=yes,phase=msg_out
+	jmp	70$,sense=true
+pke_msg_out_short::
+	clr	atn=yes
+70$:	jmp	pke_dat_out,wait=yes,phase=dat_out,sense=true
+	jmp	pke_dat_in,wait=yes,phase=dat_in,sense=true
+	jmp	pke_cmd,wait=yes,phase=cmd,sense=true
+	jmp	pke_sts,wait=yes,phase=sts,sense=true
+	jmp	pke_msg_in,wait=yes,phase=msg_in,sense=true
+	int	err111,sense=true
+pke_disconnect::
+	bic	n810$m_scntl2_sdu,n810$b_scntl2
+	bis	n810$m_scid_rre,n810$b_scid
+	clr	ack=yes
+	disc	wait=yes
+	sel	wait=yes,resel=pke_resel
+	bic	n810$m_scid_rre,n810$b_scid
+	int	reselected,sense=true
+
+.disable lsb
+
+.enable lsb
+
+pke_flush::
+10$:	jmp	20$,wait=yes,phase=msg_out,sense=false
+	dma	p1=pke_msg_out_buf,p2=1,wait=yes,phase=msg_out
+	jmp	10$,sense=true
+20$:	jmp	30$,wait=yes,phase=cmd,sense=false
+	dma	p1=pke_cmd_buf,p2=1,wait=yes,phase=cmd
+	jmp	10$,sense=true
+30$:	jmp	40$,wait=yes,phase=dat_out,sense=false
+	dma	p1=pke_dat_out_buf,p2=1,wait=yes,phase=dat_out
+	jmp	10$,sense=true
+40$:	jmp	50$,wait=yes,phase=dat_in,sense=false
+	dma	p1=pke_dat_in_buf,p2=1,wait=yes,phase=dat_in
+	jmp	10$,sense=true
+50$:	jmp	60$,wait=yes,phase=sts,sense=false
+	dma	p1=pke_sts_buf,p2=1,wait=yes,phase=sts
+	jmp	10$,sense=true
+60$:	jmp	70$,wait=yes,phase=msg_in,sense=false
+	dma	p1=pke_msg_in_buf,p2=1,wait=yes,phase=msg_in
+	clr	ack=yes
+	int	ok,data=<^x00>,mask=<^x00>,sense=true
+	jmp	10$,sense=true
+70$:	int	err107,sense=true
+
+pke_resel:
+	bic	n810$m_scid_rre,n810$b_scid
+	int	reselected,sense=true
+
+.disable lsb
+
+.align	quad
+
+pke_msg_out_buf:
+	.byte	^x07
+
+.align	quad
+
+pke_cmd_buf:
+	.blkb	1
+
+.align	quad
+
+pke_dat_out_buf:
+	.byte	^x00
+
+.align	quad
+
+pke_dat_in_buf:
+	.blkb	1
+
+.align	quad
+
+pke_sts_buf:
+	.blkb	1
+
+.align	quad
+
+pke_msg_in_buf::
+	.blkb	256+1
+
+	end	pke
+
+	.end

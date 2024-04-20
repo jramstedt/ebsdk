@@ -1,0 +1,121 @@
+{
+{ Module:	$BTDDEF
+{
+{ Version:	'X-2'
+{
+{****************************************************************************
+{*									    *
+{*  COPYRIGHT (c) 1989 BY						    *
+{*  DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASSACHUSETTS.		    *
+{*  ALL RIGHTS RESERVED.						    *
+{*									    *
+{*  THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND COPIED   *
+{*  ONLY IN  ACCORDANCE WITH  THE  TERMS  OF  SUCH  LICENSE  AND WITH THE   *
+{*  INCLUSION OF THE ABOVE COPYRIGHT NOTICE. THIS SOFTWARE OR  ANY  OTHER   *
+{*  COPIES THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY   *
+{*  OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE IS  HEREBY   *
+{*  TRANSFERRED.							    *
+{*									    *
+{*  THE INFORMATION IN THIS SOFTWARE IS  SUBJECT TO CHANGE WITHOUT NOTICE   *
+{*  AND  SHOULD  NOT  BE  CONSTRUED AS  A COMMITMENT BY DIGITAL EQUIPMENT   *
+{*  CORPORATION.							    *
+{*									    *
+{*  DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE  OR  RELIABILITY OF ITS   *
+{*  SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.		    *
+{*									    *
+{*									    *
+{****************************************************************************
+
+{++
+{
+{ FACILITY:  VAX/VMS System Macro Libraries
+{
+{ ABSTRACT:
+{
+{	This file contains the SDL source for structure $BTDDEF.
+{
+{ AUTHOR:  The VMS Group	 CREATION DATE:  1-Aug-1976
+{
+{ MODIFIED BY:
+{
+{	X-2	MAS		Mary A. Sullivan	30-Nov-1989
+{		Add NCR 53C94 boot device types for PVAX2/PMariah.
+{
+{	X-1	RAB0018		Richard Bishop		 2-SEP-1989
+{		SYSDEFAE.SDL broken up into its constituent modules.
+{
+{ SPECIAL NOTE:
+{
+{	The prior audit trail can be found in the latest mainline
+{	CMS generation of module SYSDEFAE.SDL in facility [SYS].
+{
+{--
+
+
+module $BTDDEF;
+/*+
+/*
+/* Boot device codes
+/*
+/*-
+							/* "$K_" added, 8/30/79, CHP
+constant MB		 equals 0   prefix BTD tag $K;	/* Massbus device
+
+							/* Types 1-31. reserved for
+							/*  Unibus(Qbus) devices
+constant DM		 equals 1   prefix BTD tag $K;	/* RK06/7
+constant DL		 equals 2   prefix BTD tag $K;	/* RL02
+constant DQ		 equals 3   prefix BTD tag $K;	/* RB02/RB80
+constant PROM		 equals 8   prefix BTD tag $K;	/* PROM (not copied)
+constant PROM_COPY	 equals 9   prefix BTD tag $K;	/* PROM copied (Mayflower)
+constant UDA		 equals 17  prefix BTD tag $K;	/* UDA
+constant TK50		 equals 18  prefix BTD tag $K;	/* TK50 (MAYA)
+constant KFQSA		 equals 19  prefix BTD tag $K;	/* KFQSA
+constant QBUS_SCSI	 equals 20  prefix BTD tag $K;	/* Qbus SCSI adapter
+							/* End of Unibus(Qbus) devices
+
+constant HSCCI		 equals 32  prefix BTD tag $K;	/* HSC on CI
+constant BDA		 equals 33  prefix BTD tag $K;	/* BI disk adapter
+constant BVPSSP		 equals 34  prefix BTD tag $K;	/* BVP Storage Systems ports
+constant AIE_TK50	 equals 35  prefix BTD tag $K;	/* AIE/TK50 port
+constant ST506_DISK	 equals 36  prefix BTD taG $k;	/* ST506 disk (PVAX/VAXstar)
+constant KA410_DISK	 equals 36  prefix BTD tag $K;	/* VAXstar ST506 disk
+constant KA420_DISK	 equals 36  prefix BTD tag $K;	/* PVAX ST506 disk
+constant SCSI_5380_TAPE	 equals 37  prefix BTD tag $K;	/* NCR 5380 SCSI tape (PVAX/VAXstar)
+constant KA410_TAPE	 equals 37  prefix BTD tag $K;	/* VAXstar SCSI tape
+constant KA420_TAPE	 equals 37  prefix BTD tag $K;	/* PVAX SCSI tape
+constant DISK9		 equals 38  prefix BTD tag $K;	/* Disk on 009
+constant SII		 equals 39  prefix BTD tag $K;	/* Embedded DSSI controller
+constant SHAC		 equals 41  prefix BTD tag $K;	/* Single chip DSSI adapter.
+constant SCSI_5380_DISK	 equals 42  prefix BTD tag $K;	/* NCR 5380 SCSI disk (PVAX)
+constant HSX		 equals 43  prefix BTD tag $K;	{  XMI SSP port, disk (OBSOLETE NAME)
+constant KDM70		 equals 43  prefix BTD tag $K;	{  Final name for above
+constant HSXTAPE	 equals 44  prefix BTD tag $K;	{  XMI SSP port, tape (OBSOLETE NAME)
+constant KDM70TAPE	 equals 44  prefix BTD tag $K;	{  Final name for above
+constant SWIFT		 equals 45  prefix BTD tag $K;	/* Another embedded DSSI controller-CIRRUS
+constant SCSI_53C94_DISK equals 46  prefix BTD tag $K;	{  NCR 53C94 SCSI disk (PVAX2/PMariah)
+constant SCSI_53C94_TAPE equals 47  prefix BTD tag $K;	{  NCR 53C94 SCSI tape (PVAX2/PMariah)
+
+constant CONSOLE	 equals 64  prefix BTD tag $K;	/* Console block storage device
+
+							/* Network boot devices (96-103)
+constant NET_DLL	 equals 96  prefix BTD tag $K;	/* Start of network boot devices
+							/*  Codes 96-127 reserved
+constant QNA		 equals 96  prefix BTD tag $K;	/* DEQNA
+constant UNA		 equals 97  prefix BTD tag $K;	/* DEUNA
+constant AIE_NI		 equals 98  prefix BTD tag $K;	/* AIE/NI
+constant LANCE		 equals 99  prefix BTD tag $K;	/* LANCE NI chip
+constant KA410_NI	 equals 99  prefix BTD tag $K;	/* VAXstar NI (LANCE chip)
+constant KA420_NI	 equals 99  prefix BTD tag $K;	/* PVAX NI (LANCE chip)
+constant SGEC		 equals 100 prefix BTD tag $K;	/* SGEC chip
+constant SERVER_DEBNA	 equals 101 prefix BTD tag $K;	{  NI-CDROM server
+constant SERVER_DEBNI	 equals 102 prefix BTD tag $K;	{  NI-CDROM server
+constant SERVER_XNA	 equals 103 prefix BTD tag $K;	{  NI-CDROM server
+constant DEBNI		 equals 104 prefix BTD tag $K;	/* DEBNI
+constant DEMNA		 equals 105 prefix BTD tag $K;	/* DEMNA
+constant KA520_NI	 equals 106 prefix BTD tag $K;	/* CIRRUS NI
+
+constant NISCS		 equals 128 prefix BTD tag $K;	/* SCS disk over NI
+
+end_module $BTDDEF;
+

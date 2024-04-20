@@ -1,0 +1,13 @@
+struct   drv_desc               *drv_desc_ptr;
+struct   sfbp_ioseg             *sfbp_ioseg_ptr;
+struct   cp_func_block          *func_ptr;
+struct   gfx_func_block         *gfx_func_ptr;
+struct   parse_func_block       *parse_func_ptr;
+struct   scia                   *scia_ptr;
+struct   sfbp_data              *data_ptr;
+struct   cp_func_block          *cp_func_ptr;
+struct   bt_func_block          *bt_func_ptr;
+struct   sfbp_control           *control;
+CCV                             *ccv;
+int      TgaConsoleSlot;
+long     SLOT_ADDRESS;

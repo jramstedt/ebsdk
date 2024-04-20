@@ -1,0 +1,134 @@
+/* file:	mbx_def.sdl
+/*
+/* Copyright (C) 1990, 1991, 1992 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without noticec
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Mailbox data structure definitions for
+/*		Alpha firmware.
+/*
+/* Author:	K LeMieux
+/*
+/* Modifications:
+/*                                                                          
+/*	jds	27-Sep-1991	Adjusted wait, queue timeout constants	    
+/*
+
+module	$mbxdef;
+
+IFLANGUAGE CC
+LITERAL;
+#ifndef MBX_DEF_H
+#define MBX_DEF_H
+END_LITERAL;
+END_IFLANGUAGE;
+
+constant MBX_XMI equals 0;
+constant MBX_FB equals 1;
+constant MBX_FB_UNMASKED equals 0;
+constant MBX_FB_MASKED equals 2;
+constant MBX_FB_READ equals 0;
+constant MBX_FB_WRITE equals 1;
+constant MBX_FB_32 equals 0;
+constant MBX_FB_64 equals 1;
+constant MBX_FB_128 equals 2;
+constant MBX_FB_256 equals 3;
+constant MBX_XMI_READ equals 1;
+constant MBX_XMI_WRITE equals 7;
+constant MBX_XMI_MASK equals 240;
+constant MBX_MAX_HOSE equals 2;
+constant MBX_DEFAULT_QUEUE_TIME equals 200000000;    /* 2 secs
+constant MBX_DEFAULT_WAIT_TIME equals 200000000;     /* 2 secs
+
+DECLARE	"struct MBX" SIZEOF LONGWORD;
+
+aggregate MBPR structure prefix "" tag "";
+    stqc longword unsigned;
+    stqc_complete longword unsigned;
+    stqc_delay_time longword unsigned;
+    operation_delay_time longword unsigned;
+    queue_attempts longword unsigned;
+    wait_attempts longword unsigned;
+    xmi_csr1_value longword unsigned;
+    xmi_csr2_value longword unsigned;
+    fb_csr1_value longword unsigned;
+    fb_csr2_value longword unsigned;
+    mbx address("struct MBX");
+end MBPR;
+
+aggregate MBX_HOSE structure prefix "" tag "";
+    bus_type byte;
+end MBX_HOSE;
+
+aggregate MBX_STATE structure prefix "" tag "";
+    config MBX_HOSE dimension MBX_MAX_HOSE;
+end MBX_STATE;
+
+aggregate MBX structure prefix "" tag "";
+	flink		address (MBX);			/* forward link
+	blink		address (MBX);          	/* backward link
+	mbpr	        address (MBPR);			/* address of MBPR (local I/O) space
+	queue_time	quadword unsigned;		/* timeout value for STQ_C to MBPR
+	wait_time	quadword unsigned;		/* timeout value for wait for DON
+	flags		quadword unsigned;		/* flags
+	iopslot		longword;			/* TLSB slot of the IOP
+	filler0		quadword unsigned;		/* miscellaneous
+	filler1		quadword unsigned;		/* miscellaneous
+	filler2		quadword unsigned;		/* miscellaneous
+	ctr_l		structure fill prefix ""; 	/* Hardware I/O mailbox must be 64 byte aligned
+	        transaction	bitfield mask length 4;		/* transaction code
+	        write		bitfield mask length 1;		/* write/read
+	        data_width	bitfield mask length 2;		/* data width
+	        address_width	bitfield mask length 1;		/* address width
+	        unused		bitfield mask length 8;		/* unused
+	        f_diag		bitfield mask length 7;		/* f_diag
+	        c_diag		bitfield mask length 7;		/* c_diag
+	        special_cmd	bitfield mask length 1;		/* special command
+		write_access	bitfield mask length 1;		/* wrie access
+	end ctr_l;					/*
+	ctr_h	structure fill prefix ""; 	        /* Hardware I/O mailbox must be 64 byte aligned
+			msk bitfield mask length 8;	/* mask of bytes to be transferred
+			sbz0 bitfield mask length 8;	/* should be zero
+			hose bitfield mask length 8;	/* hose number	
+			sbz1 bitfield mask length 8;	/* should be zero	
+	end ctr_h;					/*
+	rbadr	        address;			/* Remote bus address - PA of CSR to be accessed	
+	rbadr1		address;
+	wdata	        quadword unsigned;		/* Data to be written to CSR on write operation
+	u0		quadword unsigned;		/* unpredictable
+	rdata		longword unsigned;		/* Data returned from read operation	
+	u3	        longword unsigned;		/* unpredictable 		
+	status_l	structure fill prefix "";       /* 
+	        done	bitfield mask;			/* status indicating operation completed
+	        error	bitfield mask;			/* error - queue
+	        info	bitfield mask length 30;	/* operation completion information (valid only if done set)
+	end status_l;					/*
+	status_h	structure fill prefix "";	/* 
+	        info	longword unsigned;		/* operation completion information (valid only if done set)
+	end status_h;					/*
+	u1		quadword unsigned;		/* unpredictable 	
+	u2	        quadword unsigned;		/* unpredictable 		
+end MBX;
+
+IFLANGUAGE CC
+LITERAL;
+#endif
+END_LITERAL;
+END_IFLANGUAGE;
+
+end_module;

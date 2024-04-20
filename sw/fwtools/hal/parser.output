@@ -1,0 +1,8139 @@
+
+
+Terminals which are not used:
+
+   WORD
+   BYTE
+   OPEN_ANGLE
+   CLOSE_ANGLE
+   PLUS
+   MINUS
+   SHIFT
+   EQUAL
+   COLON
+   LABEL
+   EOE
+
+
+Conflict in state 229 between rule 117 and token LOG_AND resolved as reduce.
+Conflict in state 229 between rule 117 and token LOG_OR resolved as reduce.
+Conflict in state 229 between rule 117 and token '+' resolved as reduce.
+Conflict in state 229 between rule 117 and token '-' resolved as reduce.
+Conflict in state 229 between rule 117 and token '@' resolved as reduce.
+Conflict in state 229 between rule 117 and token '&' resolved as reduce.
+Conflict in state 229 between rule 117 and token '!' resolved as reduce.
+Conflict in state 229 between rule 117 and token '\\' resolved as reduce.
+Conflict in state 229 between rule 117 and token '*' resolved as reduce.
+Conflict in state 229 between rule 117 and token '/' resolved as reduce.
+Conflict in state 230 between rule 118 and token LOG_AND resolved as reduce.
+Conflict in state 230 between rule 118 and token LOG_OR resolved as reduce.
+Conflict in state 230 between rule 118 and token '+' resolved as reduce.
+Conflict in state 230 between rule 118 and token '-' resolved as reduce.
+Conflict in state 230 between rule 118 and token '@' resolved as reduce.
+Conflict in state 230 between rule 118 and token '&' resolved as reduce.
+Conflict in state 230 between rule 118 and token '!' resolved as reduce.
+Conflict in state 230 between rule 118 and token '\\' resolved as reduce.
+Conflict in state 230 between rule 118 and token '*' resolved as reduce.
+Conflict in state 230 between rule 118 and token '/' resolved as reduce.
+Conflict in state 231 between rule 119 and token LOG_AND resolved as reduce.
+Conflict in state 231 between rule 119 and token LOG_OR resolved as reduce.
+Conflict in state 231 between rule 119 and token '+' resolved as reduce.
+Conflict in state 231 between rule 119 and token '-' resolved as reduce.
+Conflict in state 231 between rule 119 and token '@' resolved as reduce.
+Conflict in state 231 between rule 119 and token '&' resolved as reduce.
+Conflict in state 231 between rule 119 and token '!' resolved as reduce.
+Conflict in state 231 between rule 119 and token '\\' resolved as reduce.
+Conflict in state 231 between rule 119 and token '*' resolved as reduce.
+Conflict in state 231 between rule 119 and token '/' resolved as reduce.
+Conflict in state 366 between rule 115 and token LOG_AND resolved as reduce.
+Conflict in state 366 between rule 115 and token LOG_OR resolved as reduce.
+Conflict in state 366 between rule 115 and token '+' resolved as reduce.
+Conflict in state 366 between rule 115 and token '-' resolved as reduce.
+Conflict in state 366 between rule 115 and token '@' resolved as reduce.
+Conflict in state 366 between rule 115 and token '&' resolved as reduce.
+Conflict in state 366 between rule 115 and token '!' resolved as reduce.
+Conflict in state 366 between rule 115 and token '\\' resolved as reduce.
+Conflict in state 366 between rule 115 and token '*' resolved as reduce.
+Conflict in state 366 between rule 115 and token '/' resolved as reduce.
+Conflict in state 367 between rule 116 and token LOG_AND resolved as reduce.
+Conflict in state 367 between rule 116 and token LOG_OR resolved as reduce.
+Conflict in state 367 between rule 116 and token '+' resolved as reduce.
+Conflict in state 367 between rule 116 and token '-' resolved as reduce.
+Conflict in state 367 between rule 116 and token '@' resolved as reduce.
+Conflict in state 367 between rule 116 and token '&' resolved as reduce.
+Conflict in state 367 between rule 116 and token '!' resolved as reduce.
+Conflict in state 367 between rule 116 and token '\\' resolved as reduce.
+Conflict in state 367 between rule 116 and token '*' resolved as reduce.
+Conflict in state 367 between rule 116 and token '/' resolved as reduce.
+Conflict in state 368 between rule 107 and token LOG_AND resolved as reduce.
+Conflict in state 368 between rule 107 and token LOG_OR resolved as reduce.
+Conflict in state 368 between rule 107 and token '+' resolved as reduce.
+Conflict in state 368 between rule 107 and token '-' resolved as reduce.
+Conflict in state 368 between rule 107 and token '@' resolved as reduce.
+Conflict in state 368 between rule 107 and token '&' resolved as reduce.
+Conflict in state 368 between rule 107 and token '!' resolved as reduce.
+Conflict in state 368 between rule 107 and token '\\' resolved as reduce.
+Conflict in state 368 between rule 107 and token '*' resolved as reduce.
+Conflict in state 368 between rule 107 and token '/' resolved as reduce.
+Conflict in state 369 between rule 108 and token LOG_AND resolved as reduce.
+Conflict in state 369 between rule 108 and token LOG_OR resolved as reduce.
+Conflict in state 369 between rule 108 and token '+' resolved as reduce.
+Conflict in state 369 between rule 108 and token '-' resolved as reduce.
+Conflict in state 369 between rule 108 and token '@' resolved as reduce.
+Conflict in state 369 between rule 108 and token '&' resolved as reduce.
+Conflict in state 369 between rule 108 and token '!' resolved as reduce.
+Conflict in state 369 between rule 108 and token '\\' resolved as reduce.
+Conflict in state 369 between rule 108 and token '*' resolved as reduce.
+Conflict in state 369 between rule 108 and token '/' resolved as reduce.
+Conflict in state 370 between rule 111 and token LOG_AND resolved as reduce.
+Conflict in state 370 between rule 111 and token LOG_OR resolved as reduce.
+Conflict in state 370 between rule 111 and token '+' resolved as reduce.
+Conflict in state 370 between rule 111 and token '-' resolved as reduce.
+Conflict in state 370 between rule 111 and token '@' resolved as reduce.
+Conflict in state 370 between rule 111 and token '&' resolved as reduce.
+Conflict in state 370 between rule 111 and token '!' resolved as reduce.
+Conflict in state 370 between rule 111 and token '\\' resolved as reduce.
+Conflict in state 370 between rule 111 and token '*' resolved as reduce.
+Conflict in state 370 between rule 111 and token '/' resolved as reduce.
+Conflict in state 371 between rule 112 and token LOG_AND resolved as reduce.
+Conflict in state 371 between rule 112 and token LOG_OR resolved as reduce.
+Conflict in state 371 between rule 112 and token '+' resolved as reduce.
+Conflict in state 371 between rule 112 and token '-' resolved as reduce.
+Conflict in state 371 between rule 112 and token '@' resolved as reduce.
+Conflict in state 371 between rule 112 and token '&' resolved as reduce.
+Conflict in state 371 between rule 112 and token '!' resolved as reduce.
+Conflict in state 371 between rule 112 and token '\\' resolved as reduce.
+Conflict in state 371 between rule 112 and token '*' resolved as reduce.
+Conflict in state 371 between rule 112 and token '/' resolved as reduce.
+Conflict in state 372 between rule 113 and token LOG_AND resolved as reduce.
+Conflict in state 372 between rule 113 and token LOG_OR resolved as reduce.
+Conflict in state 372 between rule 113 and token '+' resolved as reduce.
+Conflict in state 372 between rule 113 and token '-' resolved as reduce.
+Conflict in state 372 between rule 113 and token '@' resolved as reduce.
+Conflict in state 372 between rule 113 and token '&' resolved as reduce.
+Conflict in state 372 between rule 113 and token '!' resolved as reduce.
+Conflict in state 372 between rule 113 and token '\\' resolved as reduce.
+Conflict in state 372 between rule 113 and token '*' resolved as reduce.
+Conflict in state 372 between rule 113 and token '/' resolved as reduce.
+Conflict in state 373 between rule 114 and token LOG_AND resolved as reduce.
+Conflict in state 373 between rule 114 and token LOG_OR resolved as reduce.
+Conflict in state 373 between rule 114 and token '+' resolved as reduce.
+Conflict in state 373 between rule 114 and token '-' resolved as reduce.
+Conflict in state 373 between rule 114 and token '@' resolved as reduce.
+Conflict in state 373 between rule 114 and token '&' resolved as reduce.
+Conflict in state 373 between rule 114 and token '!' resolved as reduce.
+Conflict in state 373 between rule 114 and token '\\' resolved as reduce.
+Conflict in state 373 between rule 114 and token '*' resolved as reduce.
+Conflict in state 373 between rule 114 and token '/' resolved as reduce.
+Conflict in state 374 between rule 109 and token LOG_AND resolved as reduce.
+Conflict in state 374 between rule 109 and token LOG_OR resolved as reduce.
+Conflict in state 374 between rule 109 and token '+' resolved as reduce.
+Conflict in state 374 between rule 109 and token '-' resolved as reduce.
+Conflict in state 374 between rule 109 and token '@' resolved as reduce.
+Conflict in state 374 between rule 109 and token '&' resolved as reduce.
+Conflict in state 374 between rule 109 and token '!' resolved as reduce.
+Conflict in state 374 between rule 109 and token '\\' resolved as reduce.
+Conflict in state 374 between rule 109 and token '*' resolved as reduce.
+Conflict in state 374 between rule 109 and token '/' resolved as reduce.
+Conflict in state 375 between rule 110 and token LOG_AND resolved as reduce.
+Conflict in state 375 between rule 110 and token LOG_OR resolved as reduce.
+Conflict in state 375 between rule 110 and token '+' resolved as reduce.
+Conflict in state 375 between rule 110 and token '-' resolved as reduce.
+Conflict in state 375 between rule 110 and token '@' resolved as reduce.
+Conflict in state 375 between rule 110 and token '&' resolved as reduce.
+Conflict in state 375 between rule 110 and token '!' resolved as reduce.
+Conflict in state 375 between rule 110 and token '\\' resolved as reduce.
+Conflict in state 375 between rule 110 and token '*' resolved as reduce.
+Conflict in state 375 between rule 110 and token '/' resolved as reduce.
+State 0 contains 84 shift/reduce conflicts.
+State 87 contains 1 shift/reduce conflict.
+State 490 contains 3 shift/reduce conflicts.
+
+Grammar
+rule 1    toplevel -> sequence
+rule 2    sequence ->		/* empty */
+rule 3    sequence -> action
+rule 4    sequence -> sequence action
+rule 5    action -> EOL
+rule 6    action -> label
+rule 7    action -> label EOL
+rule 8    action -> instruction EOL
+rule 9    action -> assignment
+rule 10   action -> directive
+rule 11   action -> ENDP EOL
+rule 12   action -> error EOL
+rule 13   label -> SYMBOL ':'
+rule 14   label -> SYMBOL ':' ':'
+rule 15   label -> LOCAL_LABEL ':'
+rule 16   label -> LOCAL_LABEL ':' ':'
+rule 17   instruction -> INS_FOP three_freg
+rule 18   instruction -> INS_FP2 two_freg
+rule 19   @1 ->		/* empty */
+rule 20   instruction -> INS_IOP ireg ',' @1 intreg
+rule 21   @2 ->		/* empty */
+rule 22   instruction -> INS_FTI freg ',' @2 ireg
+rule 23   @3 ->		/* empty */
+rule 24   instruction -> INS_ITF ireg ',' @3 freg
+rule 25   instruction -> INS_SEXT intreg
+rule 26   instruction -> INS_IP2 two_ireg
+rule 27   @4 ->		/* empty */
+rule 28   instruction -> INS_IP3 ireg ',' @4 two_ireg
+rule 29   @5 ->		/* empty */
+rule 30   instruction -> INS_LSB ireg ',' @5 '(' ireg ')'
+rule 31   @6 ->		/* empty */
+rule 32   instruction -> INS_SSB ireg ',' @6 '(' ireg ')'
+rule 33   @7 ->		/* empty */
+rule 34   instruction -> INS_MEM ifreg ',' @7 disp16 '(' ireg ')'
+rule 35   instruction -> INS_UNOP disp16 '(' ireg ')'
+rule 36   instruction -> INS_UNOP disp16
+rule 37   @8 ->		/* empty */
+rule 38   instruction -> INS_JSR ireg ',' @8 '(' ireg ')' hint
+rule 39   @9 ->		/* empty */
+rule 40   instruction -> INS_JSR ireg ',' @9 disp14 '(' ireg ')'
+rule 41   @10 ->		/* empty */
+rule 42   instruction -> INS_BRN ifreg ',' @10 disp21
+rule 43   instruction -> INS_CALLPAL disp26
+rule 44   @11 ->		/* empty */
+rule 45   instruction -> INS_RPCC ireg ',' @11 '(' ireg ')'
+rule 46   instruction -> INS_RPCC ireg
+rule 47   instruction -> INS_M1A ireg
+rule 48   instruction -> INS_M1B '(' ireg ')'
+rule 49   instruction -> INS_MIS
+rule 50   instruction -> INS_1REG ireg
+rule 51   instruction -> INS_FPCR freg
+rule 52   instruction -> INS_FPCR three_freg
+rule 53   @12 ->		/* empty */
+rule 54   instruction -> INS_IPR4 ireg ',' @12 ipr
+rule 55   @13 ->		/* empty */
+rule 56   instruction -> INS_HWM4 ireg ',' @13 disp12 '(' ireg ')'
+rule 57   @14 ->		/* empty */
+rule 58   instruction -> INS_IPR5 ireg ',' @14 ipr
+rule 59   @15 ->		/* empty */
+rule 60   instruction -> INS_HWM5 ireg ',' @15 disp10 '(' ireg ')' mode
+rule 61   instruction -> INS_REI6 '(' ireg ')'
+rule 62   @16 ->		/* empty */
+rule 63   instruction -> INS_REI6 ireg ',' @16 '(' ireg ')' hint
+rule 64   @17 ->		/* empty */
+rule 65   instruction -> INS_MTI6 ireg ',' @17 ipr scbd6
+rule 66   @18 ->		/* empty */
+rule 67   instruction -> INS_MFI6 ireg ',' @18 ipr scbd6
+rule 68   @19 ->		/* empty */
+rule 69   instruction -> INS_HWM6 ireg ',' @19 disp12 '(' ireg ')'
+rule 70   ifreg -> IREG
+rule 71   ifreg -> FREG
+rule 72   ifreg -> absexpr
+rule 73   @20 ->		/* empty */
+rule 74   @21 ->		/* empty */
+rule 75   three_freg -> freg ',' @20 freg ',' @21 freg
+rule 76   @22 ->		/* empty */
+rule 77   two_freg -> freg ',' @22 freg
+rule 78   @23 ->		/* empty */
+rule 79   intreg -> ireg ',' @23 ireg
+rule 80   @24 ->		/* empty */
+rule 81   intreg -> '#' expr ',' @24 ireg
+rule 82   @25 ->		/* empty */
+rule 83   two_ireg -> ireg ',' @25 ireg
+rule 84   disp10 ->		/* empty */
+rule 85   disp10 -> expr
+rule 86   disp12 ->		/* empty */
+rule 87   disp12 -> expr
+rule 88   disp14 -> expr
+rule 89   disp16 ->		/* empty */
+rule 90   disp16 -> expr
+rule 91   disp21 -> expr
+rule 92   disp26 -> expr
+rule 93   hint ->		/* empty */
+rule 94   hint -> ',' disp14
+rule 95   mode ->		/* empty */
+rule 96   mode -> ',' expr
+rule 97   ipr -> absexpr
+rule 98   scbd6 ->		/* empty */
+rule 99   scbd6 -> ',' absexpr
+rule 100  ireg -> IREG
+rule 101  ireg -> absexpr
+rule 102  freg -> FREG
+rule 103  freg -> absexpr
+rule 104  assignment -> SYMBOL '=' expr EOL
+rule 105  assignment -> DOT '=' absexpr EOL
+rule 106  expr -> element
+rule 107  expr -> expr '+' expr
+rule 108  expr -> expr '-' expr
+rule 109  expr -> expr '*' expr
+rule 110  expr -> expr '/' expr
+rule 111  expr -> expr '@' expr
+rule 112  expr -> expr '&' expr
+rule 113  expr -> expr '!' expr
+rule 114  expr -> expr '\\' expr
+rule 115  expr -> expr LOG_AND expr
+rule 116  expr -> expr LOG_OR expr
+rule 117  expr -> NOT expr
+rule 118  expr -> LOG_NOT expr
+rule 119  expr -> '-' expr
+rule 120  expr -> '<' expr '>'
+rule 121  element -> NUMBER
+rule 122  element -> SYMBOL
+rule 123  element -> LOCAL_LABEL
+rule 124  element -> DOT
+rule 125  absexpr -> expr
+rule 126  directive -> INCLUDE STRING EOL
+rule 127  directive -> INCLUDE_DIR STRING EOL
+rule 128  directive -> MINCLUDE STRING EOL
+rule 129  @26 ->		/* empty */
+rule 130  directive -> PRAGMA @26 pragma_flags EOL
+rule 131  directive -> ARCH arch_flag EOL
+rule 132  @27 ->		/* empty */
+rule 133  directive -> ASCII @27 string_seq EOL
+rule 134  @28 ->		/* empty */
+rule 135  directive -> ASCIZ @28 string_seq EOL
+rule 136  @29 ->		/* empty */
+rule 137  directive -> IF if_condition EOL mainbody @29 ifsubbody_seq ENDC EOL
+rule 138  directive -> IIF if_condition ',' BODYTEXT EOL
+rule 139  directive -> REPEAT opt_absexpr EOL BODYTEXT ENDR EOL
+rule 140  @30 ->		/* empty */
+rule 141  @31 ->		/* empty */
+rule 142  directive -> WHILE @30 while_condition @31 EOL BODYTEXT ENDW EOL
+rule 143  directive -> BREAK EOL
+rule 144  directive -> CONTINUE EOL
+rule 145  directive -> CMDIN absexpr EOL BODYTEXT ENDI EOL
+rule 146  directive -> DOCMD STRING EOL
+rule 147  directive -> ALIGN alignbound opt_alignfill EOL
+rule 148  @32 ->		/* empty */
+rule 149  directive -> ADDR @32 mem_exprseq EOL
+rule 150  @33 ->		/* empty */
+rule 151  directive -> QUAD @33 mem_exprseq EOL
+rule 152  @34 ->		/* empty */
+rule 153  directive -> LONG @34 mem_exprseq EOL
+rule 154  directive -> WARN opt_absexpr COMMENT EOL
+rule 155  directive -> ERROR opt_absexpr COMMENT EOL
+rule 156  directive -> PRINT opt_absexpr COMMENT EOL
+rule 157  directive -> PSECT SYMBOL psect_args EOL
+rule 158  directive -> SAVE_PSECT EOL
+rule 159  directive -> SAVE_DSECT EOL
+rule 160  directive -> SAVE_PSECT LOCAL_BLOCK EOL
+rule 161  directive -> SAVE_DSECT LOCAL_BLOCK EOL
+rule 162  directive -> RESTORE_PSECT EOL
+rule 163  directive -> RESTORE_DSECT EOL
+rule 164  directive -> BLKL absexpr EOL
+rule 165  directive -> BLKQ absexpr EOL
+rule 166  @35 ->		/* empty */
+rule 167  directive -> MACRO SYMBOL opt_comma @35 opt_macro_arglist EOL BODYTEXT ENDM EOL
+rule 168  @36 ->		/* empty */
+rule 169  directive -> MACRO_CALL @36 opt_macro_call_arglist EOL
+rule 170  directive -> NEXT_ARG EOL
+rule 171  @37 ->		/* empty */
+rule 172  directive -> NOLIST @37 list_flags EOL
+rule 173  directive -> NOLIST EOL
+rule 174  @38 ->		/* empty */
+rule 175  directive -> LIST @38 list_flags EOL
+rule 176  directive -> LIST EOL
+rule 177  directive -> NODEBUG EOL
+rule 178  directive -> K_DEBUG EOL
+rule 179  directive -> IDENT EOL
+rule 180  directive -> TITLE EOL
+rule 181  directive -> DSECT SYMBOL psect_args EOL
+rule 182  directive -> HEADER EOL
+rule 183  directive -> ENDH EOL
+rule 184  directive -> LINK_ADDRESS absexpr EOL
+rule 185  directive -> LINK_OFFSET absexpr EOL
+rule 186  directive -> LINK_REGION absexpr EOL
+rule 187  directive -> LINK_SIZE absexpr EOL
+rule 188  directive -> LINK_AFTER SYMBOL EOL
+rule 189  directive -> LINK_FIRST EOL
+rule 190  directive -> LINK_LAST EOL
+rule 191  @39 ->		/* empty */
+rule 192  directive -> LINK_ATTR @39 link_flags EOL
+rule 193  arch_flag -> A_EV4
+rule 194  arch_flag -> A_EV5
+rule 195  arch_flag -> A_EV6
+rule 196  pragma_flags -> pragma_flag
+rule 197  pragma_flags -> pragma_flags pragma_flag
+rule 198  pragma_flag -> MAC_NONE
+rule 199  pragma_flag -> MAC_ONCE
+rule 200  pragma_flag -> MAC_UNLIMITED
+rule 201  pragma_flag -> LEXER_DEBUG_ON
+rule 202  pragma_flag -> LEXER_DEBUG_OFF
+rule 203  pragma_flag -> PARSER_DEBUG_ON
+rule 204  pragma_flag -> PARSER_DEBUG_OFF
+rule 205  link_flags -> link_flag
+rule 206  link_flags -> link_flags link_flag
+rule 207  link_flag -> OVERLAP_OK
+rule 208  link_flag -> DIRECTLY_AFTER
+rule 209  list_flags -> list_flag
+rule 210  list_flags -> list_flags list_flag
+rule 211  list_flag -> MEB
+rule 212  list_flag -> MC
+rule 213  list_flag -> CND
+rule 214  list_flag -> MD
+rule 215  list_flag -> ME
+rule 216  list_flag -> CMDIN
+rule 217  list_flag -> ASSIGN
+rule 218  string_seq -> string_ele
+rule 219  string_seq -> string_seq string_ele
+rule 220  string_ele -> STRING
+rule 221  string_ele -> '<' absexpr '>'
+rule 222  if_condition -> EQ absexpr
+rule 223  if_condition -> NE absexpr
+rule 224  if_condition -> GT absexpr
+rule 225  if_condition -> LT absexpr
+rule 226  if_condition -> GE absexpr
+rule 227  if_condition -> LE absexpr
+rule 228  if_condition -> DF SYMBOL
+rule 229  if_condition -> NDF SYMBOL
+rule 230  if_condition -> B ',' opt_arg_value
+rule 231  if_condition -> NB ',' opt_arg_value
+rule 232  if_condition -> IDN ',' opt_arg_value ',' opt_arg_value
+rule 233  if_condition -> DIF ',' opt_arg_value ',' opt_arg_value
+rule 234  while_condition -> EQ expr
+rule 235  while_condition -> NE expr
+rule 236  while_condition -> GT expr
+rule 237  while_condition -> LT expr
+rule 238  while_condition -> GE expr
+rule 239  while_condition -> LE expr
+rule 240  while_condition -> DF SYMBOL
+rule 241  while_condition -> NDF SYMBOL
+rule 242  while_condition -> B ',' opt_arg_value
+rule 243  while_condition -> NB ',' opt_arg_value
+rule 244  while_condition -> IDN ',' opt_arg_value ',' opt_arg_value
+rule 245  while_condition -> DIF ',' opt_arg_value ',' opt_arg_value
+rule 246  opt_comma ->		/* empty */
+rule 247  opt_comma -> ','
+rule 248  opt_arg_value ->		/* empty */
+rule 249  opt_arg_value -> arg_value
+rule 250  mainbody -> BODYTEXT
+rule 251  ifsubbody_seq ->		/* empty */
+rule 252  ifsubbody_seq -> ifsubbody
+rule 253  ifsubbody_seq -> ifsubbody_seq ifsubbody
+rule 254  ifsubbody -> IFF BODYTEXT
+rule 255  ifsubbody -> IFT BODYTEXT
+rule 256  ifsubbody -> IFTF BODYTEXT
+rule 257  alignbound -> absexpr
+rule 258  alignbound -> K_BYTE
+rule 259  alignbound -> K_WORD
+rule 260  alignbound -> K_LONG
+rule 261  alignbound -> K_QUAD
+rule 262  alignbound -> K_PAGE
+rule 263  opt_alignfill ->		/* empty */
+rule 264  opt_alignfill -> ',' absexpr
+rule 265  mem_exprseq -> expr
+rule 266  mem_exprseq -> mem_exprseq ',' expr
+rule 267  opt_absexpr ->		/* empty */
+rule 268  opt_absexpr -> absexpr
+rule 269  psect_args ->		/* empty */
+rule 270  psect_args -> ',' alignbound
+rule 271  opt_macro_arglist ->		/* empty */
+rule 272  opt_macro_arglist -> macro_arglist
+rule 273  macro_arglist -> macro_arg
+rule 274  macro_arglist -> macro_arglist ',' macro_arg
+rule 275  macro_arg -> SYMBOL arg_default
+rule 276  macro_arg -> '~' SYMBOL arg_default
+rule 277  macro_arg -> DOTDOTDOT SYMBOL arg_default
+rule 278  macro_arg -> DOTDOTDOT arg_default
+rule 279  macro_arg -> '?' SYMBOL
+rule 280  arg_default ->		/* empty */
+rule 281  arg_default -> '=' ARG_VALUE
+rule 282  arg_default -> '=' SYMBOL
+rule 283  opt_macro_call_arglist -> macro_call_arg
+rule 284  opt_macro_call_arglist -> opt_macro_call_arglist ',' macro_call_arg
+rule 285  arg_value -> SYMBOL
+rule 286  arg_value -> ARG_VALUE
+rule 287  macro_call_arg ->		/* empty */
+rule 288  macro_call_arg -> '\\' SYMBOL
+rule 289  macro_call_arg -> arg_value
+rule 290  macro_call_arg -> SYMBOL '=' '\\' SYMBOL
+rule 291  macro_call_arg -> SYMBOL '=' opt_arg_value
+
+Terminals, with rules where they appear
+
+$ (-1)
+'!' (33) 113
+'#' (35) 81
+'&' (38) 112
+'(' (40) 30 32 34 35 38 40 45 48 56 60 61 63 69
+')' (41) 30 32 34 35 38 40 45 48 56 60 61 63 69
+'*' (42) 109
+'+' (43) 107
+',' (44) 20 22 24 28 30 32 34 38 40 42 45 54 56 58 60 63 65 67 69 75
+    77 79 81 83 94 96 99 138 230 231 232 233 242 243 244 245 247 264
+    266 270 274 284
+'-' (45) 108 119
+'/' (47) 110
+':' (58) 13 14 15 16
+'<' (60) 120 221
+'=' (61) 104 105 281 282 290 291
+'>' (62) 120 221
+'?' (63) 279
+'@' (64) 111
+'\\' (92) 114 288 290
+'~' (126) 276
+error (256) 12
+ENDP (257) 11
+INS_FOP (258) 17
+INS_FP2 (259) 18
+INS_IOP (260) 20
+INS_MEM (261) 34
+INS_JSR (262) 38 40
+INS_BRN (263) 42
+INS_M1A (264) 47
+INS_M1B (265) 48
+INS_MIS (266) 49
+INS_FPCR (267) 51 52
+INS_RPCC (268) 45 46
+INS_SEXT (269) 25
+INS_IP2 (270) 26
+INS_IP3 (271) 28
+INS_FTI (272) 22
+INS_LSB (273) 30
+INS_SSB (274) 32
+INS_ITF (275) 24
+INS_UNOP (276) 35 36
+INS_CALLPAL (277) 43
+INS_IPR4 (278) 54
+INS_HWM4 (279) 56
+INS_IPR5 (280) 58
+INS_HWM5 (281) 60
+INS_REI6 (282) 61 63
+INS_MTI6 (283) 65
+INS_MFI6 (284) 67
+INS_HWM6 (285) 69
+INS_1REG (286) 50
+IREG (287) 70 100
+FREG (288) 71 102
+ADDR (289) 149
+QUAD (290) 151
+LONG (291) 153
+BLKL (292) 164
+BLKQ (293) 165
+IDENT (294) 179
+TITLE (295) 180
+WORD (296)
+BYTE (297)
+BODYTEXT (298) 138 139 142 145 167 250 254 255 256
+K_BYTE (299) 258
+K_WORD (300) 259
+K_LONG (301) 260
+K_QUAD (302) 261
+K_PAGE (303) 262
+LOCAL_LABEL (304) 15 16 123
+LOCAL_BLOCK (305) 160 161
+NOLIST (306) 172 173
+LIST (307) 175 176
+MEB (308) 211
+MC (309) 212
+CND (310) 213
+MD (311) 214
+ME (312) 215
+ASSIGN (313) 217
+CMDIN (314) 145 216
+NODEBUG (315) 177
+K_DEBUG (316) 178
+NUMBER (317) 121
+IF (318) 137
+WHILE (319) 142
+BREAK (320) 143
+CONTINUE (321) 144
+INCLUDE (322) 126
+INCLUDE_DIR (323) 127
+MINCLUDE (324) 128
+OPEN_ANGLE (325)
+CLOSE_ANGLE (326)
+PLUS (327)
+MINUS (328)
+SHIFT (329)
+EQUAL (330)
+NOT (331) 117
+LOG_AND (332) 115
+LOG_OR (333) 116
+LOG_NOT (334) 118
+COLON (335)
+SYMBOL (336) 13 14 104 122 157 167 181 188 228 229 240 241 275 276
+    277 279 282 285 288 290 291
+LABEL (337)
+STRING (338) 126 127 128 146 220
+EOL (339) 5 7 8 11 12 104 105 126 127 128 130 131 133 135 137 138 139
+    142 143 144 145 146 147 149 151 153 154 155 156 157 158 159 160
+    161 162 163 164 165 167 169 170 172 173 175 176 177 178 179 180
+    181 182 183 184 185 186 187 188 189 190 192
+EOE (340)
+DOT (341) 105 124
+EQ (342) 222 234
+GT (343) 224 236
+LT (344) 225 237
+DF (345) 228 240
+NE (346) 223 235
+GE (347) 226 238
+LE (348) 227 239
+NDF (349) 229 241
+ENDC (350) 137
+ENDW (351) 142
+ALIGN (352) 147
+IFF (353) 254
+IFT (354) 255
+IFTF (355) 256
+REPEAT (356) 139
+ENDR (357) 139
+ENDI (358) 145
+DOCMD (359) 146
+COMMENT (360) 154 155 156
+MACRO (361) 167
+ENDM (362) 167
+PRAGMA (363) 130
+MACRO_CALL (364) 169
+DOTDOTDOT (365) 277 278
+NEXT_ARG (366) 170
+ARG_VALUE (367) 281 286
+ASCII (368) 133
+ASCIZ (369) 135
+SAVE_PSECT (370) 158 160
+SAVE_DSECT (371) 159 161
+RESTORE_PSECT (372) 162
+RESTORE_DSECT (373) 163
+PSECT (374) 157
+DSECT (375) 181
+LINK_ADDRESS (376) 184
+LINK_AFTER (377) 188
+LINK_FIRST (378) 189
+LINK_LAST (379) 190
+LINK_ATTR (380) 192
+LINK_OFFSET (381) 185
+LINK_REGION (382) 186
+LINK_SIZE (383) 187
+HEADER (384) 182
+ENDH (385) 183
+OVERLAP_OK (386) 207
+DIRECTLY_AFTER (387) 208
+MAC_NONE (388) 198
+MAC_ONCE (389) 199
+MAC_UNLIMITED (390) 200
+LEXER_DEBUG_ON (391) 201
+LEXER_DEBUG_OFF (392) 202
+PARSER_DEBUG_ON (393) 203
+PARSER_DEBUG_OFF (394) 204
+WARN (395) 154
+ERROR (396) 155
+PRINT (397) 156
+B (398) 230 242
+NB (399) 231 243
+IDN (400) 232 244
+DIF (401) 233 245
+IIF (402) 138
+ARCH (403) 131
+A_EV4 (404) 193
+A_EV5 (405) 194
+A_EV6 (406) 195
+UMINUS (407)
+
+Nonterminals, with rules where they appear
+
+toplevel (172)
+    on left: 1
+sequence (173)
+    on left: 2 3 4, on right: 1 4
+action (174)
+    on left: 5 6 7 8 9 10 11 12, on right: 3 4
+label (175)
+    on left: 13 14 15 16, on right: 6 7
+instruction (176)
+    on left: 17 18 20 22 24 25 26 28 30 32 34 35 36 38 40 42 43 45
+    46 47 48 49 50 51 52 54 56 58 60 61 63 65 67 69,
+    on right: 8
+@1 (177)
+    on left: 19, on right: 20
+@2 (178)
+    on left: 21, on right: 22
+@3 (179)
+    on left: 23, on right: 24
+@4 (180)
+    on left: 27, on right: 28
+@5 (181)
+    on left: 29, on right: 30
+@6 (182)
+    on left: 31, on right: 32
+@7 (183)
+    on left: 33, on right: 34
+@8 (184)
+    on left: 37, on right: 38
+@9 (185)
+    on left: 39, on right: 40
+@10 (186)
+    on left: 41, on right: 42
+@11 (187)
+    on left: 44, on right: 45
+@12 (188)
+    on left: 53, on right: 54
+@13 (189)
+    on left: 55, on right: 56
+@14 (190)
+    on left: 57, on right: 58
+@15 (191)
+    on left: 59, on right: 60
+@16 (192)
+    on left: 62, on right: 63
+@17 (193)
+    on left: 64, on right: 65
+@18 (194)
+    on left: 66, on right: 67
+@19 (195)
+    on left: 68, on right: 69
+ifreg (196)
+    on left: 70 71 72, on right: 34 42
+three_freg (197)
+    on left: 75, on right: 17 52
+@20 (198)
+    on left: 73, on right: 75
+@21 (199)
+    on left: 74, on right: 75
+two_freg (200)
+    on left: 77, on right: 18
+@22 (201)
+    on left: 76, on right: 77
+intreg (202)
+    on left: 79 81, on right: 20 25
+@23 (203)
+    on left: 78, on right: 79
+@24 (204)
+    on left: 80, on right: 81
+two_ireg (205)
+    on left: 83, on right: 26 28
+@25 (206)
+    on left: 82, on right: 83
+disp10 (207)
+    on left: 84 85, on right: 60
+disp12 (208)
+    on left: 86 87, on right: 56 69
+disp14 (209)
+    on left: 88, on right: 40 94
+disp16 (210)
+    on left: 89 90, on right: 34 35 36
+disp21 (211)
+    on left: 91, on right: 42
+disp26 (212)
+    on left: 92, on right: 43
+hint (213)
+    on left: 93 94, on right: 38 63
+mode (214)
+    on left: 95 96, on right: 60
+ipr (215)
+    on left: 97, on right: 54 58 65 67
+scbd6 (216)
+    on left: 98 99, on right: 65 67
+ireg (217)
+    on left: 100 101, on right: 20 22 24 28 30 32 34 35 38 40 45 46
+    47 48 50 54 56 58 60 61 63 65 67 69 79 81 83
+freg (218)
+    on left: 102 103, on right: 22 24 51 75 77
+assignment (219)
+    on left: 104 105, on right: 9
+expr (220)
+    on left: 106 107 108 109 110 111 112 113 114 115 116 117 118 119
+    120, on right: 81 85 87 88 90 91 92 96 104 107 108 109 110 111
+    112 113 114 115 116 117 118 119 120 125 234 235 236 237 238 239
+    265 266
+element (221)
+    on left: 121 122 123 124, on right: 106
+absexpr (222)
+    on left: 125, on right: 72 97 99 101 103 105 145 164 165 184 185
+    186 187 221 222 223 224 225 226 227 257 264 268
+directive (223)
+    on left: 126 127 128 130 131 133 135 137 138 139 142 143 144 145
+    146 147 149 151 153 154 155 156 157 158 159 160 161 162 163 164
+    165 167 169 170 172 173 175 176 177 178 179 180 181 182 183 184
+    185 186 187 188 189 190 192, on right: 10
+@26 (224)
+    on left: 129, on right: 130
+@27 (225)
+    on left: 132, on right: 133
+@28 (226)
+    on left: 134, on right: 135
+@29 (227)
+    on left: 136, on right: 137
+@30 (228)
+    on left: 140, on right: 142
+@31 (229)
+    on left: 141, on right: 142
+@32 (230)
+    on left: 148, on right: 149
+@33 (231)
+    on left: 150, on right: 151
+@34 (232)
+    on left: 152, on right: 153
+@35 (233)
+    on left: 166, on right: 167
+@36 (234)
+    on left: 168, on right: 169
+@37 (235)
+    on left: 171, on right: 172
+@38 (236)
+    on left: 174, on right: 175
+@39 (237)
+    on left: 191, on right: 192
+arch_flag (238)
+    on left: 193 194 195, on right: 131
+pragma_flags (239)
+    on left: 196 197, on right: 130 197
+pragma_flag (240)
+    on left: 198 199 200 201 202 203 204, on right: 196 197
+link_flags (241)
+    on left: 205 206, on right: 192 206
+link_flag (242)
+    on left: 207 208, on right: 205 206
+list_flags (243)
+    on left: 209 210, on right: 172 175 210
+list_flag (244)
+    on left: 211 212 213 214 215 216 217, on right: 209 210
+string_seq (245)
+    on left: 218 219, on right: 133 135 219
+string_ele (246)
+    on left: 220 221, on right: 218 219
+if_condition (247)
+    on left: 222 223 224 225 226 227 228 229 230 231 232 233,
+    on right: 137 138
+while_condition (248)
+    on left: 234 235 236 237 238 239 240 241 242 243 244 245,
+    on right: 142
+opt_comma (249)
+    on left: 246 247, on right: 167
+opt_arg_value (250)
+    on left: 248 249, on right: 230 231 232 233 242 243 244 245 291
+mainbody (251)
+    on left: 250, on right: 137
+ifsubbody_seq (252)
+    on left: 251 252 253, on right: 137 253
+ifsubbody (253)
+    on left: 254 255 256, on right: 252 253
+alignbound (254)
+    on left: 257 258 259 260 261 262, on right: 147 270
+opt_alignfill (255)
+    on left: 263 264, on right: 147
+mem_exprseq (256)
+    on left: 265 266, on right: 149 151 153 266
+opt_absexpr (257)
+    on left: 267 268, on right: 139 154 155 156
+psect_args (258)
+    on left: 269 270, on right: 157 181
+opt_macro_arglist (259)
+    on left: 271 272, on right: 167
+macro_arglist (260)
+    on left: 273 274, on right: 272 274
+macro_arg (261)
+    on left: 275 276 277 278 279, on right: 273 274
+arg_default (262)
+    on left: 280 281 282, on right: 275 276 277 278
+opt_macro_call_arglist (263)
+    on left: 283 284, on right: 169 284
+arg_value (264)
+    on left: 285 286, on right: 249 289
+macro_call_arg (265)
+    on left: 287 288 289 290 291, on right: 283 284
+
+
+state 0
+
+    error	shift, and go to state 1
+    ENDP	shift, and go to state 2
+    INS_FOP	shift, and go to state 3
+    INS_FP2	shift, and go to state 4
+    INS_IOP	shift, and go to state 5
+    INS_MEM	shift, and go to state 6
+    INS_JSR	shift, and go to state 7
+    INS_BRN	shift, and go to state 8
+    INS_M1A	shift, and go to state 9
+    INS_M1B	shift, and go to state 10
+    INS_MIS	shift, and go to state 11
+    INS_FPCR	shift, and go to state 12
+    INS_RPCC	shift, and go to state 13
+    INS_SEXT	shift, and go to state 14
+    INS_IP2	shift, and go to state 15
+    INS_IP3	shift, and go to state 16
+    INS_FTI	shift, and go to state 17
+    INS_LSB	shift, and go to state 18
+    INS_SSB	shift, and go to state 19
+    INS_ITF	shift, and go to state 20
+    INS_UNOP	shift, and go to state 21
+    INS_CALLPAL	shift, and go to state 22
+    INS_IPR4	shift, and go to state 23
+    INS_HWM4	shift, and go to state 24
+    INS_IPR5	shift, and go to state 25
+    INS_HWM5	shift, and go to state 26
+    INS_REI6	shift, and go to state 27
+    INS_MTI6	shift, and go to state 28
+    INS_MFI6	shift, and go to state 29
+    INS_HWM6	shift, and go to state 30
+    INS_1REG	shift, and go to state 31
+    ADDR	shift, and go to state 32
+    QUAD	shift, and go to state 33
+    LONG	shift, and go to state 34
+    BLKL	shift, and go to state 35
+    BLKQ	shift, and go to state 36
+    IDENT	shift, and go to state 37
+    TITLE	shift, and go to state 38
+    LOCAL_LABEL	shift, and go to state 39
+    NOLIST	shift, and go to state 40
+    LIST	shift, and go to state 41
+    CMDIN	shift, and go to state 42
+    NODEBUG	shift, and go to state 43
+    K_DEBUG	shift, and go to state 44
+    IF  	shift, and go to state 45
+    WHILE	shift, and go to state 46
+    BREAK	shift, and go to state 47
+    CONTINUE	shift, and go to state 48
+    INCLUDE	shift, and go to state 49
+    INCLUDE_DIR	shift, and go to state 50
+    MINCLUDE	shift, and go to state 51
+    SYMBOL	shift, and go to state 52
+    EOL 	shift, and go to state 53
+    DOT 	shift, and go to state 54
+    ALIGN	shift, and go to state 55
+    REPEAT	shift, and go to state 56
+    DOCMD	shift, and go to state 57
+    MACRO	shift, and go to state 58
+    PRAGMA	shift, and go to state 59
+    MACRO_CALL	shift, and go to state 60
+    NEXT_ARG	shift, and go to state 61
+    ASCII	shift, and go to state 62
+    ASCIZ	shift, and go to state 63
+    SAVE_PSECT	shift, and go to state 64
+    SAVE_DSECT	shift, and go to state 65
+    RESTORE_PSECT	shift, and go to state 66
+    RESTORE_DSECT	shift, and go to state 67
+    PSECT	shift, and go to state 68
+    DSECT	shift, and go to state 69
+    LINK_ADDRESS	shift, and go to state 70
+    LINK_AFTER	shift, and go to state 71
+    LINK_FIRST	shift, and go to state 72
+    LINK_LAST	shift, and go to state 73
+    LINK_ATTR	shift, and go to state 74
+    LINK_OFFSET	shift, and go to state 75
+    LINK_REGION	shift, and go to state 76
+    LINK_SIZE	shift, and go to state 77
+    HEADER	shift, and go to state 78
+    ENDH	shift, and go to state 79
+    WARN	shift, and go to state 80
+    ERROR	shift, and go to state 81
+    PRINT	shift, and go to state 82
+    IIF 	shift, and go to state 83
+    ARCH	shift, and go to state 84
+
+    $   	reduce using rule 2 (sequence)
+    error	[reduce using rule 2 (sequence)]
+    ENDP	[reduce using rule 2 (sequence)]
+    INS_FOP	[reduce using rule 2 (sequence)]
+    INS_FP2	[reduce using rule 2 (sequence)]
+    INS_IOP	[reduce using rule 2 (sequence)]
+    INS_MEM	[reduce using rule 2 (sequence)]
+    INS_JSR	[reduce using rule 2 (sequence)]
+    INS_BRN	[reduce using rule 2 (sequence)]
+    INS_M1A	[reduce using rule 2 (sequence)]
+    INS_M1B	[reduce using rule 2 (sequence)]
+    INS_MIS	[reduce using rule 2 (sequence)]
+    INS_FPCR	[reduce using rule 2 (sequence)]
+    INS_RPCC	[reduce using rule 2 (sequence)]
+    INS_SEXT	[reduce using rule 2 (sequence)]
+    INS_IP2	[reduce using rule 2 (sequence)]
+    INS_IP3	[reduce using rule 2 (sequence)]
+    INS_FTI	[reduce using rule 2 (sequence)]
+    INS_LSB	[reduce using rule 2 (sequence)]
+    INS_SSB	[reduce using rule 2 (sequence)]
+    INS_ITF	[reduce using rule 2 (sequence)]
+    INS_UNOP	[reduce using rule 2 (sequence)]
+    INS_CALLPAL	[reduce using rule 2 (sequence)]
+    INS_IPR4	[reduce using rule 2 (sequence)]
+    INS_HWM4	[reduce using rule 2 (sequence)]
+    INS_IPR5	[reduce using rule 2 (sequence)]
+    INS_HWM5	[reduce using rule 2 (sequence)]
+    INS_REI6	[reduce using rule 2 (sequence)]
+    INS_MTI6	[reduce using rule 2 (sequence)]
+    INS_MFI6	[reduce using rule 2 (sequence)]
+    INS_HWM6	[reduce using rule 2 (sequence)]
+    INS_1REG	[reduce using rule 2 (sequence)]
+    ADDR	[reduce using rule 2 (sequence)]
+    QUAD	[reduce using rule 2 (sequence)]
+    LONG	[reduce using rule 2 (sequence)]
+    BLKL	[reduce using rule 2 (sequence)]
+    BLKQ	[reduce using rule 2 (sequence)]
+    IDENT	[reduce using rule 2 (sequence)]
+    TITLE	[reduce using rule 2 (sequence)]
+    LOCAL_LABEL	[reduce using rule 2 (sequence)]
+    NOLIST	[reduce using rule 2 (sequence)]
+    LIST	[reduce using rule 2 (sequence)]
+    CMDIN	[reduce using rule 2 (sequence)]
+    NODEBUG	[reduce using rule 2 (sequence)]
+    K_DEBUG	[reduce using rule 2 (sequence)]
+    IF  	[reduce using rule 2 (sequence)]
+    WHILE	[reduce using rule 2 (sequence)]
+    BREAK	[reduce using rule 2 (sequence)]
+    CONTINUE	[reduce using rule 2 (sequence)]
+    INCLUDE	[reduce using rule 2 (sequence)]
+    INCLUDE_DIR	[reduce using rule 2 (sequence)]
+    MINCLUDE	[reduce using rule 2 (sequence)]
+    SYMBOL	[reduce using rule 2 (sequence)]
+    EOL 	[reduce using rule 2 (sequence)]
+    DOT 	[reduce using rule 2 (sequence)]
+    ALIGN	[reduce using rule 2 (sequence)]
+    REPEAT	[reduce using rule 2 (sequence)]
+    DOCMD	[reduce using rule 2 (sequence)]
+    MACRO	[reduce using rule 2 (sequence)]
+    PRAGMA	[reduce using rule 2 (sequence)]
+    MACRO_CALL	[reduce using rule 2 (sequence)]
+    NEXT_ARG	[reduce using rule 2 (sequence)]
+    ASCII	[reduce using rule 2 (sequence)]
+    ASCIZ	[reduce using rule 2 (sequence)]
+    SAVE_PSECT	[reduce using rule 2 (sequence)]
+    SAVE_DSECT	[reduce using rule 2 (sequence)]
+    RESTORE_PSECT	[reduce using rule 2 (sequence)]
+    RESTORE_DSECT	[reduce using rule 2 (sequence)]
+    PSECT	[reduce using rule 2 (sequence)]
+    DSECT	[reduce using rule 2 (sequence)]
+    LINK_ADDRESS	[reduce using rule 2 (sequence)]
+    LINK_AFTER	[reduce using rule 2 (sequence)]
+    LINK_FIRST	[reduce using rule 2 (sequence)]
+    LINK_LAST	[reduce using rule 2 (sequence)]
+    LINK_ATTR	[reduce using rule 2 (sequence)]
+    LINK_OFFSET	[reduce using rule 2 (sequence)]
+    LINK_REGION	[reduce using rule 2 (sequence)]
+    LINK_SIZE	[reduce using rule 2 (sequence)]
+    HEADER	[reduce using rule 2 (sequence)]
+    ENDH	[reduce using rule 2 (sequence)]
+    WARN	[reduce using rule 2 (sequence)]
+    ERROR	[reduce using rule 2 (sequence)]
+    PRINT	[reduce using rule 2 (sequence)]
+    IIF 	[reduce using rule 2 (sequence)]
+    ARCH	[reduce using rule 2 (sequence)]
+
+    toplevel	go to state 588
+    sequence	go to state 85
+    action	go to state 86
+    label	go to state 87
+    instruction	go to state 88
+    assignment	go to state 89
+    directive	go to state 90
+
+
+
+state 1
+
+    action  ->  error . EOL   (rule 12)
+
+    EOL 	shift, and go to state 91
+
+
+
+state 2
+
+    action  ->  ENDP . EOL   (rule 11)
+
+    EOL 	shift, and go to state 92
+
+
+
+state 3
+
+    instruction  ->  INS_FOP . three_freg   (rule 17)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    three_freg	go to state 102
+    freg	go to state 103
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 4
+
+    instruction  ->  INS_FP2 . two_freg   (rule 18)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    two_freg	go to state 107
+    freg	go to state 108
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 5
+
+    instruction  ->  INS_IOP . ireg ',' @1 intreg   (rule 20)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 110
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 6
+
+    instruction  ->  INS_MEM . ifreg ',' @7 disp16 '(' ireg ')'   (rule 34)
+
+    IREG	shift, and go to state 112
+    FREG	shift, and go to state 113
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ifreg	go to state 114
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 115
+
+
+
+state 7
+
+    instruction  ->  INS_JSR . ireg ',' @8 '(' ireg ')' hint   (rule 38)
+    instruction  ->  INS_JSR . ireg ',' @9 disp14 '(' ireg ')'   (rule 40)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 116
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 8
+
+    instruction  ->  INS_BRN . ifreg ',' @10 disp21   (rule 42)
+
+    IREG	shift, and go to state 112
+    FREG	shift, and go to state 113
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ifreg	go to state 117
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 115
+
+
+
+state 9
+
+    instruction  ->  INS_M1A . ireg   (rule 47)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 118
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 10
+
+    instruction  ->  INS_M1B . '(' ireg ')'   (rule 48)
+
+    '(' 	shift, and go to state 119
+
+
+
+state 11
+
+    instruction  ->  INS_MIS .   (rule 49)
+
+    $default	reduce using rule 49 (instruction)
+
+
+
+state 12
+
+    instruction  ->  INS_FPCR . freg   (rule 51)
+    instruction  ->  INS_FPCR . three_freg   (rule 52)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    three_freg	go to state 120
+    freg	go to state 121
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 13
+
+    instruction  ->  INS_RPCC . ireg ',' @11 '(' ireg ')'   (rule 45)
+    instruction  ->  INS_RPCC . ireg   (rule 46)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 122
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 14
+
+    instruction  ->  INS_SEXT . intreg   (rule 25)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '#' 	shift, and go to state 123
+    '<' 	shift, and go to state 101
+
+    intreg	go to state 124
+    ireg	go to state 125
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 15
+
+    instruction  ->  INS_IP2 . two_ireg   (rule 26)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    two_ireg	go to state 126
+    ireg	go to state 127
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 16
+
+    instruction  ->  INS_IP3 . ireg ',' @4 two_ireg   (rule 28)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 128
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 17
+
+    instruction  ->  INS_FTI . freg ',' @2 ireg   (rule 22)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    freg	go to state 129
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 18
+
+    instruction  ->  INS_LSB . ireg ',' @5 '(' ireg ')'   (rule 30)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 130
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 19
+
+    instruction  ->  INS_SSB . ireg ',' @6 '(' ireg ')'   (rule 32)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 131
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 20
+
+    instruction  ->  INS_ITF . ireg ',' @3 freg   (rule 24)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 132
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 21
+
+    instruction  ->  INS_UNOP . disp16 '(' ireg ')'   (rule 35)
+    instruction  ->  INS_UNOP . disp16   (rule 36)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 89 (disp16)
+
+    disp16	go to state 133
+    expr	go to state 134
+    element	go to state 105
+
+
+
+state 22
+
+    instruction  ->  INS_CALLPAL . disp26   (rule 43)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    disp26	go to state 135
+    expr	go to state 136
+    element	go to state 105
+
+
+
+state 23
+
+    instruction  ->  INS_IPR4 . ireg ',' @12 ipr   (rule 54)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 137
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 24
+
+    instruction  ->  INS_HWM4 . ireg ',' @13 disp12 '(' ireg ')'   (rule 56)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 138
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 25
+
+    instruction  ->  INS_IPR5 . ireg ',' @14 ipr   (rule 58)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 139
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 26
+
+    instruction  ->  INS_HWM5 . ireg ',' @15 disp10 '(' ireg ')' mode   (rule 60)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 140
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 27
+
+    instruction  ->  INS_REI6 . '(' ireg ')'   (rule 61)
+    instruction  ->  INS_REI6 . ireg ',' @16 '(' ireg ')' hint   (rule 63)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '(' 	shift, and go to state 141
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 142
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 28
+
+    instruction  ->  INS_MTI6 . ireg ',' @17 ipr scbd6   (rule 65)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 143
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 29
+
+    instruction  ->  INS_MFI6 . ireg ',' @18 ipr scbd6   (rule 67)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 144
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 30
+
+    instruction  ->  INS_HWM6 . ireg ',' @19 disp12 '(' ireg ')'   (rule 69)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 145
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 31
+
+    instruction  ->  INS_1REG . ireg   (rule 50)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 146
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 32
+
+    directive  ->  ADDR . @32 mem_exprseq EOL   (rule 149)
+
+    $default	reduce using rule 148 (@32)
+
+    @32 	go to state 147
+
+
+
+state 33
+
+    directive  ->  QUAD . @33 mem_exprseq EOL   (rule 151)
+
+    $default	reduce using rule 150 (@33)
+
+    @33 	go to state 148
+
+
+
+state 34
+
+    directive  ->  LONG . @34 mem_exprseq EOL   (rule 153)
+
+    $default	reduce using rule 152 (@34)
+
+    @34 	go to state 149
+
+
+
+state 35
+
+    directive  ->  BLKL . absexpr EOL   (rule 164)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 150
+
+
+
+state 36
+
+    directive  ->  BLKQ . absexpr EOL   (rule 165)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 151
+
+
+
+state 37
+
+    directive  ->  IDENT . EOL   (rule 179)
+
+    EOL 	shift, and go to state 152
+
+
+
+state 38
+
+    directive  ->  TITLE . EOL   (rule 180)
+
+    EOL 	shift, and go to state 153
+
+
+
+state 39
+
+    label  ->  LOCAL_LABEL . ':'   (rule 15)
+    label  ->  LOCAL_LABEL . ':' ':'   (rule 16)
+
+    ':' 	shift, and go to state 154
+
+
+
+state 40
+
+    directive  ->  NOLIST . @37 list_flags EOL   (rule 172)
+    directive  ->  NOLIST . EOL   (rule 173)
+
+    EOL 	shift, and go to state 155
+
+    $default	reduce using rule 171 (@37)
+
+    @37 	go to state 156
+
+
+
+state 41
+
+    directive  ->  LIST . @38 list_flags EOL   (rule 175)
+    directive  ->  LIST . EOL   (rule 176)
+
+    EOL 	shift, and go to state 157
+
+    $default	reduce using rule 174 (@38)
+
+    @38 	go to state 158
+
+
+
+state 42
+
+    directive  ->  CMDIN . absexpr EOL BODYTEXT ENDI EOL   (rule 145)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 159
+
+
+
+state 43
+
+    directive  ->  NODEBUG . EOL   (rule 177)
+
+    EOL 	shift, and go to state 160
+
+
+
+state 44
+
+    directive  ->  K_DEBUG . EOL   (rule 178)
+
+    EOL 	shift, and go to state 161
+
+
+
+state 45
+
+    directive  ->  IF . if_condition EOL mainbody @29 ifsubbody_seq ENDC EOL   (rule 137)
+
+    EQ  	shift, and go to state 162
+    GT  	shift, and go to state 163
+    LT  	shift, and go to state 164
+    DF  	shift, and go to state 165
+    NE  	shift, and go to state 166
+    GE  	shift, and go to state 167
+    LE  	shift, and go to state 168
+    NDF 	shift, and go to state 169
+    B   	shift, and go to state 170
+    NB  	shift, and go to state 171
+    IDN 	shift, and go to state 172
+    DIF 	shift, and go to state 173
+
+    if_condition	go to state 174
+
+
+
+state 46
+
+    directive  ->  WHILE . @30 while_condition @31 EOL BODYTEXT ENDW EOL   (rule 142)
+
+    $default	reduce using rule 140 (@30)
+
+    @30 	go to state 175
+
+
+
+state 47
+
+    directive  ->  BREAK . EOL   (rule 143)
+
+    EOL 	shift, and go to state 176
+
+
+
+state 48
+
+    directive  ->  CONTINUE . EOL   (rule 144)
+
+    EOL 	shift, and go to state 177
+
+
+
+state 49
+
+    directive  ->  INCLUDE . STRING EOL   (rule 126)
+
+    STRING	shift, and go to state 178
+
+
+
+state 50
+
+    directive  ->  INCLUDE_DIR . STRING EOL   (rule 127)
+
+    STRING	shift, and go to state 179
+
+
+
+state 51
+
+    directive  ->  MINCLUDE . STRING EOL   (rule 128)
+
+    STRING	shift, and go to state 180
+
+
+
+state 52
+
+    label  ->  SYMBOL . ':'   (rule 13)
+    label  ->  SYMBOL . ':' ':'   (rule 14)
+    assignment  ->  SYMBOL . '=' expr EOL   (rule 104)
+
+    ':' 	shift, and go to state 181
+    '=' 	shift, and go to state 182
+
+
+
+state 53
+
+    action  ->  EOL .   (rule 5)
+
+    $default	reduce using rule 5 (action)
+
+
+
+state 54
+
+    assignment  ->  DOT . '=' absexpr EOL   (rule 105)
+
+    '=' 	shift, and go to state 183
+
+
+
+state 55
+
+    directive  ->  ALIGN . alignbound opt_alignfill EOL   (rule 147)
+
+    K_BYTE	shift, and go to state 184
+    K_WORD	shift, and go to state 185
+    K_LONG	shift, and go to state 186
+    K_QUAD	shift, and go to state 187
+    K_PAGE	shift, and go to state 188
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 189
+    alignbound	go to state 190
+
+
+
+state 56
+
+    directive  ->  REPEAT . opt_absexpr EOL BODYTEXT ENDR EOL   (rule 139)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 267 (opt_absexpr)
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 191
+    opt_absexpr	go to state 192
+
+
+
+state 57
+
+    directive  ->  DOCMD . STRING EOL   (rule 146)
+
+    STRING	shift, and go to state 193
+
+
+
+state 58
+
+    directive  ->  MACRO . SYMBOL opt_comma @35 opt_macro_arglist EOL BODYTEXT ENDM EOL   (rule 167)
+
+    SYMBOL	shift, and go to state 194
+
+
+
+state 59
+
+    directive  ->  PRAGMA . @26 pragma_flags EOL   (rule 130)
+
+    $default	reduce using rule 129 (@26)
+
+    @26 	go to state 195
+
+
+
+state 60
+
+    directive  ->  MACRO_CALL . @36 opt_macro_call_arglist EOL   (rule 169)
+
+    $default	reduce using rule 168 (@36)
+
+    @36 	go to state 196
+
+
+
+state 61
+
+    directive  ->  NEXT_ARG . EOL   (rule 170)
+
+    EOL 	shift, and go to state 197
+
+
+
+state 62
+
+    directive  ->  ASCII . @27 string_seq EOL   (rule 133)
+
+    $default	reduce using rule 132 (@27)
+
+    @27 	go to state 198
+
+
+
+state 63
+
+    directive  ->  ASCIZ . @28 string_seq EOL   (rule 135)
+
+    $default	reduce using rule 134 (@28)
+
+    @28 	go to state 199
+
+
+
+state 64
+
+    directive  ->  SAVE_PSECT . EOL   (rule 158)
+    directive  ->  SAVE_PSECT . LOCAL_BLOCK EOL   (rule 160)
+
+    LOCAL_BLOCK	shift, and go to state 200
+    EOL 	shift, and go to state 201
+
+
+
+state 65
+
+    directive  ->  SAVE_DSECT . EOL   (rule 159)
+    directive  ->  SAVE_DSECT . LOCAL_BLOCK EOL   (rule 161)
+
+    LOCAL_BLOCK	shift, and go to state 202
+    EOL 	shift, and go to state 203
+
+
+
+state 66
+
+    directive  ->  RESTORE_PSECT . EOL   (rule 162)
+
+    EOL 	shift, and go to state 204
+
+
+
+state 67
+
+    directive  ->  RESTORE_DSECT . EOL   (rule 163)
+
+    EOL 	shift, and go to state 205
+
+
+
+state 68
+
+    directive  ->  PSECT . SYMBOL psect_args EOL   (rule 157)
+
+    SYMBOL	shift, and go to state 206
+
+
+
+state 69
+
+    directive  ->  DSECT . SYMBOL psect_args EOL   (rule 181)
+
+    SYMBOL	shift, and go to state 207
+
+
+
+state 70
+
+    directive  ->  LINK_ADDRESS . absexpr EOL   (rule 184)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 208
+
+
+
+state 71
+
+    directive  ->  LINK_AFTER . SYMBOL EOL   (rule 188)
+
+    SYMBOL	shift, and go to state 209
+
+
+
+state 72
+
+    directive  ->  LINK_FIRST . EOL   (rule 189)
+
+    EOL 	shift, and go to state 210
+
+
+
+state 73
+
+    directive  ->  LINK_LAST . EOL   (rule 190)
+
+    EOL 	shift, and go to state 211
+
+
+
+state 74
+
+    directive  ->  LINK_ATTR . @39 link_flags EOL   (rule 192)
+
+    $default	reduce using rule 191 (@39)
+
+    @39 	go to state 212
+
+
+
+state 75
+
+    directive  ->  LINK_OFFSET . absexpr EOL   (rule 185)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 213
+
+
+
+state 76
+
+    directive  ->  LINK_REGION . absexpr EOL   (rule 186)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 214
+
+
+
+state 77
+
+    directive  ->  LINK_SIZE . absexpr EOL   (rule 187)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 215
+
+
+
+state 78
+
+    directive  ->  HEADER . EOL   (rule 182)
+
+    EOL 	shift, and go to state 216
+
+
+
+state 79
+
+    directive  ->  ENDH . EOL   (rule 183)
+
+    EOL 	shift, and go to state 217
+
+
+
+state 80
+
+    directive  ->  WARN . opt_absexpr COMMENT EOL   (rule 154)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 267 (opt_absexpr)
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 191
+    opt_absexpr	go to state 218
+
+
+
+state 81
+
+    directive  ->  ERROR . opt_absexpr COMMENT EOL   (rule 155)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 267 (opt_absexpr)
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 191
+    opt_absexpr	go to state 219
+
+
+
+state 82
+
+    directive  ->  PRINT . opt_absexpr COMMENT EOL   (rule 156)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 267 (opt_absexpr)
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 191
+    opt_absexpr	go to state 220
+
+
+
+state 83
+
+    directive  ->  IIF . if_condition ',' BODYTEXT EOL   (rule 138)
+
+    EQ  	shift, and go to state 162
+    GT  	shift, and go to state 163
+    LT  	shift, and go to state 164
+    DF  	shift, and go to state 165
+    NE  	shift, and go to state 166
+    GE  	shift, and go to state 167
+    LE  	shift, and go to state 168
+    NDF 	shift, and go to state 169
+    B   	shift, and go to state 170
+    NB  	shift, and go to state 171
+    IDN 	shift, and go to state 172
+    DIF 	shift, and go to state 173
+
+    if_condition	go to state 221
+
+
+
+state 84
+
+    directive  ->  ARCH . arch_flag EOL   (rule 131)
+
+    A_EV4	shift, and go to state 222
+    A_EV5	shift, and go to state 223
+    A_EV6	shift, and go to state 224
+
+    arch_flag	go to state 225
+
+
+
+state 85
+
+    toplevel  ->  sequence .   (rule 1)
+    sequence  ->  sequence . action   (rule 4)
+
+    error	shift, and go to state 1
+    ENDP	shift, and go to state 2
+    INS_FOP	shift, and go to state 3
+    INS_FP2	shift, and go to state 4
+    INS_IOP	shift, and go to state 5
+    INS_MEM	shift, and go to state 6
+    INS_JSR	shift, and go to state 7
+    INS_BRN	shift, and go to state 8
+    INS_M1A	shift, and go to state 9
+    INS_M1B	shift, and go to state 10
+    INS_MIS	shift, and go to state 11
+    INS_FPCR	shift, and go to state 12
+    INS_RPCC	shift, and go to state 13
+    INS_SEXT	shift, and go to state 14
+    INS_IP2	shift, and go to state 15
+    INS_IP3	shift, and go to state 16
+    INS_FTI	shift, and go to state 17
+    INS_LSB	shift, and go to state 18
+    INS_SSB	shift, and go to state 19
+    INS_ITF	shift, and go to state 20
+    INS_UNOP	shift, and go to state 21
+    INS_CALLPAL	shift, and go to state 22
+    INS_IPR4	shift, and go to state 23
+    INS_HWM4	shift, and go to state 24
+    INS_IPR5	shift, and go to state 25
+    INS_HWM5	shift, and go to state 26
+    INS_REI6	shift, and go to state 27
+    INS_MTI6	shift, and go to state 28
+    INS_MFI6	shift, and go to state 29
+    INS_HWM6	shift, and go to state 30
+    INS_1REG	shift, and go to state 31
+    ADDR	shift, and go to state 32
+    QUAD	shift, and go to state 33
+    LONG	shift, and go to state 34
+    BLKL	shift, and go to state 35
+    BLKQ	shift, and go to state 36
+    IDENT	shift, and go to state 37
+    TITLE	shift, and go to state 38
+    LOCAL_LABEL	shift, and go to state 39
+    NOLIST	shift, and go to state 40
+    LIST	shift, and go to state 41
+    CMDIN	shift, and go to state 42
+    NODEBUG	shift, and go to state 43
+    K_DEBUG	shift, and go to state 44
+    IF  	shift, and go to state 45
+    WHILE	shift, and go to state 46
+    BREAK	shift, and go to state 47
+    CONTINUE	shift, and go to state 48
+    INCLUDE	shift, and go to state 49
+    INCLUDE_DIR	shift, and go to state 50
+    MINCLUDE	shift, and go to state 51
+    SYMBOL	shift, and go to state 52
+    EOL 	shift, and go to state 53
+    DOT 	shift, and go to state 54
+    ALIGN	shift, and go to state 55
+    REPEAT	shift, and go to state 56
+    DOCMD	shift, and go to state 57
+    MACRO	shift, and go to state 58
+    PRAGMA	shift, and go to state 59
+    MACRO_CALL	shift, and go to state 60
+    NEXT_ARG	shift, and go to state 61
+    ASCII	shift, and go to state 62
+    ASCIZ	shift, and go to state 63
+    SAVE_PSECT	shift, and go to state 64
+    SAVE_DSECT	shift, and go to state 65
+    RESTORE_PSECT	shift, and go to state 66
+    RESTORE_DSECT	shift, and go to state 67
+    PSECT	shift, and go to state 68
+    DSECT	shift, and go to state 69
+    LINK_ADDRESS	shift, and go to state 70
+    LINK_AFTER	shift, and go to state 71
+    LINK_FIRST	shift, and go to state 72
+    LINK_LAST	shift, and go to state 73
+    LINK_ATTR	shift, and go to state 74
+    LINK_OFFSET	shift, and go to state 75
+    LINK_REGION	shift, and go to state 76
+    LINK_SIZE	shift, and go to state 77
+    HEADER	shift, and go to state 78
+    ENDH	shift, and go to state 79
+    WARN	shift, and go to state 80
+    ERROR	shift, and go to state 81
+    PRINT	shift, and go to state 82
+    IIF 	shift, and go to state 83
+    ARCH	shift, and go to state 84
+
+    $   	reduce using rule 1 (toplevel)
+
+    action	go to state 226
+    label	go to state 87
+    instruction	go to state 88
+    assignment	go to state 89
+    directive	go to state 90
+
+
+
+state 86
+
+    sequence  ->  action .   (rule 3)
+
+    $default	reduce using rule 3 (sequence)
+
+
+
+state 87
+
+    action  ->  label .   (rule 6)
+    action  ->  label . EOL   (rule 7)
+
+    EOL 	shift, and go to state 227
+
+    EOL 	[reduce using rule 6 (action)]
+    $default	reduce using rule 6 (action)
+
+
+
+state 88
+
+    action  ->  instruction . EOL   (rule 8)
+
+    EOL 	shift, and go to state 228
+
+
+
+state 89
+
+    action  ->  assignment .   (rule 9)
+
+    $default	reduce using rule 9 (action)
+
+
+
+state 90
+
+    action  ->  directive .   (rule 10)
+
+    $default	reduce using rule 10 (action)
+
+
+
+state 91
+
+    action  ->  error EOL .   (rule 12)
+
+    $default	reduce using rule 12 (action)
+
+
+
+state 92
+
+    action  ->  ENDP EOL .   (rule 11)
+
+    $default	reduce using rule 11 (action)
+
+
+
+state 93
+
+    freg  ->  FREG .   (rule 102)
+
+    $default	reduce using rule 102 (freg)
+
+
+
+state 94
+
+    element  ->  LOCAL_LABEL .   (rule 123)
+
+    $default	reduce using rule 123 (element)
+
+
+
+state 95
+
+    element  ->  NUMBER .   (rule 121)
+
+    $default	reduce using rule 121 (element)
+
+
+
+state 96
+
+    expr  ->  NOT . expr   (rule 117)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 229
+    element	go to state 105
+
+
+
+state 97
+
+    expr  ->  LOG_NOT . expr   (rule 118)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 230
+    element	go to state 105
+
+
+
+state 98
+
+    element  ->  SYMBOL .   (rule 122)
+
+    $default	reduce using rule 122 (element)
+
+
+
+state 99
+
+    element  ->  DOT .   (rule 124)
+
+    $default	reduce using rule 124 (element)
+
+
+
+state 100
+
+    expr  ->  '-' . expr   (rule 119)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 231
+    element	go to state 105
+
+
+
+state 101
+
+    expr  ->  '<' . expr '>'   (rule 120)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 232
+    element	go to state 105
+
+
+
+state 102
+
+    instruction  ->  INS_FOP three_freg .   (rule 17)
+
+    $default	reduce using rule 17 (instruction)
+
+
+
+state 103
+
+    three_freg  ->  freg . ',' @20 freg ',' @21 freg   (rule 75)
+
+    ',' 	shift, and go to state 233
+
+
+
+state 104
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    absexpr  ->  expr .   (rule 125)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 125 (absexpr)
+
+
+
+state 105
+
+    expr  ->  element .   (rule 106)
+
+    $default	reduce using rule 106 (expr)
+
+
+
+state 106
+
+    freg  ->  absexpr .   (rule 103)
+
+    $default	reduce using rule 103 (freg)
+
+
+
+state 107
+
+    instruction  ->  INS_FP2 two_freg .   (rule 18)
+
+    $default	reduce using rule 18 (instruction)
+
+
+
+state 108
+
+    two_freg  ->  freg . ',' @22 freg   (rule 77)
+
+    ',' 	shift, and go to state 244
+
+
+
+state 109
+
+    ireg  ->  IREG .   (rule 100)
+
+    $default	reduce using rule 100 (ireg)
+
+
+
+state 110
+
+    instruction  ->  INS_IOP ireg . ',' @1 intreg   (rule 20)
+
+    ',' 	shift, and go to state 245
+
+
+
+state 111
+
+    ireg  ->  absexpr .   (rule 101)
+
+    $default	reduce using rule 101 (ireg)
+
+
+
+state 112
+
+    ifreg  ->  IREG .   (rule 70)
+
+    $default	reduce using rule 70 (ifreg)
+
+
+
+state 113
+
+    ifreg  ->  FREG .   (rule 71)
+
+    $default	reduce using rule 71 (ifreg)
+
+
+
+state 114
+
+    instruction  ->  INS_MEM ifreg . ',' @7 disp16 '(' ireg ')'   (rule 34)
+
+    ',' 	shift, and go to state 246
+
+
+
+state 115
+
+    ifreg  ->  absexpr .   (rule 72)
+
+    $default	reduce using rule 72 (ifreg)
+
+
+
+state 116
+
+    instruction  ->  INS_JSR ireg . ',' @8 '(' ireg ')' hint   (rule 38)
+    instruction  ->  INS_JSR ireg . ',' @9 disp14 '(' ireg ')'   (rule 40)
+
+    ',' 	shift, and go to state 247
+
+
+
+state 117
+
+    instruction  ->  INS_BRN ifreg . ',' @10 disp21   (rule 42)
+
+    ',' 	shift, and go to state 248
+
+
+
+state 118
+
+    instruction  ->  INS_M1A ireg .   (rule 47)
+
+    $default	reduce using rule 47 (instruction)
+
+
+
+state 119
+
+    instruction  ->  INS_M1B '(' . ireg ')'   (rule 48)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 249
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 120
+
+    instruction  ->  INS_FPCR three_freg .   (rule 52)
+
+    $default	reduce using rule 52 (instruction)
+
+
+
+state 121
+
+    instruction  ->  INS_FPCR freg .   (rule 51)
+    three_freg  ->  freg . ',' @20 freg ',' @21 freg   (rule 75)
+
+    ',' 	shift, and go to state 233
+
+    $default	reduce using rule 51 (instruction)
+
+
+
+state 122
+
+    instruction  ->  INS_RPCC ireg . ',' @11 '(' ireg ')'   (rule 45)
+    instruction  ->  INS_RPCC ireg .   (rule 46)
+
+    ',' 	shift, and go to state 250
+
+    $default	reduce using rule 46 (instruction)
+
+
+
+state 123
+
+    intreg  ->  '#' . expr ',' @24 ireg   (rule 81)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 251
+    element	go to state 105
+
+
+
+state 124
+
+    instruction  ->  INS_SEXT intreg .   (rule 25)
+
+    $default	reduce using rule 25 (instruction)
+
+
+
+state 125
+
+    intreg  ->  ireg . ',' @23 ireg   (rule 79)
+
+    ',' 	shift, and go to state 252
+
+
+
+state 126
+
+    instruction  ->  INS_IP2 two_ireg .   (rule 26)
+
+    $default	reduce using rule 26 (instruction)
+
+
+
+state 127
+
+    two_ireg  ->  ireg . ',' @25 ireg   (rule 83)
+
+    ',' 	shift, and go to state 253
+
+
+
+state 128
+
+    instruction  ->  INS_IP3 ireg . ',' @4 two_ireg   (rule 28)
+
+    ',' 	shift, and go to state 254
+
+
+
+state 129
+
+    instruction  ->  INS_FTI freg . ',' @2 ireg   (rule 22)
+
+    ',' 	shift, and go to state 255
+
+
+
+state 130
+
+    instruction  ->  INS_LSB ireg . ',' @5 '(' ireg ')'   (rule 30)
+
+    ',' 	shift, and go to state 256
+
+
+
+state 131
+
+    instruction  ->  INS_SSB ireg . ',' @6 '(' ireg ')'   (rule 32)
+
+    ',' 	shift, and go to state 257
+
+
+
+state 132
+
+    instruction  ->  INS_ITF ireg . ',' @3 freg   (rule 24)
+
+    ',' 	shift, and go to state 258
+
+
+
+state 133
+
+    instruction  ->  INS_UNOP disp16 . '(' ireg ')'   (rule 35)
+    instruction  ->  INS_UNOP disp16 .   (rule 36)
+
+    '(' 	shift, and go to state 259
+
+    $default	reduce using rule 36 (instruction)
+
+
+
+state 134
+
+    disp16  ->  expr .   (rule 90)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 90 (disp16)
+
+
+
+state 135
+
+    instruction  ->  INS_CALLPAL disp26 .   (rule 43)
+
+    $default	reduce using rule 43 (instruction)
+
+
+
+state 136
+
+    disp26  ->  expr .   (rule 92)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 92 (disp26)
+
+
+
+state 137
+
+    instruction  ->  INS_IPR4 ireg . ',' @12 ipr   (rule 54)
+
+    ',' 	shift, and go to state 260
+
+
+
+state 138
+
+    instruction  ->  INS_HWM4 ireg . ',' @13 disp12 '(' ireg ')'   (rule 56)
+
+    ',' 	shift, and go to state 261
+
+
+
+state 139
+
+    instruction  ->  INS_IPR5 ireg . ',' @14 ipr   (rule 58)
+
+    ',' 	shift, and go to state 262
+
+
+
+state 140
+
+    instruction  ->  INS_HWM5 ireg . ',' @15 disp10 '(' ireg ')' mode   (rule 60)
+
+    ',' 	shift, and go to state 263
+
+
+
+state 141
+
+    instruction  ->  INS_REI6 '(' . ireg ')'   (rule 61)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 264
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 142
+
+    instruction  ->  INS_REI6 ireg . ',' @16 '(' ireg ')' hint   (rule 63)
+
+    ',' 	shift, and go to state 265
+
+
+
+state 143
+
+    instruction  ->  INS_MTI6 ireg . ',' @17 ipr scbd6   (rule 65)
+
+    ',' 	shift, and go to state 266
+
+
+
+state 144
+
+    instruction  ->  INS_MFI6 ireg . ',' @18 ipr scbd6   (rule 67)
+
+    ',' 	shift, and go to state 267
+
+
+
+state 145
+
+    instruction  ->  INS_HWM6 ireg . ',' @19 disp12 '(' ireg ')'   (rule 69)
+
+    ',' 	shift, and go to state 268
+
+
+
+state 146
+
+    instruction  ->  INS_1REG ireg .   (rule 50)
+
+    $default	reduce using rule 50 (instruction)
+
+
+
+state 147
+
+    directive  ->  ADDR @32 . mem_exprseq EOL   (rule 149)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 269
+    element	go to state 105
+    mem_exprseq	go to state 270
+
+
+
+state 148
+
+    directive  ->  QUAD @33 . mem_exprseq EOL   (rule 151)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 269
+    element	go to state 105
+    mem_exprseq	go to state 271
+
+
+
+state 149
+
+    directive  ->  LONG @34 . mem_exprseq EOL   (rule 153)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 269
+    element	go to state 105
+    mem_exprseq	go to state 272
+
+
+
+state 150
+
+    directive  ->  BLKL absexpr . EOL   (rule 164)
+
+    EOL 	shift, and go to state 273
+
+
+
+state 151
+
+    directive  ->  BLKQ absexpr . EOL   (rule 165)
+
+    EOL 	shift, and go to state 274
+
+
+
+state 152
+
+    directive  ->  IDENT EOL .   (rule 179)
+
+    $default	reduce using rule 179 (directive)
+
+
+
+state 153
+
+    directive  ->  TITLE EOL .   (rule 180)
+
+    $default	reduce using rule 180 (directive)
+
+
+
+state 154
+
+    label  ->  LOCAL_LABEL ':' .   (rule 15)
+    label  ->  LOCAL_LABEL ':' . ':'   (rule 16)
+
+    ':' 	shift, and go to state 275
+
+    $default	reduce using rule 15 (label)
+
+
+
+state 155
+
+    directive  ->  NOLIST EOL .   (rule 173)
+
+    $default	reduce using rule 173 (directive)
+
+
+
+state 156
+
+    directive  ->  NOLIST @37 . list_flags EOL   (rule 172)
+
+    MEB 	shift, and go to state 276
+    MC  	shift, and go to state 277
+    CND 	shift, and go to state 278
+    MD  	shift, and go to state 279
+    ME  	shift, and go to state 280
+    ASSIGN	shift, and go to state 281
+    CMDIN	shift, and go to state 282
+
+    list_flags	go to state 283
+    list_flag	go to state 284
+
+
+
+state 157
+
+    directive  ->  LIST EOL .   (rule 176)
+
+    $default	reduce using rule 176 (directive)
+
+
+
+state 158
+
+    directive  ->  LIST @38 . list_flags EOL   (rule 175)
+
+    MEB 	shift, and go to state 276
+    MC  	shift, and go to state 277
+    CND 	shift, and go to state 278
+    MD  	shift, and go to state 279
+    ME  	shift, and go to state 280
+    ASSIGN	shift, and go to state 281
+    CMDIN	shift, and go to state 282
+
+    list_flags	go to state 285
+    list_flag	go to state 284
+
+
+
+state 159
+
+    directive  ->  CMDIN absexpr . EOL BODYTEXT ENDI EOL   (rule 145)
+
+    EOL 	shift, and go to state 286
+
+
+
+state 160
+
+    directive  ->  NODEBUG EOL .   (rule 177)
+
+    $default	reduce using rule 177 (directive)
+
+
+
+state 161
+
+    directive  ->  K_DEBUG EOL .   (rule 178)
+
+    $default	reduce using rule 178 (directive)
+
+
+
+state 162
+
+    if_condition  ->  EQ . absexpr   (rule 222)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 287
+
+
+
+state 163
+
+    if_condition  ->  GT . absexpr   (rule 224)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 288
+
+
+
+state 164
+
+    if_condition  ->  LT . absexpr   (rule 225)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 289
+
+
+
+state 165
+
+    if_condition  ->  DF . SYMBOL   (rule 228)
+
+    SYMBOL	shift, and go to state 290
+
+
+
+state 166
+
+    if_condition  ->  NE . absexpr   (rule 223)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 291
+
+
+
+state 167
+
+    if_condition  ->  GE . absexpr   (rule 226)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 292
+
+
+
+state 168
+
+    if_condition  ->  LE . absexpr   (rule 227)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 293
+
+
+
+state 169
+
+    if_condition  ->  NDF . SYMBOL   (rule 229)
+
+    SYMBOL	shift, and go to state 294
+
+
+
+state 170
+
+    if_condition  ->  B . ',' opt_arg_value   (rule 230)
+
+    ',' 	shift, and go to state 295
+
+
+
+state 171
+
+    if_condition  ->  NB . ',' opt_arg_value   (rule 231)
+
+    ',' 	shift, and go to state 296
+
+
+
+state 172
+
+    if_condition  ->  IDN . ',' opt_arg_value ',' opt_arg_value   (rule 232)
+
+    ',' 	shift, and go to state 297
+
+
+
+state 173
+
+    if_condition  ->  DIF . ',' opt_arg_value ',' opt_arg_value   (rule 233)
+
+    ',' 	shift, and go to state 298
+
+
+
+state 174
+
+    directive  ->  IF if_condition . EOL mainbody @29 ifsubbody_seq ENDC EOL   (rule 137)
+
+    EOL 	shift, and go to state 299
+
+
+
+state 175
+
+    directive  ->  WHILE @30 . while_condition @31 EOL BODYTEXT ENDW EOL   (rule 142)
+
+    EQ  	shift, and go to state 300
+    GT  	shift, and go to state 301
+    LT  	shift, and go to state 302
+    DF  	shift, and go to state 303
+    NE  	shift, and go to state 304
+    GE  	shift, and go to state 305
+    LE  	shift, and go to state 306
+    NDF 	shift, and go to state 307
+    B   	shift, and go to state 308
+    NB  	shift, and go to state 309
+    IDN 	shift, and go to state 310
+    DIF 	shift, and go to state 311
+
+    while_condition	go to state 312
+
+
+
+state 176
+
+    directive  ->  BREAK EOL .   (rule 143)
+
+    $default	reduce using rule 143 (directive)
+
+
+
+state 177
+
+    directive  ->  CONTINUE EOL .   (rule 144)
+
+    $default	reduce using rule 144 (directive)
+
+
+
+state 178
+
+    directive  ->  INCLUDE STRING . EOL   (rule 126)
+
+    EOL 	shift, and go to state 313
+
+
+
+state 179
+
+    directive  ->  INCLUDE_DIR STRING . EOL   (rule 127)
+
+    EOL 	shift, and go to state 314
+
+
+
+state 180
+
+    directive  ->  MINCLUDE STRING . EOL   (rule 128)
+
+    EOL 	shift, and go to state 315
+
+
+
+state 181
+
+    label  ->  SYMBOL ':' .   (rule 13)
+    label  ->  SYMBOL ':' . ':'   (rule 14)
+
+    ':' 	shift, and go to state 316
+
+    $default	reduce using rule 13 (label)
+
+
+
+state 182
+
+    assignment  ->  SYMBOL '=' . expr EOL   (rule 104)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 317
+    element	go to state 105
+
+
+
+state 183
+
+    assignment  ->  DOT '=' . absexpr EOL   (rule 105)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 318
+
+
+
+state 184
+
+    alignbound  ->  K_BYTE .   (rule 258)
+
+    $default	reduce using rule 258 (alignbound)
+
+
+
+state 185
+
+    alignbound  ->  K_WORD .   (rule 259)
+
+    $default	reduce using rule 259 (alignbound)
+
+
+
+state 186
+
+    alignbound  ->  K_LONG .   (rule 260)
+
+    $default	reduce using rule 260 (alignbound)
+
+
+
+state 187
+
+    alignbound  ->  K_QUAD .   (rule 261)
+
+    $default	reduce using rule 261 (alignbound)
+
+
+
+state 188
+
+    alignbound  ->  K_PAGE .   (rule 262)
+
+    $default	reduce using rule 262 (alignbound)
+
+
+
+state 189
+
+    alignbound  ->  absexpr .   (rule 257)
+
+    $default	reduce using rule 257 (alignbound)
+
+
+
+state 190
+
+    directive  ->  ALIGN alignbound . opt_alignfill EOL   (rule 147)
+
+    ',' 	shift, and go to state 319
+
+    $default	reduce using rule 263 (opt_alignfill)
+
+    opt_alignfill	go to state 320
+
+
+
+state 191
+
+    opt_absexpr  ->  absexpr .   (rule 268)
+
+    $default	reduce using rule 268 (opt_absexpr)
+
+
+
+state 192
+
+    directive  ->  REPEAT opt_absexpr . EOL BODYTEXT ENDR EOL   (rule 139)
+
+    EOL 	shift, and go to state 321
+
+
+
+state 193
+
+    directive  ->  DOCMD STRING . EOL   (rule 146)
+
+    EOL 	shift, and go to state 322
+
+
+
+state 194
+
+    directive  ->  MACRO SYMBOL . opt_comma @35 opt_macro_arglist EOL BODYTEXT ENDM EOL   (rule 167)
+
+    ',' 	shift, and go to state 323
+
+    $default	reduce using rule 246 (opt_comma)
+
+    opt_comma	go to state 324
+
+
+
+state 195
+
+    directive  ->  PRAGMA @26 . pragma_flags EOL   (rule 130)
+
+    MAC_NONE	shift, and go to state 325
+    MAC_ONCE	shift, and go to state 326
+    MAC_UNLIMITED	shift, and go to state 327
+    LEXER_DEBUG_ON	shift, and go to state 328
+    LEXER_DEBUG_OFF	shift, and go to state 329
+    PARSER_DEBUG_ON	shift, and go to state 330
+    PARSER_DEBUG_OFF	shift, and go to state 331
+
+    pragma_flags	go to state 332
+    pragma_flag	go to state 333
+
+
+
+state 196
+
+    directive  ->  MACRO_CALL @36 . opt_macro_call_arglist EOL   (rule 169)
+
+    SYMBOL	shift, and go to state 334
+    ARG_VALUE	shift, and go to state 335
+    '\\'	shift, and go to state 336
+
+    $default	reduce using rule 287 (macro_call_arg)
+
+    opt_macro_call_arglist	go to state 337
+    arg_value	go to state 338
+    macro_call_arg	go to state 339
+
+
+
+state 197
+
+    directive  ->  NEXT_ARG EOL .   (rule 170)
+
+    $default	reduce using rule 170 (directive)
+
+
+
+state 198
+
+    directive  ->  ASCII @27 . string_seq EOL   (rule 133)
+
+    STRING	shift, and go to state 340
+    '<' 	shift, and go to state 341
+
+    string_seq	go to state 342
+    string_ele	go to state 343
+
+
+
+state 199
+
+    directive  ->  ASCIZ @28 . string_seq EOL   (rule 135)
+
+    STRING	shift, and go to state 340
+    '<' 	shift, and go to state 341
+
+    string_seq	go to state 344
+    string_ele	go to state 343
+
+
+
+state 200
+
+    directive  ->  SAVE_PSECT LOCAL_BLOCK . EOL   (rule 160)
+
+    EOL 	shift, and go to state 345
+
+
+
+state 201
+
+    directive  ->  SAVE_PSECT EOL .   (rule 158)
+
+    $default	reduce using rule 158 (directive)
+
+
+
+state 202
+
+    directive  ->  SAVE_DSECT LOCAL_BLOCK . EOL   (rule 161)
+
+    EOL 	shift, and go to state 346
+
+
+
+state 203
+
+    directive  ->  SAVE_DSECT EOL .   (rule 159)
+
+    $default	reduce using rule 159 (directive)
+
+
+
+state 204
+
+    directive  ->  RESTORE_PSECT EOL .   (rule 162)
+
+    $default	reduce using rule 162 (directive)
+
+
+
+state 205
+
+    directive  ->  RESTORE_DSECT EOL .   (rule 163)
+
+    $default	reduce using rule 163 (directive)
+
+
+
+state 206
+
+    directive  ->  PSECT SYMBOL . psect_args EOL   (rule 157)
+
+    ',' 	shift, and go to state 347
+
+    $default	reduce using rule 269 (psect_args)
+
+    psect_args	go to state 348
+
+
+
+state 207
+
+    directive  ->  DSECT SYMBOL . psect_args EOL   (rule 181)
+
+    ',' 	shift, and go to state 347
+
+    $default	reduce using rule 269 (psect_args)
+
+    psect_args	go to state 349
+
+
+
+state 208
+
+    directive  ->  LINK_ADDRESS absexpr . EOL   (rule 184)
+
+    EOL 	shift, and go to state 350
+
+
+
+state 209
+
+    directive  ->  LINK_AFTER SYMBOL . EOL   (rule 188)
+
+    EOL 	shift, and go to state 351
+
+
+
+state 210
+
+    directive  ->  LINK_FIRST EOL .   (rule 189)
+
+    $default	reduce using rule 189 (directive)
+
+
+
+state 211
+
+    directive  ->  LINK_LAST EOL .   (rule 190)
+
+    $default	reduce using rule 190 (directive)
+
+
+
+state 212
+
+    directive  ->  LINK_ATTR @39 . link_flags EOL   (rule 192)
+
+    OVERLAP_OK	shift, and go to state 352
+    DIRECTLY_AFTER	shift, and go to state 353
+
+    link_flags	go to state 354
+    link_flag	go to state 355
+
+
+
+state 213
+
+    directive  ->  LINK_OFFSET absexpr . EOL   (rule 185)
+
+    EOL 	shift, and go to state 356
+
+
+
+state 214
+
+    directive  ->  LINK_REGION absexpr . EOL   (rule 186)
+
+    EOL 	shift, and go to state 357
+
+
+
+state 215
+
+    directive  ->  LINK_SIZE absexpr . EOL   (rule 187)
+
+    EOL 	shift, and go to state 358
+
+
+
+state 216
+
+    directive  ->  HEADER EOL .   (rule 182)
+
+    $default	reduce using rule 182 (directive)
+
+
+
+state 217
+
+    directive  ->  ENDH EOL .   (rule 183)
+
+    $default	reduce using rule 183 (directive)
+
+
+
+state 218
+
+    directive  ->  WARN opt_absexpr . COMMENT EOL   (rule 154)
+
+    COMMENT	shift, and go to state 359
+
+
+
+state 219
+
+    directive  ->  ERROR opt_absexpr . COMMENT EOL   (rule 155)
+
+    COMMENT	shift, and go to state 360
+
+
+
+state 220
+
+    directive  ->  PRINT opt_absexpr . COMMENT EOL   (rule 156)
+
+    COMMENT	shift, and go to state 361
+
+
+
+state 221
+
+    directive  ->  IIF if_condition . ',' BODYTEXT EOL   (rule 138)
+
+    ',' 	shift, and go to state 362
+
+
+
+state 222
+
+    arch_flag  ->  A_EV4 .   (rule 193)
+
+    $default	reduce using rule 193 (arch_flag)
+
+
+
+state 223
+
+    arch_flag  ->  A_EV5 .   (rule 194)
+
+    $default	reduce using rule 194 (arch_flag)
+
+
+
+state 224
+
+    arch_flag  ->  A_EV6 .   (rule 195)
+
+    $default	reduce using rule 195 (arch_flag)
+
+
+
+state 225
+
+    directive  ->  ARCH arch_flag . EOL   (rule 131)
+
+    EOL 	shift, and go to state 363
+
+
+
+state 226
+
+    sequence  ->  sequence action .   (rule 4)
+
+    $default	reduce using rule 4 (sequence)
+
+
+
+state 227
+
+    action  ->  label EOL .   (rule 7)
+
+    $default	reduce using rule 7 (action)
+
+
+
+state 228
+
+    action  ->  instruction EOL .   (rule 8)
+
+    $default	reduce using rule 8 (action)
+
+
+
+state 229
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    expr  ->  NOT expr .   (rule 117)
+
+
+    $default	reduce using rule 117 (expr)
+
+
+
+state 230
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    expr  ->  LOG_NOT expr .   (rule 118)
+
+
+    $default	reduce using rule 118 (expr)
+
+
+
+state 231
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    expr  ->  '-' expr .   (rule 119)
+
+
+    $default	reduce using rule 119 (expr)
+
+
+
+state 232
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    expr  ->  '<' expr . '>'   (rule 120)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+    '>' 	shift, and go to state 364
+
+
+
+state 233
+
+    three_freg  ->  freg ',' . @20 freg ',' @21 freg   (rule 75)
+
+    $default	reduce using rule 73 (@20)
+
+    @20 	go to state 365
+
+
+
+state 234
+
+    expr  ->  expr LOG_AND . expr   (rule 115)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 366
+    element	go to state 105
+
+
+
+state 235
+
+    expr  ->  expr LOG_OR . expr   (rule 116)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 367
+    element	go to state 105
+
+
+
+state 236
+
+    expr  ->  expr '+' . expr   (rule 107)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 368
+    element	go to state 105
+
+
+
+state 237
+
+    expr  ->  expr '-' . expr   (rule 108)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 369
+    element	go to state 105
+
+
+
+state 238
+
+    expr  ->  expr '@' . expr   (rule 111)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 370
+    element	go to state 105
+
+
+
+state 239
+
+    expr  ->  expr '&' . expr   (rule 112)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 371
+    element	go to state 105
+
+
+
+state 240
+
+    expr  ->  expr '!' . expr   (rule 113)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 372
+    element	go to state 105
+
+
+
+state 241
+
+    expr  ->  expr '\\' . expr   (rule 114)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 373
+    element	go to state 105
+
+
+
+state 242
+
+    expr  ->  expr '*' . expr   (rule 109)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 374
+    element	go to state 105
+
+
+
+state 243
+
+    expr  ->  expr '/' . expr   (rule 110)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 375
+    element	go to state 105
+
+
+
+state 244
+
+    two_freg  ->  freg ',' . @22 freg   (rule 77)
+
+    $default	reduce using rule 76 (@22)
+
+    @22 	go to state 376
+
+
+
+state 245
+
+    instruction  ->  INS_IOP ireg ',' . @1 intreg   (rule 20)
+
+    $default	reduce using rule 19 (@1)
+
+    @1  	go to state 377
+
+
+
+state 246
+
+    instruction  ->  INS_MEM ifreg ',' . @7 disp16 '(' ireg ')'   (rule 34)
+
+    $default	reduce using rule 33 (@7)
+
+    @7  	go to state 378
+
+
+
+state 247
+
+    instruction  ->  INS_JSR ireg ',' . @8 '(' ireg ')' hint   (rule 38)
+    instruction  ->  INS_JSR ireg ',' . @9 disp14 '(' ireg ')'   (rule 40)
+
+    '(' 	reduce using rule 37 (@8)
+    $default	reduce using rule 39 (@9)
+
+    @8  	go to state 379
+    @9  	go to state 380
+
+
+
+state 248
+
+    instruction  ->  INS_BRN ifreg ',' . @10 disp21   (rule 42)
+
+    $default	reduce using rule 41 (@10)
+
+    @10 	go to state 381
+
+
+
+state 249
+
+    instruction  ->  INS_M1B '(' ireg . ')'   (rule 48)
+
+    ')' 	shift, and go to state 382
+
+
+
+state 250
+
+    instruction  ->  INS_RPCC ireg ',' . @11 '(' ireg ')'   (rule 45)
+
+    $default	reduce using rule 44 (@11)
+
+    @11 	go to state 383
+
+
+
+state 251
+
+    intreg  ->  '#' expr . ',' @24 ireg   (rule 81)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+    ',' 	shift, and go to state 384
+
+
+
+state 252
+
+    intreg  ->  ireg ',' . @23 ireg   (rule 79)
+
+    $default	reduce using rule 78 (@23)
+
+    @23 	go to state 385
+
+
+
+state 253
+
+    two_ireg  ->  ireg ',' . @25 ireg   (rule 83)
+
+    $default	reduce using rule 82 (@25)
+
+    @25 	go to state 386
+
+
+
+state 254
+
+    instruction  ->  INS_IP3 ireg ',' . @4 two_ireg   (rule 28)
+
+    $default	reduce using rule 27 (@4)
+
+    @4  	go to state 387
+
+
+
+state 255
+
+    instruction  ->  INS_FTI freg ',' . @2 ireg   (rule 22)
+
+    $default	reduce using rule 21 (@2)
+
+    @2  	go to state 388
+
+
+
+state 256
+
+    instruction  ->  INS_LSB ireg ',' . @5 '(' ireg ')'   (rule 30)
+
+    $default	reduce using rule 29 (@5)
+
+    @5  	go to state 389
+
+
+
+state 257
+
+    instruction  ->  INS_SSB ireg ',' . @6 '(' ireg ')'   (rule 32)
+
+    $default	reduce using rule 31 (@6)
+
+    @6  	go to state 390
+
+
+
+state 258
+
+    instruction  ->  INS_ITF ireg ',' . @3 freg   (rule 24)
+
+    $default	reduce using rule 23 (@3)
+
+    @3  	go to state 391
+
+
+
+state 259
+
+    instruction  ->  INS_UNOP disp16 '(' . ireg ')'   (rule 35)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 392
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 260
+
+    instruction  ->  INS_IPR4 ireg ',' . @12 ipr   (rule 54)
+
+    $default	reduce using rule 53 (@12)
+
+    @12 	go to state 393
+
+
+
+state 261
+
+    instruction  ->  INS_HWM4 ireg ',' . @13 disp12 '(' ireg ')'   (rule 56)
+
+    $default	reduce using rule 55 (@13)
+
+    @13 	go to state 394
+
+
+
+state 262
+
+    instruction  ->  INS_IPR5 ireg ',' . @14 ipr   (rule 58)
+
+    $default	reduce using rule 57 (@14)
+
+    @14 	go to state 395
+
+
+
+state 263
+
+    instruction  ->  INS_HWM5 ireg ',' . @15 disp10 '(' ireg ')' mode   (rule 60)
+
+    $default	reduce using rule 59 (@15)
+
+    @15 	go to state 396
+
+
+
+state 264
+
+    instruction  ->  INS_REI6 '(' ireg . ')'   (rule 61)
+
+    ')' 	shift, and go to state 397
+
+
+
+state 265
+
+    instruction  ->  INS_REI6 ireg ',' . @16 '(' ireg ')' hint   (rule 63)
+
+    $default	reduce using rule 62 (@16)
+
+    @16 	go to state 398
+
+
+
+state 266
+
+    instruction  ->  INS_MTI6 ireg ',' . @17 ipr scbd6   (rule 65)
+
+    $default	reduce using rule 64 (@17)
+
+    @17 	go to state 399
+
+
+
+state 267
+
+    instruction  ->  INS_MFI6 ireg ',' . @18 ipr scbd6   (rule 67)
+
+    $default	reduce using rule 66 (@18)
+
+    @18 	go to state 400
+
+
+
+state 268
+
+    instruction  ->  INS_HWM6 ireg ',' . @19 disp12 '(' ireg ')'   (rule 69)
+
+    $default	reduce using rule 68 (@19)
+
+    @19 	go to state 401
+
+
+
+state 269
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    mem_exprseq  ->  expr .   (rule 265)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 265 (mem_exprseq)
+
+
+
+state 270
+
+    directive  ->  ADDR @32 mem_exprseq . EOL   (rule 149)
+    mem_exprseq  ->  mem_exprseq . ',' expr   (rule 266)
+
+    EOL 	shift, and go to state 402
+    ',' 	shift, and go to state 403
+
+
+
+state 271
+
+    directive  ->  QUAD @33 mem_exprseq . EOL   (rule 151)
+    mem_exprseq  ->  mem_exprseq . ',' expr   (rule 266)
+
+    EOL 	shift, and go to state 404
+    ',' 	shift, and go to state 403
+
+
+
+state 272
+
+    directive  ->  LONG @34 mem_exprseq . EOL   (rule 153)
+    mem_exprseq  ->  mem_exprseq . ',' expr   (rule 266)
+
+    EOL 	shift, and go to state 405
+    ',' 	shift, and go to state 403
+
+
+
+state 273
+
+    directive  ->  BLKL absexpr EOL .   (rule 164)
+
+    $default	reduce using rule 164 (directive)
+
+
+
+state 274
+
+    directive  ->  BLKQ absexpr EOL .   (rule 165)
+
+    $default	reduce using rule 165 (directive)
+
+
+
+state 275
+
+    label  ->  LOCAL_LABEL ':' ':' .   (rule 16)
+
+    $default	reduce using rule 16 (label)
+
+
+
+state 276
+
+    list_flag  ->  MEB .   (rule 211)
+
+    $default	reduce using rule 211 (list_flag)
+
+
+
+state 277
+
+    list_flag  ->  MC .   (rule 212)
+
+    $default	reduce using rule 212 (list_flag)
+
+
+
+state 278
+
+    list_flag  ->  CND .   (rule 213)
+
+    $default	reduce using rule 213 (list_flag)
+
+
+
+state 279
+
+    list_flag  ->  MD .   (rule 214)
+
+    $default	reduce using rule 214 (list_flag)
+
+
+
+state 280
+
+    list_flag  ->  ME .   (rule 215)
+
+    $default	reduce using rule 215 (list_flag)
+
+
+
+state 281
+
+    list_flag  ->  ASSIGN .   (rule 217)
+
+    $default	reduce using rule 217 (list_flag)
+
+
+
+state 282
+
+    list_flag  ->  CMDIN .   (rule 216)
+
+    $default	reduce using rule 216 (list_flag)
+
+
+
+state 283
+
+    directive  ->  NOLIST @37 list_flags . EOL   (rule 172)
+    list_flags  ->  list_flags . list_flag   (rule 210)
+
+    MEB 	shift, and go to state 276
+    MC  	shift, and go to state 277
+    CND 	shift, and go to state 278
+    MD  	shift, and go to state 279
+    ME  	shift, and go to state 280
+    ASSIGN	shift, and go to state 281
+    CMDIN	shift, and go to state 282
+    EOL 	shift, and go to state 406
+
+    list_flag	go to state 407
+
+
+
+state 284
+
+    list_flags  ->  list_flag .   (rule 209)
+
+    $default	reduce using rule 209 (list_flags)
+
+
+
+state 285
+
+    directive  ->  LIST @38 list_flags . EOL   (rule 175)
+    list_flags  ->  list_flags . list_flag   (rule 210)
+
+    MEB 	shift, and go to state 276
+    MC  	shift, and go to state 277
+    CND 	shift, and go to state 278
+    MD  	shift, and go to state 279
+    ME  	shift, and go to state 280
+    ASSIGN	shift, and go to state 281
+    CMDIN	shift, and go to state 282
+    EOL 	shift, and go to state 408
+
+    list_flag	go to state 407
+
+
+
+state 286
+
+    directive  ->  CMDIN absexpr EOL . BODYTEXT ENDI EOL   (rule 145)
+
+    BODYTEXT	shift, and go to state 409
+
+
+
+state 287
+
+    if_condition  ->  EQ absexpr .   (rule 222)
+
+    $default	reduce using rule 222 (if_condition)
+
+
+
+state 288
+
+    if_condition  ->  GT absexpr .   (rule 224)
+
+    $default	reduce using rule 224 (if_condition)
+
+
+
+state 289
+
+    if_condition  ->  LT absexpr .   (rule 225)
+
+    $default	reduce using rule 225 (if_condition)
+
+
+
+state 290
+
+    if_condition  ->  DF SYMBOL .   (rule 228)
+
+    $default	reduce using rule 228 (if_condition)
+
+
+
+state 291
+
+    if_condition  ->  NE absexpr .   (rule 223)
+
+    $default	reduce using rule 223 (if_condition)
+
+
+
+state 292
+
+    if_condition  ->  GE absexpr .   (rule 226)
+
+    $default	reduce using rule 226 (if_condition)
+
+
+
+state 293
+
+    if_condition  ->  LE absexpr .   (rule 227)
+
+    $default	reduce using rule 227 (if_condition)
+
+
+
+state 294
+
+    if_condition  ->  NDF SYMBOL .   (rule 229)
+
+    $default	reduce using rule 229 (if_condition)
+
+
+
+state 295
+
+    if_condition  ->  B ',' . opt_arg_value   (rule 230)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 411
+    arg_value	go to state 412
+
+
+
+state 296
+
+    if_condition  ->  NB ',' . opt_arg_value   (rule 231)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 413
+    arg_value	go to state 412
+
+
+
+state 297
+
+    if_condition  ->  IDN ',' . opt_arg_value ',' opt_arg_value   (rule 232)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 414
+    arg_value	go to state 412
+
+
+
+state 298
+
+    if_condition  ->  DIF ',' . opt_arg_value ',' opt_arg_value   (rule 233)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 415
+    arg_value	go to state 412
+
+
+
+state 299
+
+    directive  ->  IF if_condition EOL . mainbody @29 ifsubbody_seq ENDC EOL   (rule 137)
+
+    BODYTEXT	shift, and go to state 416
+
+    mainbody	go to state 417
+
+
+
+state 300
+
+    while_condition  ->  EQ . expr   (rule 234)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 418
+    element	go to state 105
+
+
+
+state 301
+
+    while_condition  ->  GT . expr   (rule 236)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 419
+    element	go to state 105
+
+
+
+state 302
+
+    while_condition  ->  LT . expr   (rule 237)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 420
+    element	go to state 105
+
+
+
+state 303
+
+    while_condition  ->  DF . SYMBOL   (rule 240)
+
+    SYMBOL	shift, and go to state 421
+
+
+
+state 304
+
+    while_condition  ->  NE . expr   (rule 235)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 422
+    element	go to state 105
+
+
+
+state 305
+
+    while_condition  ->  GE . expr   (rule 238)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 423
+    element	go to state 105
+
+
+
+state 306
+
+    while_condition  ->  LE . expr   (rule 239)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 424
+    element	go to state 105
+
+
+
+state 307
+
+    while_condition  ->  NDF . SYMBOL   (rule 241)
+
+    SYMBOL	shift, and go to state 425
+
+
+
+state 308
+
+    while_condition  ->  B . ',' opt_arg_value   (rule 242)
+
+    ',' 	shift, and go to state 426
+
+
+
+state 309
+
+    while_condition  ->  NB . ',' opt_arg_value   (rule 243)
+
+    ',' 	shift, and go to state 427
+
+
+
+state 310
+
+    while_condition  ->  IDN . ',' opt_arg_value ',' opt_arg_value   (rule 244)
+
+    ',' 	shift, and go to state 428
+
+
+
+state 311
+
+    while_condition  ->  DIF . ',' opt_arg_value ',' opt_arg_value   (rule 245)
+
+    ',' 	shift, and go to state 429
+
+
+
+state 312
+
+    directive  ->  WHILE @30 while_condition . @31 EOL BODYTEXT ENDW EOL   (rule 142)
+
+    $default	reduce using rule 141 (@31)
+
+    @31 	go to state 430
+
+
+
+state 313
+
+    directive  ->  INCLUDE STRING EOL .   (rule 126)
+
+    $default	reduce using rule 126 (directive)
+
+
+
+state 314
+
+    directive  ->  INCLUDE_DIR STRING EOL .   (rule 127)
+
+    $default	reduce using rule 127 (directive)
+
+
+
+state 315
+
+    directive  ->  MINCLUDE STRING EOL .   (rule 128)
+
+    $default	reduce using rule 128 (directive)
+
+
+
+state 316
+
+    label  ->  SYMBOL ':' ':' .   (rule 14)
+
+    $default	reduce using rule 14 (label)
+
+
+
+state 317
+
+    assignment  ->  SYMBOL '=' expr . EOL   (rule 104)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    EOL 	shift, and go to state 431
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+
+
+state 318
+
+    assignment  ->  DOT '=' absexpr . EOL   (rule 105)
+
+    EOL 	shift, and go to state 432
+
+
+
+state 319
+
+    opt_alignfill  ->  ',' . absexpr   (rule 264)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 433
+
+
+
+state 320
+
+    directive  ->  ALIGN alignbound opt_alignfill . EOL   (rule 147)
+
+    EOL 	shift, and go to state 434
+
+
+
+state 321
+
+    directive  ->  REPEAT opt_absexpr EOL . BODYTEXT ENDR EOL   (rule 139)
+
+    BODYTEXT	shift, and go to state 435
+
+
+
+state 322
+
+    directive  ->  DOCMD STRING EOL .   (rule 146)
+
+    $default	reduce using rule 146 (directive)
+
+
+
+state 323
+
+    opt_comma  ->  ',' .   (rule 247)
+
+    $default	reduce using rule 247 (opt_comma)
+
+
+
+state 324
+
+    directive  ->  MACRO SYMBOL opt_comma . @35 opt_macro_arglist EOL BODYTEXT ENDM EOL   (rule 167)
+
+    $default	reduce using rule 166 (@35)
+
+    @35 	go to state 436
+
+
+
+state 325
+
+    pragma_flag  ->  MAC_NONE .   (rule 198)
+
+    $default	reduce using rule 198 (pragma_flag)
+
+
+
+state 326
+
+    pragma_flag  ->  MAC_ONCE .   (rule 199)
+
+    $default	reduce using rule 199 (pragma_flag)
+
+
+
+state 327
+
+    pragma_flag  ->  MAC_UNLIMITED .   (rule 200)
+
+    $default	reduce using rule 200 (pragma_flag)
+
+
+
+state 328
+
+    pragma_flag  ->  LEXER_DEBUG_ON .   (rule 201)
+
+    $default	reduce using rule 201 (pragma_flag)
+
+
+
+state 329
+
+    pragma_flag  ->  LEXER_DEBUG_OFF .   (rule 202)
+
+    $default	reduce using rule 202 (pragma_flag)
+
+
+
+state 330
+
+    pragma_flag  ->  PARSER_DEBUG_ON .   (rule 203)
+
+    $default	reduce using rule 203 (pragma_flag)
+
+
+
+state 331
+
+    pragma_flag  ->  PARSER_DEBUG_OFF .   (rule 204)
+
+    $default	reduce using rule 204 (pragma_flag)
+
+
+
+state 332
+
+    directive  ->  PRAGMA @26 pragma_flags . EOL   (rule 130)
+    pragma_flags  ->  pragma_flags . pragma_flag   (rule 197)
+
+    EOL 	shift, and go to state 437
+    MAC_NONE	shift, and go to state 325
+    MAC_ONCE	shift, and go to state 326
+    MAC_UNLIMITED	shift, and go to state 327
+    LEXER_DEBUG_ON	shift, and go to state 328
+    LEXER_DEBUG_OFF	shift, and go to state 329
+    PARSER_DEBUG_ON	shift, and go to state 330
+    PARSER_DEBUG_OFF	shift, and go to state 331
+
+    pragma_flag	go to state 438
+
+
+
+state 333
+
+    pragma_flags  ->  pragma_flag .   (rule 196)
+
+    $default	reduce using rule 196 (pragma_flags)
+
+
+
+state 334
+
+    arg_value  ->  SYMBOL .   (rule 285)
+    macro_call_arg  ->  SYMBOL . '=' '\\' SYMBOL   (rule 290)
+    macro_call_arg  ->  SYMBOL . '=' opt_arg_value   (rule 291)
+
+    '=' 	shift, and go to state 439
+
+    $default	reduce using rule 285 (arg_value)
+
+
+
+state 335
+
+    arg_value  ->  ARG_VALUE .   (rule 286)
+
+    $default	reduce using rule 286 (arg_value)
+
+
+
+state 336
+
+    macro_call_arg  ->  '\\' . SYMBOL   (rule 288)
+
+    SYMBOL	shift, and go to state 440
+
+
+
+state 337
+
+    directive  ->  MACRO_CALL @36 opt_macro_call_arglist . EOL   (rule 169)
+    opt_macro_call_arglist  ->  opt_macro_call_arglist . ',' macro_call_arg   (rule 284)
+
+    EOL 	shift, and go to state 441
+    ',' 	shift, and go to state 442
+
+
+
+state 338
+
+    macro_call_arg  ->  arg_value .   (rule 289)
+
+    $default	reduce using rule 289 (macro_call_arg)
+
+
+
+state 339
+
+    opt_macro_call_arglist  ->  macro_call_arg .   (rule 283)
+
+    $default	reduce using rule 283 (opt_macro_call_arglist)
+
+
+
+state 340
+
+    string_ele  ->  STRING .   (rule 220)
+
+    $default	reduce using rule 220 (string_ele)
+
+
+
+state 341
+
+    string_ele  ->  '<' . absexpr '>'   (rule 221)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 443
+
+
+
+state 342
+
+    directive  ->  ASCII @27 string_seq . EOL   (rule 133)
+    string_seq  ->  string_seq . string_ele   (rule 219)
+
+    STRING	shift, and go to state 340
+    EOL 	shift, and go to state 444
+    '<' 	shift, and go to state 341
+
+    string_ele	go to state 445
+
+
+
+state 343
+
+    string_seq  ->  string_ele .   (rule 218)
+
+    $default	reduce using rule 218 (string_seq)
+
+
+
+state 344
+
+    directive  ->  ASCIZ @28 string_seq . EOL   (rule 135)
+    string_seq  ->  string_seq . string_ele   (rule 219)
+
+    STRING	shift, and go to state 340
+    EOL 	shift, and go to state 446
+    '<' 	shift, and go to state 341
+
+    string_ele	go to state 445
+
+
+
+state 345
+
+    directive  ->  SAVE_PSECT LOCAL_BLOCK EOL .   (rule 160)
+
+    $default	reduce using rule 160 (directive)
+
+
+
+state 346
+
+    directive  ->  SAVE_DSECT LOCAL_BLOCK EOL .   (rule 161)
+
+    $default	reduce using rule 161 (directive)
+
+
+
+state 347
+
+    psect_args  ->  ',' . alignbound   (rule 270)
+
+    K_BYTE	shift, and go to state 184
+    K_WORD	shift, and go to state 185
+    K_LONG	shift, and go to state 186
+    K_QUAD	shift, and go to state 187
+    K_PAGE	shift, and go to state 188
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 189
+    alignbound	go to state 447
+
+
+
+state 348
+
+    directive  ->  PSECT SYMBOL psect_args . EOL   (rule 157)
+
+    EOL 	shift, and go to state 448
+
+
+
+state 349
+
+    directive  ->  DSECT SYMBOL psect_args . EOL   (rule 181)
+
+    EOL 	shift, and go to state 449
+
+
+
+state 350
+
+    directive  ->  LINK_ADDRESS absexpr EOL .   (rule 184)
+
+    $default	reduce using rule 184 (directive)
+
+
+
+state 351
+
+    directive  ->  LINK_AFTER SYMBOL EOL .   (rule 188)
+
+    $default	reduce using rule 188 (directive)
+
+
+
+state 352
+
+    link_flag  ->  OVERLAP_OK .   (rule 207)
+
+    $default	reduce using rule 207 (link_flag)
+
+
+
+state 353
+
+    link_flag  ->  DIRECTLY_AFTER .   (rule 208)
+
+    $default	reduce using rule 208 (link_flag)
+
+
+
+state 354
+
+    directive  ->  LINK_ATTR @39 link_flags . EOL   (rule 192)
+    link_flags  ->  link_flags . link_flag   (rule 206)
+
+    EOL 	shift, and go to state 450
+    OVERLAP_OK	shift, and go to state 352
+    DIRECTLY_AFTER	shift, and go to state 353
+
+    link_flag	go to state 451
+
+
+
+state 355
+
+    link_flags  ->  link_flag .   (rule 205)
+
+    $default	reduce using rule 205 (link_flags)
+
+
+
+state 356
+
+    directive  ->  LINK_OFFSET absexpr EOL .   (rule 185)
+
+    $default	reduce using rule 185 (directive)
+
+
+
+state 357
+
+    directive  ->  LINK_REGION absexpr EOL .   (rule 186)
+
+    $default	reduce using rule 186 (directive)
+
+
+
+state 358
+
+    directive  ->  LINK_SIZE absexpr EOL .   (rule 187)
+
+    $default	reduce using rule 187 (directive)
+
+
+
+state 359
+
+    directive  ->  WARN opt_absexpr COMMENT . EOL   (rule 154)
+
+    EOL 	shift, and go to state 452
+
+
+
+state 360
+
+    directive  ->  ERROR opt_absexpr COMMENT . EOL   (rule 155)
+
+    EOL 	shift, and go to state 453
+
+
+
+state 361
+
+    directive  ->  PRINT opt_absexpr COMMENT . EOL   (rule 156)
+
+    EOL 	shift, and go to state 454
+
+
+
+state 362
+
+    directive  ->  IIF if_condition ',' . BODYTEXT EOL   (rule 138)
+
+    BODYTEXT	shift, and go to state 455
+
+
+
+state 363
+
+    directive  ->  ARCH arch_flag EOL .   (rule 131)
+
+    $default	reduce using rule 131 (directive)
+
+
+
+state 364
+
+    expr  ->  '<' expr '>' .   (rule 120)
+
+    $default	reduce using rule 120 (expr)
+
+
+
+state 365
+
+    three_freg  ->  freg ',' @20 . freg ',' @21 freg   (rule 75)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    freg	go to state 456
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 366
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr LOG_AND expr .   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 115 (expr)
+
+
+
+state 367
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    expr  ->  expr LOG_OR expr .   (rule 116)
+
+
+    $default	reduce using rule 116 (expr)
+
+
+
+state 368
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr '+' expr .   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 107 (expr)
+
+
+
+state 369
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr '-' expr .   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 108 (expr)
+
+
+
+state 370
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr '@' expr .   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 111 (expr)
+
+
+
+state 371
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr '&' expr .   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 112 (expr)
+
+
+
+state 372
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr '!' expr .   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 113 (expr)
+
+
+
+state 373
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr '\\' expr .   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 114 (expr)
+
+
+
+state 374
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr '*' expr .   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 109 (expr)
+
+
+
+state 375
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr '/' expr .   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+
+    $default	reduce using rule 110 (expr)
+
+
+
+state 376
+
+    two_freg  ->  freg ',' @22 . freg   (rule 77)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    freg	go to state 457
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 377
+
+    instruction  ->  INS_IOP ireg ',' @1 . intreg   (rule 20)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '#' 	shift, and go to state 123
+    '<' 	shift, and go to state 101
+
+    intreg	go to state 458
+    ireg	go to state 125
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 378
+
+    instruction  ->  INS_MEM ifreg ',' @7 . disp16 '(' ireg ')'   (rule 34)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 89 (disp16)
+
+    disp16	go to state 459
+    expr	go to state 134
+    element	go to state 105
+
+
+
+state 379
+
+    instruction  ->  INS_JSR ireg ',' @8 . '(' ireg ')' hint   (rule 38)
+
+    '(' 	shift, and go to state 460
+
+
+
+state 380
+
+    instruction  ->  INS_JSR ireg ',' @9 . disp14 '(' ireg ')'   (rule 40)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    disp14	go to state 461
+    expr	go to state 462
+    element	go to state 105
+
+
+
+state 381
+
+    instruction  ->  INS_BRN ifreg ',' @10 . disp21   (rule 42)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    disp21	go to state 463
+    expr	go to state 464
+    element	go to state 105
+
+
+
+state 382
+
+    instruction  ->  INS_M1B '(' ireg ')' .   (rule 48)
+
+    $default	reduce using rule 48 (instruction)
+
+
+
+state 383
+
+    instruction  ->  INS_RPCC ireg ',' @11 . '(' ireg ')'   (rule 45)
+
+    '(' 	shift, and go to state 465
+
+
+
+state 384
+
+    intreg  ->  '#' expr ',' . @24 ireg   (rule 81)
+
+    $default	reduce using rule 80 (@24)
+
+    @24 	go to state 466
+
+
+
+state 385
+
+    intreg  ->  ireg ',' @23 . ireg   (rule 79)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 467
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 386
+
+    two_ireg  ->  ireg ',' @25 . ireg   (rule 83)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 468
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 387
+
+    instruction  ->  INS_IP3 ireg ',' @4 . two_ireg   (rule 28)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    two_ireg	go to state 469
+    ireg	go to state 127
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 388
+
+    instruction  ->  INS_FTI freg ',' @2 . ireg   (rule 22)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 470
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 389
+
+    instruction  ->  INS_LSB ireg ',' @5 . '(' ireg ')'   (rule 30)
+
+    '(' 	shift, and go to state 471
+
+
+
+state 390
+
+    instruction  ->  INS_SSB ireg ',' @6 . '(' ireg ')'   (rule 32)
+
+    '(' 	shift, and go to state 472
+
+
+
+state 391
+
+    instruction  ->  INS_ITF ireg ',' @3 . freg   (rule 24)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    freg	go to state 473
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 392
+
+    instruction  ->  INS_UNOP disp16 '(' ireg . ')'   (rule 35)
+
+    ')' 	shift, and go to state 474
+
+
+
+state 393
+
+    instruction  ->  INS_IPR4 ireg ',' @12 . ipr   (rule 54)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ipr 	go to state 475
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 476
+
+
+
+state 394
+
+    instruction  ->  INS_HWM4 ireg ',' @13 . disp12 '(' ireg ')'   (rule 56)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 86 (disp12)
+
+    disp12	go to state 477
+    expr	go to state 478
+    element	go to state 105
+
+
+
+state 395
+
+    instruction  ->  INS_IPR5 ireg ',' @14 . ipr   (rule 58)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ipr 	go to state 479
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 476
+
+
+
+state 396
+
+    instruction  ->  INS_HWM5 ireg ',' @15 . disp10 '(' ireg ')' mode   (rule 60)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 84 (disp10)
+
+    disp10	go to state 480
+    expr	go to state 481
+    element	go to state 105
+
+
+
+state 397
+
+    instruction  ->  INS_REI6 '(' ireg ')' .   (rule 61)
+
+    $default	reduce using rule 61 (instruction)
+
+
+
+state 398
+
+    instruction  ->  INS_REI6 ireg ',' @16 . '(' ireg ')' hint   (rule 63)
+
+    '(' 	shift, and go to state 482
+
+
+
+state 399
+
+    instruction  ->  INS_MTI6 ireg ',' @17 . ipr scbd6   (rule 65)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ipr 	go to state 483
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 476
+
+
+
+state 400
+
+    instruction  ->  INS_MFI6 ireg ',' @18 . ipr scbd6   (rule 67)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ipr 	go to state 484
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 476
+
+
+
+state 401
+
+    instruction  ->  INS_HWM6 ireg ',' @19 . disp12 '(' ireg ')'   (rule 69)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    $default	reduce using rule 86 (disp12)
+
+    disp12	go to state 485
+    expr	go to state 478
+    element	go to state 105
+
+
+
+state 402
+
+    directive  ->  ADDR @32 mem_exprseq EOL .   (rule 149)
+
+    $default	reduce using rule 149 (directive)
+
+
+
+state 403
+
+    mem_exprseq  ->  mem_exprseq ',' . expr   (rule 266)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 486
+    element	go to state 105
+
+
+
+state 404
+
+    directive  ->  QUAD @33 mem_exprseq EOL .   (rule 151)
+
+    $default	reduce using rule 151 (directive)
+
+
+
+state 405
+
+    directive  ->  LONG @34 mem_exprseq EOL .   (rule 153)
+
+    $default	reduce using rule 153 (directive)
+
+
+
+state 406
+
+    directive  ->  NOLIST @37 list_flags EOL .   (rule 172)
+
+    $default	reduce using rule 172 (directive)
+
+
+
+state 407
+
+    list_flags  ->  list_flags list_flag .   (rule 210)
+
+    $default	reduce using rule 210 (list_flags)
+
+
+
+state 408
+
+    directive  ->  LIST @38 list_flags EOL .   (rule 175)
+
+    $default	reduce using rule 175 (directive)
+
+
+
+state 409
+
+    directive  ->  CMDIN absexpr EOL BODYTEXT . ENDI EOL   (rule 145)
+
+    ENDI	shift, and go to state 487
+
+
+
+state 410
+
+    arg_value  ->  SYMBOL .   (rule 285)
+
+    $default	reduce using rule 285 (arg_value)
+
+
+
+state 411
+
+    if_condition  ->  B ',' opt_arg_value .   (rule 230)
+
+    $default	reduce using rule 230 (if_condition)
+
+
+
+state 412
+
+    opt_arg_value  ->  arg_value .   (rule 249)
+
+    $default	reduce using rule 249 (opt_arg_value)
+
+
+
+state 413
+
+    if_condition  ->  NB ',' opt_arg_value .   (rule 231)
+
+    $default	reduce using rule 231 (if_condition)
+
+
+
+state 414
+
+    if_condition  ->  IDN ',' opt_arg_value . ',' opt_arg_value   (rule 232)
+
+    ',' 	shift, and go to state 488
+
+
+
+state 415
+
+    if_condition  ->  DIF ',' opt_arg_value . ',' opt_arg_value   (rule 233)
+
+    ',' 	shift, and go to state 489
+
+
+
+state 416
+
+    mainbody  ->  BODYTEXT .   (rule 250)
+
+    $default	reduce using rule 250 (mainbody)
+
+
+
+state 417
+
+    directive  ->  IF if_condition EOL mainbody . @29 ifsubbody_seq ENDC EOL   (rule 137)
+
+    $default	reduce using rule 136 (@29)
+
+    @29 	go to state 490
+
+
+
+state 418
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    while_condition  ->  EQ expr .   (rule 234)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 234 (while_condition)
+
+
+
+state 419
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    while_condition  ->  GT expr .   (rule 236)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 236 (while_condition)
+
+
+
+state 420
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    while_condition  ->  LT expr .   (rule 237)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 237 (while_condition)
+
+
+
+state 421
+
+    while_condition  ->  DF SYMBOL .   (rule 240)
+
+    $default	reduce using rule 240 (while_condition)
+
+
+
+state 422
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    while_condition  ->  NE expr .   (rule 235)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 235 (while_condition)
+
+
+
+state 423
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    while_condition  ->  GE expr .   (rule 238)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 238 (while_condition)
+
+
+
+state 424
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    while_condition  ->  LE expr .   (rule 239)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 239 (while_condition)
+
+
+
+state 425
+
+    while_condition  ->  NDF SYMBOL .   (rule 241)
+
+    $default	reduce using rule 241 (while_condition)
+
+
+
+state 426
+
+    while_condition  ->  B ',' . opt_arg_value   (rule 242)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 491
+    arg_value	go to state 412
+
+
+
+state 427
+
+    while_condition  ->  NB ',' . opt_arg_value   (rule 243)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 492
+    arg_value	go to state 412
+
+
+
+state 428
+
+    while_condition  ->  IDN ',' . opt_arg_value ',' opt_arg_value   (rule 244)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 493
+    arg_value	go to state 412
+
+
+
+state 429
+
+    while_condition  ->  DIF ',' . opt_arg_value ',' opt_arg_value   (rule 245)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 494
+    arg_value	go to state 412
+
+
+
+state 430
+
+    directive  ->  WHILE @30 while_condition @31 . EOL BODYTEXT ENDW EOL   (rule 142)
+
+    EOL 	shift, and go to state 495
+
+
+
+state 431
+
+    assignment  ->  SYMBOL '=' expr EOL .   (rule 104)
+
+    $default	reduce using rule 104 (assignment)
+
+
+
+state 432
+
+    assignment  ->  DOT '=' absexpr EOL .   (rule 105)
+
+    $default	reduce using rule 105 (assignment)
+
+
+
+state 433
+
+    opt_alignfill  ->  ',' absexpr .   (rule 264)
+
+    $default	reduce using rule 264 (opt_alignfill)
+
+
+
+state 434
+
+    directive  ->  ALIGN alignbound opt_alignfill EOL .   (rule 147)
+
+    $default	reduce using rule 147 (directive)
+
+
+
+state 435
+
+    directive  ->  REPEAT opt_absexpr EOL BODYTEXT . ENDR EOL   (rule 139)
+
+    ENDR	shift, and go to state 496
+
+
+
+state 436
+
+    directive  ->  MACRO SYMBOL opt_comma @35 . opt_macro_arglist EOL BODYTEXT ENDM EOL   (rule 167)
+
+    SYMBOL	shift, and go to state 497
+    DOTDOTDOT	shift, and go to state 498
+    '~' 	shift, and go to state 499
+    '?' 	shift, and go to state 500
+
+    $default	reduce using rule 271 (opt_macro_arglist)
+
+    opt_macro_arglist	go to state 501
+    macro_arglist	go to state 502
+    macro_arg	go to state 503
+
+
+
+state 437
+
+    directive  ->  PRAGMA @26 pragma_flags EOL .   (rule 130)
+
+    $default	reduce using rule 130 (directive)
+
+
+
+state 438
+
+    pragma_flags  ->  pragma_flags pragma_flag .   (rule 197)
+
+    $default	reduce using rule 197 (pragma_flags)
+
+
+
+state 439
+
+    macro_call_arg  ->  SYMBOL '=' . '\\' SYMBOL   (rule 290)
+    macro_call_arg  ->  SYMBOL '=' . opt_arg_value   (rule 291)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+    '\\'	shift, and go to state 504
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 505
+    arg_value	go to state 412
+
+
+
+state 440
+
+    macro_call_arg  ->  '\\' SYMBOL .   (rule 288)
+
+    $default	reduce using rule 288 (macro_call_arg)
+
+
+
+state 441
+
+    directive  ->  MACRO_CALL @36 opt_macro_call_arglist EOL .   (rule 169)
+
+    $default	reduce using rule 169 (directive)
+
+
+
+state 442
+
+    opt_macro_call_arglist  ->  opt_macro_call_arglist ',' . macro_call_arg   (rule 284)
+
+    SYMBOL	shift, and go to state 334
+    ARG_VALUE	shift, and go to state 335
+    '\\'	shift, and go to state 336
+
+    $default	reduce using rule 287 (macro_call_arg)
+
+    arg_value	go to state 338
+    macro_call_arg	go to state 506
+
+
+
+state 443
+
+    string_ele  ->  '<' absexpr . '>'   (rule 221)
+
+    '>' 	shift, and go to state 507
+
+
+
+state 444
+
+    directive  ->  ASCII @27 string_seq EOL .   (rule 133)
+
+    $default	reduce using rule 133 (directive)
+
+
+
+state 445
+
+    string_seq  ->  string_seq string_ele .   (rule 219)
+
+    $default	reduce using rule 219 (string_seq)
+
+
+
+state 446
+
+    directive  ->  ASCIZ @28 string_seq EOL .   (rule 135)
+
+    $default	reduce using rule 135 (directive)
+
+
+
+state 447
+
+    psect_args  ->  ',' alignbound .   (rule 270)
+
+    $default	reduce using rule 270 (psect_args)
+
+
+
+state 448
+
+    directive  ->  PSECT SYMBOL psect_args EOL .   (rule 157)
+
+    $default	reduce using rule 157 (directive)
+
+
+
+state 449
+
+    directive  ->  DSECT SYMBOL psect_args EOL .   (rule 181)
+
+    $default	reduce using rule 181 (directive)
+
+
+
+state 450
+
+    directive  ->  LINK_ATTR @39 link_flags EOL .   (rule 192)
+
+    $default	reduce using rule 192 (directive)
+
+
+
+state 451
+
+    link_flags  ->  link_flags link_flag .   (rule 206)
+
+    $default	reduce using rule 206 (link_flags)
+
+
+
+state 452
+
+    directive  ->  WARN opt_absexpr COMMENT EOL .   (rule 154)
+
+    $default	reduce using rule 154 (directive)
+
+
+
+state 453
+
+    directive  ->  ERROR opt_absexpr COMMENT EOL .   (rule 155)
+
+    $default	reduce using rule 155 (directive)
+
+
+
+state 454
+
+    directive  ->  PRINT opt_absexpr COMMENT EOL .   (rule 156)
+
+    $default	reduce using rule 156 (directive)
+
+
+
+state 455
+
+    directive  ->  IIF if_condition ',' BODYTEXT . EOL   (rule 138)
+
+    EOL 	shift, and go to state 508
+
+
+
+state 456
+
+    three_freg  ->  freg ',' @20 freg . ',' @21 freg   (rule 75)
+
+    ',' 	shift, and go to state 509
+
+
+
+state 457
+
+    two_freg  ->  freg ',' @22 freg .   (rule 77)
+
+    $default	reduce using rule 77 (two_freg)
+
+
+
+state 458
+
+    instruction  ->  INS_IOP ireg ',' @1 intreg .   (rule 20)
+
+    $default	reduce using rule 20 (instruction)
+
+
+
+state 459
+
+    instruction  ->  INS_MEM ifreg ',' @7 disp16 . '(' ireg ')'   (rule 34)
+
+    '(' 	shift, and go to state 510
+
+
+
+state 460
+
+    instruction  ->  INS_JSR ireg ',' @8 '(' . ireg ')' hint   (rule 38)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 511
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 461
+
+    instruction  ->  INS_JSR ireg ',' @9 disp14 . '(' ireg ')'   (rule 40)
+
+    '(' 	shift, and go to state 512
+
+
+
+state 462
+
+    disp14  ->  expr .   (rule 88)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 88 (disp14)
+
+
+
+state 463
+
+    instruction  ->  INS_BRN ifreg ',' @10 disp21 .   (rule 42)
+
+    $default	reduce using rule 42 (instruction)
+
+
+
+state 464
+
+    disp21  ->  expr .   (rule 91)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 91 (disp21)
+
+
+
+state 465
+
+    instruction  ->  INS_RPCC ireg ',' @11 '(' . ireg ')'   (rule 45)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 513
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 466
+
+    intreg  ->  '#' expr ',' @24 . ireg   (rule 81)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 514
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 467
+
+    intreg  ->  ireg ',' @23 ireg .   (rule 79)
+
+    $default	reduce using rule 79 (intreg)
+
+
+
+state 468
+
+    two_ireg  ->  ireg ',' @25 ireg .   (rule 83)
+
+    $default	reduce using rule 83 (two_ireg)
+
+
+
+state 469
+
+    instruction  ->  INS_IP3 ireg ',' @4 two_ireg .   (rule 28)
+
+    $default	reduce using rule 28 (instruction)
+
+
+
+state 470
+
+    instruction  ->  INS_FTI freg ',' @2 ireg .   (rule 22)
+
+    $default	reduce using rule 22 (instruction)
+
+
+
+state 471
+
+    instruction  ->  INS_LSB ireg ',' @5 '(' . ireg ')'   (rule 30)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 515
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 472
+
+    instruction  ->  INS_SSB ireg ',' @6 '(' . ireg ')'   (rule 32)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 516
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 473
+
+    instruction  ->  INS_ITF ireg ',' @3 freg .   (rule 24)
+
+    $default	reduce using rule 24 (instruction)
+
+
+
+state 474
+
+    instruction  ->  INS_UNOP disp16 '(' ireg ')' .   (rule 35)
+
+    $default	reduce using rule 35 (instruction)
+
+
+
+state 475
+
+    instruction  ->  INS_IPR4 ireg ',' @12 ipr .   (rule 54)
+
+    $default	reduce using rule 54 (instruction)
+
+
+
+state 476
+
+    ipr  ->  absexpr .   (rule 97)
+
+    $default	reduce using rule 97 (ipr)
+
+
+
+state 477
+
+    instruction  ->  INS_HWM4 ireg ',' @13 disp12 . '(' ireg ')'   (rule 56)
+
+    '(' 	shift, and go to state 517
+
+
+
+state 478
+
+    disp12  ->  expr .   (rule 87)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 87 (disp12)
+
+
+
+state 479
+
+    instruction  ->  INS_IPR5 ireg ',' @14 ipr .   (rule 58)
+
+    $default	reduce using rule 58 (instruction)
+
+
+
+state 480
+
+    instruction  ->  INS_HWM5 ireg ',' @15 disp10 . '(' ireg ')' mode   (rule 60)
+
+    '(' 	shift, and go to state 518
+
+
+
+state 481
+
+    disp10  ->  expr .   (rule 85)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 85 (disp10)
+
+
+
+state 482
+
+    instruction  ->  INS_REI6 ireg ',' @16 '(' . ireg ')' hint   (rule 63)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 519
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 483
+
+    instruction  ->  INS_MTI6 ireg ',' @17 ipr . scbd6   (rule 65)
+
+    ',' 	shift, and go to state 520
+
+    $default	reduce using rule 98 (scbd6)
+
+    scbd6	go to state 521
+
+
+
+state 484
+
+    instruction  ->  INS_MFI6 ireg ',' @18 ipr . scbd6   (rule 67)
+
+    ',' 	shift, and go to state 520
+
+    $default	reduce using rule 98 (scbd6)
+
+    scbd6	go to state 522
+
+
+
+state 485
+
+    instruction  ->  INS_HWM6 ireg ',' @19 disp12 . '(' ireg ')'   (rule 69)
+
+    '(' 	shift, and go to state 523
+
+
+
+state 486
+
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+    mem_exprseq  ->  mem_exprseq ',' expr .   (rule 266)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 266 (mem_exprseq)
+
+
+
+state 487
+
+    directive  ->  CMDIN absexpr EOL BODYTEXT ENDI . EOL   (rule 145)
+
+    EOL 	shift, and go to state 524
+
+
+
+state 488
+
+    if_condition  ->  IDN ',' opt_arg_value ',' . opt_arg_value   (rule 232)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 525
+    arg_value	go to state 412
+
+
+
+state 489
+
+    if_condition  ->  DIF ',' opt_arg_value ',' . opt_arg_value   (rule 233)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 526
+    arg_value	go to state 412
+
+
+
+state 490
+
+    directive  ->  IF if_condition EOL mainbody @29 . ifsubbody_seq ENDC EOL   (rule 137)
+
+    IFF 	shift, and go to state 527
+    IFT 	shift, and go to state 528
+    IFTF	shift, and go to state 529
+
+    IFF 	[reduce using rule 251 (ifsubbody_seq)]
+    IFT 	[reduce using rule 251 (ifsubbody_seq)]
+    IFTF	[reduce using rule 251 (ifsubbody_seq)]
+    $default	reduce using rule 251 (ifsubbody_seq)
+
+    ifsubbody_seq	go to state 530
+    ifsubbody	go to state 531
+
+
+
+state 491
+
+    while_condition  ->  B ',' opt_arg_value .   (rule 242)
+
+    $default	reduce using rule 242 (while_condition)
+
+
+
+state 492
+
+    while_condition  ->  NB ',' opt_arg_value .   (rule 243)
+
+    $default	reduce using rule 243 (while_condition)
+
+
+
+state 493
+
+    while_condition  ->  IDN ',' opt_arg_value . ',' opt_arg_value   (rule 244)
+
+    ',' 	shift, and go to state 532
+
+
+
+state 494
+
+    while_condition  ->  DIF ',' opt_arg_value . ',' opt_arg_value   (rule 245)
+
+    ',' 	shift, and go to state 533
+
+
+
+state 495
+
+    directive  ->  WHILE @30 while_condition @31 EOL . BODYTEXT ENDW EOL   (rule 142)
+
+    BODYTEXT	shift, and go to state 534
+
+
+
+state 496
+
+    directive  ->  REPEAT opt_absexpr EOL BODYTEXT ENDR . EOL   (rule 139)
+
+    EOL 	shift, and go to state 535
+
+
+
+state 497
+
+    macro_arg  ->  SYMBOL . arg_default   (rule 275)
+
+    '=' 	shift, and go to state 536
+
+    $default	reduce using rule 280 (arg_default)
+
+    arg_default	go to state 537
+
+
+
+state 498
+
+    macro_arg  ->  DOTDOTDOT . SYMBOL arg_default   (rule 277)
+    macro_arg  ->  DOTDOTDOT . arg_default   (rule 278)
+
+    SYMBOL	shift, and go to state 538
+    '=' 	shift, and go to state 536
+
+    $default	reduce using rule 280 (arg_default)
+
+    arg_default	go to state 539
+
+
+
+state 499
+
+    macro_arg  ->  '~' . SYMBOL arg_default   (rule 276)
+
+    SYMBOL	shift, and go to state 540
+
+
+
+state 500
+
+    macro_arg  ->  '?' . SYMBOL   (rule 279)
+
+    SYMBOL	shift, and go to state 541
+
+
+
+state 501
+
+    directive  ->  MACRO SYMBOL opt_comma @35 opt_macro_arglist . EOL BODYTEXT ENDM EOL   (rule 167)
+
+    EOL 	shift, and go to state 542
+
+
+
+state 502
+
+    opt_macro_arglist  ->  macro_arglist .   (rule 272)
+    macro_arglist  ->  macro_arglist . ',' macro_arg   (rule 274)
+
+    ',' 	shift, and go to state 543
+
+    $default	reduce using rule 272 (opt_macro_arglist)
+
+
+
+state 503
+
+    macro_arglist  ->  macro_arg .   (rule 273)
+
+    $default	reduce using rule 273 (macro_arglist)
+
+
+
+state 504
+
+    macro_call_arg  ->  SYMBOL '=' '\\' . SYMBOL   (rule 290)
+
+    SYMBOL	shift, and go to state 544
+
+
+
+state 505
+
+    macro_call_arg  ->  SYMBOL '=' opt_arg_value .   (rule 291)
+
+    $default	reduce using rule 291 (macro_call_arg)
+
+
+
+state 506
+
+    opt_macro_call_arglist  ->  opt_macro_call_arglist ',' macro_call_arg .   (rule 284)
+
+    $default	reduce using rule 284 (opt_macro_call_arglist)
+
+
+
+state 507
+
+    string_ele  ->  '<' absexpr '>' .   (rule 221)
+
+    $default	reduce using rule 221 (string_ele)
+
+
+
+state 508
+
+    directive  ->  IIF if_condition ',' BODYTEXT EOL .   (rule 138)
+
+    $default	reduce using rule 138 (directive)
+
+
+
+state 509
+
+    three_freg  ->  freg ',' @20 freg ',' . @21 freg   (rule 75)
+
+    $default	reduce using rule 74 (@21)
+
+    @21 	go to state 545
+
+
+
+state 510
+
+    instruction  ->  INS_MEM ifreg ',' @7 disp16 '(' . ireg ')'   (rule 34)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 546
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 511
+
+    instruction  ->  INS_JSR ireg ',' @8 '(' ireg . ')' hint   (rule 38)
+
+    ')' 	shift, and go to state 547
+
+
+
+state 512
+
+    instruction  ->  INS_JSR ireg ',' @9 disp14 '(' . ireg ')'   (rule 40)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 548
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 513
+
+    instruction  ->  INS_RPCC ireg ',' @11 '(' ireg . ')'   (rule 45)
+
+    ')' 	shift, and go to state 549
+
+
+
+state 514
+
+    intreg  ->  '#' expr ',' @24 ireg .   (rule 81)
+
+    $default	reduce using rule 81 (intreg)
+
+
+
+state 515
+
+    instruction  ->  INS_LSB ireg ',' @5 '(' ireg . ')'   (rule 30)
+
+    ')' 	shift, and go to state 550
+
+
+
+state 516
+
+    instruction  ->  INS_SSB ireg ',' @6 '(' ireg . ')'   (rule 32)
+
+    ')' 	shift, and go to state 551
+
+
+
+state 517
+
+    instruction  ->  INS_HWM4 ireg ',' @13 disp12 '(' . ireg ')'   (rule 56)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 552
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 518
+
+    instruction  ->  INS_HWM5 ireg ',' @15 disp10 '(' . ireg ')' mode   (rule 60)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 553
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 519
+
+    instruction  ->  INS_REI6 ireg ',' @16 '(' ireg . ')' hint   (rule 63)
+
+    ')' 	shift, and go to state 554
+
+
+
+state 520
+
+    scbd6  ->  ',' . absexpr   (rule 99)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 555
+
+
+
+state 521
+
+    instruction  ->  INS_MTI6 ireg ',' @17 ipr scbd6 .   (rule 65)
+
+    $default	reduce using rule 65 (instruction)
+
+
+
+state 522
+
+    instruction  ->  INS_MFI6 ireg ',' @18 ipr scbd6 .   (rule 67)
+
+    $default	reduce using rule 67 (instruction)
+
+
+
+state 523
+
+    instruction  ->  INS_HWM6 ireg ',' @19 disp12 '(' . ireg ')'   (rule 69)
+
+    IREG	shift, and go to state 109
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    ireg	go to state 556
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 111
+
+
+
+state 524
+
+    directive  ->  CMDIN absexpr EOL BODYTEXT ENDI EOL .   (rule 145)
+
+    $default	reduce using rule 145 (directive)
+
+
+
+state 525
+
+    if_condition  ->  IDN ',' opt_arg_value ',' opt_arg_value .   (rule 232)
+
+    $default	reduce using rule 232 (if_condition)
+
+
+
+state 526
+
+    if_condition  ->  DIF ',' opt_arg_value ',' opt_arg_value .   (rule 233)
+
+    $default	reduce using rule 233 (if_condition)
+
+
+
+state 527
+
+    ifsubbody  ->  IFF . BODYTEXT   (rule 254)
+
+    BODYTEXT	shift, and go to state 557
+
+
+
+state 528
+
+    ifsubbody  ->  IFT . BODYTEXT   (rule 255)
+
+    BODYTEXT	shift, and go to state 558
+
+
+
+state 529
+
+    ifsubbody  ->  IFTF . BODYTEXT   (rule 256)
+
+    BODYTEXT	shift, and go to state 559
+
+
+
+state 530
+
+    directive  ->  IF if_condition EOL mainbody @29 ifsubbody_seq . ENDC EOL   (rule 137)
+    ifsubbody_seq  ->  ifsubbody_seq . ifsubbody   (rule 253)
+
+    ENDC	shift, and go to state 560
+    IFF 	shift, and go to state 527
+    IFT 	shift, and go to state 528
+    IFTF	shift, and go to state 529
+
+    ifsubbody	go to state 561
+
+
+
+state 531
+
+    ifsubbody_seq  ->  ifsubbody .   (rule 252)
+
+    $default	reduce using rule 252 (ifsubbody_seq)
+
+
+
+state 532
+
+    while_condition  ->  IDN ',' opt_arg_value ',' . opt_arg_value   (rule 244)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 562
+    arg_value	go to state 412
+
+
+
+state 533
+
+    while_condition  ->  DIF ',' opt_arg_value ',' . opt_arg_value   (rule 245)
+
+    SYMBOL	shift, and go to state 410
+    ARG_VALUE	shift, and go to state 335
+
+    $default	reduce using rule 248 (opt_arg_value)
+
+    opt_arg_value	go to state 563
+    arg_value	go to state 412
+
+
+
+state 534
+
+    directive  ->  WHILE @30 while_condition @31 EOL BODYTEXT . ENDW EOL   (rule 142)
+
+    ENDW	shift, and go to state 564
+
+
+
+state 535
+
+    directive  ->  REPEAT opt_absexpr EOL BODYTEXT ENDR EOL .   (rule 139)
+
+    $default	reduce using rule 139 (directive)
+
+
+
+state 536
+
+    arg_default  ->  '=' . ARG_VALUE   (rule 281)
+    arg_default  ->  '=' . SYMBOL   (rule 282)
+
+    SYMBOL	shift, and go to state 565
+    ARG_VALUE	shift, and go to state 566
+
+
+
+state 537
+
+    macro_arg  ->  SYMBOL arg_default .   (rule 275)
+
+    $default	reduce using rule 275 (macro_arg)
+
+
+
+state 538
+
+    macro_arg  ->  DOTDOTDOT SYMBOL . arg_default   (rule 277)
+
+    '=' 	shift, and go to state 536
+
+    $default	reduce using rule 280 (arg_default)
+
+    arg_default	go to state 567
+
+
+
+state 539
+
+    macro_arg  ->  DOTDOTDOT arg_default .   (rule 278)
+
+    $default	reduce using rule 278 (macro_arg)
+
+
+
+state 540
+
+    macro_arg  ->  '~' SYMBOL . arg_default   (rule 276)
+
+    '=' 	shift, and go to state 536
+
+    $default	reduce using rule 280 (arg_default)
+
+    arg_default	go to state 568
+
+
+
+state 541
+
+    macro_arg  ->  '?' SYMBOL .   (rule 279)
+
+    $default	reduce using rule 279 (macro_arg)
+
+
+
+state 542
+
+    directive  ->  MACRO SYMBOL opt_comma @35 opt_macro_arglist EOL . BODYTEXT ENDM EOL   (rule 167)
+
+    BODYTEXT	shift, and go to state 569
+
+
+
+state 543
+
+    macro_arglist  ->  macro_arglist ',' . macro_arg   (rule 274)
+
+    SYMBOL	shift, and go to state 497
+    DOTDOTDOT	shift, and go to state 498
+    '~' 	shift, and go to state 499
+    '?' 	shift, and go to state 500
+
+    macro_arg	go to state 570
+
+
+
+state 544
+
+    macro_call_arg  ->  SYMBOL '=' '\\' SYMBOL .   (rule 290)
+
+    $default	reduce using rule 290 (macro_call_arg)
+
+
+
+state 545
+
+    three_freg  ->  freg ',' @20 freg ',' @21 . freg   (rule 75)
+
+    FREG	shift, and go to state 93
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    freg	go to state 571
+    expr	go to state 104
+    element	go to state 105
+    absexpr	go to state 106
+
+
+
+state 546
+
+    instruction  ->  INS_MEM ifreg ',' @7 disp16 '(' ireg . ')'   (rule 34)
+
+    ')' 	shift, and go to state 572
+
+
+
+state 547
+
+    instruction  ->  INS_JSR ireg ',' @8 '(' ireg ')' . hint   (rule 38)
+
+    ',' 	shift, and go to state 573
+
+    $default	reduce using rule 93 (hint)
+
+    hint	go to state 574
+
+
+
+state 548
+
+    instruction  ->  INS_JSR ireg ',' @9 disp14 '(' ireg . ')'   (rule 40)
+
+    ')' 	shift, and go to state 575
+
+
+
+state 549
+
+    instruction  ->  INS_RPCC ireg ',' @11 '(' ireg ')' .   (rule 45)
+
+    $default	reduce using rule 45 (instruction)
+
+
+
+state 550
+
+    instruction  ->  INS_LSB ireg ',' @5 '(' ireg ')' .   (rule 30)
+
+    $default	reduce using rule 30 (instruction)
+
+
+
+state 551
+
+    instruction  ->  INS_SSB ireg ',' @6 '(' ireg ')' .   (rule 32)
+
+    $default	reduce using rule 32 (instruction)
+
+
+
+state 552
+
+    instruction  ->  INS_HWM4 ireg ',' @13 disp12 '(' ireg . ')'   (rule 56)
+
+    ')' 	shift, and go to state 576
+
+
+
+state 553
+
+    instruction  ->  INS_HWM5 ireg ',' @15 disp10 '(' ireg . ')' mode   (rule 60)
+
+    ')' 	shift, and go to state 577
+
+
+
+state 554
+
+    instruction  ->  INS_REI6 ireg ',' @16 '(' ireg ')' . hint   (rule 63)
+
+    ',' 	shift, and go to state 573
+
+    $default	reduce using rule 93 (hint)
+
+    hint	go to state 578
+
+
+
+state 555
+
+    scbd6  ->  ',' absexpr .   (rule 99)
+
+    $default	reduce using rule 99 (scbd6)
+
+
+
+state 556
+
+    instruction  ->  INS_HWM6 ireg ',' @19 disp12 '(' ireg . ')'   (rule 69)
+
+    ')' 	shift, and go to state 579
+
+
+
+state 557
+
+    ifsubbody  ->  IFF BODYTEXT .   (rule 254)
+
+    $default	reduce using rule 254 (ifsubbody)
+
+
+
+state 558
+
+    ifsubbody  ->  IFT BODYTEXT .   (rule 255)
+
+    $default	reduce using rule 255 (ifsubbody)
+
+
+
+state 559
+
+    ifsubbody  ->  IFTF BODYTEXT .   (rule 256)
+
+    $default	reduce using rule 256 (ifsubbody)
+
+
+
+state 560
+
+    directive  ->  IF if_condition EOL mainbody @29 ifsubbody_seq ENDC . EOL   (rule 137)
+
+    EOL 	shift, and go to state 580
+
+
+
+state 561
+
+    ifsubbody_seq  ->  ifsubbody_seq ifsubbody .   (rule 253)
+
+    $default	reduce using rule 253 (ifsubbody_seq)
+
+
+
+state 562
+
+    while_condition  ->  IDN ',' opt_arg_value ',' opt_arg_value .   (rule 244)
+
+    $default	reduce using rule 244 (while_condition)
+
+
+
+state 563
+
+    while_condition  ->  DIF ',' opt_arg_value ',' opt_arg_value .   (rule 245)
+
+    $default	reduce using rule 245 (while_condition)
+
+
+
+state 564
+
+    directive  ->  WHILE @30 while_condition @31 EOL BODYTEXT ENDW . EOL   (rule 142)
+
+    EOL 	shift, and go to state 581
+
+
+
+state 565
+
+    arg_default  ->  '=' SYMBOL .   (rule 282)
+
+    $default	reduce using rule 282 (arg_default)
+
+
+
+state 566
+
+    arg_default  ->  '=' ARG_VALUE .   (rule 281)
+
+    $default	reduce using rule 281 (arg_default)
+
+
+
+state 567
+
+    macro_arg  ->  DOTDOTDOT SYMBOL arg_default .   (rule 277)
+
+    $default	reduce using rule 277 (macro_arg)
+
+
+
+state 568
+
+    macro_arg  ->  '~' SYMBOL arg_default .   (rule 276)
+
+    $default	reduce using rule 276 (macro_arg)
+
+
+
+state 569
+
+    directive  ->  MACRO SYMBOL opt_comma @35 opt_macro_arglist EOL BODYTEXT . ENDM EOL   (rule 167)
+
+    ENDM	shift, and go to state 582
+
+
+
+state 570
+
+    macro_arglist  ->  macro_arglist ',' macro_arg .   (rule 274)
+
+    $default	reduce using rule 274 (macro_arglist)
+
+
+
+state 571
+
+    three_freg  ->  freg ',' @20 freg ',' @21 freg .   (rule 75)
+
+    $default	reduce using rule 75 (three_freg)
+
+
+
+state 572
+
+    instruction  ->  INS_MEM ifreg ',' @7 disp16 '(' ireg ')' .   (rule 34)
+
+    $default	reduce using rule 34 (instruction)
+
+
+
+state 573
+
+    hint  ->  ',' . disp14   (rule 94)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    disp14	go to state 583
+    expr	go to state 462
+    element	go to state 105
+
+
+
+state 574
+
+    instruction  ->  INS_JSR ireg ',' @8 '(' ireg ')' hint .   (rule 38)
+
+    $default	reduce using rule 38 (instruction)
+
+
+
+state 575
+
+    instruction  ->  INS_JSR ireg ',' @9 disp14 '(' ireg ')' .   (rule 40)
+
+    $default	reduce using rule 40 (instruction)
+
+
+
+state 576
+
+    instruction  ->  INS_HWM4 ireg ',' @13 disp12 '(' ireg ')' .   (rule 56)
+
+    $default	reduce using rule 56 (instruction)
+
+
+
+state 577
+
+    instruction  ->  INS_HWM5 ireg ',' @15 disp10 '(' ireg ')' . mode   (rule 60)
+
+    ',' 	shift, and go to state 584
+
+    $default	reduce using rule 95 (mode)
+
+    mode	go to state 585
+
+
+
+state 578
+
+    instruction  ->  INS_REI6 ireg ',' @16 '(' ireg ')' hint .   (rule 63)
+
+    $default	reduce using rule 63 (instruction)
+
+
+
+state 579
+
+    instruction  ->  INS_HWM6 ireg ',' @19 disp12 '(' ireg ')' .   (rule 69)
+
+    $default	reduce using rule 69 (instruction)
+
+
+
+state 580
+
+    directive  ->  IF if_condition EOL mainbody @29 ifsubbody_seq ENDC EOL .   (rule 137)
+
+    $default	reduce using rule 137 (directive)
+
+
+
+state 581
+
+    directive  ->  WHILE @30 while_condition @31 EOL BODYTEXT ENDW EOL .   (rule 142)
+
+    $default	reduce using rule 142 (directive)
+
+
+
+state 582
+
+    directive  ->  MACRO SYMBOL opt_comma @35 opt_macro_arglist EOL BODYTEXT ENDM . EOL   (rule 167)
+
+    EOL 	shift, and go to state 586
+
+
+
+state 583
+
+    hint  ->  ',' disp14 .   (rule 94)
+
+    $default	reduce using rule 94 (hint)
+
+
+
+state 584
+
+    mode  ->  ',' . expr   (rule 96)
+
+    LOCAL_LABEL	shift, and go to state 94
+    NUMBER	shift, and go to state 95
+    NOT 	shift, and go to state 96
+    LOG_NOT	shift, and go to state 97
+    SYMBOL	shift, and go to state 98
+    DOT 	shift, and go to state 99
+    '-' 	shift, and go to state 100
+    '<' 	shift, and go to state 101
+
+    expr	go to state 587
+    element	go to state 105
+
+
+
+state 585
+
+    instruction  ->  INS_HWM5 ireg ',' @15 disp10 '(' ireg ')' mode .   (rule 60)
+
+    $default	reduce using rule 60 (instruction)
+
+
+
+state 586
+
+    directive  ->  MACRO SYMBOL opt_comma @35 opt_macro_arglist EOL BODYTEXT ENDM EOL .   (rule 167)
+
+    $default	reduce using rule 167 (directive)
+
+
+
+state 587
+
+    mode  ->  ',' expr .   (rule 96)
+    expr  ->  expr . '+' expr   (rule 107)
+    expr  ->  expr . '-' expr   (rule 108)
+    expr  ->  expr . '*' expr   (rule 109)
+    expr  ->  expr . '/' expr   (rule 110)
+    expr  ->  expr . '@' expr   (rule 111)
+    expr  ->  expr . '&' expr   (rule 112)
+    expr  ->  expr . '!' expr   (rule 113)
+    expr  ->  expr . '\\' expr   (rule 114)
+    expr  ->  expr . LOG_AND expr   (rule 115)
+    expr  ->  expr . LOG_OR expr   (rule 116)
+
+    LOG_AND	shift, and go to state 234
+    LOG_OR	shift, and go to state 235
+    '+' 	shift, and go to state 236
+    '-' 	shift, and go to state 237
+    '@' 	shift, and go to state 238
+    '&' 	shift, and go to state 239
+    '!' 	shift, and go to state 240
+    '\\'	shift, and go to state 241
+    '*' 	shift, and go to state 242
+    '/' 	shift, and go to state 243
+
+    $default	reduce using rule 96 (mode)
+
+
+
+state 588
+
+    $   	go to state 589
+
+
+
+state 589
+
+    $   	go to state 590
+
+
+
+state 590
+
+    $default	accept

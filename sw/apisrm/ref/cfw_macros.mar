@@ -1,0 +1,183 @@
+; file:	cfw_macros.mar
+;
+; Copyright (C) 1993 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;
+
+;++
+;  FACILITY:
+;
+;      Alpha Console
+;
+;  MODULE DESCRIPTION:
+;
+;	Commonly used macros
+;
+;  AUTHOR:
+;
+;	Stephen Shirron
+;
+;  MODIFICATION HISTORY:
+;
+;	sfs	21-Oct-1993	Initial entry.
+;
+;--
+
+.macro	get_addr	dst, offset, src
+	lda	'dst', <<'offset'>&^xffff>('src')
+	ldah	'dst', <<<'offset'>+^x8000>@-16>('dst')
+.endm
+
+.macro 	align_branch_target	odd=0
+$$$current_dot = .
+.if eq odd
+.iif ne <$$$current_dot & 7>,	or	r31, r31, r31
+.iff
+.iif eq <$$$current_dot & 7>,	or	r31, r31, r31
+.endc
+.endm
+
+.macro	pd	name, alias1, alias2, alias3, alias4
+.if df macro64$
+	.procedure_descriptor	name, _'name'_
+.if nb alias1
+	.procedure_descriptor	alias1, _'name'_
+.endc
+.if nb alias2
+	.procedure_descriptor	alias2, _'name'_
+.endc
+.if nb alias3
+	.procedure_descriptor	alias3, _'name'_
+.endc
+.if nb alias4
+	.procedure_descriptor	alias4, _'name'_
+.endc
+.iff
+name::
+.if nb alias1
+alias1::
+.endc
+.if nb alias2
+alias2::
+.endc
+.if nb alias3
+alias3::
+.endc
+.if nb alias4
+alias4::
+.endc
+.endc
+	.quad	8
+	.quad	_'name'_
+.endm
+
+.macro	ref	name
+'name'_:
+_'name' = . - linkage
+	.quad	name
+.endm
+
+.macro	load_reg	src, dst
+.if idn <%extract(0,1,src)> <r>
+	or	'src', r31, 'dst'
+.iff
+	lda	'dst', 'src'(r31)
+.endc
+.endm
+
+.macro	cserve	p1, p2, p3, p4, p5, p6
+.if nb p1
+	load_reg	<'p1'>, r16
+.endc
+.if nb p2
+	load_reg	<'p2'>, r17
+.endc
+.if nb p3
+	load_reg	<'p3'>, r18
+.endc
+.if nb p4
+	load_reg	<'p4'>, r19
+.endc
+.if nb p5
+	load_reg	<'p5'>, r20
+.endc
+.if nb p6
+	load_reg	<'p6'>, r21
+.endc
+	.long	pal_func_cserve
+.endm
+
+.macro	ldlp
+	cserve	cserve$ldlp
+.endm
+
+.macro	stlp
+	cserve	cserve$stlp
+.endm
+
+.macro	ldbp
+	cserve	cserve$ldbp
+.endm
+
+.macro	stbp
+	cserve	cserve$stbp
+.endm
+
+.macro	mtpr_datfx
+	.long	pal_func_mtpr_datafx
+.endm
+
+.macro	mtpr_exc_addr
+	.long	pal_func_mtpr_exc_addr
+.endm
+
+.macro	rscc
+	.long	pal_func_rscc
+.endm
+
+.macro	swppal
+	.long	pal_func_swppal
+.endm
+
+.macro	pal_instructions
+.if df macro64$
+$opdef	mnemonic=mf,-
+	format=<custom=iregister,literal>,-
+	encoding=<26:31=^x19, 21:25=%op1, 16:20=%op1, 0:15=%op2>
+
+$opdef	mnemonic=mt,-
+	format=<custom=iregister,literal>,-
+	encoding=<26:31=^x1d, 21:25=%op1, 16:20=%op1, 0:15=%op2>
+
+$opdef	mnemonic=ldl_p,-
+	format=<custom=iregister,displacement>,-
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 12:15=^x8, 0:11=%op2.disp>
+
+$opdef	mnemonic=ldq_p,-
+	format=<custom=iregister,displacement>,-
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 12:15=^x9, 0:11=%op2.disp>
+
+$opdef	mnemonic=stl_p,-
+	format=<custom=iregister,displacement>,-
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 12:15=^x8, 0:11=%op2.disp>
+
+$opdef	mnemonic=stq_p,-
+	format=<custom=iregister,displacement>,-
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 12:15=^x9, 0:11=%op2.disp>
+.endc
+.endm

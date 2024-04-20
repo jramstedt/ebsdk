@@ -1,0 +1,91 @@
+/*
+/* Copyright (C) 1996 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by Digital Equipment
+/* Corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by Digital.
+/*
+/*
+/* Abstract:	SMC FDC37C93X Ultra I/O Controller Definitions
+/*
+/* Author:	Eric A. Rasmussen
+/*
+/* Modifications:
+/*
+/*	er	02-Apr-1996	Added definitions for KYBD, PARP, and DMA_CHANNEL_SEL.
+/*
+/*
+
+module	$smcdef;
+
+constant
+	DEVICE_ON equals %x01,
+	DEVICE_OFF equals %x00;
+ 
+/* configuration on/off keys 
+
+constant
+	CONFIG_ON_KEY equals %x55,
+	CONFIG_OFF_KEY equals %xAA;
+
+/* configuration space device definitions 
+
+constant (
+	FDC,
+	IDE1,
+	IDE2,
+	PARP,
+	SER1,
+	SER2,
+	RTCL,
+	KYBD,
+	AUXIO ) equals 0 increment 1 prefix "";
+
+/* Chip register offsets from base
+
+constant
+	CONFIG_CONTROL equals %x00,
+	INDEX_ADDRESS equals %x03,
+	LOGICAL_DEVICE_NUMBER equals %x07,
+	DEVICE_ID equals %x20,
+	DEVICE_REV equals %x21,
+	POWER_CONTROL equals %x22,
+	POWER_MGMT equals %x23,
+	OSC equals %x24,
+	ACTIVATE equals %x30,
+	ADDR_HI equals %x60,
+	ADDR_LO equals %x61,
+	INTERRUPT_SEL equals %x70,
+	DMA_CHANNEL_SEL equals %x74,
+	FDD_MODE_REGISTER equals %x90,
+	FDD_OPTION_REGISTER equals %x91;
+
+/* values that we read back that are expected ...
+
+constant
+	VALID_DEVICE_ID equals %x02;
+
+/* default device addresses
+
+constant
+	KYBD_INTERRUPT equals 1,
+	COM2_BASE equals %x2F8,
+	COM2_INTERRUPT equals 3,
+	COM1_BASE equals %x3F8,
+	COM1_INTERRUPT equals 4,
+	PARP_BASE equals %x3BC,
+	PARP_INTERRUPT equals 7;
+	
+end_module;

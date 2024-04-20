@@ -1,0 +1,282 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:24:20 by OpenVMS SDL EV1-33     
+;  Source:   5-NOV-1996 11:20:54 AFW_USER$:[CONSOLE.V58.COMMON.SRC]PYXIS_MEM_CSR 
+; ********************************************************************************************************************************
+ 
+	.MACRO	pyxis_mem_csr_def,..EQU=<=>,..COL=<:> ; IDENT x0.1
+; 
+; 
+;  The following is the base address of the system configuration registers in
+;  the PYXIS.  This value must be shifted left 28 places to yield the proper
+;  value, thus simplifying the load of the address into registers.
+; 
+pyxis_k_mem_csr_base'..equ'2165         ;  sysconfig base
+pyxis_v_mem_csr_base'..equ'28           ;  sysconfig base extent
+; 
+; 
+;   Memory Configuration Register bitfields
+; 
+mcr_m_mode_req'..equ'^X1
+mcr_m_server_mode'..equ'^X100
+mcr_m_bcache_stat'..equ'^X200
+mcr_m_bcache_enable'..equ'^X400
+mcr_m_pipelined_cache'..equ'^X800
+mcr_m_overlap_disable'..equ'^X1000
+mcr_m_seq_trace'..equ'^X2000
+mcr_m_cke_auto'..equ'^X4000
+mcr_m_dram_clk_auto'..equ'^X8000
+mcr_m_dram_burst_len'..equ'^X70000
+mcr_m_dram_wrap_type'..equ'^X80000
+mcr_m_dram_lat_mode'..equ'^X700000
+mcr_m_dram_mode_unused'..equ'^X3F800000
+mcr_S_displacement'..equ'64
+mcr_b_displacement'..equ'0              ;  space used by this register
+mcr_l_whole'..equ'0
+mcr_v_mode_req'..equ'0                  ;  [0]
+mcr_S_mcr_reserved1'..equ'7
+mcr_v_mcr_reserved1'..equ'1             ;  [7:1]
+mcr_v_server_mode'..equ'8               ;  [8]
+mcr_v_bcache_stat'..equ'9               ;  [9]
+mcr_v_bcache_enable'..equ'10            ;  [10]
+mcr_v_pipelined_cache'..equ'11          ;  [11]
+mcr_v_overlap_disable'..equ'12          ;  [12]
+mcr_v_seq_trace'..equ'13                ;  [13]
+mcr_v_cke_auto'..equ'14                 ;  [14]
+mcr_v_dram_clk_auto'..equ'15            ;  [15]
+mcr_S_dram_burst_len'..equ'3
+mcr_v_dram_burst_len'..equ'16           ;  [18:16]
+mcr_v_dram_wrap_type'..equ'19           ;  [19]
+mcr_S_dram_lat_mode'..equ'3
+mcr_v_dram_lat_mode'..equ'20            ;  [22:20]
+mcr_S_dram_mode_unused'..equ'7
+mcr_v_dram_mode_unused'..equ'23         ; [29:23]
+mcr_S_mcr_reserved3'..equ'2
+mcr_v_mcr_reserved3'..equ'30            ;  [31:30]
+; 
+;   Memory Base Address Register
+; 
+mcmr_m_dram_clk0'..equ'^X1
+mcmr_m_dram_clk1'..equ'^X2
+mcmr_m_dram_clk2'..equ'^X4
+mcmr_m_dram_clk3'..equ'^X8
+mcmr_m_dram_clk4'..equ'^X10
+mcmr_m_dram_clk5'..equ'^X20
+mcmr_m_dram_clk6'..equ'^X40
+mcmr_m_dram_clk7'..equ'^X80
+mcmr_m_dram_clk8'..equ'^X100
+mcmr_m_dram_clk9'..equ'^X200
+mcmr_m_dram_clk10'..equ'^X400
+mcmr_m_dram_clk11'..equ'^X800
+mcmr_m_dram_clk12'..equ'^X1000
+mcmr_m_sram_clk1'..equ'^X2000
+mcmr_m_sram_clk2'..equ'^X4000
+mcmr_m_sram_clk3'..equ'^X8000
+mcmr_S_displacement'..equ'64
+mcmr_b_displacement'..equ'0             ;  space used by this register
+mcmr_l_whole'..equ'0
+mcmr_v_dram_clk0'..equ'0
+mcmr_v_dram_clk1'..equ'1
+mcmr_v_dram_clk2'..equ'2
+mcmr_v_dram_clk3'..equ'3
+mcmr_v_dram_clk4'..equ'4
+mcmr_v_dram_clk5'..equ'5
+mcmr_v_dram_clk6'..equ'6
+mcmr_v_dram_clk7'..equ'7
+mcmr_v_dram_clk8'..equ'8
+mcmr_v_dram_clk9'..equ'9
+mcmr_v_dram_clk10'..equ'10
+mcmr_v_dram_clk11'..equ'11
+mcmr_v_dram_clk12'..equ'12
+mcmr_v_sram_clk1'..equ'13
+mcmr_v_sram_clk2'..equ'14
+mcmr_v_sram_clk3'..equ'15
+; 
+;   Global Timing Register
+; 
+gtr_m_min_ras_precharge'..equ'^X7
+gtr_m_idle_bc_width'..equ'^X700
+gtr_S_displacement'..equ'64
+gtr_b_displacement'..equ'0              ;  space used by this register
+gtr_l_whole'..equ'0
+gtr_S_min_ras_precharge'..equ'3
+gtr_v_min_ras_precharge'..equ'0         ;  [2:0]
+gtr_v_gtr_reserved1'..equ'3             ;  [3]
+gtr_S_cas_latency'..equ'2
+gtr_v_cas_latency'..equ'4               ;  [5:4]
+gtr_S_gtr_reserved2'..equ'2
+gtr_v_gtr_reserved2'..equ'6             ;  [7:6]
+gtr_S_idle_bc_width'..equ'3
+gtr_v_idle_bc_width'..equ'8             ;  [10:8]
+gtr_S_gtr_reserved3'..equ'21
+gtr_v_gtr_reserved3'..equ'11            ;  [31:11]
+; 
+;   Refresh Timing Register
+; 
+rtr_m_refresh_width'..equ'^X70
+rtr_m_ref_interval'..equ'^X1F80
+rtr_m_force_ref'..equ'^X8000
+rtr_S_displacement'..equ'64
+rtr_b_displacement'..equ'0              ;  space used by this register
+rtr_l_whole'..equ'0
+rtr_S_rtr_reserved1'..equ'4
+rtr_v_rtr_reserved1'..equ'0             ;  [3:0]
+rtr_S_refresh_width'..equ'3
+rtr_v_refresh_width'..equ'4             ;  [6:4]
+rtr_S_ref_interval'..equ'6
+rtr_v_ref_interval'..equ'7              ;  [12:7]
+rtr_S_rtr_reserved2'..equ'2
+rtr_v_rtr_reserved2'..equ'13            ;  [14:13]
+rtr_v_force_ref'..equ'15                ;  [15]
+rtr_S_rtr_reserved3'..equ'16
+rtr_v_rtr_reserved3'..equ'16            ;  [31:16]
+; 
+;   Row History Policy Register
+; 
+rhpr_m_policy_mask'..equ'^XFFFF
+rhpr_S_displacement'..equ'64
+rhpr_b_displacement'..equ'0             ;  space used by this register
+rhpr_l_whole'..equ'0
+rhpr_S_policy_mask'..equ'16
+rhpr_v_policy_mask'..equ'0              ;  [15:0]
+rhpr_S_rphr_reserved1'..equ'16
+rhpr_v_rphr_reserved1'..equ'16          ;  [31:16]
+; 
+;   Memory debug 1 Register
+; 
+mdr1_m_sel0'..equ'^X3F
+mdr1_m_sel1'..equ'^X3F00
+mdr1_m_sel2'..equ'^X3F0000
+mdr1_m_sel3'..equ'^X3F000000
+mdr1_m_enable'..equ'^X80000000
+mdr1_S_displacement'..equ'64
+mdr1_b_displacement'..equ'0             ;  space used by this register
+mdr1_l_whole'..equ'0
+mdr1_S_sel0'..equ'6
+mdr1_v_sel0'..equ'0                     ;  [5:0]
+mdr1_S_mdr1_reserve1'..equ'2
+mdr1_v_mdr1_reserve1'..equ'6            ;  [7:6]
+mdr1_S_sel1'..equ'6
+mdr1_v_sel1'..equ'8                     ;  [13:8]
+mdr1_S_mdr1_reserve2'..equ'2
+mdr1_v_mdr1_reserve2'..equ'14           ;  [15:14]
+mdr1_S_sel2'..equ'6
+mdr1_v_sel2'..equ'16                    ;  [21:16]
+mdr1_S_mdr1_reserve3'..equ'2
+mdr1_v_mdr1_reserve3'..equ'22           ;  [23:22]
+mdr1_S_sel3'..equ'6
+mdr1_v_sel3'..equ'24                    ;  [29:24]
+mdr1_v_mdr1_reserve4'..equ'30           ;  [30]
+mdr1_v_enable'..equ'31                  ;  [31]
+; 
+;   Memory debug 2 Register
+; 
+mdr2_m_sel0'..equ'^X3F
+mdr2_m_sel1'..equ'^X3F00
+mdr2_m_sel2'..equ'^X3F0000
+mdr2_m_sel3'..equ'^X3F000000
+mdr2_m_enable'..equ'^X80000000
+mdr2_S_displacement'..equ'64
+mdr2_b_displacement'..equ'0             ;  space used by this register
+mdr2_l_whole'..equ'0
+mdr2_S_sel0'..equ'6
+mdr2_v_sel0'..equ'0                     ;  [5:0]
+mdr2_S_mdr1_reserve1'..equ'2
+mdr2_v_mdr1_reserve1'..equ'6            ;  [7:6]
+mdr2_S_sel1'..equ'6
+mdr2_v_sel1'..equ'8                     ;  [13:8]
+mdr2_S_mdr1_reserve2'..equ'2
+mdr2_v_mdr1_reserve2'..equ'14           ;  [15:14]
+mdr2_S_sel2'..equ'6
+mdr2_v_sel2'..equ'16                    ;  [21:16]
+mdr2_S_mdr1_reserve3'..equ'2
+mdr2_v_mdr1_reserve3'..equ'22           ;  [23:22]
+mdr2_S_sel3'..equ'6
+mdr2_v_sel3'..equ'24                    ;  [29:24]
+mdr2_v_mdr1_reserve4'..equ'30           ;  [30]
+mdr2_v_enable'..equ'31                  ;  [31]
+; 
+;   Base Bank Addr Register
+; 
+bbar_m_base_addr'..equ'^XFFC0
+bbar_S_displacement'..equ'64
+bbar_b_displacement'..equ'0             ;  space used by this register
+bbar_l_whole'..equ'0
+bbar_S_bbarx_reserved1'..equ'6
+bbar_v_bbarx_reserved1'..equ'0          ;  [5:0]
+bbar_S_base_addr'..equ'10
+bbar_v_base_addr'..equ'6                ;  [15:6]
+bbar_S_bbarx_reserved2'..equ'16
+bbar_v_bbarx_reserved2'..equ'16         ;  [31:16]
+; 
+;   Bank Config Register
+; 
+bcr_m_bank_enable'..equ'^X1
+bcr_m_bank_size'..equ'^X1E
+bcr_m_subbank_enable'..equ'^X20
+bcr_m_rowsel'..equ'^X40
+bcr_m_k4bank'..equ'^X80
+bcr_S_displacement'..equ'64
+bcr_b_displacement'..equ'0              ;  space used by this register
+bcr_l_whole'..equ'0
+bcr_v_bank_enable'..equ'0               ;  [0]
+bcr_S_bank_size'..equ'4
+bcr_v_bank_size'..equ'1                 ;  [4:1]
+bcr_v_subbank_enable'..equ'5            ;  [5]
+bcr_v_rowsel'..equ'6                    ;  [6]
+bcr_v_k4bank'..equ'7                    ;  [7]
+bcr_S_reserve1'..equ'24
+bcr_v_reserve1'..equ'8                  ;  [31:8]
+; 
+;   Bank Timing Register
+; 
+btr_m_row_addr_hold'..equ'^X7
+btr_m_toshiba'..equ'^X10
+btr_m_slow_precharge'..equ'^X20
+btr_S_displacement'..equ'64
+btr_b_displacement'..equ'0              ;  space used by this register
+btr_l_whole'..equ'0
+btr_S_row_addr_hold'..equ'3
+btr_v_row_addr_hold'..equ'0             ;  [2:0]
+btr_v_btrx_reserved1'..equ'3            ;  [3]
+btr_v_toshiba'..equ'4                   ;  [4]
+btr_v_slow_precharge'..equ'5            ;  [5]
+btr_S_btrx_reserved2'..equ'26
+btr_v_btrx_reserved2'..equ'6            ;  [31:6]
+;  CACHE VALID MAP REGISTERS
+S_CVM'..equ'4
+CVM'..equ'0
+CACHE_VALID'..equ'0
+; 
+; 
+;   PYXIS Memory CSR Register Block
+; 
+;   This block of registers contains at all of the registers modelled in the
+;   structures above in the address space order in which they will appear on the
+;   machine.
+; 
+csr_S_PYXIS_MEM_CSR'..equ'3076
+PYXIS_MEM_CSR'..equ'0
+csr_r_mcr'..equ'0                       ;  Memory Configuration Register 0x0
+csr_r_mcmr'..equ'64                     ;  Memory Clock mask register 0x40
+csr_S_offset_0'..equ'384
+csr_b_offset_0'..equ'128
+csr_r_gtr'..equ'512                     ;  global timing register 0x200
+csr_S_offset_1'..equ'192
+csr_b_offset_1'..equ'576
+csr_r_rtr'..equ'768                     ;  refresh timing register 0x300
+csr_S_offset_2'..equ'192
+csr_b_offset_2'..equ'832
+csr_r_rhpr'..equ'1024                   ;  row history policy reg 0x400
+csr_S_offset_3'..equ'192
+csr_b_offset_3'..equ'1088
+csr_r_mdr1'..equ'1280                   ;  mem ctlr debug reg 1 0x500
+csr_r_mdr2'..equ'1344                   ;  mem ctlr debug reg 2 0x540
+csr_S_offset_4'..equ'128
+csr_b_offset_4'..equ'1408
+csr_r_bbarx'..equ'1536                  ;  Bank base Addr reg 0  0x600
+csr_r_bcrx'..equ'2048                   ;  Bank Config reg 0  0x800
+csr_r_btrx'..equ'2560                   ;  Bank timing reg 0  0xa00
+csr_r_cvm'..equ'3072                    ;  Cache valid MAP reg
+; 
+; 
+	.ENDM

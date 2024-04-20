@@ -1,0 +1,60 @@
+/* file:	ev5_lx164_pal_def.sdl
+/*
+/* Abstract:	Platform specific PALcode definitions and Cserve defintions 
+/*		for the AlphaPC 164/LX.
+/*
+{*	To convert to source:
+{*      SDL/LANGUAGE=(MACRO,CC)/COPYRIGHT/LIST ev5_lx164_pal_def.sdl
+{*
+module	$pal_def;
+
+constant PAL$PAL_BASE				equals %xC000;
+constant PAL$PAL_SIZE				equals %xC000;
+constant PAL$OSFPAL_BASE			equals %x18000;
+constant PAL$OSFPAL_SIZE			equals %x8000;
+constant PAL$IPL_TABLE_BASE			equals 0;
+constant PAL$HWRPB_BASE				equals %x2000;
+constant PAL$HWRPB_SIZE				equals %x4000;
+constant PAL$IMPURE_BASE			equals %x5000;
+constant PAL$IMPURE_COMMON_SIZE			equals (%x0200 +7) & %xfff8;
+constant PAL$IMPURE_SPECIFIC_SIZE		equals %x600;
+constant PAL$LOGOUT_BASE			equals %x6000;
+constant PAL$CONSOLE_BASE			equals %x20000;
+
+constant PAL$ENTER_CONSOLE_PTR			equals PAL$IMPURE_BASE + %x140;
+constant PAL$ENTER_OSF         			equals PAL$IMPURE_BASE + %x180;
+
+constant SLOT$_PAL_LOGOUT			equals PAL$LOGOUT_BASE; 
+constant SLOT$_PAL_LOGOUT_LEN			equals PAL$IMPURE_SPECIFIC_SIZE;
+
+constant IMPURE$PCB_OFFSET			equals %x10;
+constant IMPURE$PROF_OFFSET			equals %x40;
+constant IMPURE$QUILT_OFFSET			equals %x40;
+constant IMPURE$UART_OFFSET			equals %x70;
+constant IMPURE$CPU_TYPE_OFFSET			equals %x80;
+
+constant MP$RESTART				equals 1;
+constant MP$HALT				equals 2;
+constant MP$CONTROL_P				equals 3;
+constant MP$BREAK				equals 4;
+constant MP$BLOCK_INTERRUPTS			equals 5;
+constant MP$UNBLOCK_INTERRUPTS			equals 6;
+
+end_module $pal_def;
+
+module $cserve_def;
+
+constant CSERVE$SET_HWE				equals 8;
+constant CSERVE$CLEAR_HWE			equals 9;
+constant CSERVE$LDLP				equals 16;
+constant CSERVE$STLP				equals 17;
+constant CSERVE$PCI_INTR_ENABLE			equals 52;
+constant CSERVE$PCI_INTR_DISABLE		equals 53;
+constant CSERVE$HALT				equals 64;
+constant CSERVE$WHAMI				equals 65;
+constant CSERVE$START				equals 66;
+constant CSERVE$CALLBACK			equals 67;
+constant CSERVE$MTPR_EXC_ADDR			equals 68;
+constant CSERVE$JUMP_TO_ARC			equals 69;
+
+end_module $cserve_def;

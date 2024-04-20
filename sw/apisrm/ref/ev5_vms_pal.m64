@@ -1,0 +1,4607 @@
+	.title	"EV5 VMS PAL" 
+	.ident	"V1.21"
+;
+;****************************************************************************
+;*									    *
+;*  Copyright (c) 1992, 1995, 1997,1998	                     		    *
+;*  by DIGITAL Equipment Corporation, Maynard, Mass.			    *
+;* 									    *
+;*  This software is furnished under a license and may be used and  copied  *
+;*  only  in  accordance  with  the  terms  of  such  license and with the  *
+;*  inclusion of the above copyright notice.  This software or  any  other  *
+;*  copies  thereof may not be provided or otherwise made available to any  *
+;*  other person.  No title to and ownership of  the  software  is  hereby  *
+;*  transferred.							    *
+;* 									    *
+;*  The information in this software is subject to change  without  notice  *
+;*  and  should  not  be  construed  as  a commitment by DIGITAL Equipment  *
+;*  Corporation.							    *
+;* 									    *
+;*  DIGITAL assumes no responsibility for the use or  reliability  of  its  *
+;*  software on equipment which is not supplied by DIGITAL.		    *
+;*									    *
+;****************************************************************************
+
+.sbttl	"Edit History"
+;+
+; Who		Rev	When		What	
+; ------------	---	-----------	--------------------------------
+; DB		0.0	10-Mar-1992	Start
+; DB            0.1     02-Jun-1992     Move stack pointers to memory, rewrite swpctx
+; DB		0.2     16-Jul-1992     REI
+; DB		0.3	21-Jul-1992     POST_KM_TRAP_UPDATE_R45, ARITH, IACCVIO, DFAULT, FEN, OPCDEC
+;					POST_KM_TRAP, CHMK
+; DB		0.4     27-Jul-1992	ITBMISS, DTBMISS_SINGLE, DTBMISS_DOUBLE
+; DB		0.5     11-Aug-1992	CHME, CHMS, CHMU, SWASTEN
+; JH		0.6     18-Aug-1992	Fix RESET PAL & add cycle to UNALIGN,DFAULT,DTBMISS_SINGLE,CHMK,
+;					REI,ITBMISS_SIMPLE,IACCVIO,OPCDEC,BPT,BUGCHK,CHME,CHMS,CHMU,GENTRAP
+; DB		0.7	24-Aug-1992	Take out extra cycle on trap entry points.  Rewrite REI to account
+;					for new restriciton on exc_addr read.
+; DB		0.8     25-Aug-1992	Remove PALtemp 24-31.  New restriction, shortest CALL_PAL is 2 cycles.
+; DB		0.9     31-Aug-1992	MM_stat MS bits are undefined on read.
+;					Add PC_SIGN_CHECK entry point at 0x600. (Code not written yet).
+; DB		0.10    10-Sep-1992	Remove PC<1> as sign-check bit.
+; DB		0.11    15-Sep-1992	Unlock VA on PTE invalid flows out of DOUBLE.
+; DB		0.12	02-Oct-1992	Remove PC_SIGN_CHECK entry point.
+; DB		0.13	02-Oct-1992	Fix bug with PC in DOUBLE_PTE_INV.
+; DB		0.14	05-Oct-1992	UNALIGNED loads, rewrite TNV_IN_PAL, DFAULT_IN_PAL
+; DB		0.15	09-Oct-1992	Add Software interrupts and ASTs
+;					Fix bug: unlock VA on ARITH traps and MACHINE_CHECK
+; DB		0.17	21-Oct-1992	Fix bug: can't mfpr VA and do virtual reference in same cycle
+; DB		0.18	26-Oct-1992	UNALIGNED integer stores,  PROBEx
+; DB		0.19	27-Oct-1992	r15->r25
+; DB		0.20	27-Oct-1992	DATAFX, DRAINA, CFLUSH
+; DB		0.21	28-Oct-1992	Fix bug: unlock VA on ITBmiss case with Invalid PTE.
+; DB		0.22	28-Oct-1992	Fix bug: Store correct KSP on SWPCTX.
+; DB		0.23	02-Nov-1992	Fix bug: Don't take interrupt if INTID equal to IPL.
+;					UNALIGNED FP stores, moved some code to ev5_vms_system_pal.
+; DB		0.24	05-Nov-1992	remove fen->opcdec path.  
+; DB		0.25	05-Nov-1992	restore fen->opcdec path.  
+; DB		0.26	12-Nov-1992	Fix bug: pal_mm_dispatch 
+;					Fix bug: ldxa macros fix
+; DB		0.27	17-Nov-1992	Fix bug: unaligned stack in REI
+; DB		0.28	19-Nov-1992	New IPR restriction: TBISI must be in same octaword as HW_REI_STALL
+;					Fix bug: typo in l3 marker stuff for PROBE
+;					Fix bug: remove stack probe in unaligned stores (only needed for ua ld)
+; DB		0.29	23-Nov-1992	Fix bug: no use of pt0 in tbmiss
+;					Fix bug: typo in restore of R1, unaligned integer ld
+; DB		0.30	24-Nov-1992	Fix bug: probe recheck uses wrong register for pte recheck
+;					Fix bug: probe dismiss needs to restore r14
+; DB		0.31	30-Nov-1992	Fix bug: Move 2nd ldq_u to after stq_u in unaligned_lw_st fixup
+; DB		0.32	02-Dec-1992	Fix bug: assembler did not correctly calculate icsr$m_sde-16
+; DB		0.33	07-Dec-1992	Update RAX interface
+; DB		0.34	09-Dec-1992	Fix bug: CHMx updates SP before potential MM fault on stack push.
+; DB		0.35	16-Dec-1992	Fix bug: DFAULT_IN_CHMx needs to update local current mode (r11)
+; DB		0.36	17-Dec-1992	Fix bug: PROBE_RECHECK does not correctly distinguish read from write probe.
+; DB            0.37    17-Dec-1992     Fix bug: CHMx SP and current mode = new mode on fault.  Should be old.  
+;					         Remove fix in version .35
+; DB            0.38    21-Dec-1992     Fix bug: The saga continues.  Need to have CHMx current mode = new when prioritizing
+;						   ACV/TNV faults.
+; DB		0.39	21-Dec-1992	Fix bug: Illegal unaligned opcode reports incorrect PC (uses wrong shadow)
+; DB		0.40	22-Dec-1992	Fix bug: Illegal unaligned opcode reports PC, should report PC+4
+; DB		0.41	28-Dec-1992	Update RAX interface
+; DB		0.42	05-Jan-1993	Fix bug: PVC found MT/MF bug in WRITE UNQ
+;						 PVC found MT alt_mode bug in PROBEx
+; DB		0.43	11-Jan-1993	Update trap entry points to match new hardware
+; DB		0.44	02-Feb-1993	Add AMOVRR, AMOVRM code.  
+;					Change RAX code.
+; DB		0.45	08-Feb-1993	Faster IMB algorithm
+; DB		0.46	10-Feb-1993	Wrong PC in call_pal OPCDEC
+; DB		0.47	16-Feb-1993	From PVC: Pad MTPR PRBR, MTPR MCES, MTPR SCBB, MTPR MCES, RSCC, WR_PS_SW paltemp writes
+;						Pad REI_FROM_NONKERN DTB_CM write.
+;					Change RAX code.
+;					Egore and Acore reset sequences
+; DB		0.48	18-Feb-1993	Change pt_trap to be offset rather than full address
+;					Add CSERVE, update CFLUSH
+;					Start PVC$JSR stuff
+; DB		0.49	28-Feb-1993	Add INSQUEL, INSQUELD
+;					Bug:  move final write to pt_trap out of trap shadow in INSQUEL
+; DB		0.50	05-Mar-1993	Add INSQUEQ
+; DB		0.51	09-Mar-1993	Add INSQUEQD
+;					Bug:  queue instrs reading exc_addr in 1st cycle of flow
+; DB		0.52	10-Mar-1993	Bug:  PAL_MM_DISPATCH clears pt_trap.  pal$ill_una needs pt_trap.
+; DB		0.53	11-Mar-1993	New restriction: no mfpr exc_sum or exc_mask in first 2 cycles of arith flow
+;					Bug:  queues, move write pt_trap out of trap shadow even on retry case
+; DB		0.54	17-Mar-1993	Add simple REMQUES
+;					Bug: fix write_flag calculation for FOR on queue write probes
+;					Bug: Set write bit on queue probes that fault
+;					Reorder FOR and FOW in dfault_in_pal to match EV4
+;					Reorder load & probes in insquel to match EV4
+; DB		0.55	23-Mar-1993	Add interlocked queues
+;					move pt3 to pt12, add pt_impure at pt3
+;					Bug: insqtiq was using nolock fault handler
+;					Reorder load & probes in insqueld to match EV4
+;					Add pal$update_pcb, pal$save_state, pal$restore_state
+;					Remove ACORE stack shortcut
+; DB		0.56	31-Mar-1993	Clear out r13 and r14 for spot mismatches
+; DB		0.57	01-Apr-1993	Fix up 1-1 MM flows
+;					Bug: Killing intid in hw interrupt flows
+; DB		0.58	05-Apr-1993	Bug: PS<IP> not set by post_interrupt
+;					Hardware interrupts complete
+;					Start real machine check
+; DB		0.59	12-Apr-1993	Bug: remqueq stores wrong pointer on empty queue case
+;					Change interface to PAL$POST_INTERRUPT for machine checks
+;					Fixup pal machine checks
+;					Combine pt_flags, pt_whami
+; DB		0.60	21-Apr-1993	update pal$save_state/pal$restore_state to save/restore shadows
+;					real halt flows
+;					Bug: insqueq changes pt_trap in trap shadow
+;					Bug: insqueqd doesn't do full alignment check
+;					Bug: AMOV violates mf exc_addr restriction
+; DB		0.61	07-May-1993	General clean-up (comments and extra NOPs)
+; JM		0.62	11-May-1993	Updated for Ibox IPR changes
+; DB		0.63	11-May-1993	Add disable_crd option
+; DB		0.64	13-May-1993	Bug: in mtpr_mces, not clearing DPC, DSC
+; DB		0.65	13-May-1993	Bug: mf exc_addr in cycle 0 of flow opcdecs and halt
+;					New restriction: no mfpr exc_addr in cycle 1 of call_pal flows
+; JM            0.66    18-May-1993     Fixed up cycle 1 exc_addr bugs.  
+;					Fixed some PVC violations.
+; DB            0.67    18-May-1993     Bug: exc_addr not correct for if double tbmiss dfault_in_prober
+;					Update pal$save_state and pal$restore_state
+; DB		0.68	25-May-1993	Fix up queue fault handler:
+;						pal$queue_fault_setup_lock could tbmiss - preserve r8, pt5, etc
+;					New restriction: No hw_rei_stall in 0,1,2 after mtpr itb_asn
+; DB		0.69	02-Jun-1993	DTBMISS_SINGLE - 1to1 mode now sets all write enables
+;					Bug: Fix PS<IP> in REI
+;					Bug: Fix astsr saved in SWPCTX
+;					Bug: Fix astsr loaded in SWPCTX (sll should be srl)
+; DB		0.70	08-Jun-1993	Bug: INSQUEQD uses wrong shadow in header alignment check
+; JM		0.71	08-Jun-1993	Bug: REI reading old SP; writing updated SP to hyperspace
+; DB		0.72	09-Jun-1993	Bug: AMOV reports wrong MMF for probe_fault
+;					Bug: AMOVRM_UA uses wrong shadow for offset in probe of first write, part 2
+; DB		0.73	10-Jun-1993	Bug: fix AMOVRM unaligned 2nd half probe
+; DB		0.74	14-Jun-1993	Reorder probes in remquel for RAX
+; JM		0.75	22-Jun-1993	Bug: fix typo in SWPCTX pcc calculations
+;					Bug: fix INSQUEQD with unaligned H -- bug in EV4 code
+; JM		0.76	07-Jul-1993	Fixup cns$ and mchk$ names for conversion of impure.mar to impure.sdl
+;					Split off everything from call_pal$halt and after into ev5_vms_callpal.m64
+; JM		0.77	20-jul-1993	Bug: DOUBLE_PTE_INV - need to restore r21 before branch to DFAULT_FETCH_ERR
+;					Bug: DOUBLE_PTE_INV_ISTREAM - need to unlock va
+; JM		0.78	28-jul-1993	Bug: ILLEGAL_UNALIGNED_OPCODE: restore r2 before branch to  POST_KM_TRAP
+; JM		0.79	 3-aug-1993	Bug: pal$queue_fault_setup_lock: setup pt_trap with pal$queue_fault address 
+;						before store to clear lock flag (found by ev4)
+; JM		0.80	 4-aug-1993	Add debug_mp_queue macro calls and enable_mp_debug flag for multi-processor
+;						queue instruction testing
+; JM		0.81	 5-aug-1993	Bump version to 102 for release
+; JM		0.82	 5-aug-1993	(included in previous release) change enable_mp_debug to enable_debug_mp
+; JM		0.83	 5-aug-1993	(included in previous release) add disable_crd flag init back in (somehow deleted)
+; JM		0.84	10-aug-1993	Bug: DISMISS_PROBE_FAULT,PAL$QUEUE_FAULT - palshadow write -> hw_rei restriction violation
+;					Bug: store after mt exc_addr in POST_KM_TRAP_UPDATE_R45,POST_KM_TRAP,POST_XM_TRAP,
+;						PAL$POST_INTERRUPT,
+; JM		0.85	15-sep-1993	New restriction:  No hw_rei_stall in 0,1,2,3,4 after mtpr itb_asn - affects SWPCTX
+; JM	 	0.86	07-oct-1993	Re-implement pal$version 
+; JM	 	0.87	12-oct-1993	One more time:  change pal$version format to conform to SRM
+; JM	 	0.88	13-oct-1993	Add code to report fault on ld_vpte (previously just halted). added d/ildvpte_dfault flows
+; JM	 	0.89	14-oct-1993	Incorporate the ptbr/1-to-1 mapping scheme into dtbmiss,itbmiss,dtbmiss_double flows
+;						(needed to add read of mm_stat in INVALID_DPTE_HANDLER after va unlocked -- yikes!
+;						  -- but *SHOULD* be ok)
+; JM		0.90	06-dec-1993	Edits to other files:
+;						     EV5_VMS_PAL.M64 -- no changes
+;						     EV5_VMS_CALLPAL.M64 -- save/restore state bug fixes
+;						     EV5_VMS_SYSTEM_PAL.M64 -- change impure/logout algorithm
+;						     EV5_IMPURE.MAR -- change impure/logout algorith, add regs
+;						     PAL_MACROS.MAR -- change save/restore_reg macros
+; JM		0.91	07-dec-1993	Move IC-FLUSH code to ev5_vms_callpal.m64
+;					BUG: pal$queue_fault - r12 being overwritten before write to dtb_pte
+;					BUG: TNV_IN_PAL clearing PC<0> in saved PAL PC
+;					BUG: INSQTIL,REMQHIL - wrong value in pt_trap
+;					PVC BUG: queue_addr_error_unlock, remqtil - move mt pt_trap out of shadow of stl
+; JM		0.92	14-dec-1993	Add pvc$violate statements for ibox ipr writes following virtual ld/st
+;					BUG: stq_c's in REI *may* fault - add fault handlers.
+; JM		0.93	03-jan-1993	Move pal$pal_bug_check code to ev5_vms_callpal.m64
+; JM		0.94	17-jan-1994	-Add flag to enable performance monitoring debug code
+;					-Add flag for flushing Icache on tbix instructions
+;					BUG: move loading of halt code to after call to update_pcb in ksnv_halt2
+; JM		0.95	1-feb-1994	Add enter/exit console hooks for beh_model dvt's
+;					Moved ldqp,stqp macros to ev5_pal_macros.mar and add .mcall here to recognize them
+; JM		0.96	4-feb-1994	Add align_page to mcall
+;					Put impure base pointer in pal scratch area (in trap$reset unused area).
+;					Use former pt_impure as bc_ctl shadow and performance monitor control (called pt_bcs_pm)
+;					Add pme/performance monitoring hooks to swpctx
+; JM		0.97	17-feb-1994	Add debug flags
+; JM		0.98	25-feb-1994	ev5_vms_system_pal.m64: add pmctr,maf_mode initialization to reset
+;								fix bug in pointer initialization in enable_debug_pcout reset code
+;					ev5_vms_callpal.m64: fix 2 bugs in pal$save_state routine.
+;					ev5_vms_pal.m64: no change except version number bump
+; JM		0.99	22-apr-1994	Move impure pointer back into paltemp (pt_impure); move pmctr_ctl out to impure area
+;					swpctx: get pmctr_ctl from impure area.  Fix bugs: Need to isolate FEN bit read from PCB;
+;						and fix out of order performance monitor setup instructions.
+; JM		0.100	 9-may-1994	Bump version # (for ev5_vms_system_pal.m64 sys$perfmon fix)
+; JM		0.101	28-jun-1994	Add workaround for PASS1 LDX_L bug (add MB before every LDX_L)
+; JM		0.102	22-jul-1994	Add flag definition: restore_evms_palbase
+; JM		0.103	28-jul-1994	Dismiss exceptions on loads to r31/f31 (affects trap$dfault,invalid_dpte_handler,
+;						and double_pte_inv );	changed DFAULT_FETCH_ERR to DFAULT_FETCH_LDR31_ERR
+;					BUG: in invalid_dpte_handler, faulting FETCH may not always get dismissed
+; JM		1.00	 1-aug-1994	Update for Pass2:  change SWPCTX to use new ICSR PM bits.
+; JM		1.01	19-aug-1994	Add checks to sget_addr/get_addr macros
+; JM		1.02	29-sep-1994	Bump version number for release (performance monitor bug fixes)
+; JM		1.03	14-oct-1994	BUG: trap$interrupt - ISR read (and saved) before INTID -- INTID can change
+;						after ISR read, but we won't catch the ISR update.  reverse order
+; JM		1.04	17-nov-1994	Dismiss unalign traps if LD F/R31
+; JM		1.05	 1-dec-1994	EV5 PASS1,2,3 BUG WORKAROUND:  Add flag LDVPTE_BUG_FIX.  In DTBMISS_DOUBLE, branch to 
+;					DTBMISS_SINGLE if not in palmode.
+; JM		1.06	 9-jan-1995	Bump version number for change to ev5_vms_system_pal.m64 - ei_stat fix in mchk logout frame
+; JM		1.07	24-feb-1995	Replace jsr/ret pairs with jmp/br pairs in unalign fixup code to avoid performance
+;						impact of pass4 hardware change.  ev5_vms_callpal.m64 also changed.
+;						Set ldvpte_bug_fix flag regardless of pass. set default to ev5_p2
+; JM		1.08	 6-mar-1995	Change ".if eq ev5_p2" to ".if ne ev5_p1" in swpctx code
+; ES		1.09	13-mar-1995	Add vms_chm_fix flag to enable dcache in user mode only
+;					to avoid cpu bug.
+; ES		1.10	20-mar-1995	In swpctx vms_chm_fix, don't need as many stalls before hw_rei_stall
+; ES		1.11	21-mar-1995	Add a stall in pal$restore_state to avoid to pvc violation
+;					Use cserve to force pvc checking of exit_console
+; ES		1.12	26-apr-1995	In write performance monitor, correct meaning of r17<2:0> to ctl2,ctl1,ctl0
+; ES		1.13	01-may-1995	Bug fixes in ev5_vms_callpal.m64 in hw_rei_change_mode code
+; ES		1.14	06-jun-1995	In TNV_IN_PAL, only check KRE in non-level 3 ptes.
+; ES		1.15	14-jul-1995	(1) ev5_vms_callpal: In wrperfmon enable, on pass2, always update pmctr. Icsr provides
+;					the master enable.
+;					(2) Add word unalign fixups (for ev56)
+;					(3) ev5_vms_system_pal: Set ICSR<17> byte/word eco enable (for ev56)
+; ES		1.16	27-sep-1995	In reset, compute PAL_BASE (for relocatibility)
+; ES		1.17	25-oct-1995	In trap$reset, conditionalize use of r1 for compatibility
+; ES		1.18	13-mar-1996	Add clrfen
+; ES		1.19	07-oct-1996	In remqtiq_cont, replace 'subl' with 'subq'
+; ER		1.20	05-feb-1997	Add PCA56 support
+; ES		1.21	31-Mar-1998	In crd with ei_stat showing unc, turn it into mchk
+;
+	vmaj == 1
+	vmin == 21
+	vms_pal == 1 
+	osf_pal	== 2
+	pal_type = vms_pal
+	pal$version_l = < <pal_type@16> ! <vmaj@8> ! <vmin@0> >
+;-
+
+.sbttl	"PALtemp register usage"
+
+;+
+;  The EV5 Ibox holds 24 PALtemp registers.  This maps the EVMS PAL usage
+;  for these PALtemps:
+;
+;	pt0   scratch
+;	pt1   scratch
+;	pt2   scratch
+;	pt3   pt_impure
+;
+;	pt4   DOUBLE TB miss flow/TNV_IN_PAL
+;	pt5   DOUBLE TB miss flow/INVALID_DPTE_HANDLER
+;	pt6   SINGLE TB miss flow - exc_addr
+;	pt7   temp for stack builders
+;
+;	pt8   temp for stack builders
+;	pt9   Shadow register for PS - SW bits 		pt_ps
+;	pt10  scratch
+;	pt11  Trap catcher address			pt_trap
+
+;	pt12  scratch
+;	pt13  reserved for system specific PAL
+;	pt14  reserved for system specific PAL
+;	pt15  reserved for system specific PAL
+;
+;	pt16  MISC: switch_bit ! scratch ! WHAMI<7:0> ! 0 0 0 MCES<4:0> 	pt_misc, pt_whami, pt_mces
+;	pt17  SCC					pt_scc
+;	pt18  PRBR					pt_prbr
+;	pt19  KSP					pt_ksp 
+;
+;	pt20  PTBR					pt_ptbr    ; stored internally shifted left by "page_offset_size_bits"
+;	pt21  VPTBR					pt_vptbr 
+;	pt22  SCBB					pt_scbb 
+;	pt23  PCBB					pt_pcbb 	
+;
+;-
+
+.sbttl	"PALshadow register usage"
+;
+;+
+;
+; EV5 shadows R8-R14 and R25 when in PALmode and ICSR<shadow_enable> = 1.
+; This maps the EVMS PAL usage of R8 - R14 and R25:
+;
+; 	r8    ITBmiss/DTBmiss scratch
+; 	r9    ITBmiss/DTBmiss scratch
+; 	r10   ITBmiss/DTBmiss scratch
+;	r11   PS current mode in <4:3>
+;	r12   local scratch
+;	r13   local scratch
+;	r14   local scratch
+;	r25   local scratch
+;
+;
+;-
+
+.sbttl	"ALPHA symbol definitions"
+	$PSDEF		GLOBAL
+	$PTEDEF		GLOBAL
+	$VADEF		GLOBAL
+	$PCBDEF		GLOBAL
+	$SCBDEF		GLOBAL
+	$FRMDEF		GLOBAL
+	$EXSDEF		GLOBAL
+	$MCESDEF	GLOBAL
+
+.sbttl	"EV5 Hardware symbol definitions"
+
+        $HALT_CODES     GLOBAL
+        $MCHK_CODES     GLOBAL
+
+        $PAL_IMPURE
+        $PAL_LOGOUT
+
+	$EV5DEF
+	$PALTEMP
+	$MM_STAT_DEF
+	$EV5_MM
+	$EV5_IPLDEF
+
+.sbttl	"PALcode configuration options"
+
+; There are a number of options that may be assembled into this version of
+; PALcode. They should be adjusted in a prefix assembly file (i.e. do not edit
+; the following). The options that can be adjusted cause the resultant PALcode
+; to reflect the desired target system.
+
+
+
+	.iif ndf byte_word_emulation, byte_word_emulation = 1
+
+	.iif ndf galaxy, galaxy = 0
+	.iif ndf nonzero_console_base, nonzero_console_base = 0
+
+	.iif ndf gamma_system, gamma_system = 0
+
+	.iif ndf rawhide_system, rawhide_system = 0
+	.iif ndf rawhide_irq3_hack, rawhide_irq3_hack = 0
+
+        .iif ndf real_mm, real_mm   = 1		; Page table translation vs 1-1 mapping
+
+        .if ndf enable_physical_console         ; Enables 1-to-1 memory mapping if ptbr<0> flag is set
+                enable_physical_console = 0
+        .endc
+
+	.iif ndf rax_mode, rax_mode   = 0	; Reset and halt as required by RAX
+	.iif ndf egore, egore   = 0		; End of reset flow starts a program at 200000(hex).
+	.iif ndf acore, acore   = 1		; End of reset flow starts a program at 40000(hex).
+
+	assume <acore+egore+rax_mode> lt 2	; Assertion checker. Only 1 of acore,egore,rax_mode may be set)
+
+	.iif ndf beh_model,beh_model   = 1	; EV5 behavioral model specific code
+	.iif ndf init_cbox, init_cbox  = 1	; Reset flow init of Bcache and Scache
+        .iif ndf disable_crd, disable_crd=0	; Decides whether the reset flow will disable
+						; correctable read interrupts via ICSR
+        .if ndf enable_debug_mp 		; enables dtb zap in queue instructions for multi-processor testing
+	   enable_debug_mp = 0  
+	.endc
+	.if ndf	perfmon_debug 			; disables "real" performance monitor code & enables debug version
+	   perfmon_debug = 0
+	.endc
+
+	.if ndf enable_debug_pcout
+	   enable_debug_pcout = 0		; disables "real" pm interrupt, and adds code to trace exc_addr to io address
+	.endc
+
+	.if ndf enable_debug_ringbuf
+	   enable_debug_ringbuf = 0		; disables "real" pm interrupt, and adds code to trace exc_addr to ring buffer
+	.endc
+
+	.if ndf flushic_on_tbix			; enables code to flush Icache in xTBIx callpal instructions
+	   flushic_on_tbix = 0
+	.endc
+
+	.iif ndf ev5_p1, ev5_p1 = 0		; Indicates palcode for EV5 pass1
+	.iif ndf ev5_p2, ev5_p2 = 1		; Indicates palcode for EV5 pass2
+	assume <ev5_p1+ev5_p2> eq 1
+
+        .iif ndf pca56, pca56   = 0		; Indicates palcode for PCA56
+
+	.iif ndf restore_evms_palbase, restore_evms_palbase = 0	
+						; Enables code in save_state routine to restore the evms palbase.
+
+	.if ndf p1_ldx_l_fix			; If set, fix for pass1 ldx_l bug enabled. (adds MB's before all LDx_L's
+	  .if ne ev5_p1
+	     p1_ldx_l_fix = 1
+	  .iff 
+	     p1_ldx_l_fix = 0
+	  .endc
+	.endc
+
+	.if ndf ldvpte_bug_fix
+	     ldvpte_bug_fix = 1			; If set, fix ldvpte bug in dtbmiss_double flow.
+	.endc
+
+; LDx/L STx/C retry count
+; This sets the maximum number of times that the LDx/L STx/C will be tried
+; inorder to obtain a lock prior to giving up and requeueing the instruction
+
+	.iif ndf ldxl_stxc_retry_count, ldxl_stxc_retry_count	== 32
+
+; Flag to enable TurboLaser PCI level sensitive interrupt workaround
+	.iif ndf turbo_pcia_intr_fix, turbo_pcia_intr_fix = 0
+
+; Flag for detecting console accesses to physical page 0
+	.iif ndf console_protect_pfn0, console_protect_pfn0 = 0
+
+; Add flag "vms_chm_fix" to enable dcache in user mode only
+; to avoid cpu bug.
+
+	.iif ndf vms_chm_fix, vms_chm_fix = 0	; If set, enable D-Cache in 
+	.iif ne vms_chm_fix, hw_rei_chm_count = 0 ; user mode only.
+	.iif ne vms_chm_fix, hw_rei_stall_chm_count = 0
+	.iif ndf enable_p4_fixups, enable_p4_fixups = 0
+					; If set, do EV5 Pass 4 fixups
+	.iif eq	vms_chm_fix, enable_p4_fixups = 0
+					; Only allow fixups if fix enabled
+	.iif ndf build_fixed_image, build_fixed_image = 0
+
+	.macro hw_rei_chm
+	.iif eq vms_chm_fix, hw_rei
+	.if ne vms_chm_fix
+	hw_rei_chm_count = hw_rei_chm_count + 1
+	p4_fixup$label	\hw_rei_chm_count
+	.iif eq build_fixed_image,	br	r31, hw_rei_change_mode
+	.iif ne build_fixed_image,	hw_rei
+	.endc
+	.endm
+
+; multiprocessor support can be enabled for a max of n processors by
+; setting the following to the number of processors on the system.
+; Note that this is really the max cpuid.
+
+	.if ndf max_cpuid 
+		max_cpuid  = 8
+	.endc
+        .if ndf svmin			; platform specific palcode version number
+		svmin= 0
+	.endc
+
+	pal$version_h = < <max_cpuid@16> ! <svmin@0>>
+
+
+.mcall ldqp,stqp,align_page		; get these macros from ev5 macro library
+
+
+	.psect	$pal,mix
+pal$base::
+        current_block_base = . - pal$base	
+
+.sbttl	"RESET	-  Reset Trap Entry Point"
+
+;+
+; RESET - offset 0000
+; Entry:
+;	Vectored into via hardware trap on reset.
+;
+;	r0 = whami
+;	r1 = pal_base
+;	r2 = base of scratch area
+;	r3 = halt code
+;
+; Function:
+;
+;-
+
+TRAP$RESET:
+	nop
+   .if ne beh_model ! nonzero_console_base
+	br	r1, sys$reset		; Use r1 to compute PAL_BASE
+   .iff
+	br	r31, sys$reset
+   .endc
+
+	.long pal$version_l		; <pal_type@16> ! <vmaj@8> ! <vmin@0>
+	.long pal$version_h		; <max_cpuid@16> ! <lvmin@0>
+	.long 0
+	.long 0
+pal$impure_start::
+	.quad 0
+pal$debug_ptr::
+	.quad 0				; reserved for debug pointer ; 20
+   .if eq beh_model
+	.if ne	enable_p4_fixups
+	.quad 0
+	.long p4_fixup$hw_rei_fixup_table		; pal_base + 30
+	.endc
+   .iff
+	.quad 0				; 
+	.quad 0	;0x0030
+	.quad 0
+	.quad 0 ;0x0040
+	.quad 0
+	.quad 0 ;0x0050
+	.quad 0								
+	.quad 0 ;0x0060
+	.quad 0
+pal$enter_cns_address:
+	.quad 0				;0x0070 -- address to jump to from enter_console
+	.long <<sys$exit_console-pal$base>+1>      ;0x0078 -- offset to sys$exit_console (set palmode bit)
+   .endc
+
+	align_trap_entry
+
+.sbttl	"IACCVIO- Istream Access Violation Trap Entry Point"
+
+;+
+; IACCVIO - offset 0080
+; Entry:
+;	Vectored into via hardware trap on Istream access violation or sign check error on PC.
+;
+; Function:
+;       Prepare to take an Access Violation exception via POST_KM_TRAP_UPDATE_R45
+;       r12 <- exc_addr
+;       r13 <- SCB offset
+;       r14 <- Memory Management Flags
+;       r25 <- VA
+;
+;-
+
+TRAP$IACCVIO:
+	lda	r13, scb$v_acv(r31)	; Get offset for access violation trap
+	mfpr	r12, exc_addr		; Get fault PC
+
+	lda	r14, 1(r31)		; MMflag = 1 (faulting I-fetch)
+	nop
+
+	bis	r12, r31, r25		; Fault VA = PC
+	br	r31, POST_KM_TRAP_UPDATE_R45	; Go build stack frame and vector back to software
+	
+
+	align_trap_entry
+
+.sbttl	"INTERRUPT- Interrupt Trap Entry Point"
+
+;+
+; INTERRUPT - offset 0100
+; Entry:
+;	Vectored into via hardware trap on interrupt - hardware, software, and AST
+;
+; Function:
+;
+;-
+
+TRAP$INTERRUPT:
+	mfpr	r14, ev5$_intid			; Fetch level of interruptor
+	mfpr	r8, ev5$_isr			; Fetch interrupt summary register
+	
+	srl	r8, #isr$v_hlt, r9		; Get HLT bit
+	mfpr	r13, ev5$_ipl			; Fetch current level
+
+	sll	r14, #4, r10			; Index into SCB table
+	blbs	r9, sys$halt_interrupt
+	
+	cmple	r14, r13, r25			; R25 = 1 if intid .less than or eql. ipl
+	bne	r25, sys$passive_release	; Passive release is current rupt is lt or eq ipl
+	
+	cmplt	r14, #16, r25			; R25 = 1 if intid .lt. 16 (sw or ast)
+	beq	r25, sys$hw_interrupt
+						; Software or AST interrupt
+	cmpeq	r14, #2, r25			; Check for AST level
+	bne	r25, check_for_ast
+
+INTERRUPT_NOT_AST:
+	lda	r25, scb$v_sw0(r31)			
+	mtpr	r14, pt7			; Stash new IPL for PAL$POST_INTERRUPT
+	
+	addq	r10, r25, r13			; Get SCB offset for PAL$POST_INTERRUPT
+	mfpr	r12, exc_addr			; Get SavedPC for PAL$POST_INTERRUPT
+	
+	bis	r31, #<1@PS$V_IP>, r25		; Get a 1 in IP position.
+	mtpr	r4, pt0				; Save R4 for POST_INTERRUPT
+	
+	addq	r14, #<<sirr$v_sirr>-1>, r14	; Add offset into SIRR
+	mtpr	r25, pt8			; Save new PS<IP>
+
+	bis	r31, #1, r8			; Get a 1
+	mfpr	r25, ev5$_sirr			; get old SIRR
+
+	sll	r8, r14, r8			; Move a 1 into clear position
+	bic	r25, r8, r8			; ACK the interrupt
+
+	mtpr	r8, ev5$_sirr			; write the new SIRR
+	br	r31, PAL$POST_INTERRUPT
+
+	align_trap_entry
+
+.sbttl	"ITBMISS- Istream TBmiss Trap Entry Point"
+
+;+
+; ITBMISS - offset 0180
+; Entry:
+;	Vectored into via hardware trap on Istream translation buffer miss.
+;
+; Function:
+;       Do a virtual fetch of the PTE, and fill the ITB if the PTE is valid.
+;       Can trap into DTBMISS_DOUBLE.
+;       This routine can use the PALshadow registers r8, r9, and r10
+;	
+;-
+
+TRAP$ITBMISS:
+	nop
+        mfpr	r8, ev5$_ifault_va_form ; Get virtual address of PTE.  E1.
+	
+	nop
+        mfpr    r10, exc_addr           ; Get PC of faulting instruction in case of DTBmiss.  E1.
+	
+pal$itb_ldq:
+        ld_vpte r8, 0(r8)             	; Get PTE, traps to DTBMISS_DOUBLE in case of TBmiss
+	mtpr	r10, exc_addr		; Restore exc_address if there was a trap.
+	
+	mfpr	r31, ev5$_va		; Unlock VA in case there was a double miss
+        mfpr    r9, pt_ptbr
+
+        and     r8, #<pte$m_foe ! pte$m_v>, r25         ; Isolate FOE and Valid bits
+	.if eq real_mm
+	 br	itbmiss_1to1
+	.else
+	  .if ne enable_physical_console
+            blbs    r9, itbmiss_1to1	; do 1-to-1 mapping if flag set
+	  .else
+	    nop
+	  .endc
+	.endc
+
+        cmpeq   r25, #pte$m_v, r25                      ; FOE should be clear, valid bit set
+        beq     r25, INVALID_OR_FOE_IPTE_HANDLER        ; if not, go to fault handler
+                                                        ; cmpeq into branch has 0 latency!
+	nop
+	mtpr	r8, ev5$_itb_pte	; Ibox remembers the VA, load the PTE into the ITB. E1.
+
+	hw_rei_stall			; Can ignore shadow write rule due to hw_rei_stall.
+	
+itbmiss_1to1:				; 1-to-1 mapping
+        srl     r10, #page_offset_size_bits, r9
+	.if ne	gamma_system ! nonzero_console_base
+	;
+	; Gamma needs to (potentially) diddle with the PFN here...
+	;
+	br	r31, system_itbmiss_1to1
+system_itbmiss_1to1_ret:
+	.endc
+        sll     r9, #32, r9
+
+
+        lda     r9, ^x7F01(r9)          ; Make PTE, V set, all RE set, all but UWE set
+        mtpr    r9, itb_pte             ;
+
+        hw_rei_stall                    ; Nital says I don't have to obey shadow wait rule here.
+    
+
+	align_trap_entry
+
+
+.sbttl	"DTBMISS_SINGLE	- Dstream Single TBmiss Trap Entry Point"
+
+;+
+; DTBMISS_SINGLE - offset 0200
+; Entry:
+;	Vectored into via hardware trap on Dstream single translation buffer miss.
+;
+; Function:
+;	Do a virtual fetch of the PTE, and fill the DTB if the PTE is valid.
+;	Can trap into DTBMISS_DOUBLE.
+;	This routine can use the PALshadow registers r8, r9, and r10
+;-
+
+TRAP$DTBMISS_SINGLE:
+        mfpr	r8, ev5$_va_form      	; Get virtual address of PTE - 1 cycle delay.  E0.
+        mfpr    r10, exc_addr           ; Get PC of faulting instruction in case of error.  E1.
+
+; This code is used for console test purposes to check for uninitialized
+; pointer references to the "global stack" (address 0).  Enabling this
+; instruction will cause the console to take an unexpected ACCVIO, providing
+; the PC of the offending reference.  Any access to the first page of physical
+; memory will be detected.  This assumes that, when running the console, the
+; MVPTBR has been written to a value of 0.
+.if ne	console_protect_pfn0
+;	beq	r8, TRAP$IACCVIO	; generic case
+	beq	r8, check_pfn0		; Turbo can enable/disable via CSERVE
+return_pfn0_check:
+.endc
+
+        mfpr    r9, ev5$_mm_stat	; Get read/write bit.  E0. 
+	mtpr	r10, pt6		; Stash exc_addr away
+
+pal$dtb_ldq:
+        ld_vpte r8, 0(r8)             	; Get PTE, traps to DTBMISS_DOUBLE in case of TBmiss
+	mfpr	r9, pt_ptbr
+	
+	mfpr	r10, ev5$_va            ; Get original faulting VA for TB load.  E0.	
+	.if eq real_mm
+	 br	dtbmiss_1to1
+	.else
+	  .if ne enable_physical_console
+            blbs    r9, dtbmiss_1to1	; do 1-to-1 mapping if flag set
+	  .else
+	    nop
+	  .endc
+	.endc
+
+        mtpr    r8, ev5$_dtb_pte       	; Write DTB PTE part.   E0.
+        blbc    r8, INVALID_DPTE_HANDLER    ; Handle invalid PTE
+	
+        mtpr    r10, ev5$_dtb_tag      	; Write DTB TAG part, completes DTB load.  No virt ref for 3 cycles.
+	mfpr	r10, pt6
+
+					; Following 2 instructions take 2 cycles
+        mtpr    r10, exc_addr           ; Return linkage in case we trapped.  
+	mfpr	r31,  pt0		; Pad the write to dtb_tag
+
+        hw_rei                          ; Done, return
+
+dtbmiss_1to1:
+					; Simple 1-1 va->pa mapping
+	mfpr 	r8, va			; 
+	srl	r8, #page_offset_size_bits, r9
+	.if ne	gamma_system ! nonzero_console_base
+	;
+	; Gamma needs to (potentially) diddle with the PFN here...
+	;
+	br	r31, system_dtbmiss_1to1
+system_dtbmiss_1to1_ret:
+	.endc
+
+	sll	r9, #32, r9
+	lda	r10, ^xFF01(r31)	; Make PTE, V set, all RE and WE set
+	
+	zapnot	r10, #3, r10
+	or	r9, r10, r9
+
+	mtpr	r9, ev5$_dtb_pte		; 
+	nop				; 
+	
+	
+	mtpr	r8, ev5$_dtb_tag		;  Write DTB TAG part, completes DTB load.  No virt ref for 3 cycles.
+	mfpr	r10, pt6
+
+                                        ; Following 2 instructions take 2 cycles
+        mtpr    r10, exc_addr           ; Return linkage in case we trapped.  
+        mfpr    r31,  pt0               ; Pad the write to dtb_tag & exc_addr
+
+	hw_rei
+
+
+	align_trap_entry
+
+
+.sbttl	"DTBMISS_DOUBLE	- Dstream Double TBmiss Trap Entry Point"
+
+;+
+; DTBMISS_DOUBLE - offset 0280
+; Entry:
+;	Vectored into via hardware trap on Double TBmiss from single miss flows.
+;
+;	r8   - faulting VA
+;	r9   - original MMstat
+;	pt6 - original exc_addr
+;	VA IPR - locked with original faulting VA
+;
+; Function:
+; 	Get PTE, if valid load TB and return.
+;	If not valid then take TNV/ACV exception.
+;
+;	pt4 and pt5 are reserved for this flow.
+;
+;-
+
+TRAP$DTBMISS_DOUBLE:
+	.if ne ldvpte_bug_fix
+	mtpr 	r8, pt4			; save r8 to do exc_addr check
+	mfpr	r8, exc_addr
+
+	blbc	r8, TRAP$DTBMISS_SINGLE	;if not in palmode, should be in the single routine, dummy!
+	mfpr	r8, pt4			; restore r8
+	.endc
+
+	mtpr	r22, pt5		; Get some scratch space. E1.
+
+					; Due to virtual scheme, we can skip the first lookup and go
+					; right to fetch of level 2 PTE
+	sll     r8, #<64-<<2*page_seg_size_bits>+page_offset_size_bits>>, r22  ; Clean off upper bits of VA
+
+	mtpr	r21, pt4		; Get some scratch space. E1.
+	srl    	r22, #<61-page_seg_size_bits>, r22 ; Get Va<seg1>*8
+
+	mfpr	r21, pt_ptbr		; Get physical address of the page table.
+	.if eq real_mm
+	 br	do_hwrei
+	.else
+	  .if ne enable_physical_console
+            blbs    r21, do_hwrei	; do 1-to-1 mapping if flag set
+	  .else
+	    nop
+	  .endc
+	.endc
+
+	addq    r21, r22, r21           ; Index into page table for level 2 PTE.
+	sll    	r8, #<64-<<1*page_seg_size_bits>+page_offset_size_bits>>, r22  ; Clean off upper bits of VA
+
+	ldqp   	r21, 0(r21)            	; Get level 2 PTE (addr<2:0> ignored)
+	srl    	r22, #<61-page_seg_size_bits>, r22; Get Va<seg1>*8
+
+	blbc 	r21, DOUBLE_PTE_INV	; Check for Invalid PTE. 
+        srl    	r21, #32, r21           ; extract PFN from PTE
+
+	sll     r21, #page_offset_size_bits, r21; get PFN * 2^13 for add to <seg3>*8
+	addq    r21, r22, r21           ; Index into page table for level 3 PTE.
+
+	ldqp   	r21, 0(r21)            	; Get level 3 PTE (addr<2:0> ignored)
+	blbc	r21, DOUBLE_PTE_INV	; Check for invalid PTE.
+	
+	mtpr	r21, ev5$_dtb_pte	; Write the PTE.  E0.
+	mfpr	r22, pt5		; Restore scratch register
+	
+	mtpr	r8, ev5$_dtb_tag	; Write the TAG. E0.  No virtual references in subsequent 3 cycles.
+
+return_1to1:
+	mfpr	r21, pt4		; Restore scratch register
+
+	mfpr	r31, pt0		; Pad write to tag.  cycle 1
+	mfpr	r31, pt0		;   "		     cycle 2
+
+	hw_rei				;		     cycle 3
+
+do_hwrei:				; finish 1-to-1 mapping code
+	mfpr	r21, exc_addr
+	addq	r21, #4, r21
+	mtpr	r21, exc_addr
+	mfpr	r22, pt5
+	br	r31, return_1to1
+
+	align_trap_entry
+
+.sbttl	"UNALIGN -- Dstream unalign trap"
+;+
+; UNALIGN - offset 0300
+; Entry:
+;	Vectored into via hardware trap on unaligned Dstream reference.
+;
+; Function:
+;
+;       Prepare to take an unaligned exception via POST_KM_TRAP_UPDATE_R45
+;       r12 <- SavePC
+;       r13 <- SCB offset
+;       r14 <- Memory Management Flags
+;       r25 <- VA
+;-
+
+TRAP$UNALIGN:
+  	mtpr	r2, pt2			; Stash R2
+	mfpr	r2, ev5$_exc_addr	; Get exception address. E1.
+
+	blbs	r2, una_from_pal	; Unaligned in PAL. 
+	mfpr	r25, pal_base
+	
+	nop
+	mtpr	r3, pt12			; Stash R3
+	
+	mfpr	r14, ev5$_mm_stat	; Get Mbox status register. E0.
+	sget_addr r25, <<unaligned_dfault-pal$base>>, r31, verify=0  ; Trap catcher address
+
+	srl	r14, #mm_stat$v_opcode, r13	; Get Opcode
+	mtpr	r25, pt_trap		; Save trap catcher address
+
+	mfpr	r25, ev5$_va		; Get the virtual address.  Unlock VA and MMSTAT.  E0.
+	and	r13, #^b1010, r8	; No danger of TBmiss here.
+	
+	cmpeq	r8, #^b1010, r8		; Look for integer _C or _L
+	bne	r8, ILLEGAL_UNALIGNED_OPCODE
+
+	mtpr	r2, pt0
+	blbs	r14, UNALIGNED_STORE	; Use mmstat rd/write bit to look for store.
+
+	;;; Code for dismissing unalign trap on Load to R31/F31
+	; Not a store, so must be a LOAD
+	srl	r14, #mm_stat$v_ra, r8	; get Ra to bottom  (ok to use R8 - no tbmiss)
+	and	r8, #^x1F, r8		; isolate ra
+
+	cmpeq	r8, #^x1F, r8		; check for R31/F31
+	bne	r8, UNALIGN_LDR31_ERR ; OK, itsa load to r31 or f31 -- dismiss the fault
+	;;; end of code for dismissing unalign trap on Load to R31/F31
+
+	ldq_u	r12, (r25)		; First half of the load.  Could trap!
+	blbc	r13, UNALIGNED_LDL
+
+UNALIGNED_LDQ:
+	ldq_u	r13, 7(r25)		; 2nd half. Could trap!
+	extql	r12, r25, r12		; Mask
+
+	extqh	r13, r25, r13
+	or	r12, r13, r12		; Combine 2 halves
+	
+	nop
+	br	r31, UNALIGNED_LD_CONT
+
+	align_trap_entry
+
+
+.sbttl	"DFAULT	- Dstream Fault Trap Entry Point"
+
+;+
+; DFAULT - offset 0380
+; Entry:
+;	Vectored into via hardware trap on dstream fault or sign check error on DVA.
+;
+; Function:
+;       Prepare to take an Access Violation, FOR, or FOW exception via POST_KM_TRAP_UPDATE_R45
+;       r12 <- exc_addr
+;       r13 <- SCB offset
+;       r14 <- Memory Management Flags
+;       r25 <- VA
+;
+; Access violation takes precedence over FOR and FOW.
+;
+; If dfault while in pal, we exit to DFAULT_IN_PAL
+; If access was a fetch(m) or load to F31/R31, we exit to DFAULT_FETCH_LDR31_ERR
+;
+;-
+
+TRAP$DFAULT:
+					; OK to use TBmiss PALshadows here - no danger of TBmiss.
+	mfpr	r9, ev5$_mm_stat	; Get Mbox status register. E0.
+	mtpr	r12, pt5		; Stash old R12 in case fault in pal
+
+	mfpr	r12, ev5$_exc_addr	; Get exception address. E1.
+	blbs	r12, DFAULT_IN_PAL		
+
+					; Dfault in native mode.  PALshadows available.
+	srl	r9, #mm_stat$v_opcode, r14 	; Shift faulting opcode to bottom bits.	
+	srl	r9, #mm_stat$v_ra, r13	; shift rnum to bottom bits
+
+	mfpr	r25, ev5$_va		; Get the virtual address.  Unlock VA and MMSTAT.
+	and	r14, #mm_stat$m_opcode, r14 	; Clean undefined bits of faulting opcode.
+
+	cmpeq	r14, #EVX$OPC_SYNC, r14	; Is the opcode fetch/fetchm?
+	bne	r14, DFAULT_FETCH_LDR31_ERR	; Yes, dismiss the fault
+	
+	;  if detect load to f31 or r31, dismiss the exception
+	blbs	r9,  DFAULT_NO_DISMISS	; mm_stat<0> set if itsa store or fetch_m.
+
+					; not a store or fetch -- must be a load
+	and	r13, #^x1F, r13		; isolate ra
+
+	cmpeq	r13, #^x1F, r13		; check for R31/F31
+	bne	r13, DFAULT_FETCH_LDR31_ERR	; OK, itsa load to r31 or f31 -- dismiss the fault
+
+DFAULT_NO_DISMISS:
+	lda	r13, scb$v_fow(r31)	; Assume FOW
+        and     r9, #<1@mm_stat$v_for>, r8 ; Isolate FOR bit.
+
+	cmovne	r8, #scb$v_for, r13	; Switch to FOR vector, if necessary
+	and	r9, #<1@mm_stat$v_acv>, r8	; Isolate ACV bit.
+
+	mtpr	r25, ev5$_dtb_is	; Invalidate the bad TB entry (necessary for FOR and FOW)
+	cmovne	r8, #scb$v_acv, r13	; Switch to ACV vector, if necessary
+	
+	sll	r9, #63, r14		; Move read/write bit to MMF position
+	br	r31, POST_KM_TRAP_UPDATE_R45 ; Go build stack frame and vector back to software
+
+	
+
+	align_trap_entry
+
+
+.sbttl	"MCHK	-  Machine Check Trap Entry Point"
+
+;+
+; MCHK - offset 0400
+; Entry:
+;	Vectored into via hardware trap on machine check.
+;
+; Function:
+;
+;-
+
+TRAP$MCHK:
+	mtpr	r31, ic_flush_ctl	; Flush the Icache
+	br	r31, sys$machine_check
+
+	align_trap_entry
+
+
+.sbttl	"OPCDEC	-  Illegal Opcode Trap Entry Point"
+
+;+
+; OPCDEC - offset 0480
+; Entry:
+;	Vectored into via hardware trap on illegal opcode.
+;
+; Function:
+;       Prepare to take an Illegal instruction exception via POST_KM_TRAP
+;       r12 <- exc_addr
+;       r13 <- SCB offset
+;
+;-
+
+TRAP$OPCDEC:
+	nop
+	mfpr	r12, exc_addr		; Get exc_addr - E1
+
+	.if ne	byte_word_emulation
+	blbs	r12, 1$			; Branch if in PALmode
+	mfpr	r13, pt_ptbr		; Get PTBR
+	blbc	r13, 1$			; Branch if not in console mode
+	ldl	r13, (r12)		; Get faulting instruction
+	srl	r13, #26, r14		; Extract opcode
+	and	r14, #63, r14		;
+	subq	r14, #10, r25		; Check for LDBU
+	beq	r25, bw_ldbu		; Branch if so
+	subq	r14, #14, r25		; Check for STB
+	beq	r25, bw_stb		; Branch if so
+	subq	r14, #12, r25		; Check for LDWU
+	beq	r25, bw_ldwu		; Branch if so
+	subq	r14, #13, r25		; Check for STW
+	beq	r25, bw_stw		; Branch if so
+	subq	r14, #28, r25		; Check for SEXTx
+	bne	r25, 1$			; Branch if not
+	srl	r13, #5, r14		; Extract function
+	and	r14, #127, r14		;
+	subq	r14, #0, r25		; Check for SEXTB
+	beq	r25, bw_sextb		; Branch if so
+	subq	r14, #1, r25		; Check for SEXTW
+	beq	r25, bw_sextw		; Branch if so
+1$:	mtpr	r12, exc_addr		; Restore EXC_ADDR
+	.endc
+
+	lda	r13, scb$v_opcdec(r31)	; Get SCB vector
+	blbs	r12, pal$pal_bug_check	; Machine check if OPCDEC is in PAL
+
+	addq	r12, #4, r12		; SavePC is next PC
+	br	r31, POST_KM_TRAP	; Post the exception
+
+
+
+	align_trap_entry
+
+
+.sbttl	"ARITH	-  Arithmetic Exception Trap Entry Point"
+
+;+
+; ARITH - offset 0500
+; Entry:
+;	Vectored into via hardware trap on arithmetic excpetion.
+;
+; Function:
+;	Prepare to take an Arithmetic exception via POST_KM_TRAP_UPDATE_R45
+;	r12 <- SavePC
+;	r13 <- SCB offset
+;	r14 <- exc_summary
+;	r25 <- Register Write Mask
+;
+;-
+
+TRAP$ARITH:
+					; No mf exc_sum or exc_mask in first 2 cycles of flow
+	lda	r13, scb$v_arith(r31)	; Get offset for arith trap
+	nop
+	
+	mfpr	r31, ev5$_va		; Unlock VA in case there was also a MM problem.
+	mfpr	r12, exc_addr		; Get fault PC
+	
+	nop
+	mfpr	r14, ev5$_exc_sum	; Get exception summary IPR - E1
+	
+	srl	r14, exc_sum$v_swc ,r14 ; Get exception summary to SRM position
+	mfpr	r25, ev5$_exc_mask	; Get exception register mask IPR - E1
+	
+	nop
+	mtpr	r31, ev5$_exc_sum	; Unlock exc_sum and exc_mask
+
+	nop
+	blbs	r12, pal$pal_bug_check	; Machine check if arith fault in PALmode
+
+	nop
+	br	r31, POST_KM_TRAP_UPDATE_R45	; Go build stack frame and vector back to software
+
+	align_trap_entry
+
+
+
+.sbttl	"FEN	-  Illegal Floating Point Operation Trap Entry Point"
+
+;+
+; FEN - offset 0580
+; Entry:
+;	Vectored into via hardware trap on illegal FP op.
+;
+; Function:
+;       prepare to take a Floating disabled exception via POST_KM_TRAP
+;
+;       r12 <- exc_addr
+;       r13 <- SCB offset
+;
+;-
+
+TRAP$FEN:
+	nop
+	mfpr	r14, ev5$_icsr		; Get ICSR. E1
+
+	srl	r14, #icsr$v_fpe, r14	; Shift FP enable to bit 0
+	mfpr	r12, exc_addr		; Get SavePC. E1.
+	
+	lda	r13, scb$v_opcdec(r31)	; Set OPCDEC SCB vector
+	blbs	r12, pal$pal_bug_check	; Machine check if FEN within PAL
+	
+	nop
+	blbs	r14, fen_to_opcdec	; If FP is enabled, this is really an OPCDEC
+
+	lda	r13, scb$v_fen(r31)	; Get FEN SCB vector
+	br	r31, POST_KM_TRAP	; Post the FEN exception
+
+fen_to_opcdec:
+
+	addq	r12, #4, r12		; SavePC is next PC
+        br      r31, POST_KM_TRAP       ; Post the OPCDEC exception
+	
+
+.sbttl	"SWPCTX_CONTINUE"
+						; Start area for misc code.
+
+
+	align_block
+;+
+;
+;SWPCTX_CONTINUE
+;
+;	Continuation of SWPCTX code
+;	Current state:		(R8, R9, R10 are available as there is no chance of TBmiss, D or I)
+;		R0	new PCC (pending load)
+;		R1	
+;		R8	new PTBR (pending load)
+;		R9	new ASN (pending load)
+;		R10	new AST (pending load)
+;		R12	new FEN/PME/DAT (pending load)
+;		R13	combined old ASTSR/ASTEN
+;		R14	new KSP (pending load)
+;		R25	icsr$fpe bit set
+;		R16	new PCBB
+;		pt0	R0
+;		pt1	R1
+;
+;-
+SWPCTX_CONTINUE:
+.if eq ev5_p1
+	lda	r25, 1@icsr$v_pmp(r25)	; set icsr<pmp> too
+.iff
+	nop				; needed to get things to issue properly
+.endc
+	mfpr	r1, ev5$_icsr		; Fetch ICSR for new FEN - E1
+
+	bic	r1, r25, r1		; ICSR with FPE clean 
+	and 	r12, #1, r25		; isolate FPE bit.
+
+	sll	r25, #icsr$v_fpe, r25	; Get new FPE into position
+	sll	r8, #page_offset_size_bits, r8 ; Move PTBR into internal position.
+
+.if ne ev5_p1	
+	bis	r25, r1, r25		; New ICSR
+	get_impure r1			; get impure pointer
+
+	fix_impure_ipr r1		; adjust impure pointer
+	mtpr	r25, ev5$_icsr		; Write new ICSR.  
+
+	restore_reg1 pmctr_ctl, r1, r1, ipr=1	; "ldqp" - get pmctr_ctl bits
+	srl	r10, #4, r25
+
+	pvc$violate 379			; write to paltemp in shadow of ldqp -- danger of replay trap only.
+					;    ok if no read of same paltemp in same shadow.
+	mtpr	r8, pt_ptbr		; Store new PTBR - E1
+	sll	r9, dtb_asn$v_asn, r8	; ASN in Mbox position
+
+	mtpr	r10, ev5$_aster		; Write new AST enable register - E1
+.iff
+
+	bis	r25, r1, r1
+	srl	r12, #pcb$v_pme, r25	; move pme bit to lsb
+
+	and	r25, #1, r25		; isolate pme bit
+	mtpr	r8, pt_ptbr		; Store new PTBR - E1
+
+	sll	r25, #icsr$v_pmp, r25	; move to icsr pmp position
+	nop
+
+	bis     r25, r1, r1		; create new icsr
+	sll	r9, dtb_asn$v_asn, r8	; ASN in Mbox position
+
+	srl	r10, #4, r25
+	mtpr	r10, ev5$_aster		; Write new AST enable register - E1
+
+	mtpr	r1, ev5$_icsr           ; Write new ICSR.
+.endc
+	mtpr	r8, ev5$_dtb_asn	; E0.  Update DTB ASN.  No Mbox instruction current or next 3 cycles.
+
+	mtpr	r25, ev5$_astrr		; Write new AST request register - E1
+	rpcc	r25			; Get current cycle counter  - E0
+
+
+
+;	Current state:		(R8, R9, R10 are available as there is no chance of TBmiss, D or I)
+;		R0	new PCC (pending load)
+;		R1	PMCTR_CTL register bits (pass1); available  pass2
+;		R8	available
+;		R9	new ASN 
+;		R10	available
+;		R12	FEN/PME/DAT
+;		R13	combined old ASTSR/ASTEN
+;		R14	new KSP (pending load)
+;		R25	RPCC
+;		R16	new PCBB
+;		pt0	R0
+;		pt1	R1
+
+
+.if ne ev5_p1
+	blbc	r1, no_pm_change		; if monitoring all processes -- no need to change pm 
+	; otherwise, monitoring select processes - update pm
+	srl	r12, pcb$v_pme, r12		; get pme down to bit 0
+
+	lda	r8, ^x3F(r31)
+	cmovlbc	r12, r31, r1			; if pme set, disable counters, otherwise use saved encodings
+
+	sll	r8, pmctr$v_ctl2, r8		; create ctl field bit mask
+	mfpr	r12, ev5$_pmctr
+
+	and	r1, r8, r1			; mask new ctl value
+	bic	r12, r8, r12			; clear ctl field in pmctr
+
+	or	r1, r12, r1
+	nop
+
+	mtpr	r1, ev5$_pmctr
+no_pm_change:
+.endc
+	srl	r25, #32, r10		; upper longword of PCC (tmp3)
+
+	zap	r0, #^xF0, r0		; zext bottom longword of new PCC (tmp4)
+	zap	r25, #^xF0, r25		; zext bottom longword of PCC (tmp2)
+
+	subq	r0, r25, r0		; tmp4 - tmp2
+	sll	r9, itb_asn$v_asn, r8	; ASN in Ibox position
+
+	sll	r0, #32, r0		; Get PCC to upper longword
+	mtpr	r8, ev5$_itb_asn	; E1.  Update ITB ASN.  No hw_rei for 5 cycles. 
+
+	mtpr	r0, ev5$_cc		; E0.  No RPCC in current & next 2 cycles.
+	mfpr	r1, pt1			; restore R1 - E1
+
+	addq	r25, r10, r10		; tmp2 + tmp3
+	mfpr	r25, pt_pcbb		; Get current PCBB - E1
+
+	stlp	r10, pcb$q_cc(r25)	; Save current PCC info
+	mfpr	r0, pt0			; restore R0 - E1
+
+	stqp	r30, pcb$q_ksp(r25)	; Save current KSP
+	pvc$violate  379		; ok to write ipr in shadow of stxp since replay trap only & no mf same ipr in same shadow
+	mtpr	r16, pt_pcbb		; Stash new PCBB
+
+	stqp	r13, pcb$q_ast(r25)	; Save current AST info
+	bis	r14, r14, sp		; New SP
+
+.if ne	vms_chm_fix
+	p4_fixup$hw_rei_stall		; removes this section for Pass 4 by placing a hw_rei_stall here
+
+.if ne build_fixed_image
+	hw_rei_stall
+.iff
+	mfpr	r31, pt0		; pad to separate mt/mf pt_pcbb
+.endc
+	mfpr	r31, pt0		; pad to separate mt/mf pt_pcbb
+
+	mfpr	r9, pt_pcbb		; get FEN
+	ldqp	r9, pcb$q_fen(r9)
+	blbc	r9, 10$			; skip if FEN disabled
+
+	mb				; ensure no outstanding fills					
+	lda r12, <1@dc_mode$v_dc_ena>(r31)
+	mtpr	r12, dc_mode		; turn dcache on so we can flush it
+	nop				; force correct slotting
+	mfpr	r31, pt0		; no mbox instructions in 1,2,3,4
+	mfpr	r31, pt0		; no mbox instructions in 1,2,3,4
+	mfpr	r31, pt0		; no mbox instructions in 1,2,3,4
+	mfpr	r31, pt0		; no mbox instructions in 1,2,3,4
+
+	lda	r8, 0(r31)		; flood the dcache with junk data
+5$:	ldqp	r31, 0(r8)			
+	lda	r8, ^x20(r8)		; touch each cache block
+	srl	r8, #13, r9
+	blbc	r9, 5$	
+
+	mb				; ensure no outstanding fills
+	mtpr	r31, dc_mode		; turn the dcache back off
+	nop				; force correct slotting
+	mfpr	r31, pt0		; no hw_rei_stall in 0,1
+.endc
+
+10$:	hw_rei_stall			; Need _stall cuz itb asn written
+
+
+
+
+	align_block
+.sbttl	"REI_FROM_NONKERN "
+;+
+;
+;REI_FROM_NONKERN - REI, current mode is not kernel
+;Current state:	
+; r14 - stack alignment check
+; r12, r13, r25 - available
+;
+;-
+
+REI_FROM_NONKERN:
+	lda	r25, ^x3f(r31)          ; Build cleaning mask
+        bne     r14, REI_STACK_UNALIGNED ; Error, sp align fault
+
+        mfpr    r12, exc_addr           ; Get the address of the REI, in case of fault - E1
+
+pal$rei_ldq2:
+                                        ; Start to read from frame.  If the next load passes translation
+                                        ; checks, then we know that the entire frame is ok, and further
+                                        ; frame reads will TBhit.  
+        ldq   	r13, FRM$V_PS(sp)       ; Get new PS, end of frame
+
+	ldq	r9, FRM$V_PC(sp)	; Get new PC.  OK to use R9 - No tbmiss
+	bis	r13, r31, r8
+
+pal$rei_stqc1:
+	stq_c	r8, FRM$V_PS(sp)	; Clear lock flag - E0. 
+	sll	r25, #ps$v_sp, r25	; Shift to SP align position
+
+	and	r13, #ps$m_cm, r14	; Clean out all but new mode in new PS
+	lda	r25, <ps$m_cm!ps$m_sw>(r25) ; Now have mask to clear out sw, cm, and sp
+
+	cmplt	r14, r11, r3		; Check new mode less priv than current mode
+	bic	r13, r25, r5		; Clean out sw, cm, and sp bits
+
+	bne	r3, REI_ILLEGAL_OP	; Priv problem - post error
+        ldq	r2, FRM$V_R2(sp)        ; Restore R2, beginning of frame.
+
+	bne	r5, REI_ILLEGAL_OP	; PS problem - post error
+	ldq	r3, FRM$V_R3(sp)	; Restore R3
+
+	ldq	r4, FRM$V_R4(sp)	; Restore R4
+	ldq	r5, FRM$V_R5(sp)	; Restore R5
+
+	ldq	r6, FRM$V_R6(sp)        ; Restore R6
+        extbl   r13, <ps$v_ipl/8>, r25  ; Get new IPL
+
+	mfpr	r12, pt_pcbb		; Get PCBB - E1
+        extbl   r13, #<ps$v_sp/8>, r8   ; Get ps<sp_align> bits.  OK to use R8, no TBmiss
+
+        mtpr    r25, ev5$_ipl           ; Set new IPL     - E1
+	lda	r25, 64(sp)		; Find stack pointer beyond the frame
+
+	addq	r12, r11, r7		; Point to old SP in HWPCB (this works because stack pointers are first 4 
+					; quadwords in HWPCB, and PS<CM> is in bits <4:3>)	
+	or	r8, r25, r25		; Adjust stack pointer by sp_align
+
+	addq	r12, r14, r8		; Point to new SP in HWPCB (this works because PS<CM> is in bits <4:3>)
+	stqp	r25, PCB$Q_KSP(r7)	; Save old SP in HWPCB
+
+        bis     r14, r31, r11           ; Set PALshadow current mode to new current mode
+	ldq	r7, FRM$V_R7(sp)        ; Restore R7
+
+        and     r13, <ps$m_sw+ps$m_vmm+ps$m_ip>, r25 ; Get just PS SW bits
+	pvc$violate 354			; ldq from stack should not trap after first
+	mtpr	r13, ev5$_ps		; Set Ibox current mode to new current mode (bit positions match) - E1.  No hw_rei
+					; for 2 cycles.  Violation?
+
+	bic	r9, #3, r9		; Clean new PC
+	ldqp	r30, PCB$Q_KSP(r8)	; Read new SP from HWPCB
+
+	mtpr	r9, exc_addr		; Load new PC - E1.  1 cycle to hw_rei.
+	mtpr	r11, ev5$_dtb_cm	; Set Mbox current mode to new current mode. No virtual
+					; reference in current or next 2 cycles.
+
+	mtpr	r25, pt_ps		; Load PS PALtemp copy. - E1. 
+	rc	r31			; Clear intr_flag - E0
+        pvc$violate 238                 ; possible hidden mt-mf paltemp - ok in callpal
+.if ne	turbo_pcia_intr_fix
+        pvc$jsr check_pcia, bsr=1
+	bsr	r8, check_pcia_intr
+.endc
+
+.if eq	rawhide_system
+	hw_rei_chm			;
+.iff
+	hw_rei_rawhide			;
+.endc
+
+
+
+
+	align_block
+.sbttl	"REI_KERN_TO_KERN"
+;+
+;
+;REI_KERN_TO_KERN - REI, current mode is kernel, new mode is kernel
+;Current state:	
+; r2, r3, r4, r5, r6, r7 - popped from stack
+; r12 - exc_addr
+; r13 - new PS
+; r14 - new Current Mode in <4:3>
+; r25 - available
+;
+;-
+REI_KERN_TO_KERN:
+	ldq	r9, FRM$V_PC(sp)	; Get new PC
+	bis	r13, r31, r8
+
+pal$rei_stqc2:
+	stq_c	r8, FRM$V_PS(sp)	; Clear lock flag - E0.
+	bic	r9, #3, r10		; Clean new PC
+
+	lda	sp, 64(sp)		; Find stack pointer beyond the frame
+	mtpr	r10, exc_addr		; Load new PC - E1.  1 cycle to hw_rei.Violation?
+
+	extbl	r13, <ps$v_ipl/8>, r25	; Get new IPL
+	mtpr	r13, ev5$_ps		; Set Ibox current mode to new current mode (bit positions match) - E1.  No hw_rei
+					; for 2 cycles.
+
+	mtpr	r25, ev5$_ipl		; Set new IPL     - E1
+	and 	r13, <ps$m_sw+ps$m_vmm+ps$m_ip>, r25	; Get just PS SW bits
+
+	extbl	r13, #<ps$v_sp/8>, r14	; Get ps<sp_align> bits
+	mtpr	r25, pt_ps		; Load PS PALtemp copy. - E1.
+
+	or	r14, sp, sp		; Adjust stack pointer by sp_align	
+	rc	r31			; Clear intr_flag - E0
+
+.if ne	turbo_pcia_intr_fix
+        pvc$jsr check_pcia, bsr=1
+	bsr	r8, check_pcia_intr
+.endc
+
+.if eq	rawhide_system
+	hw_rei				;
+.iff
+	hw_rei_rawhide			;
+.endc
+
+
+.sbttl "REI_KERN_TO_NONKERN_CONT"
+	align_block
+;+
+;
+;REI_KERN_TO_NONKERN_CONT - REI, current mode is kernel, new mode is non-kernel	
+;Current state:
+; r2, r3, r4, r5, r6, r7 - popped from stack
+; r9 - new PS sp_align bits
+; r12 - exc_addr
+; r13 - new PS
+; r14 - new CM
+; r25 - available
+; IPL - not updated
+; PALshadow current mode (R11) - updated
+;
+;-
+REI_KERN_TO_NONKERN_CONT:	
+	ldq	r10, FRM$V_PC(sp)	; Get new PC	
+	mfpr	r8, pt_pcbb		; Get PCBB - E1
+
+	mtpr	r11, ev5$_alt_mode	; Set Mbox alt mode to previous mode.  No virtual
+					; reference in current or next 2 cycles.
+	addq	r8, r14, r8		; Point to new SP in HWPCB (this works because PS<CM> is in bits <4:3>)
+
+	mtpr	r14, ev5$_dtb_cm	; Set Mbox current mode to new current mode (bit positions match) - E0.  No virtual
+					; reference in current or next 2 cycles.
+	lda	r25, 64(sp)		; Find stack pointer beyond the frame
+
+	ldqp	r8, PCB$Q_KSP(r8)	; Read new SP from HWPCB
+	or	r9, r25, r25		; Adjust stack pointer by sp_align
+
+	bic	r10, #3, r9		; Clean new PC
+	pvc$violate  379		; ok to write pt in shadow of ldqp since replay trap only & no mf same pt in same shadow
+	mtpr	r25, pt_ksp		; Stash away KSP.  If stqc traps, overwritten anyway
+
+pal$rei_stqc3:
+	stqca	r10, FRM$V_PC(r30)	; Clear lock flag - E0.  
+	bis	r14, r31, r11		; Set PALshadow current mode to new current mode
+
+	and 	r13, <ps$m_sw+ps$m_vmm+ps$m_ip>, r13	; Get just PS SW bits.  Last PALshadow write.
+	mtpr	r9, exc_addr		; Load new PC - E1.  next 1 cycle no hw_rei.
+
+	bis	r8, r31, sp		; setup new SP
+	mtpr	r11, ev5$_ps		; Set Ibox current mode to new current mode (bit positions match) - E1.  
+					; No hw_rei for 2 cycles.
+	mtpr	r31, ev5$_ipl		; Set IPL = 0  - E1.
+	mtpr	r13, pt_ps		; Load PS PALtemp copy. - E1.
+
+	rc	r31			; Clear intr_flag - E0
+	pvc$violate 238                 ; possible hidden mt-mf paltemp - ok in callpal
+.if ne	turbo_pcia_intr_fix
+        pvc$jsr check_pcia, bsr=1
+	bsr	r8, check_pcia_intr
+.endc
+
+.if eq	rawhide_system
+	hw_rei_chm			;
+.iff
+	hw_rei_rawhide			;
+.endc
+
+
+
+.sbttl  "Stack Builders"
+	align_block
+;+
+;
+;POST_KM_TRAP_UPDATE_R45
+;
+; Build a stack frame on kernel mode stack called from any mode.
+; Update R4 and R5.
+; IPL is NOT changed.
+; DTB_MISS may be taken along the way.
+; 
+; Inputs:
+; r12 - savedPC
+; r13 - SCB offset
+; r14 - new r5
+; r25 - new r4
+;
+;-
+
+POST_KM_TRAP_UPDATE_R45:
+	mtpr	r31, ev5$_dtb_cm	; Set Mbox current mode to kernel - no virt ref for next 2 cycles
+	mtpr	r25, pt7		; Stash away new R4
+
+	bic	r12, #3, r12		; Clear low 2 bits of old PC -- needed????
+	mfpr	r25, pt_pcbb		; Get PCBB - E1.  
+
+	addq	r25, r11, r25		; Point to current mode SP in HWPCB
+	beq	r11, POST_TRAP_KUP_CONT	; Skip stack swap if already in kernel mode
+	
+	stqp	r30, PCB$Q_KSP(r25)	; Save old SP
+	mfpr	r30, pt_ksp		; Get Kernel SP
+	
+POST_TRAP_KUP_CONT:
+	and	sp, #63, r25		; Isolate SP unaligned bits
+	pvc$violate  379		; ok to write ipr in shadow of stqp since replay trap only & no mf same ipr in same shadow
+	mtpr	r14, pt8		; Stash away new R5.  Violation?
+
+	bic	sp, #63, sp		; Round down stack
+	mtpr	r31, ev5$_ps		; Set Ibox current mode to kernel - no hw_rei for 2 cycles
+
+					; The first store may trap (TBmiss or fault).  The subsequent stores
+					; are all to the same page, and thus won't trap.
+POST_TRAP_KUP_STORE:
+	stq	r2, <FRM$V_R2-64>(sp)	; Write R2 to the stack
+	mfpr	r14, pt_scbb		; Get SCBB
+
+	stq	r3, <FRM$V_R3-64>(sp)	; Write R3 to the stack
+	addq	r13, r14, r14		; Get address of vector in SCB
+	
+	ldqp	r2, 0(r14)		; Get SCBV - scheduled for Dcache miss
+	ldqp	r3, 8(r14)		; Get SCBP
+	
+        stq     r4, <FRM$V_R4-64>(sp)   ; Write R4 to the stack
+	mfpr	r13, pt_ps		; Get current PS
+
+        stq     r5, <FRM$V_R5-64>(sp)   ; Write R5 to the stack
+	or	r13, r11, r13		; Combine CM and SW bits for PS
+
+        stq     r6, <FRM$V_R6-64>(sp)   ; Write R6 to the stack
+	mfpr	r14, ev5$_ipl		; Fetch IPL
+	
+	sll	r14, #PS$V_IPL, r14	; Shift IPL to PS position
+	bis	r31, r31, r11		; New PALshadow current mode = 0
+
+	sll	r25, #PS$V_SP, r25	; Shift stack alignment bits to PS position
+	or	r14, r13, r14		; Get IPL into PS
+
+        stq     r7, <FRM$V_R7-64>(sp)   ; Write R7 to the stack
+	or	r14, r25, r14		; Get SP_ALIGN into PS
+
+	subq	sp, #64, sp		; Decrement stack pointer
+	mfpr	r4, pt7			; Get new R4 value - E1.
+	
+	bic	r2, #3, r2		; Clean new PC - scheduled for Dcache miss.
+        stq     r12, <FRM$V_PC>(sp)  	; Write PC to the stack
+
+	pvc$violate 354			; stq shouldn't trap: after 1st stack write, subsequent writes won't fault
+	mtpr	r31, pt_ps		; New PS<SW> = 0.  E1. 2 bubbles to next read. Violation?
+	stq	r14, <FRM$V_PS>(sp)	; Write PS to the stack.
+
+	mtpr	r2, ev5$_exc_addr	; Give Ibox new PC.  E1.  1 bubble to hw_rei.  Violation?
+	mfpr	r5, pt8			; Get new r5 value.
+	
+	hw_rei_chm
+
+
+	align_block
+;+
+;
+;POST_KM_TRAP
+;
+; Build a stack frame on kernel mode stack called from any mode.
+; IPL is NOT changed.
+; DTB_MISS may be taken on the first store.
+; 
+; Inputs:
+; r12 - savedPC
+; r13 - SCB offset
+;
+;-
+
+POST_KM_TRAP:
+	mtpr	r31, ev5$_dtb_cm	; Set Mbox current mode to kernel - no virt ref for next 2 cycles
+	mfpr	r25, pt_pcbb		; Get PCBB - E1.  
+
+	mtpr	r31, ev5$_ps		; Set Ibox current mode to kernel - no hw_rei for 2 cycles
+	addq	r25, r11, r25		; Point to current mode SP in HWPCB
+
+POST_KM_TRAP2:
+	bic	r12, #3, r12		; Clear low 2 bits of old PC -- needed??????
+	beq	r11, POST_TRAP_K_CONT	; Skip stack swap if already in kernel mode
+	
+	stqp	r30, pcb$q_ksp(r25)	; Save old SP
+	mfpr	r30, pt_ksp		; Get Kernel SP
+	
+POST_TRAP_K_CONT:
+	and	sp, #63, r25		; Isolate SP unaligned bits
+	bic	sp, #63, sp		; Round down stack
+
+					; The first store may trap (TBmiss or fault).  The subsequent stores
+					; are all to the same page, and thus won't trap.
+POST_TRAP_K_STORE:
+	stq	r2, <frm$v_r2-64>(sp)	; Write R2 to the stack
+	mfpr	r14, pt_scbb		; Get SCBB
+
+	stq	r3, <frm$v_r3-64>(sp)	; Write R3 to the stack
+	addq	r13, r14, r14		; Get address of vector in SCB
+	
+	ldqp	r2, 0(r14)		; Get SCBV - scheduled for Dcache miss
+	ldqp	r3, 8(r14)		; Get SCBP
+	
+        stq     r4, <frm$v_r4-64>(sp)   ; Write R4 to the stack
+	mfpr	r13, pt_ps		; Get current PS
+
+        stq     r5, <frm$v_r5-64>(sp)   ; Write R5 to the stack
+	or	r13, r11, r13		; Combine CM and SW bits for PS
+
+        stq     r6, <frm$v_r6-64>(sp)   ; Write R6 to the stack
+	mfpr	r14, ev5$_ipl		; Fetch IPL
+	
+	sll	r14, #ps$v_ipl, r14	; Shift IPL to PS position
+	bis	r31, r31, r11		; New PALshadow current mode = 0
+
+	sll	r25, #ps$v_sp, r25	; Shift stack alignment bits to PS position
+	or	r14, r13, r14		; Get IPL into PS
+
+        stq     r7, <frm$v_r7-64>(sp)   ; Write R7 to the stack
+	or	r14, r25, r14		; Get SP_ALIGN into PS
+
+	bic	r2, #3, r2		; Clean new PC - scheduled for Dcache miss.
+        stq     r12, <frm$v_pc-64>(sp) 	; Write PC to the stack
+
+	pvc$violate 354			; stq to stack should not trap after first
+	mtpr	r31, pt_ps		; New PS<SW> = 0.  E1. 2 bubbles to next read.  Violation?
+	stq	r14, <frm$v_ps-64>(sp)	; Write PS to the stack.
+
+	mtpr	r2, ev5$_exc_addr	; Give Ibox new PC.  E1.  1 bubble to hw_rei.  Violation?
+	subq	sp, #64, sp		; Decrement stack pointer
+
+	mfpr	r31,	pt0		; pad exc_addr write
+	hw_rei_chm
+
+
+
+	align_block
+;+
+;
+;POST_XM_TRAP
+;
+; Build a stack frame on selected mode stack called from any mode.
+; IPL is NOT changed.
+; DTB_MISS may be taken on the first store.
+; 
+; Inputs:
+; r11 - old mode
+; r12 - savedPC
+; r13 - SCB offset
+; r14 - new mode
+; r25 - result of compare of new mode & old mode
+;-
+
+POST_XM_TRAP:
+	mtpr	r30, pt1		; Stash SP in case of fault
+	bne	r25, POST_TRAP_X_CONT	
+
+	mtpr	r14, ev5$_dtb_cm	; Set Mbox current mode to new mode - no virt ref for next 2 cycles
+	mtpr	r14, ev5$_ps		; Set Ibox current mode to new mode - no hw_rei for 2 cycles
+	
+	bis	r30, r31, r9		; Stash old SP
+	mfpr	r25, pt_pcbb		; Get PCBB - E1.  
+	
+	addq	r25, r14, r8		; Point to new mode SP in HWPCB
+	addq	r25, r11, r25		; Point to current mode SP in HWPCB
+	
+	ldqp	r30, pcb$q_ksp(r8)	; Read new SP
+	stqp	r9, pcb$q_ksp(r25)	; Save old SP
+	
+					; CHMU enters here
+POST_TRAP_X_CONT:			
+
+	bic	sp, #63, r25		; Round down stack
+	bis	r14, r31, r11		; Update date current mode
+
+					; The first store may trap (TBmiss or fault).  The subsequent stores
+					; are all to the same page, and thus won't trap.
+POST_TRAP_X_STORE:
+	stq	r2, <frm$v_r2-64>(r25)	; Write R2 to the stack
+	mfpr	r14, pt_scbb		; Get SCBB
+
+	stq	r3, <frm$v_r3-64>(r25)	; Write R3 to the stack
+	addq	r13, r14, r14		; Get address of vector in SCB
+	
+	ldqp	r2, 0(r14)		; Get SCBV - scheduled for Dcache miss
+	ldqp	r3, 8(r14)		; Get SCBP
+	
+        stq     r4, <frm$v_r4-64>(r25)  ; Write R4 to the stack
+	mfpr	r13, pt_ps		; Get current PS
+	
+        stq     r5, <frm$v_r5-64>(r25)  ; Write R5 to the stack
+	mfpr	r14, pt0		; Get old CM
+
+        stq     r6, <frm$v_r6-64>(r25)  ; Write R6 to the stack
+	or	r13, r14, r13		; Combine CM and SW bits for PS
+
+	and	sp, #63, r8		; Isolate SP unaligned bits
+	mfpr	r14, ev5$_ipl		; Fetch IPL
+	
+	sll	r14, #ps$v_ipl, r14	; Shift IPL to PS position
+	subq	r25, #64, sp		; Decrement stack pointer
+
+	sll	r8, #ps$v_sp, r8	; Shift stack alignment bits to PS position
+	or	r14, r13, r14		; Get IPL into PS
+
+	or	r14, r8, r14		; Get SP_ALIGN into PS
+        stq     r7, <frm$v_r7-64>(r25)  ; Write R7 to the stack
+
+	pvc$violate 354			; stq to stack should not trap after first
+	mtpr	r31, pt_ps		; New PS<SW> = 0.  E1. 2 bubbles to next read.  Violation?
+        stq     r12, <frm$v_pc-64>(r25)	; Write PC to the stack
+
+	bic	r2, #3, r2		; Clean new PC - scheduled for Dcache miss.
+	stq	r14, <frm$v_ps-64>(r25)	; Write PS to the stack.
+
+	mtpr	r2, ev5$_exc_addr	; Give Ibox new PC.  E1.  1 bubble to hw_rei.
+	mfpr	r31, pt0		; Pad exc_addr write.
+	
+	hw_rei_chm
+
+	align_block
+;+
+;
+;PAL$POST_INTERRUPT
+;
+; Build an interrupt stack frame on kernel mode stack called from any mode.
+; IPL is changed.
+; DTB_MISS may be taken on the first store.
+; 
+; Inputs:
+; r12 - savedPC
+; r13 - SCB offset
+; pt7 - new IPL
+; pt8 - new PS<IP>
+; pt0 - new R4
+;
+;-
+
+PAL$POST_INTERRUPT:
+	mtpr	r31, ev5$_dtb_cm	; Set Mbox current mode to kernel - no virt ref for next 2 cycles
+	mtpr	r31, ev5$_ps		; Set Ibox current mode to kernel - no hw_rei for 2 cycles
+
+	bic	r12, #3, r12		; Clear low 2 bits of old PC -- needed?????
+	mfpr	r25, pt_pcbb		; Get PCBB - E1.  
+
+	addq	r25, r11, r25		; Point to current mode SP in HWPCB
+	beq	r11, POST_INT_CONT	; Skip stack swap if already in kernel mode
+	
+	stqp	r30, pcb$q_ksp(r25)	; Save old SP
+	mfpr	r30, pt_ksp		; Get Kernel SP
+	
+POST_INT_CONT:
+	and	sp, #63, r25		; Isolate SP unaligned bits
+	bic	sp, #63, sp		; Round down stack
+
+					; The first store may trap (TBmiss or fault).  The 
+					; subsequent stores are all to the same
+					; page, and thus won't trap.
+POST_INT_STORE:
+	stq	r2, <frm$v_r2-64>(sp)	; Write R2 to the stack
+	mfpr	r14, pt_scbb		; Get SCBB
+
+	stq	r3, <frm$v_r3-64>(sp)	; Write R3 to the stack
+	addq	r13, r14, r14		; Get address of vector in SCB
+	
+	ldqp	r2, 0(r14)		; Get SCBV - scheduled for Dcache miss
+	ldqp	r3, 8(r14)		; Get SCBP
+	
+        stq     r4, <frm$v_r4-64>(sp)   ; Write R4 to the stack
+	mfpr	r13, pt_ps		; Get current PS
+
+        stq     r5, <frm$v_r5-64>(sp)   ; Write R5 to the stack
+	or	r13, r11, r13		; Combine CM and SW bits for PS
+
+        stq     r6, <frm$v_r6-64>(sp)   ; Write R6 to the stack
+	mfpr	r14, ev5$_ipl		; Fetch old IPL for stack
+	
+	mfpr	r8, pt7			; Get new IPL
+	mtpr	r8, ev5$_ipl		; Update IPL
+
+	sll	r14, #ps$v_ipl, r14	; Shift old IPL to PS position
+	bis	r31, r31, r11		; New PALshadow current mode = 0
+
+	sll	r25, #ps$v_sp, r25	; Stack alignment bits to PS position
+	or	r14, r13, r14		; Get IPL into PS
+
+        stq     r7, <frm$v_r7-64>(sp)   ; Write R7 to the stack
+	or	r14, r25, r14		; Get SP_ALIGN into PS
+
+	bic	r2, #3, r2		; Clean new PC - scheduled for Dcache miss.
+	mfpr	r25, pt8			
+
+	mtpr	r25, pt_ps		; New PS<SW> = 0, <IP> from argument
+        stq     r12, <frm$v_pc-64>(sp) 	; Write PC to the stack
+
+	mfpr	r4, pt0			; Update R4 
+	stq	r14, <frm$v_ps-64>(sp)	; Write PS to the stack.
+
+	mtpr	r2, ev5$_exc_addr	; Give Ibox new PC.  E1.  1 bubble to hw_rei.
+	subq	sp, #64, sp		; Decrement stack pointer
+
+	mfpr	r31, pt0		; pad exc_addr write
+	hw_rei_chm
+
+
+.sbttl	"Interrupt processing"
+	align_block
+CHECK_FOR_AST:
+	srl	r8, isr$v_atr, r25		; Get AST request bit
+	bis	r31, r31, r13			; Get a zero
+
+	srl	r8, #1, r9			; Get East bit
+	blbc	r25,  interrupt_not_ast		; No AST, do software int.
+	
+	srl	r8, #2, r10			; Get Sast bit
+	blbs	r8, found_ast			; Branch if Kast
+	
+	addq	r13, #1, r13
+	blbs	r9, found_ast			; Branch if East
+
+	addq	r13, #1, r13
+	blbs	r10, found_ast			; Branch if Sast
+
+	addq	r13, #1, r13			; Must be Uast
+	nop
+
+FOUND_AST:
+	bis	r31, #1, r8			; Get a 1
+	mtpr	r14, pt7			; Stash new IPL for PAL$POST_INTERRUPT
+	
+	sll	r8, r13, r8			; Get 1 in bit position of taken AST
+	mfpr	r9, astrr
+
+	bic	r9, r8, r9			; Clear the request	
+	mfpr	r12, exc_addr			; Get SavedPC for PAL$POST_INTERRUPT
+	
+	sll	r13, #4, r13			; Get ASTmode-1*16
+	mtpr	r4, pt0				; Save R4 for POST_INTERRUPT
+
+	lda	r13, scb$v_kast(r13)		; Get SCB vector	
+	mtpr	r9, astrr
+	
+	mfpr	r9, pt_ps
+	and	r9, #4, r9
+
+	mtpr	r9, pt8				; New PS<IP> = old
+	br	r31, PAL$POST_INTERRUPT		; Go build the stack
+	
+
+
+.sbttl  "DFAULT_IN_PAL"
+	align_block
+;+
+;
+; DFAULT_IN_PAL
+;
+; Function:
+;  	Dstream fault trap has been taken, exc_addr points to PAL
+;	Vector to specific handler for current PALroutine
+;  
+;	Current state:
+;	r8  - faulting va for vpte fetch dfault
+;	r9  MMstat
+;	r10 
+;	r12 PAL PC
+;	pt5 Saved R12 (sometimes PC of CALL_PAL instruction + 4)
+;	Mbox VA IPR is locked
+;-
+DFAULT_IN_PAL:		
+	bis	r8, r31, r25		; save r8 in r25 for ildvpte_dfault, dldvpte_dfault flows
+	mtpr    r10, pt10		; save original exc_addr for ildvpte_dfault flow
+
+	ldah	r8, <<1@pte$v_soft>+32768>@-16(r31); get marker for level 3 errors
+	mtpr	r8, pt7			; Stash level 3 marker
+
+	lda	r8, scb$v_for(r31)	; Assume FOR
+        and     r9, #<1@mm_stat$v_fow>, r10	; Isolate FOW bit.
+
+	cmovne	r10, #scb$v_fow, r8	; Switch to FOW vector, if necessary
+	and	r9, #<1@mm_stat$v_acv>, r10	; Isolate ACV bit.
+
+	cmovne	r10, #scb$v_acv, r8	; Switch to ACV vector, if necessary
+	nop
+
+        bic     r12, #3, r12           	; Clean PC
+        mfpr    r10, pal_base          	; Fetch PAL_BASE IPR - E1.
+	
+	subq	r10, r12, r12		; pal_base - offset
+	mfpr	r10, va			; Unlock the VA
+
+;	and	r9, #1, r9
+	nop
+	mtpr	r10, ev5$_dtb_is	; Invalidate the bad TB entry (necessary for FOR and FOW)		
+					; Fall thru to mm_disp code
+
+.sbttl  "PAL_MM_DISPATCH"
+
+;+
+; PAL_MM_DISPATCH
+; 
+; Function:
+;	Vector to specific handler for current PALroutine
+;  
+;	Current state:
+;	r8  SCB Vector
+;	r9  MMstat 
+;	r10 VA
+;	r12 offset to check
+;	pt5 Saved R12 (sometimes PC of CALL_PAL instruction + 4)
+;	pt6 PAL PC on TNV
+;	pt7 PTE or junk with level 3 marker set in SW field
+;
+;	pt8  will hold saved r14
+;-
+pal_mm_dispatch:
+	mtpr	r14, pt8
+	lda	r14, <pal$prober_ldl1-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_PROBER
+	lda	r14, <pal$prober_ldl2-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_PROBER
+	lda	r14, <pal$probew_ldl1-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_PROBEW
+	lda	r14, <pal$probew_ldl2-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_PROBEW
+	lda	r14, <post_trap_kup_store-pal$base>(r12)
+
+	beq	r14, PAL$KSP_INVALID
+	lda	r14, <post_trap_k_store-pal$base>(r12)
+
+	beq	r14, PAL$KSP_INVALID
+	lda	r14, <post_trap_x_store-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_CHMX
+	lda	r14, <post_int_store-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_INTERRUPT
+	lda	r14, <pal$rei_ldq-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_REI
+	lda	r14, <pal$rei_ldq2-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_REI
+	lda	r14, <pal$rei_stqc1-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_REI
+	lda	r14, <pal$rei_stqc2-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_REI_KERN
+	lda	r14, <pal$rei_stqc3-pal$base>(r12)
+
+	beq	r14, DFAULT_IN_REI_KERN
+	lda	r14, <pal$itb_ldq-pal$base>(r12)
+
+	beq	r14, ILDVPTE_DFAULT
+	lda	r14, <pal$dtb_ldq-pal$base>(r12)
+
+	beq	r14, DLDVPTE_DFAULT
+	mfpr	r12, pt_trap		; Check if special MM handler for current PAL flow
+
+	beq	r12, NO_PAL_HANDLER
+	zap	r12, #^xF0, r12		; Clear out upper 32 bits
+
+	mfpr	r14, pal_base
+	addq	r14, r12, r12
+
+	mfpr	r14, pt8		; Restore r14
+	pvc$jsr	spec
+	jmp	r31, (r12)		; Jump to special handler
+
+	.align	quad
+NO_PAL_HANDLER:				; No handler....
+	mfpr	r14, pt8		; Restore r14
+	br	r31, call_pal$halt
+
+	.align 	quad
+PAL$KSP_INVALID:			; TNV/DFAULT in stack builder - Kern stack not valid 
+	mfpr	r12, pt5		; Get original PC
+
+KSNV_HALT:
+	bis	r31, r31, r11		; Local current mode=kern
+
+	mtpr	r31, pt_ps		; PS software bits=0
+KSNV_HALT2:
+	mtpr	r12, exc_addr		; Store for enter console routine
+
+	mtpr	r0, pt0
+        pvc$jsr updpcb, bsr=1
+        bsr     r0, pal$update_pcb      ; update the pcb
+
+	lda	r0, hlt$c_ksp_inval(r31)
+	br	r31, sys$enter_console	; Kernel stack not valid
+
+	.align	quad
+DFAULT_IN_INTERRUPT:			; TNV/DFAULT in interrupt stack builder -
+					; Kernel stack not valid.
+	mfpr	r8, pt7
+	mtpr	r8, ipl			; Update IPL
+	br	r31, pal$ksp_invalid
+
+	.align	quad
+DFAULT_IN_CHMX:
+	nop
+	mfpr	r12, pt5		; Get original CALL_PAL PC
+	
+	subq	r12, #4, r12		; Fix PC
+	beq	r11, ksnv_halt		; CHMx on kernel stack, take kernel stack not valid
+	
+        sll     r9, #63, r14            ; Move read/write bit to MMF position
+	mfpr	r11, pt0		; Get old mode. 
+
+	bis	r10, r31, r25		; Move VA for POST_KM_TRAP_UPDATE_R45
+	mfpr	r30, pt1		; Get old SP
+	
+	bis	r8, r31, r13		; Move SCB vector for POST_KM_TRAP_UPDATE_R45
+        br      r31, POST_KM_TRAP_UPDATE_R45 ; Go build stack frame and vector back to software
+
+DFAULT_IN_REI:
+	mfpr	r12, pt5		; Get original CALL_PAL PC+4
+	sll	r9, #63, r14		; Move read/write bit to MMF position
+	
+	subq	r12, #4, r12		; Subtract off +4 offset to get original CALL_PAL PC
+	beq	r11, ksnv_halt2		; REI on kernel stack, take kernel stack not valid
+	
+	srl	r11, #ps$v_cm, r13	; Get  mode to bits<1:0>
+	bis	r10, r31, r25		; Move VA for POST_KM_TRAP_UPDATE_R45
+	
+	bis	r8, r31, r13		; Move SCB vector for POST_KM_TRAP_UPDATE_R45
+	br	r31, POST_KM_TRAP_UPDATE_R45 ; Go build stack frame and vector back to software
+
+DFAULT_IN_REI_KERN:
+	mfpr	r12, pt5		; Get original CALL_PAL PC+4
+	mtpr	r31, ev5$_dtb_cm	; restore cm to kernel mode.  No virtual ref in 1,2
+	
+	subq	r12, #4, r12		; Subtract off +4 offset to get original CALL_PAL PC
+	br	r31, ksnv_halt2		; REI on kernel stack, take kernel stack not valid
+	
+;+
+;ILDVPTE_DFAULT - Dfault on LD of the VPTE in ITBMISS flow
+;
+; on entrance: 
+; 	r25 = VA of faulting vpte
+;	pt10= original exc_addr
+;	
+;
+; on exit:
+;	r12 - original PC of instruction that missed
+;	r13 - SCB offset (ACCVIO)
+;	r14 - MM flag (bit 1 set to indicate fault on vpte fetch.  bit 63=0,bit0=1 to indicate instruction)
+; 	r25 - new r4 (VA of faulting vpte)
+;-
+ILDVPTE_DFAULT:
+	mfpr	r12, pt10		; original PC
+	lda	r14, 3(r31)		; setup MM flags
+	lda	r13, scb$v_acv(r31)	; Report as an ACCVIO 
+	br	r31, POST_KM_TRAP_UPDATE_R45 ; Go build stack frame and vector back to software
+
+;+
+;DLDVPTE_DFAULT - Dfault on LD of the VPTE in DTBMISS flow
+;
+; on entrance:
+;	pt6 = original exc_addr
+;	 r9 = original mm_stat for dtb_miss (no fault info)
+;	r10 = va of original dtb miss address
+; 	r25 = VA of faulting vpte
+;	don't know va of faulting instruction, so can't invalidate dtb (except dtb_ia)
+;
+; on exit:
+;	r12 - original PC of instruction that missed
+;	r13 - SCB offset (ACCVIO)
+;	r14 - MM flag (bit 1 set to indicate fault on vpte fetch.  bit 63 indicates r/w, bit0 indicates instruction)
+; 	r25 - new r4 (VA of faulting vpte)
+;-
+DLDVPTE_DFAULT:
+	sll	r9, #63, r14		; Move read/write bit to MMF position
+	mfpr 	r12, pt6		; original PC of the dtbmiss
+
+	or	r14, #2, r14		; set bit 2 to indicate fault on vpte fetch
+	lda	r13, scb$v_acv(r31)	; Report as an ACCVIO 
+
+	br	r31, POST_KM_TRAP_UPDATE_R45 ; Go build stack frame and vector back to software
+
+
+	align_block
+;+
+;DFAULT_IN_PROBEx - Dfault/TNV detected in probe instruction 
+;
+; 3 cases:
+;       1. TNV,FOR,FOW, dismiss the error, continue with the probe
+;       2. ACV the probe is terminated, and failure is returned
+;       3. Level 1 or 2 TNV, build stack frame, generate trap
+;
+;
+;       Current state:
+;       r8  SCB Vector
+;       r9  MMstat
+;       r10 VA
+;	r13 alt_mode in current mode bit position
+;	r14 0
+;	r25 available
+;       pt5 Saved R12 (PC of CALL_PAL instruction + 4)
+;       pt7 PTE or junk with level 3 marker set in SW field
+;       pt8 Saved R14
+;	exc_addr  PAL PC
+; 
+;
+;	Inputs to POST_KM_TRAP_UPDATE_R45
+;	r12 - savedPC
+;	r13 - SCB offset
+;	r14 - new r5 (MMF)
+;	r25 - new r4 (VA)
+;-
+DFAULT_IN_PROBEW:
+	bis	r31, #1, r14		; Set for write access
+	nop
+
+DFAULT_IN_PROBER:
+	cmpeq	r8, #SCB$V_FOR, r25     ; Check for FOR
+	bne	r25, DISMISS_PROBE_FAULT
+
+	cmpeq	r8, #SCB$V_FOW, r25     ; Check for FOW
+	bne	r25, DISMISS_PROBE_FAULT
+
+	mfpr	r25, pt7		; Get "PTE"
+	srl	r25, #pte$v_soft+1, r0 	; Check marker
+	
+	nop
+	blbs	r0, PROBE_RECHECK
+
+					; Came from double tbmiss flow
+	cmpeq	r8, #SCB$V_ACV, r0	; ACV?
+	bne	r0, PROBE_FAILED
+
+					; Probe found invalid doublemiss PTE
+					; Generate a TNV trap using the PC
+					; of the CALL_PAL probe	
+	sll	r14, #63, r14		; Set up MMF for stack builder
+	mfpr	r12, pt5		; Get call_pal PC
+
+	bis	r10, r31, r25		; Set up VA for stack builder
+	subq	r12, #4, r12		; Point to Probe instr
+
+	bis	r8, r31, r13		; Copy SCB vector for stack builder
+	br	r31, POST_KM_TRAP_UPDATE_R45
+
+PROBE_RECHECK:
+	sll	r14, #2, r12		; read=0, write=4
+        lda     r0, <1@pte$v_kre>(r31)  ; get a KRE bit
+	
+	srl	r13, #ps$v_cm, r9	; Get correct access mode in position
+	sll	r0, r9, r0		; now is xRE (where x=mode)
+	
+	sll	r0, r12, r0		; now is xaE (where a=R/W)
+	and	r25, r0, r0		; is PTE<xae> set?
+	
+	beq	r0, PROBE_FAILED	; No, do probe failed flow
+	nop				; Yes, continue probe instr
+
+; Bump PC to next instruction in Probe flow and return
+DISMISS_PROBE_FAULT:
+	mfpr	r12, exc_addr
+	addq	r12, #4, r12		; Bump PC
+	
+	mtpr	r12, exc_addr		; 1 bubble to hw_rei
+	mfpr	r12, pt5		; Restore R12
+	
+	mfpr	r14, pt8		; Restore R14
+	nop
+
+	nop				; Pad write to palshadow reg
+	nop
+	
+	hw_rei
+
+PROBE_FAILED:
+	or	r31, r31, r0		; Flag no access
+	mfpr	r12, pt5		; Restore r12
+	
+	nop
+	mtpr	r12, exc_addr		; Point to CALL_PAL PC+4
+	
+	nop				; Pad exc_addr write
+	nop
+	
+	nop
+	hw_rei
+	
+
+
+
+	align_block
+.sbttl  "DOUBLE_PTE_INV"
+;+
+; DOUBLE_PTE_INV - Double TBmiss flow found an invalid level 2/3 page table entry.
+;
+; Function:
+;       Prepare to take a Translation Not Valid or Access Violation exception via POST_KM_TRAP_UPDATE_R45
+;       r12 <- exc_addr
+;       r13 <- SCB offset
+;       r14 <- Memory Management Flags
+;       r25 <- VA
+;
+; Only way to tell Dstream from Istream is by looking at exc_addr.
+;
+; Access violation takes priority over translation not valid.
+;
+; Inputs:
+; R9   MMstat(Dstream)
+; R10  original exc_addr(Istream)
+; R21  PTE
+; PT4 original R21
+; PT5 original R22
+; PT6 original exc_addr(Dstream)
+; VA IPR - locked with original faulting VA(Dstream) or 
+;-
+
+
+DOUBLE_PTE_INV:
+
+  .if eq real_mm
+	pvc$violate 1003
+	halt				; Should never get here in 1-1 mode.
+
+  .iff
+
+  itbmiss_trap = <pal$itb_ldq-pal$base> 
+
+	nop
+	mfpr	r8, exc_addr		; Get trapping address, figure out if it was from ITB miss.  E1.
+	
+	bic	r8, #3, r8		; Clean PC
+	mfpr	r22, pal_base		; Fetch PAL_BASE IPR - E1.
+	
+	subq	r22, r8, r8		; pal_base - offset
+	lda	r22, <itbmiss_trap>(r8) ; Test if exc_addr = itbmiss_trap address
+	
+	lda	r8, pte$m_kre(r31)	; Get a one in KRE position
+	beq	r22, DOUBLE_PTE_INV_ISTREAM
+					; Dstream case
+	and	r8, r21, r8		; Mask all but KRE in PTE
+	mfpr	r22, pt6		; Get original exc_addr
+	
+	mfpr	r10, ev5$_va		; Unlock VA
+	blbs	r22, DOUBLE_TNV_IN_PAL	; Handle MM problem in PAL
+
+	bis	r22, r31, r12		; Copy SavePC for stack builder.
+	srl	r9, #mm_stat$v_ra, r13 ; Shift rnum to low bits
+
+	srl	r9, #mm_stat$v_opcode, r14 ; Shift OPCODE to low bits
+	mfpr	r22, pt5		; Restore R22.  E1.
+	
+        and     r14, #mm_stat$m_opcode, r14 ; Clean undefined bits of faulting opcode.
+        and     r13, #^x1F, r13 	; Isolate rnum
+
+	bis	r10, r31, r25		; Copy original faulting VA
+	mfpr	r21, pt4		; Restore R21.
+	
+        cmpeq   r14, #EVX$OPC_SYNC, r14   	; Is the opcode fetch/fetchm?
+        bne     r14, DFAULT_FETCH_LDR31_ERR    	; Yes, dismiss the fault
+
+	blbs 	r9, DOUBLE_PTE_INV_NO_DISMISS  	; low bit set only if store.
+	nop					; Its not a store or fetch, must be a load
+
+        cmpeq   r13, #^x1F, r13   		; Is it R31 or F31?
+        bne     r13, DFAULT_FETCH_LDR31_ERR    	; OK, itsa load to R31 or F31 -- dismiss the fault
+
+DOUBLE_PTE_INV_NO_DISMISS:
+	lda	r13, scb$v_tnv(r31)     	; Get TNV SCB offset
+	sll	r9, #63, r14			; Set up MMflag
+
+	cmoveq	r8, #scb$v_acv, r13     	; Take ACV over TNV
+        br      r31, POST_KM_TRAP_UPDATE_R45 	; Post the trap
+
+                         
+DOUBLE_PTE_INV_ISTREAM:
+					; Istream case
+	and	r8, r21, r8		; Mask all but KRE in PTE
+	mfpr	r22, pt5		; Restore R22.  E1.
+
+	lda	r13, scb$v_tnv(r31)     ; Get TNV SCB offset
+	mfpr	r21, pt4		; Restore R21.
+	
+	bis	r10, r31, r12		; Get original exc_addr
+	bis	r10, r31, r25		; Copy original faulting VA
+
+	cmoveq	r8, #scb$v_acv, r13    	; Take ACV over TNV
+	bis	r31, 1, r14		; Set MMflag to Istream
+
+	mfpr	r31, ev5$_va		; unlock VA
+        br      r31, POST_KM_TRAP_UPDATE_R45 ; Post the trap
+
+DOUBLE_TNV_IN_PAL:
+	ldah	r8, <<1@pte$v_soft>+32768>@-16(r31) ; get marker for level 3 errors
+	mfpr	r22, pt5		; Restore R22.  E1.
+
+	bic	r21, r8, r8		; Clear level 3 marker in PTE
+	mtpr	r12, pt5		; Stash r12 in case we were in PALmode when TBmiss occurred
+
+	mfpr	r21, pt4		; Restore R21.
+	mfpr	r12, pt6		; Set up exc_addr for TNV_IN_PAL
+
+	br	TNV_IN_PAL
+
+  .endc
+
+
+
+.sbttl  "INVALID_DPTE_HANDLER"
+	align_block
+;+
+; INVALID_DPTE_HANDLER - Invalid Dstream PTE fetched by TBmiss routine.
+;
+; Function:
+;       Prepare to take a Translation Not Valid or Access Violation exception via POST_KM_TRAP_UPDATE_R45
+;       r12 <- exc_addr
+;       r13 <- SCB offset
+;       r14 <- Memory Management Flags
+;       r25 <- VA
+;
+; Access violation takes precedence over translation not valid.
+; 
+;
+; Current state:
+; r8    the PTE
+; r9 	mm_stat
+; r10   faulting VA
+; r12   PC of PAL instruction (if TBmiss was provoked by PALcode)
+; pt6   exc_addr
+;
+; If dfault while in pal, we exit to TNV_IN_PAL
+; If access was a fetch(m) or load to r31/f31, we exit to DFAULT_FETCH_LDR31_ERR
+;
+;-
+
+INVALID_DPTE_HANDLER:
+	mfpr	r9, ev5$_mm_stat	; already unlocked, but should not have changed.
+	mtpr	r12, pt5		; Stash r12 in case we were in PALmode when TBmiss occurred
+
+	ldah	r12, <<3@pte$v_soft>+32768>@-16(r31); get marker for level 3 errors
+	bis	r8, r12, r8		; Set level 3 markers in PTE
+	
+	mfpr	r12, pt6		; Setup fault PC for POST_KM_TRAP_UPDATE_R45
+	blbs	r12, TNV_IN_PAL		; Special handler if original faulting reference was in PALmode
+
+	srl	r11, #ps$v_cm, r13	; Get current mode to bits<1:0>
+	bis	r10, r31, r25		; Setup faulting VA for POST_KM_TRAP_UPDATE_R45
+
+	srl	r9, #mm_stat$v_opcode, r14 ; Shift faulting opcode to ls bits
+	addq	r13, #pte$v_kre, r13	; Get position of read enable bit for current mode.
+	
+        and     r14, #mm_stat$m_opcode, r14 ; Clean undefined bits of faulting opcode.
+        srl	r9, #mm_stat$v_ra, r10		; shift rnum to low bits
+	
+	cmpeq	r14, #EVX$OPC_SYNC, r14
+	blbs	r14, DFAULT_FETCH_LDR31_ERR	; Dismiss fault on FETCH instruction
+
+	blbs	r9, INVALID_DPTE_NO_DISMISS	; mm_stat<0> set for store or fetch_m
+
+						; not a store or a fetch, must be a load
+	and	r10, #^x1F, r10			; isolate rnum
+
+	cmpeq	r10, #^x1F, r10			; is it r31 or f31?
+	bne	r10, DFAULT_FETCH_LDR31_ERR	; load to r31 or f31 detected -- dismiss fault
+
+INVALID_DPTE_NO_DISMISS:
+	and	r9, #1, r9		; r9<0> set if store
+	bis	r31, r31, r10		; Clear R10
+	
+	sll	r9, #63, r14		; MM flag now set if opcode was a write.
+	cmovne	r9, #4, r10		; R10 is 4 if store, 0 if read		
+	
+	bis	r31, #1, r9		; Get a one
+	addq	r10, r13, r10		; R10 is bit position in PTE
+	
+	sll	r9, r10, r10		; Shift a 1 to current mode read/write enable
+	lda	r13, scb$v_tnv(r31)	; Get TNV SCB offset
+	
+	and	r10, r8, r10		; Clear out entire PTE except enable bit of interest
+	nop
+	
+	cmoveq	r10, #scb$v_acv, r13	; Take ACV over TNV	
+	br	r31, POST_KM_TRAP_UPDATE_R45 ; Post the trap
+	
+
+
+
+.sbttl  "TNV_IN_PAL"
+	align_block
+;+
+; TNV_IN_PAL - TNV in PALmode
+;
+; Function:
+;  	TNV has been found, exc_addr points to PAL PC.
+;	Vector to specific handler for current PALroutine.
+;
+; Current state:
+; 	r8   the PTE with correct level 3 marker
+; 	r9   
+; 	r10  faulting VA
+; 	r12  PAL PC
+; 	pt5  Saved R12 (PC of CALL_PAL instruction)
+;
+;
+;-
+TNV_IN_PAL:
+	nop
+	mtpr	r12, exc_addr		; Make sure exc_addr has pal PC
+
+	mtpr	r14, pt6		; Stash r14 in case it need to be preserved.
+	bis	r31, r31, r14		; Clear R14
+
+	mtpr	r13, pt4		; Stash r13 in case it needs to be preserved.
+	srl	r11, #ps$v_cm, r13	; Get  mode to bits<1:0>
+
+	cmovlbs	r9, #4, r14		; R14 is 4 if store, 0 if read		
+	addq	r13, #pte$v_kre, r13	; Get position of read enable bit for current mode.
+	
+	addq	r14, r13, r14		; R14 is bit position in PTE
+	srl	r8, #pte$v_soft, r13	; Get level 3 marker
+
+	cmovlbc	r13, #pte$v_kre, r14	; If not level 3, check KRE only
+	bis	r31, #1, r13		; Get a one
+	
+	sll	r13, r14, r14		; Shift a 1 to current mode read/write enable
+	mtpr	r8, pt7
+	
+	and	r14, r8, r14		; Clear out entire PTE except enable bit of interest
+	lda	r8, scb$v_tnv(r31)	; Get TNV SCB offset
+	
+	cmoveq	r14, #scb$v_acv, r8	; Take ACV over TNV	
+        mfpr    r13, pal_base          	; Fetch PAL_BASE IPR - E1.
+
+	mfpr	r14, pt6		; Restore GPR
+	mtpr	r12, pt6		; Save PAL PC
+	
+        bic     r12, #3, r12           	; Clean PC
+	subq	r13, r12, r12		; pal_base - offset
+	
+	mfpr	r13, pt4		; Restore GPR
+	br	r31, pal_mm_dispatch
+
+
+
+.sbttl  "INVALID_OR_FOE_IPTE_HANDLER"
+	align_block
+;+
+; INVALID_OR_FOE_IPTE_HANDLER - Invalid or FOE Istream PTE fetched by ITBmiss routine.
+;
+; Function:
+;       Prepare to take a Translation Not Valid, Access Violation, or Fault on Execute exception 
+;       via POST_KM_TRAP_UPDATE_R45
+;       r12 <- exc_addr
+;       r13 <- SCB offset
+;       r14 <- Memory Management Flags
+;       r25 <- VA
+;
+; Access violation takes precedence over translation not valid.
+; Translation not valid takes precedence over fault on execute.
+; 
+;
+; Current state:
+; r8    the PTE
+; r10   faulting VA
+;
+;
+;-
+
+INVALID_OR_FOE_IPTE_HANDLER:
+	srl	r11, #ps$v_cm, r14	; Get current mode to bits<1:0>
+	bis	r10, r31, r12		; Setup fault PC for POST_KM_TRAP_UPDATE_R45
+
+	bis	r10, r31, r25		; Setup faulting VA for POST_KM_TRAP_UPDATE_R45
+	addq	r14, #pte$v_kre, r14	; Get position of read enable bit for current mode.
+
+	lda	r13, scb$v_foe(r31)	; Get FOE SCB offset
+	and	r8, #pte$m_v, r9	; Check PTE Valid bit
+	
+	cmoveq	r9, #scb$v_tnv, r13    	; Take TNV over FOE
+	bis	r31, #1, r9		; Get a one
+	
+	sll	r9, r14, r10		; Shift a 1 to current mode read enable
+	bis	r31, #1, r14		; MMF for faulting Ifetch.
+	
+	and	r10, r8, r10		; Clear out entire PTE except read enable bit current mode
+	cmoveq	r10, #scb$v_acv, r13	; Take ACV over TNV/FOE
+
+	nop
+	br	r31, POST_KM_TRAP_UPDATE_R45 ; Post the trap
+	
+
+
+.sbttl  "Unaligned fixup code"
+	align_block
+;+
+; UNALIGNED_LD_CONT - Fixup unaligned load
+;
+; Function:
+;	Redo an unaligned load.  Optionally report the error.
+;
+;
+; Current state:
+; r12 -  the data
+; r13 -  test for ldwu, then available
+; r14 -  mm_stat
+; r25 -  VA
+; pt0 -  exc_addr
+; pt2 -  R2
+; pt12 -  R3
+; pt_trap - trap catcher
+;-
+UNALIGNED_LDL:
+;+
+; Add test for ev56 ldwu
+;-
+	srl	r13, #5, r13		; Shift to test for ldwu (0C)
+	blbc	r13, UNALIGNED_LDWU	; If ldwu, go do it
+
+;+
+; Now handle ldl
+;-
+	ldq_u	r13, 3(r25)		; Get 2nd half. Could trap!
+	extll	r12, r25, r12		; Mask
+
+	extlh	r13, r25, r13
+	or	r12, r13, r12		; Combine 2 halves
+
+	addl	r12, r31, r12		; Sign-extend
+	br	r31, UNALIGNED_LD_CONT
+
+;+
+; ev56 ldwu
+;-
+UNALIGNED_LDWU:
+	ldq_u	r13, 1(r25)		; Get 2nd half. Could trap!
+	extwl	r12, r25, r12		; Mask
+
+	extwh	r13, r25, r13
+	or	r12, r13, r12		; Combine 2 halves (zero-extend!)
+
+UNALIGNED_LD_CONT:
+        srl     r14, #mm_stat$v_opcode, r13     ; Get Opcode
+	nop
+	
+	and 	r13, #1@3, r2		; r2= 1 is integer, 0 is fp
+	bne	r2, UNALIGNED_INT_LD
+	
+;+
+; Unaligned FP Load
+;-
+
+	and	r13, #3, r13		; Get IEEE and QUAD flags
+	lda	r2, -8(sp)		; Allocate a quadword buffer.
+
+	
+	srl	r14, #mm_stat$v_ra, r3	; Shift down register number
+	bic	r2, #7, r2		; Align buffer.
+	
+	stq	r12, (r2)		; Store data onto stack.
+	and	r3, #mm_stat$m_ra, r3		; Clean register number
+	
+	sll	r3, #5, r3		; Index table based on register number
+	mfpr	r12, pal_base
+	
+	s8addq  r13, r3, r13		; Index table based on data type
+	bic	sp, #63, r3		; Get addr of new stack frame+64
+	
+		
+					; Probe the stack to insure that
+					; frame is OK in case there is
+					; fault on sp
+	stq	r31, -64(r3)
+	nop
+
+	sget_addr r12, <pal_fld_tbl-pal$base>, r12, verify=0 ; Get table base.
+	addq	r12, r13, r12		; Address of subroutine to load data
+	
+	pvc$jsr pulfp
+	jmp	r12, (r12)
+
+pal$una_fld_return:
+	mfpr	r2, pt_pcbb		; Get PCB base
+	
+	ldqp	r2, pcb$q_fen(r2)     	; Read DAT/PME/FEN quadword
+	mfpr	r3, pt0			; Get exc_addr
+
+	addq	r3, #4, r3
+	pvc$violate  379		; ok to write ipr in shadow of ldqp since replay trap only & no mf same ipr in same shadow
+	mtpr	r31, pt_trap		; Clear trap catcher
+
+	srl	r2, #pcb$v_dat, r2	; Isolate DAT bit
+	mtpr	r3, exc_addr		; 1 bubble to hw_rei
+
+	blbc	r2, REPORT_UNALIGNED	
+	mfpr	r3, pt12			; Restore R3
+
+	mfpr	r2, pt2			; Restore R2
+	hw_rei				; 
+	
+
+;+
+; Unaligned Integer Load
+; Current state:
+; r12 -  load data
+; r13 -  available
+; r14 -  mm_stat
+; r25 -  VA
+; pt0 -  exc_addr
+; pt2 -  R2
+; pt12 -  R3
+;-
+	align_branch
+UNALIGNED_INT_LD:
+        srl     r14, #mm_stat$v_ra, r13 ; Get ra
+	and	r13, #mm_stat$m_ra, r13 ; Clean ra
+	
+					; Load table is 2 instructions/register
+	sll	r13, #3, r13		; ra*8
+	mfpr	r2, pal_base
+	
+	sget_addr r2, <pal_ild_tbl-pal$base>, r2, verify=0 ; Get address of load table
+	addq	r2, r13, r2		; Index into load table
+
+	bic	sp, #63, r13		; Get addr of potential new stack frame+64
+	mtpr	r1, pt1			; Stash R1
+	
+	stq	r31, -64(r13)		; Probe the stack, to insure that
+					; we can build stack frame incase of fault
+	ldah	r1, <1@<icsr$v_sde-16>>(r31)	; Get a one in SHADOW_ENABLE bit location	
+
+	nop
+	mfpr	r3, icsr
+	
+	bic	r3, r1, r1		; ICSR with SDE clear
+	bis	r12, r31, r3		; Move data to non-shadow space
+	
+					; Need to clear SHADOW_ENABLE in order
+					; to update the "real" GPR.
+	nop
+	mtpr	r1, icsr		; Turn off SDE
+	
+	nop				; SDE bubble cycle 1
+	mfpr	r1, pt1			; Restore R1
+
+	nop				; SDE bubble cycle 2
+	nop
+
+	nop				; SDE bubble cycle 3
+	pvc$jsr	puli
+	jmp	r2, (r2)		; Go load the Integer register file
+
+pal$una_ild_return:	
+	ldah	r3, <1@<icsr$v_sde-16>>(r31)	; Get a one in SHADOW_ENABLE bit location
+	mfpr	r2, icsr
+	
+	or 	r3, r2, r3		; re-set SDE
+	mtpr	r3, icsr
+					; SDE bubble cycle 1 & 2
+	mfpr	r3, pt0			; Get exc_addr
+        mfpr    r2, pt_pcbb             ; Get PCB base
+
+					; SDE bubble cycle 3
+        ldqp    r2, pcb$q_fen(r2)       ; Read DAT/PME/FEN quadword
+	addq	r3, #4, r3		;
+
+	nop
+	pvc$violate  379		; ok to write ipr in shadow of ldqp since replay trap only & no mf same ipr in same shadow
+	mtpr	r31, pt_trap		; Clear trap catcher
+	
+        srl     r2, #pcb$v_dat, r2      ; Isolate DAT bit
+	mtpr	r3, exc_addr		; 1 bubble to hw_rei
+
+        blbc    r2, REPORT_UNALIGNED
+	mfpr	r3, pt12			; Restore R3
+
+	mfpr	r2, pt2			; Restore R2
+	hw_rei				
+	
+
+	
+	align_branch
+;+
+; UNALIGNED_STORE - Fixup unaligned store
+;
+; Function:
+;	Redo an unaligned store.  Optionally report the error.
+;
+;
+; Current state:
+; r2  -  available
+; r3  -  available
+; r12 -  available
+; r13 -  mm_stat opcode in low bits
+; r14 -  mm_stat
+; r25 -  VA
+; pt0 -  exc_addr
+; pt2 -  R2
+; pt12 -  R3
+; pt_trap - trap catcher
+;-
+UNALIGNED_STORE:
+	and	r13, #1@3, r12		; r12 = 1 is integer, 0 is fp
+	bne	r12, UNALIGNED_INT_ST
+
+;+
+; Unaligned FP Store
+;-
+	and	r13, #3, r13		; Get IEEE and QUAD flags
+	lda	r2, -8(sp)		; Allocate a quadword buffer.
+
+	
+	srl	r14, #mm_stat$v_ra, r3	; Shift down register number
+	bic	r2, #7, r2		; Align buffer.
+	
+	and	r3, #mm_stat$m_ra, r3	; Clean register number
+	mfpr	r12, pal_base
+
+	sll	r3, #5, r3		; Index table based on register number
+	s8addq  r13, r3, r13		; Index table based on data type
+
+	sget_addr r12, <pal_fst_tbl-pal$base>, r12, verify=0 ; Get table base.
+	addq	r12, r13, r12		; Address of subroutine to load data
+	
+	pvc$jsr pusfp
+	jmp	r12, (r12)
+pal$una_fst_return:
+	nop
+	
+	ldq	r3, (r2)		; Fetch formatted data from buffer
+	br	r31, UNALIGNED_STORE_FIXUP
+
+	align_branch
+UNALIGNED_INT_ST:
+        srl     r14, #mm_stat$v_ra, r13 ; Get ra
+	and	r13, #mm_stat$m_ra, r13	; Clean ra
+	
+					; Load table is 2 instructions/register
+	sll	r13, #3, r13		; ra*8
+	mfpr	r2, pal_base
+	
+	sget_addr r2, <pal_ist_tbl-pal$base>, r2, verify=0 ; Get address of load table
+	addq	r2, r13, r2		; Index into load table
+
+	ldah	r3,  <1@<icsr$v_sde-16>>(r31)	; Get a one in SHADOW_ENABLE bit location
+	mtpr	r1, pt1			; Stash R1
+
+	nop
+	mfpr	r1, icsr
+	
+					; Need to clear SHADOW_ENABLE in order
+					; to read the "real" GPR.
+	bic	r1, r3, r3		; ICSR with SDE clear
+	mtpr	r3, icsr		; Turn off SDE
+	
+	nop				; SDE bubble cycle 1
+	nop
+
+	nop				; SDE bubble cycle 2
+	nop
+
+	nop				; SDE bubble cycle 3
+	pvc$jsr	pusi
+	jmp	r2, (r2)		; Go load the Integer register file
+
+pal$una_ist_return:
+	nop
+	mtpr	r1, icsr
+
+					; SDE bubble cycle 1
+	mfpr	r1, pt1			; Restore R1
+	nop
+					; SDE bubble cycle 2
+	nop
+	nop
+
+					; SDE bubble cycle 3
+	nop
+	nop
+
+UNALIGNED_STORE_FIXUP:	
+	srl	r14, #mm_stat$v_opcode, r13
+	blbc	r13, UNALIGNED_LW_ST
+
+;+
+; Add test for ev56 stw
+;-
+	srl	r13, #5, r13		; Shift down opcode
+	blbc	r13, UNALIGNED_W_ST	; If clear, is a stw
+
+;+
+; Now handle quad
+;-
+	ldq_u	r13, (r25)		; Load 2 qw that write overlaps
+	ldq_u	r2, 7(r25)
+
+	insql	r3, r25, r12
+	mskql	r13, r25, r13
+
+	or	r13, r12, r13		; Combine data
+	stq_u	r13, (r25)		; Store first half
+
+	insqh	r3, r25, r12
+	mskqh	r2, r25, r13
+
+	or	r13, r12, r13		; Combine data
+	mfpr	r3, pt0			; Get exc_addr
+
+	stq_u	r13, 7(r25)		; Store 2nd half.
+	addq	r3, #4, r3		; Bump PC
+
+        mfpr    r2, pt_pcbb             ; Get PCB base
+        ldqp    r2, pcb$q_fen(r2)       ; Read DAT/PME/FEN quadword
+
+	nop
+	mtpr	r3, exc_addr		; 1 bubble to hw_rei
+	
+        srl     r2, #pcb$v_dat, r2      ; Isolate DAT bit	
+	mtpr	r31, pt_trap		; Clear trap catcher
+
+	blbc	r2, REPORT_UNALIGNED	;
+	mfpr	r3, pt12			; Restore R3
+
+	mfpr	r2, pt2			; Restore R2
+	hw_rei				
+
+	align_branch
+UNALIGNED_LW_ST:
+	ldq_u	r13, (r25)		; Load 1st half
+	insll	r3, r25, r12
+
+	mskll	r13, r25, r13
+	or	r13, r12, r13		; Combine
+
+	stq_u	r13, (r25)		; Write first half
+	ldq_u	r2, 3(r25)		; Get 2nd half
+
+	inslh	r3, r25, r12
+	msklh	r2, r25, r13
+
+	or	r13, r12, r13		; Combine
+	mfpr	r3, pt0			; Get exc_addr
+
+
+	stq_u	r13, 3(r25)		; Store 2nd half
+	addq	r3, #4, r3		; Bump PC
+
+
+        mfpr    r2, pt_pcbb             ; Get PCB base
+        ldqp    r2, pcb$q_fen(r2)       ; Read DAT/PME/FEN quadword
+
+        nop
+        mtpr    r3, exc_addr            ; 1 bubble to hw_rei
+
+        srl     r2, #pcb$v_dat, r2      ; Isolate DAT bit
+        mtpr    r31, pt_trap            ; Clear trap catcher
+
+        blbc    r2, REPORT_UNALIGNED    ;
+        mfpr    r3, pt12                 ; Restore R3
+
+        mfpr    r2, pt2                 ; Restore R2
+        hw_rei
+	
+	align_branch
+UNALIGNED_W_ST:
+	ldq_u	r13, (r25)		; Load 1st half
+	inswl	r3, r25, r12
+
+	mskwl	r13, r25, r13
+	or	r13, r12, r13		; Combine
+
+	stq_u	r13, (r25)		; Write first half
+	ldq_u	r2, 1(r25)		; Get 2nd half
+
+	inswh	r3, r25, r12
+	mskwh	r2, r25, r13
+
+	or	r13, r12, r13		; Combine
+	mfpr	r3, pt0			; Get exc_addr
+
+
+	stq_u	r13, 1(r25)		; Store 2nd half
+	addq	r3, #4, r3		; Bump PC
+
+
+        mfpr    r2, pt_pcbb             ; Get PCB base
+        ldqp    r2, pcb$q_fen(r2)       ; Read DAT/PME/FEN quadword
+
+        nop
+        mtpr    r3, exc_addr            ; 1 bubble to hw_rei
+
+        srl     r2, #pcb$v_dat, r2      ; Isolate DAT bit
+        mtpr    r31, pt_trap            ; Clear trap catcher
+
+        blbc    r2, REPORT_UNALIGNED    ;
+        mfpr    r3, pt12                 ; Restore R3
+
+        mfpr    r2, pt2                 ; Restore R2
+        hw_rei
+	
+	align_branch
+;+
+; UNALIGNED_DFAULT - A Dfault/TNV was detected during UA processing
+;
+; Function:
+;	Report the error
+;
+;
+; Current state:
+; r8  -  SCB vector
+; r9  -  MMstat
+; r10 -  VA
+; r14 -  original mm_stat
+; pt0 -  exc_addr of original faulting instruction
+; pt2 -  R2
+; pt12 -  R3
+;-
+UNALIGNED_DFAULT:
+	pvc$jsr	spec, dest=1
+        sll     r9, #63, r14            ; Move read/write bit to MMF position
+	mfpr	r12, pt0		; Get SavePC
+	
+        bis     r10, r31, r25           ; Move VA for POST_KM_TRAP_UPDATE_R45
+	mfpr	r2, pt2			; Restore R2
+	
+        bis     r8, r31, r13            ; Move SCB vector for POST_KM_TRAP_UPDATE_R45
+	mfpr	r3, pt12			; Restore R3
+
+	mtpr	r31, pt_trap		; Clear trap handler address
+        br      r31, POST_KM_TRAP_UPDATE_R45 ; Go build stack frame and vector back to software
+                                                                                                       
+
+;+
+; ILLEGAL_UNALIGNED_OPCODE - unaligned caused by illegal opcode
+;
+; Function:
+;	LDx_L or STx_C with unaligned memory reference.  Post a trap.
+;
+;
+; Current state:
+; pt2 - saved R2
+; r2 -  SavePC
+;-
+	.align	quad
+ILLEGAL_UNALIGNED_OPCODE:
+	lda	r13, scb$v_illpal(r31)	; Set SCB vector to use.
+	addq	r2, #4, r12		; Set PC
+	
+	mfpr	r2, pt2			; restore r2
+	br	r31, POST_KM_TRAP	; Post the exception.
+
+
+
+;+
+;  REPORT_UNALIGNED - report Data Alignment trap
+;
+; Function:
+;	Post a Data Alignment Trap via POST_KM_TRAP_UPDATE_R45
+;       r12 <- SavePC
+;       r13 <- SCB offset
+;       r14 <- new r5 (RW)
+;       r25 <- new r4 (VA)
+;
+;
+; Current state:
+; 	r3  - SavePC
+;	r14 - mm_stat
+;	r25 - VA
+;	pt12 - saved r3
+;	pt2 - saved r2
+;-
+	.align	quad
+REPORT_UNALIGNED:
+	and	r14, #<1@mm_stat$v_wr>, r14	; Get R/W bit
+	mfpr	r2, pt2			; Restore R2
+	
+	bis	r3, #0, r12		; Move SavePC
+	mfpr	r3, pt12			; Restore R3
+
+	lda	r13, scb$v_unalign(r31)	; Set SCB vector to use
+	br	r31, POST_KM_TRAP_UPDATE_R45 ; Build the stack
+
+
+.sbttl  "Queue fault handlers"
+
+
+	align_branch
+;+
+;pal$queue_fault_setup_nolock, pal$queue_fault_setup_lock
+;
+; while doing a QUEUE probe we have encountered a mm error
+;       memory management error. Our function, is to unscramble the
+;       register state, and transition into the stack builder.
+;
+;	Current state:
+;		r8  - fault SCB Vector
+;		r9  - MMstat
+;		r10 - fault VA
+;
+;		pt5 - Saved R12 (PC of CALL_PAL instruction + 4)
+;		pt6 - PAL PC on TNV
+;		pt7 - PTE or junk with level 3 marker set in SW field
+;		pt8 - Saved R14
+;
+;		r0  - contents of header, lock flag clear
+;		r16 - addr of header (lock case)
+;
+;
+;	Exit to POST_KM_TRAP_UPDATE_R45
+;		r12 - savedPC
+;		r13 - SCB offset
+; 		r14 - new r5
+; 		r25 - new r4
+;
+;-
+pal$queue_fault_setup_lock:
+        pvc$jsr spec, dest=1
+
+	cmpeq	r8, #scb$v_for, r14
+	srl	r9, mm_stat$v_opcode, r25
+	
+	and	r25, #mm_stat$m_opcode, r25
+	cmpeq	r25, #EVX$OPC_HW_LD, r25
+	
+	or	r9, r25, r9		; set write if hw_ld, or was write
+	nop
+
+	bis	r10, r31, r25		; move VA for stack builder
+	mfpr	r12, pt5		; fetch PC
+
+	and	r9, #1, r9		; Isolate r/w bit
+	subq	r12, #4, r12		; Back PC up to queue instr	
+
+	bis	r8, r31, r13		; move SCB offset for stack builder
+	bic	r9, r14, r14		; set MMF to read if FOR	
+
+	sll	r14, #63, r14		; set up MMF
+	mtpr	r31, pt_trap		; signal no valid trap handler
+
+	and	r12, #2, r8		; get lock flag indicator
+	bic	r12, #2, r12		; clear lock flag indicator
+	
+	beq	r8, post_km_trap_update_r45
+	sget_addr r8, <<pal$queue_fault-pal$base>!1>, r31, verify=0; get address
+
+	mtpr	r8, pt_trap			; set recovery address
+	stl	r0, (r16)		; Clear lock flag in header 
+
+	nop				; pad ipr write after store
+	nop
+	
+	nop
+	mtpr	r31, pt_trap			; clear recovery address
+
+	br	r31, post_km_trap_update_r45
+
+
+
+	align_branch
+pal$queue_fault_setup_nolock:
+        pvc$jsr spec, dest=1
+	cmpeq	r8, #scb$v_for, r14
+	srl	r9, mm_stat$v_opcode, r25
+	
+	and	r25, #mm_stat$m_opcode, r25
+	cmpeq	r25, #EVX$OPC_HW_LD, r25
+	
+	or	r9, r25, r9		; set write if hw_ld, or was write
+	nop
+
+	bis	r10, r31, r25		; move VA for stack builder
+	mfpr	r12, pt5		; fetch PC
+
+	and	r9, #1, r9		; Isolate r/w bit
+	subq	r12, #4, r12		; Back PC up to queue instr	
+
+	bis	r8, r31, r13		; move SCB offset for stack builder
+	bic	r9, r14, r14		; set MMF to read if FOR	
+
+	sll	r14, #63, r14		; set up MMF
+	mtpr	r31, pt_trap		; signal no valid trap handler
+
+	br	r31, post_km_trap_update_r45
+
+
+	align_branch
+pal$queue_fault::
+        pvc$jsr spec, dest=1
+	cmpeq	r8, #SCB$V_TNV, r14
+	mfpr	r12, pt7		; fetch PTE
+
+	mtpr	r12, ev5$_dtb_pte	; write DTB PTE part
+	srl	r12, #pte$v_soft, r12	; Get SW field (is really level check)
+
+	and	r12, r14, r14		; Is it both level 3, and TNV?
+	blbc	r14, 30$		; MCHK if not TNV on level 3
+
+	mtpr	r10 ev5$_dtb_tag	; No virt ref for 3 cycles.
+	mfpr	r14, pt6		; fetch PAL PC
+
+        mfpr    r12, pt5                ; fetch PC
+	mtpr	r14, exc_addr
+
+	mfpr	r14, pt8		; fetch saved R14
+	nop				; pad exc_addr write
+	
+	nop				; pad palshadow write
+	nop
+
+	hw_rei
+
+30$:
+        mfpr    r12, pt5	                ; fetch PC
+	subq	r12, #4, r12			; back-up PC to call_pal
+        lda     r14, mchk$c_os_bugcheck(r31) 	; fetch mchk code
+	br	r31, pal$pal_mchk
+
+
+;+
+;
+; pal$queue_fault_resident
+;
+; While executing a Resident queue instruction we have encountered a
+;	mm error.  In this case we abandon the queue leaving it in whatever
+;	partial state it may be in, and transition into the stack builder
+;	to post a invalid operand trap.
+;
+; Registers on entry...
+;
+;
+;	From the special handler:
+;               pt5 - Saved R12 (PC of CALL_PAL instruction + 4)
+;
+;	The stack builder expects:
+; 		r12 - savedPC
+; 		r13 - SCB offset
+;
+;-
+	
+	align_branch
+pal$queue_fault_resident::
+	pvc$jsr	spec, dest=1
+	lda	r13, scb$v_illpal(r31)	; set scb vector to use
+	mtpr	r31, pt_trap
+
+	mfpr	r12, pt5
+	br	r31, post_km_trap	; go post the trap
+
+
+
+
+;+
+; queue_busy
+; Return to the user with a status code of -1 (secondary interlock locked)
+;
+; on entry
+;	r0   contents of queue header
+;	r16  addr of queue header, currently locked
+;	r12  PC of queue instr
+;
+;-
+	align_branch
+queue_busy:
+	stl_c	r0, (r16)		; release primary interlock
+	mtpr	r12, exc_addr		; set the rei address
+
+	subq	r31, #1, r0		; set failed to get lock code
+	nop				; pad exc_addr write
+
+	hw_rei
+
+
+
+;+
+; queue_empty
+;   Return to the user with a status code of 0 (queue already empty)
+;-
+	align_branch
+
+queue_empty:
+	mtpr	r12, exc_addr	; set the rei address
+	or	r16, r31, r1	; set addr of rem'd entry
+
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+
+
+
+.sbttl queue error catchers
+;+
+;  Error handlers for the queue instructions.
+;  If we fail to acquire the hardware lock, we vector to an error handler
+;  for the appropriate queue instruction, which increments the try count
+;  and retries unless the maximum retry count is exceeded, in which case the
+;  queue instruction returns a locked status to the user (r0 = -1).
+;-
+
+    .macro	retry_lock inst, rn
+      retry_lock_'inst':
+      subq	'rn', #1, 'rn'
+      bne	'rn', lock_'inst'
+      br	r31, queue_busy		; too many retries => return -1
+      nop				; to align
+    .endm
+
+    align_branch
+    retry_lock insqhil,  r14
+    retry_lock insqhiq,  r14
+    retry_lock insqtil,  r14
+    retry_lock insqtiq,  r14
+    
+    retry_lock remqhil,  r1
+    retry_lock remqhiq,  r1
+    retry_lock remqtil,  r14
+    retry_lock remqtiq,  r14
+
+    retry_lock insqhilr, r14
+    retry_lock insqhiqr, r14
+    retry_lock insqtilr, r14
+    retry_lock insqtiqr, r14
+    
+    retry_lock remqhilr, r1
+    retry_lock remqhiqr, r1
+    retry_lock remqtilr, r14
+    retry_lock remqtiqr, r14
+
+
+
+	align_branch
+;+
+; una_from_pal 		unaligned trap from pal
+;
+; this code is used in a very limited environment to fix up
+; unaligned d-stream access from within pal.
+; The environment is extremly limited, and is targeted to
+; explicitly handle the QUEUE instructions only.
+;
+; 
+; The situation is that the queue instructions want to be written
+; so as to assume that the queue elements and headers are naturally
+; aligned, and to not bother checking the alignment as they process
+; the queue request. So, they make that assumption, and trap to here
+; if it's not true. This code handles those unaligned access by
+; fixing up the reference. This can result in a few unfortunate events.
+; For example, either half of the load/store can generate a dmm
+; error. And in the queue instructions, once we get past the point of
+; no return, we need to auto-magically fix up TNV's, Prior to that
+; point we need to generate the errors. Also, on some of the queue
+; instructions we need to generate illpalop's if we get any alignment
+; error, others we fix up.
+; In short this is a nasty bit of code, but it allows the main line
+; queue instructions to be as fast as possible,at the expense of
+; the unaligned cases (life is hard).
+;
+; Current state:
+;	R2  - exc_addr
+;	PT2 - saved R2
+;-
+una_from_pal::
+	nop
+	mfpr	r25, pt_trap		; get recover address
+
+	mtpr	r6, pt1
+	blbc	r25, pal_ill_runa	; go generate the illpalop if unexpected err
+
+	sll	r25, #32, r25		; save old recover address is upper longwd
+	mtpr	r16, pt0
+
+	sget_addr r6, <pal$ill_una-pal$base>, r31, verify=0 ; get addr of recovery rtn
+	mtpr	r17, pt12
+
+	or	r25, r6, r25		; merge in our recover routine
+	mtpr	r25, pt_trap		; put addr back in hw.
+
+	mfpr	r25, mm_stat		; get mmstat
+	srl	r25, #mm_stat$v_opcode, r16	; get opcode
+
+	mfpr	r6, va			; get va, and unlock
+	and	r16, #^b1010, r17	; isolate int and lock bits
+
+	cmpeq	r17, #^b1000, r17	; make sure no bonus bits are set
+	blbc	r17, pal_una_pal_bug		; ooopps.
+
+	blbs	r25, pal_una_st		; br if access was a STx
+	blbc	r16, pal_una_ldl		; br if access was LDL
+
+	; access is LDQ
+	; do access
+	ldq_u	r16, (r6)
+	ldq_u	r17, 7(r6)
+
+	extql	r16, r6, r16
+	extqh	r17, r6, r17
+
+	or	r17, r16, r16
+
+	align_branch
+pal_una_ldq:	
+	srl	r25, #mm_stat$v_ra-3, r17; get ra
+	and	r17, #^x1f@3, r17	; isolate
+
+	subq	r17, #13@3, r17		; offset from r13
+	cmpule	r17, #<14-13>@3, r6	; within range?
+
+	blbc	r6, pal_una_pal_bug		; nop pal bug.
+	mfpr	r6, pal_base		; get pal base
+
+	sget_addr r6, <pal$pal_una_ld_tbl-pal$base>, r6, verify=0 ; base of tbl
+	addq	r6, r17, r17		; get addr of our code
+
+	pvc$jsr	pult
+	jmp	r31, (r17)		; go update the reg file
+
+	
+pal_una_pal_bug:	
+	bis	r2, r31, r12
+	br	pal$pal_bug_check	; Machine check
+
+
+
+	; access is LDL
+	align_branch
+pal_una_ldl:
+	ldq_u	r16, (r6)
+	ldq_u 	r17, 3(r6)
+
+	extll	r16, r6, r16
+	extlh	r17, r6, r17
+
+	or	r17, r16, r16
+	addl	r16, r31, r16
+
+	br	r31, pal_una_ldq	; go join common ldq case
+
+
+	align_branch
+pal_una_stl:	; access is STL
+	; perform the probe
+	ldlw	r31, 0(r6)	; access first half
+	ldlw	r31, 3(r6)	; access second
+
+	; probe has completed, now do unaliged access
+	ldq_u	r17, (r6)
+	insll	r16, r6, r25
+
+	mskll	r17, r6, r17
+	or	r17, r25, r17
+
+	stq_u	r17, (r6)
+	ldq_u	r17, 3(r6)
+
+	inslh	r16, r6, r25
+	msklh	r17, r6, r17
+
+	or	r17, r25, r17
+	stq_u	r17, 3(r6)
+
+	br	r31, pal_una_fin	; and go finish up
+
+
+
+	align_branch
+pal_una_st:	; access is store
+	srl	r25, #mm_stat$v_ra-3, r17	; get ra
+	and	r17, #^x1f@3, r17		; isolate
+
+	subq	r17, #13@3, r17		; offset from r13
+	cmpule	r17, #<17-13>@3, r16	; within range?
+
+	blbc	r16, pal_una_pal_bug		; nop pal bug.
+	mfpr	r16, pal_base		; get pal base
+
+	sget_addr r16, <pal$pal_una_st_tbl-pal$base>, r16, verify=0 ; base of tbl
+	addq	r16, r17, r17		; get addr of our code
+
+	srl	r25, #mm_stat$v_opcode, r25	; get opcode
+	pvc$jsr	pust
+	jmp	r17, (r17)		; go update the reg file
+
+pal$una_st_return:
+	blbc	r25, pal_una_stl		; br if access was STL
+
+	align_branch
+	; access is STQ
+	ldqw	r31, 0(r6)	; access first half
+	ldqw	r31, 7(r6)	; access second
+
+	; probe has completed, now do unaliged access
+	ldq_u	r17, (r6)
+	insql	r16, r6, r25
+
+	mskql	r17, r6, r17
+	or	r17, r25, r17
+
+	stq_u	r17, (r6)
+	ldq_u	r17, 7(r6)
+
+	insqh	r16, r6, r25
+	mskqh	r17, r6, r17
+
+	or	r17, r25, r17
+	stq_u	r17, 7(r6)
+	
+
+
+
+	; unaligned ld/st has completed, clean up and back out
+	align_branch
+pal_una_fin:
+	mfpr	r25, pt_trap	; recover address
+	srl	r25, #32, r25	; put it back the way it was
+
+	addq	r2, #4, r2	; bump pc
+	mtpr	r25, pt_trap	; save restored recover address
+
+	mtpr	r2, exc_addr	; 
+	mfpr	r2, pt2
+
+	mfpr	r6, pt1
+	mfpr	r16, pt0
+
+	mfpr	r17, pt12
+	hw_rei			; and away we go
+
+
+
+
+	; error detected while doing unaligned resident queue
+	align_branch
+pal_ill_runa:
+	mfpr	r2, pt2
+	mfpr	r31, va			; unlock va/mm_stat
+
+	mtpr	r31, pt_trap
+	lda	r13, scb$v_illpal(r31)	; scb vector
+
+	br	r31, post_km_trap	; build stack frame
+
+	; error detected while doing probe for unaligned access
+	.align	quad
+	pvc$jsr	spec, dest=1
+pal$ill_una::
+	mfpr	r25, pt_trap		; get pt_trap
+;	srl	r25, #<32+1>, r16	; get stuffer bit????????????
+
+;	blbs	r25, 1710$		; go to stuffer
+	mfpr	r2, pt2
+
+	mfpr	r6, pt1
+
+
+	srl	r25, #32, r25
+	mfpr	r16, pal_base
+
+	addq	r16, r25, r25
+	mfpr	r17, pt12
+
+	mfpr	r16, pt0
+	mtpr	r31, pt_trap
+	pvc$violate	1007			; disable rule checker on computed goto
+	jmp	r31, (r25)			; and off to the specific handler
+
+
+
+	.align	quad
+1710$:;	mtpr	r21, dtb_ctl		; Jam in gran hints
+;	 srl	r21, #pte$v_soft, r1	; Get SW field (is really level check)
+;	mfpr	r22, pt22		;
+;	 cmpeq	r23, #SCB$V_TNV, r0	; Check for TNV
+;	and	r0, r1, r0		; Is it both level 3, and TNV?
+;	 mfpr	r1,  pt1
+;	blbc	r1, 1730$		; nope, take an MCHK
+;	 mfpr	r0,  pt0
+;	mtpr	r20, tb_tag		; Load TB TAG and clear TB valid bit
+;	 mtpr	r21, dtb_pte		; Load PTE and set TB valid bit
+	 hw_rei				; go back and re-try access
+
+
+	.align	quad
+1730$:
+	; need to load r12 here
+        lda     r14, mchk$c_os_bugcheck(r31)
+        br      r31, pal$pal_mchk
+
+
+.sbttl	PALUNATBL - PALmode UNA table
+
+	.align	quad
+pal$pal_una_ld_tbl:
+	pvc$jsr	pult, dest=1
+	or	r16, r31, r13	; move data to r13
+	br	r31, pal_una_fin; now go finish up
+
+	pvc$jsr	pult, dest=1
+	or	r16, r31, r14	; move data to r14
+	br	r31, pal_una_fin; now go finish up
+
+
+	.align	quad
+pal$pal_una_st_tbl:
+	pvc$jsr	pust,dest=1
+	or	r13, r31, r16	; move data from r13
+	br 	r31, pal$una_st_return
+
+
+	pvc$jsr	pust,dest=1
+	or	r14, r31, r16	; move data from r14
+	br 	r31, pal$una_st_return
+
+
+	pvc$jsr	pust,dest=1
+	or	r15, r31, r16	; move data from r15
+	br 	r31, pal$una_st_return
+
+
+	pvc$jsr	pust,dest=1
+	mfpr	r16, pt0	; move data from r16
+	br 	r31, pal$una_st_return
+
+
+	pvc$jsr	pust,dest=1
+	mfpr	r16, pt12	; move data from r17
+	br 	r31, pal$una_st_return
+
+
+	.align quad
+;+
+; queue_addr_error - report the illegal pal op
+; queue_addr_error_unlock - Release the secondary lock
+;	Current state
+;		r12 - SavePC
+;		r16 - addr of queue header
+;		r0  - contents of queue header
+;-
+queue_addr_error_unlock:
+	stl	r0, (r16)
+	nop
+
+	nop				; pad write to pt_trap after store
+	nop
+
+queue_addr_error:
+	mtpr	r31, pt_trap
+	nop
+
+	lda	r13, scb$v_illpal(r31)	; scb vector
+	br	r31, post_km_trap	; build stack frame
+
+
+
+
+.sbttl  "Queue instructions - cont'd"
+	align_block
+;+
+;insquel_cont
+;	Current state:
+;		r12 - address of call_pal queue + 4
+;		r13 - contents of H
+;		r16 - addr of queue header
+;		r17 - addr of new entry
+;-
+insquel_cont:
+	debug_mp_queue
+	; do the queue instruction assuming it is aligned
+	stl	r13, (r17)		; (E) <- N
+	stl	r16, 4(r17)		; (E+4) <- H
+
+	stl	r17, 4(r13)		; (N+4) <- E
+	stl	r17, (r16)		; (H)   <- E
+
+	mtpr	r12, exc_addr
+	cmpeq	r16, r13, r0		; set queue empty flag
+
+	nop				; Pad PALtemp write beyond stl
+	mtpr	r31, pt_trap		; signal no valid trap handler
+
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+  	hw_rei				; done
+
+	align_block
+;+
+;insqueld_cont
+;	Current state:
+;		r12 - address of call_pal queue + 4
+;		r13 - contents of H
+;		r16 - addr of queue header
+;		r17 - addr of new entry
+;-
+insqueld_cont:
+	debug_mp_queue
+
+	; do the queue instruction assuming it is aligned
+	stl	r13, (r17)		; (E) <- N
+	stl	r14, 4(r17)		; (E+4) <- H
+
+	stl	r17, 4(r13)		; (N+4) <- E
+	stl	r17, (r14)		; (H)   <- E
+
+	mtpr	r12, exc_addr
+	cmpeq	r14, r13, r0		; set queue empty flag
+
+	nop				; Pad PALtemp write beyond store
+	mtpr	r31, pt_trap		; signal no valid trap handler
+
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+  	hw_rei				; done
+
+
+	align_block
+;+
+;insqueq_cont
+;	Current state:
+;		r12 - address of call_pal queue + 4
+;		r13 - addr of N
+;		r16 - addr of queue header
+;		r17 - addr of new entry
+;-
+  
+insqueq_cont:
+	and	r13, #^xf, r0		; check N alignment
+	bne	r0, queue_addr_error	; br if bad N alignment
+
+	ldqw	r31, 8(r13)		; probe N
+	; access check passed
+	; this is the point of no return
+	; The only possible mm errors now are TNV, if we encounter these
+	; we reload the TB with the no longer valid pte (if it was level 3)
+	; and continue. Else MCHK.
+	sget_addr r25, <pal$queue_fault-pal$base>, r31; get address
+
+	cmpeq	r13, r16, r0		; queue empty if N = H
+	nop				; pad paltemp write out of ld shadow
+	
+	nop
+	mtpr	r25, pt_trap		; set recovery address
+
+	debug_mp_queue
+	; do the queue instruction assuming it is aligned
+
+	stq	r13, (r17)		; (E)   <- N
+	stq	r16, 8(r17)		; (E+8) <- H
+
+	stq	r17, 8(r13)		; (N+8) <- E
+	stq	r17, (r16)		; (H)   <- E
+
+	mtpr	r12, exc_addr
+	mfpr	r31, pt0		; Pad PALtemp write from store shadow
+
+	mtpr	r31, pt_trap		; Clear recovery address
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+ 	hw_rei
+
+
+	align_block
+;+
+;insqueqd_cont
+;	Current state:
+;		r12 - address of call_pal queue + 4
+;		r13 - addr of N
+;		r14 - addr of queue header
+;		r16 - addr of addr of queue header
+;		r17 - addr of new entry
+;-
+  
+insqueqd_cont:
+	or	r13, r14, r0		; merge N and H for alignment check
+	and	r0, #^xf, r0		; check N/H alignment
+
+	bne	r0, queue_addr_error	; br if bad N alignment
+
+	ldqw	r31, 8(r13)		; probe N
+	; access check passed
+	; this is the point of no return
+	; The only possible mm errors now are TNV, if we encounter these
+	; we reload the TB with the no longer valid pte (if it was level 3)
+	; and continue. Else MCHK.
+	sget_addr r25, <pal$queue_fault-pal$base>, r31; get address
+	
+	cmpeq	r13, r14, r0		; queue empty if N = H
+	nop
+
+	nop				; pad pt_trap write in shadow of ld
+	mtpr	r25, pt_trap		; set recovery address
+
+	debug_mp_queue
+
+	; do the queue instruction assuming it is aligned
+
+	stq	r13, (r17)		; (E)   <- N
+	stq	r14, 8(r17)		; (E+8) <- H
+
+	stq	r17, 8(r13)		; (N+8) <- E
+	stq	r17, (r14)		; (H)   <- E
+
+	mtpr	r12, exc_addr
+	mfpr	r31, pt0		; Pad PALtemp write from store shadow
+
+	mtpr	r31, pt_trap		; Clear recovery address
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+ 	hw_rei
+
+
+	align_block
+;+
+;remquel_cont
+;	Current-state:
+;               r12 - address of call_pal queue + 4
+;		r13 - address of N
+;		r14 - address of P
+;		r16 - address of queue entry
+;-
+
+remquel_cont:
+	; access check passed
+	; this is the point of no return
+	; The only possible mm errors now are TNV, if we encounter these
+	; we reload the TB with the no longer valid pte (if it was level 3)
+	; and continue. Else MCHK.
+ 
+	sget_addr r25, <<pal$queue_fault-pal$base>!1>, r31 ; get address
+	or  	r16, r31, r1		; return addr of entry
+
+	nop
+	mtpr	r25, pt_trap		; set recovery address
+
+	debug_mp_queue
+  
+	; do the queue instruction assuming it is aligned
+
+	stl	r13, (r14)		; (P) <- N
+	or	r31, #1, r0		; assume queue not yet empty	
+
+	stl	r14, 4(r13)		; (N+4) <- P
+	cmpeq	r13, r14, r14		; 1 queue is now empty, 0 if not
+
+	cmpeq	r13, r1, r13		; 1 if N = E queue WAS empty
+	mtpr	r12, exc_addr
+
+	subq	r0, r14, r0		; sub by 1 if now empty
+	mtpr	r31, pt_trap
+
+	subq	r0, r13, r0		; sub by 1 if was empty
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+	align_block
+;+
+;remqueld_cont
+;	Current-state:
+;		r1  - address of entry removed
+;               r12 - address of call_pal queue + 4
+;		r13 - address of N
+;		r14 - address of P
+;		r16 - address of address of queue entry
+;-
+
+remqueld_cont:
+	ldlw   	r31, 0(r14)		; probe first part of P
+	ldlw   	r31, 3(r14)		; probe second part of P
+
+	; access check passed
+	; this is the point of no return
+	; The only possible mm errors now are TNV, if we encounter these
+	; we reload the TB with the no longer valid pte (if it was level 3)
+	; and continue. Else MCHK.
+ 
+	sget_addr r25, <<pal$queue_fault-pal$base>!1>, r31 ; get address
+	nop				; Pad write to pt_trap out of trap shadow
+
+	nop
+	mtpr	r25, pt_trap		; set recovery address
+
+	debug_mp_queue
+  
+	; do the queue instruction assuming it is aligned
+
+	stl	r13, (r14)		; (P) <- N
+	or	r31, #1, r0		; assume queue not yet empty	
+
+	stl	r14, 4(r13)		; (N+4) <- P
+	cmpeq	r13, r14, r14		; 1 queue is now empty, 0 if not
+
+	cmpeq	r13, r1, r13		; 1 if N = E queue WAS empty
+	mtpr	r12, exc_addr
+
+	subq	r0, r14, r0		; sub by 1 if now empty
+	mtpr	r31, pt_trap
+
+	subq	r0, r13, r0		; sub by 1 if was empty
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+	align_block
+;+
+;remqueq_cont
+;	This code is also used by remqueqd
+;	Current state:
+;		r1  - addr of entry
+;		r13 - N
+;		r14 - P
+;-
+	; access check passed
+	; this is the point of no return
+	; The only possible mm errors now are TNV, if we encounter these
+	; we reload the TB with the no longer valid pte (if it was level 3)
+	; and continue. Else MCHK.
+ 
+remqueq_cont:
+	mtpr	r25, pt_trap		; set recovery address
+  	or	r31, #1, r0		; assume queue not yet empty	
+
+	debug_mp_queue
+
+	; do the queue instr
+
+	stq	r13, (r14)		; (P)   <- N
+	cmpeq	r13, r14, r25		; 1 queue is now empty, 0 if not
+
+	stq	r14, 8(r13)		; (N+4) <- P
+	cmpeq	r13, r1, r13		; 1 if N = E queue WAS empty
+
+	subq	r0, r25, r0		; sub by 1 if now empty
+	mtpr	r12, exc_addr
+
+	subq	r0, r13, r0		; sub by 1 if was empty
+	mtpr	r31, pt_trap
+
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+	align_block
+;+
+;insqhil_cont
+;	Current state:
+;		r12 - addr of call_pal queue +4
+;		r16 - addr of queue header
+;		r17 - addr of new entry
+;-
+
+insqhil_cont:
+	.iif ne p1_ldx_l_fix, mb	; fix for Pass1 ldx_l bug
+	.iif ne p1_ldx_l_fix, unop	; fix for Pass1 ldx_l bug
+
+lock_insqhil:
+	ldl_l	r0, (r16)		; try to get H, interlocked
+	blbs	r0, queue_busy		; entry already locked => return -1
+
+	or	r0, #1, r13		; attempt to set lock flag
+	stl_c	r13, (r16)		; try to set secondary lock in H
+
+	blbc	r13, retry_lock_insqhil	; abort if stx/c failed
+	or	r12, #2, r12		; set flag indicating we own lock
+
+	mb
+	; check all remaining addrs for read write accessability and alignment
+	ldlw	r31, 0(r17)		; check E (protection)
+
+	and	r0, #^x7, r13		; check N (alignment)
+	addq	r16, r0, r14		; get N
+
+	bne	r13, queue_addr_error_unlock	; br if bad alignment of N
+	ldlw	r31, 0(r14)		; check N (protection)
+
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+	nop				; pad write to pt out of ld shadow
+	
+	nop
+	mtpr	r13, pt_trap		; set recovery address
+
+	debug_mp_queue
+
+	; Do the queue operation
+	subl	r16, r17, r13		; H - E
+	stl	r13, 4(r17)		; (E+4) <- H-E
+
+	addl	r13, r0, r13		; N - E
+	stl	r13, (r17)		; (E) <- N-E
+
+	subl	r31, r13, r13		; E-N
+	stl	r13, 4(r14)		; (N+4) <- E-N
+
+	mb
+	subl	r17, r16, r13		; E-H
+
+	stl	r13, (r16)		; (H) <- E-H
+	mtpr	r12, exc_addr		; set the rei address
+
+	cmpeq	r0, r31, r0		; queue was empty if N-H == 0
+	nop
+
+	mtpr	r31, pt_trap		; Clear trap handler addr
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; insqhilr_cont
+;     finish up the insqhilr instruction
+;-
+	align_branch
+insqhilr_cont:
+	.iif ne p1_ldx_l_fix, 	subl	r31, r13, r13		; E-N	; move to insqhilr_cont for pass1 bug workaround
+	.iif ne p1_ldx_l_fix, 	unop
+
+	stl	r13, 4(r14)		; (N+4) <- E-N
+	mb
+
+	subl	r17, r16, r13		; E-H
+	stl	r13, (r16)		; (H) <- E-H
+
+	mtpr	r12, exc_addr		; set the rei address
+	cmpeq	r0, r31, r0		; queue was empty if N-H == 0
+
+	mtpr	r31, pt_trap		; clear trap recovery addr
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; insqhiq_cont
+;     finish up the insqhiq instruction
+;-
+	align_branch
+insqhiq_cont:
+	.iif ne p1_ldx_l_fix, mb	; move this here for pass1 ldx_l bug workaround
+
+	or	r12, #2, r12		; set flag indicating we own lock
+	; check all remaining addrs for read write accessability and alignment
+	ldqw	r14, 0(r17)		; check E (protection)
+
+	and	r0, #^xf, r13		; check N alignment
+	addq	r16, r0, r14		; get addr of N
+
+	bne	r13, queue_addr_error_unlock	; br if bad N alignment
+	ldqw	r31, 0(r14)		; check N (protection)
+
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+	nop				; pad write to pt out of ld shadow
+	
+	nop
+	mtpr	r13, pt_trap		; set recovery address
+
+	debug_mp_queue
+
+	; Do the queue operation
+
+	subq	r16, r17, r13		; H-E
+	stq	r13, 8(r17)		; (E+8) <- H-E
+
+	addq	r13, r0, r13		; N-E
+	stq	r13, (r17)		; (E) <- N-E
+
+	subq	r31, r13, r13		; E-N
+	stq	r13, 8(r14)		; (N+8) <- E-N
+
+	mb
+	subq	r17, r16, r13		; E-H
+
+	stq	r13, (r16)		; (H) <- E-H
+	mtpr	r12, exc_addr		; set the rei address
+
+	cmpeq	r0, r31, r0		; queue was empty if N-H == 0
+	nop				; Pad pt_trap write out of st shadow
+
+	mtpr	r31, pt_trap		;
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; insqhiqr_cont
+;    finish up insqhiqr
+;-
+
+	align_branch
+insqhiqr_cont:
+	.iif ne p1_ldx_l_fix, 	subq	r31, r13, r13		; E-N	; move to insqhiqr_cont for PASS1 bug
+	.iif ne p1_ldx_l_fix, 	unop
+
+	stq	r13, 8(r14)		; (N+8) <- E-N
+	mb
+
+	subq	r17, r16, r13		; E-H
+	stq	r13, (r16)		; (H) <- E-H
+
+	mtpr	r12, exc_addr		; set the rei address
+	cmpeq	r0, #0, r0
+	
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+;+
+; insqtil_cont
+;    finish up insqtil
+;-
+
+	align_block
+insqtil_cont:
+	.iif ne p1_ldx_l_fix, mb	; fix for Pass1 ldx_l bug
+	.iif ne p1_ldx_l_fix, unop	; fix for Pass1 ldx_l bug
+
+lock_insqtil:
+	ldq_l	r0, (r16)		; try to get queue H, interlocked
+	blbs	r0, queue_busy		; entry already locked => return -1
+
+	or	r0, #1, r13		; attempt to set lock flag
+	stl_c	r13, (r16)		; try to set secondary lock in H
+
+	blbc	r13, retry_lock_insqtil	; abort if stx/c failed
+	or	r12, #2, r12		; set flag indicating we own lock
+
+	mb
+	; check all remaining addrs for read write accessability and alignment
+	sra	r0, #32, r14		; P-H
+
+	or	r0, r14, r13		; merge N-H, P-H for alignment check
+	nop
+
+	and	r13, #^x7, r13		; check N, P alignment
+	bne	r13, queue_addr_error_unlock	; br if bad N/P alignment
+
+
+	ldlw	r13, 0(r17)		; check E (protection)
+	beq	r0, insqtil_empty	; br if if queue empty
+
+	addl	r16, r14, r14		; P
+	ldlw	r31, 0(r14)		; check P (protection)
+
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+	nop				; pad write to pt out of ld shadow
+	
+	nop
+	mtpr	r13, pt_trap		; set recovery address
+
+
+	debug_mp_queue
+
+	; Do the queue operation
+	subl	r16, r17, r13		; H-E
+	stl	r13, (r17)		; (E) <- H-E
+
+	subl	r14, r17, r13		; P-E
+	stl	r13, 4(r17)		; (E+4) <- P-E
+
+	subl	r31, r13, r13		; E-P
+	stl	r13, (r14)		; (P) <- E-P
+
+	subl	r17, r16, r13		; E-H
+	stl	r13, 4(r16)		; (H+4) <- E-H
+
+	mb
+	stl	r0, (r16)		; (H) <- orig (H)
+
+	mtpr	r12, exc_addr		; set the rei address
+	or	R31, #0, r0		; queue was NOT empty
+	
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+	
+	align_branch
+insqtil_empty:
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+	mtpr	r13, pt_trap		; set recovery address
+
+insqtilr_empty:
+	; Do the queue operation
+	debug_mp_queue
+
+	subl	r16, r17, r13		; H - E
+	stl	r13, 4(r17)		; (E+4) <- H-E
+
+	subl	r17, r16, r14		; E-H
+	stl	r13, (r17)		; (E) <- H-E
+
+	stl	r14, 4(r16)		; (H+4) <- E-H
+	mb
+
+	stl	r14, (r16)		; (H) <- E-H
+	mtpr	r12, exc_addr		; set the rei address
+
+	or	r31, #1, r0		; queue was empty
+	nop				; pad pt write
+
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+;+
+; insqtilr_cont
+;	complete insqtilr
+;-
+	align_branch
+insqtilr_cont:
+	.iif ne p1_ldx_l_fix, 	stl     r13, 4(r17)             ; (E+4) <- P-E ; move to insqtilr_cont for PASS1 bug fix
+	addl	r16, r14, r14		; P
+	subl	r31, r13, r13		; E-P
+
+	stl	r13, (r14)		; (P) <- E-P
+	subl	r17, r16, r13		; E-H
+
+	stl	r13, 4(r16)		; (H+4) <- E-H
+	mb
+
+	stl	r0, (r16)		; (H)   <- H
+	mtpr	r12, exc_addr		; set the rei address
+
+	or	r31, #0, r0		; R0 = 0, queue was not empty
+	nop
+
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; insqtiq_cont
+;   finish up insqtiq
+;-
+	align_branch
+insqtiq_cont:
+	.iif ne p1_ldx_l_fix, mb	; move this to insqtiq_cont for pass1 ldx_l bug workaround
+
+	or	r12, #2, r12		; set flag indicating we own lock
+	; check all remaining addrs for read write accessability and alignment
+	ldq	r14, 8(r16)		; P-H
+
+	or	r0, r14, r13		; merge N-H & P-H for alignment check
+	and	r13, #^xf, r13		; check N & P alignment
+
+	bne	r13, queue_addr_error_unlock	; br if bad N/P alignment
+	ldqw	r13, 0(r17)		; check E (protection)
+
+	addq	r16, r14, r14		; P
+	beq	r0, insqtiq_empty	; br if queue empty
+
+	ldqw	r31, 0(r14)		; check P (protection)
+
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+
+	mfpr	r31, pt0		; pad pt write 
+	mtpr	r13, pt_trap		; set recovery address
+
+	debug_mp_queue
+
+	; Do the queue operation
+	subq	r16, r17, r13		; H-E
+	nop
+
+	stq	r13, (r17)		; (E) <- H-E
+	subq	r14, r17, r13		; P-E
+
+	stq	r13, 8(r17)		; (E+8) <- P-E
+	subq	r31, r13, r13		; E-P
+
+	stq	r13, (r14)		; (P) <- E-P
+	subq	r17, r16, r13		; E-H
+
+	stq	r13, 8(r16)		; (H+8) <- E-H
+	mb
+
+	stq	r0, (r16)		; (H) <- Orig (H)
+	mtpr	r12, exc_addr		; set the rei address
+
+	or	r31, #0, r0		; queue was NOT empty
+	nop
+
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+	align_branch
+insqtiq_empty:
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+	mtpr	r13, pt_trap		; set recovery address
+
+	; Do the queue operation
+insqtiqr_empty:
+	subq	r16, r17, r13		; H - E
+	nop
+
+	debug_mp_queue
+
+	stq	r13, 8(r17)		; (E+8) <- H-E
+	subq	r17, r16, r14		; E-H
+
+	stq	r13, (r17)		; (E) <- H-E
+	stq	r14, 8(r16)		; (H+8) <- E-H
+
+	mb
+	stq	r14, (r16)		; (H) <- E-H
+
+	mtpr	r12, exc_addr		; set the rei address
+	or	r31, #1, r0		; queue was empty
+
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+
+;+
+; insqtiqr_cont
+;    finish the insqtiqr instruction
+;-
+	align_branch
+insqtiqr_cont:
+	.iif ne p1_ldx_l_fix,	stq	r13, 8(r17)		; (E+8) -> P-E	; move to insqtiqr_cont for PASS1 bug
+
+	subq	r31, r13, r13		; E-P
+	addl	r16, r14, r14		; P
+
+	stq	r13, (r14)		; (P) <- E-P
+	subq	r17, r16, r13		; E-H
+
+	stq	r13, 8(r16)		; (H+8) <- E-H
+	mb
+
+	stq	r0, (r16)		; (r16) <- H
+	mtpr	r12, exc_addr		; set the rei address
+
+	or	r31, #0, r0		; r0 = 0, queue was not empty
+	nop
+		
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+;+
+; remqhil_cont
+;  finish up remqhil
+;-
+
+	align_branch
+remqhil_cont:
+	or	r12, #2, r12		; set flag indicating we own lock
+	mb
+
+	; check all remaining addrs for read write accessability and alignment
+	addl	r16, r0, r1		; N
+	nop
+
+	ldq	r13, (r1)		; check N (protection+alignment)
+	addl	r13, r1, r1		; NN 
+
+	and	r1, #^x7, r13		; check NN (alignment)
+	bne	r13, queue_addr_error_unlock	; br if bad NN alignment
+
+	ldlw	r31, 0(r1)		; check NN (protection)
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+	
+	mfpr	r31, pt0		; pad pt write
+	mtpr	r13, pt_trap		; set recovery address
+
+	debug_mp_queue
+
+	subl	r16, r1, r13		; H-NN
+
+	; Do the queue operation
+	stl	r13, 4(r1)		; (NN+4) <- H-NN
+
+	mb
+	subl	r31, r13, r13		; NN-H
+
+	stl	r13, (r16)		; (H) <- NN-H
+	addl	r16, r0, r1		; r1 <- N
+
+	mtpr	r12, exc_addr		; set the rei address
+	cmpeq	r13, r31, r0		; r0 = 1 if now empty, 0 if not yet empty
+
+	addq	r0, #1, r0		; r0 = 2 if now empty, 1 if not yet empty
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; remqhilr_cont
+;  finish remqhilr
+;-
+
+	align_branch
+remqhilr_cont:
+	.iif ne p1_ldx_l_fix,	stl	r1, 4(r13)		; (NN+4) <- H-NN ; move to remqhilr_cont for PASS1 bug
+
+	mb
+	subl	r13, r16, r13		; NN-H
+
+	stl	r13, (r16)		; (H) <- NN-H
+	addl	r16, r0, r1		; r1 <- N
+
+	mtpr	r12, exc_addr		; set the rei address
+	cmpeq	r13, r31, r0		; r0 = 1 if now empty, 0 if not yet empty
+
+	addq	r0, #1, r0		; r0 = 2 if now empty, 1 if not yet empty
+	mtpr	r31, pt_trap
+
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; remqhiq_cont
+;-
+	align_branch
+remqhiq_cont:
+	mb				;
+
+	; check all remaining addrs for read write accessability and alignment
+	addq	r16, r0, r1		; N
+
+	and	r1, #^xf, r13		; check N (alignment)
+	bne	r13, queue_addr_error_unlock	; br if bad N alignment
+
+	ldq 	r13, (r1)		; check N (protection+alignment)
+	addq	r13, r1, r1		; NN
+
+	and	r1, #^xf, r13		; check NN (alignment)
+	bne	r13, queue_addr_error_unlock
+
+	ldqw	r31, 0(r1)		; check NN (protection)
+
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+	sget_addr r13, <pal$queue_fault-pal$base>, r31; get address
+
+	mfpr	r31,	pt0		; pad pt write
+	mtpr	r13, pt_trap		; set recovery address
+
+	debug_mp_queue
+
+	; Do the queue operation
+	subq	r16, r1, r13		; H-NN
+	stq	r13, 8(r1)		; (H+8) <- H-NN
+
+	mb
+	subq	r31, r13, r13		; NN-H
+
+	stq	r13, (r16)		; (H) <- NN-H
+	mtpr	r12, exc_addr		; set the rei address
+
+	addq	r16, r0, r1		; r1 <- N
+	cmpeq	r13, r31, r0		; r0 = 1 if empty, 0 if not yet empty
+
+	addq	r0, #1, r0		; r0 = 2 if empty, 1 if not yet empty
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+
+;+
+; remqhiqr_cont
+;
+;-
+	align_branch
+remqhiqr_cont:
+	.iif ne p1_ldx_l_fix,	stq	r1, 8(r13)		; (NN+4) <- H-NN	; move to remqhiqr_cont for pass1 bug fix
+
+	mb
+ 	subq	r13, r16, r13		; NN-H
+
+	stq	r13, (r16)		; (H) <- NN-H
+	addq	r16, r0, r1		; r1 <- N
+
+	mtpr	r12, exc_addr		; set the rei address
+ 	cmpeq	r13, r31, r0		; r0 = 1 if now empty, 0 if not yet empty
+
+	addq	r0, #1, r0		; r0 = 2 if now empty, 1 if not yet empty
+	mtpr	r31, pt_trap
+
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+;+
+; remqtil_cont
+;-
+	align_branch
+remqtil_cont::
+	.iif ne p1_ldx_l_fix, 	blbc	r13, retry_lock_remqtil	; abort if stx/c failed ; move to remqtil_cont for pass1 bug fix
+
+	or	r12, #2, r12		; set flag indicating we own lock
+	mb
+
+	; check all remaining addrs for read write accessability and alignment
+	sra	r0, #32, r13		; P-H
+	addl	r16, r13, r1		; P
+
+	ldl	r14, 4(r1)		; check P (access)
+	addl	r1, r14, r13		; PP
+
+	ldlw	r14, 0(r13)		; check PP (access)
+	or	r13, r1, r14		; merge PP, P for align check
+
+	and	r14, #^x7, r14		; do align check
+	bne	r14, queue_addr_error
+
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+
+	sget_addr r14, <pal$queue_fault-pal$base>, r31; get address
+	mtpr	r14, pt_trap		; set recovery address
+
+	debug_mp_queue
+
+	; Do the queue operation
+
+	subl	r13, r16, r14		; PP-H
+	stl	r14, 4(r16)		; (H+4) <- PP-H
+
+	subl	r16, r13, r14		; H-PP
+	stl	r14, (r13)		; (PP) <- H-PP
+
+	beq	r14, 10$		; br if queue empty H-PP = 0
+	mb
+
+	stl	r0, (r16)		; (r16) <- N-H
+10$:	mtpr	r12, exc_addr		; set the rei address
+
+	cmpeq	r14, r31, r0		; r0 = 1 if empty, 0 if not yet empty
+	addq	r0, #1, r0		; r0 = 2 if empty, 1 if not yet empty
+
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+
+;+
+; remqtilr_cont
+;-
+	align_branch
+remqtilr_cont::
+	.iif ne p1_ldx_l_fix,	subl	r13, r16, r14		; PP-H	;move to remqtilr_cont for PASS1 bug fix
+
+	stl	r14, 4(r16)		; (H+4) <- PP-H
+	subl	r16, r13, r14		; H-PP
+
+	stl	r14, (r13)		; (PP) <- H-PP
+	beq	r14, 10$		; br if queue empty H-PP = 0
+
+	mb				;
+	stl	r0, (r16)		; (H) <- N-H
+
+10$:	mtpr	r12, exc_addr		; set the rei address
+	cmpeq	r14, r31, r0		; r0 = 1 if empty, 0 if not yet empty
+
+	addq	r0, #1, r0		; r0 = 2 if empty, 1 if not yet empty
+	mtpr	r31, pt_trap
+
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; remqtiq_cont
+;-
+	align_branch
+remqtiq_cont::
+	mb
+	; check all remaining addrs for read write accessability and alignment
+	ldq	r13, 8(r16)		; P-H
+	addq	r16, r13, r1		; P
+
+	ldq	r14, 8(r1)		; check P (access)
+	addq	r1, r14, r13		; PP
+
+	ldqw	r14, 0(r13)		; check PP (access)
+	or	r13, r1, r14		; merge PP, P for align check
+
+	and	r14, #^xf, r14		; do align check
+	bne	r14, queue_addr_error	; br if bad P or PP alignment
+
+	; now we are committed to the instruction - the only possible error
+	; is a TNV, in which case we reload the TB with the no longer valid pte
+	; (if it was level 3) and continue - otherwise MCHK...
+
+	sget_addr r14, <pal$queue_fault-pal$base>, r31; get address
+	mtpr	r14, pt_trap		; set recovery address
+
+	debug_mp_queue
+	; Do the queue operation
+
+	subq	r13, r16, r14		; PP-H
+	stq	r14, 8(r16)		; (H+8) <- PP-H
+
+	subq	r16, r13, r14		; H-PP
+	stq	r14, (r13)		; (PP) <- H-PP
+
+	beq	r14, 10$		; br if queue now empty
+	mb				;
+
+	stq	r0, (r16)		; (H) <- N-H
+10$:	mtpr	r12, exc_addr		; set the rei address
+
+	cmpeq	r14, r31, r0		; r0 = 1 if empty, 0 if not yet empty
+	addq	r0, #1, r0		; r0 = 2 if empty, 1 if not yet empty
+
+	mtpr	r31, pt_trap
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+;+
+; remqtiqr_cont
+;-
+	align_branch
+remqtiqr_cont::
+	.iif ne p1_ldx_l_fix, 	subq	r13, r16, r14		; PP-H	; move to remqtiqr_cont for PASS1 bug fix
+
+	stq	r14, 8(r16)		; (H+8) <- PP-H
+	subq	r16, r13, r14		; H-PP
+
+	stq	r14, (r13)		; (PP) H-PP
+	beq	r14, 10$		; br if queue empty H-PP = 0
+
+	mb				;
+	stq	r0, (r16)		; (H) <- N-H
+
+10$:	mtpr	r12, exc_addr		; set the rei address
+	cmpeq	r14, r31, r0		; r0 = 1 if empty, 0 if not yet empty
+
+	addq	r0, #1, r0		; r0 = 2 if empty, 1 if not yet empty
+	mtpr	r31, pt_trap
+
+	pvc$violate	240		; disable rule checker in call_pal for hidden mf pt
+	hw_rei
+
+
+

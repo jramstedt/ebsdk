@@ -1,0 +1,958 @@
+	.TITLE	XDELTA_ISRS "EXECUTIVE DEBUGGER"
+	.IDENT	"V01-001"
+
+;
+;****************************************************************************
+;*									    *
+;*  COPYRIGHT (c) 1990 BY						    *
+;*  DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASSACHUSETTS.		    *
+;*  ALL RIGHTS RESERVED.						    *
+;* 									    *
+;*  THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND COPIED   *
+;*  ONLY IN  ACCORDANCE WITH  THE  TERMS  OF  SUCH  LICENSE  AND WITH THE   *
+;*  INCLUSION OF THE ABOVE COPYRIGHT NOTICE. THIS SOFTWARE OR  ANY  OTHER   *
+;*  COPIES THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY   *
+;*  OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE IS  HEREBY   *
+;*  TRANSFERRED.							    *
+;* 									    *
+;*  THE INFORMATION IN THIS SOFTWARE IS  SUBJECT TO CHANGE WITHOUT NOTICE   *
+;*  AND  SHOULD  NOT  BE  CONSTRUED AS  A COMMITMENT BY DIGITAL EQUIPMENT   *
+;*  CORPORATION.							    *
+;* 									    *
+;*  DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE  OR  RELIABILITY OF ITS   *
+;*  SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.		    *
+;* 									    *
+;*									    *
+;****************************************************************************
+
+;++
+; FACILITY: EXECUTIVE, DEBUGGING TOOLS
+;
+; ABSTRACT:
+;	This module contains EVAX XDELTA routines that absolutely had to
+;	be written (unfortunately) in assembly language. These routines
+;	do explicit register or stack manipulation that couldn't be done
+;	cleanly in a high-level language.
+;
+; ENVIRONMENT:
+;	XDELTA - STANDALONE, RESIDENT, KERNEL MODE, IPL=31
+;	(What could possibly be a better environment to work in?)
+;
+;--
+
+	.SUBTITLE	"HISTORY"			; DETAILED
+;
+; AUTHOR:	Steve DiPirro	 CREATION DATE: 5-APR-90
+;
+; MODIFIED BY:
+;
+;	V01-001	KLN1067		Karen L. Noel		9-Nov-1990
+;		Fix syntax of .title, .ident, .sbttl, put noexe in psect
+;		declaration
+;
+
+	.SUBTITLE	"DECLARATIONS"
+
+;
+; INCLUDE FILES:
+;
+	$boostatedef
+;
+; External references:
+;
+	.EXTRN	xdt$xdelta_bpt		;XDELTA BPT handler
+	.EXTRN	xdt$owner_check		;XDELTA ownership checker
+	.WEAK	exe$break		;OS BPT handler
+	.WEAK	ini$brk			;OS initial breakpoint
+	.WEAK	exe$gl_state		;System state bits
+;
+; Module-wide data (and a global symbol to point to the start of it):
+;
+	.PSECT z$debug_data,quad,pic,con,rel,lcl,noshr,noexe,rd,wrt
+
+xdt$bpt_lp::
+	.LINKAGE_PAIR	xdt$xdelta_bpt	;Build linkage pair for ext. routine
+ownchk_lp::
+	.LINKAGE_PAIR	xdt$owner_check	;Build linkage pair for ext. routine
+exebr_lp:
+	.LINKAGE_PAIR	exe$break	;Build linkage pair for ext. routine
+inibrk_lp:
+	.LINKAGE_PAIR	ini$brk		;Build linkage pair for ext. routine
+state_adr:
+	.ADDRESS	exe$gl_state	;Address of EXE$GL_STATE (or zero)
+bpt_sync::
+	.QUAD	0			;For synchronizing BPT handling
+xdt$iregsav::
+	.BLKQ	34			;32 Integer GPRs + PC + PS
+xdt$fregsav::
+	.BLKQ	33			;32 FP registers (includes FPCR)
+except_sync::
+	.QUAD	0			;For synchronizing exception handling
+
+;
+; And now, on with the show...
+;
+
+	.PSECT z$debug_code,long,pic,con,rel,lcl,noshr,exe,rd,wrt
+	.SUBTITLE "xdt$bpt - XDELTA Breakpoint ISR"
+;++
+; xdt$bpt - XDELTA Breakpoint ISR
+;
+; FUNCTIONAL DESCRIPTION:
+;
+;	This routine is invoked directly (via SCB vector) in response
+; to BPT traps when XDELTA is loaded. This routine loads registers into
+; memory (and otherwise does things which are difficult if not impossible
+; from a HLL) and then invokes the XDELTA breakpoint handler in the main
+; BLISS module.
+;
+; INPUTS:
+;
+;	R2 = SCB vector
+;	R3 = SCB parameter - Preloaded linkage pointer
+;
+;	0(SP)  = Saved R2
+;	8(SP)  = Saved R3
+;	16(SP) = Saved R4
+;	24(SP) = Saved R5
+;	32(SP) = Saved R6
+;	40(SP) = Saved R7
+;	48(SP) = Saved PC
+;	56(SP) = Saved PS
+;
+; OUTPUTS:
+;
+;	All registers (except SP), PC, and PS potentially modified by XDELTA,
+; including those saved on the stack. Note that R4-R7 are available as
+; scratch registers for this routine.
+;
+; IMPLICIT INPUTS:
+;
+;	None
+;
+; IMPLICIT OUTPUTS:
+;
+;	None
+;
+; SIDE EFFECTS:
+;
+;	Nothing too hideous...I hope
+;
+;--
+
+xdt$bpt::				;BPT ISR entry point
+;
+; Before we get to work, let's make sure any pending exceptions get
+; pushed through the system.
+;
+	trapb				;A little Alpha draino
+;
+; If we're already actively processing a BPT, then this one will merely
+; be dismissed (this could only happen if XDELTA executed a BPT instruction
+; somehow before or after its own SCB was loaded).
+;	
+	bis	r31,r0,r4		;Save R0
+	bis	r31,r1,r5		;Save R1
+	bis	r31,r16,r6		;Save R16
+	bis	r31,r17,r7		;Save R17
+	mfpr_whami			;Get the current CPU ID
+	bis	r31,r5,r1		;Restore R1
+	bis	r31,r6,r16		;Restore R16
+	bis	r31,r7,r17		;Restore R17
+	bis	r31,#1,r7		;Stick a 1 someplace convenient
+	sll	r7,r0,r2		;Create a CPU ID mask in R2
+	bis	r31,r4,r0		;Restore R0
+;
+	lda	r5,<bpt_sync-xdt$bpt_lp>(r3) ;Get address of sync.
+2$:	ldq_l	r6,(r5)			;Let's see what's in there
+	bis	r6,r2,r7		;Set the appropriate bit for this CPU
+	stq_c	r7,(r5)			;Write it back
+	blbc	r7,2$			;Atomicity failed - Try again
+	and	r2,r6,r6		;See if was already set
+	beq	r6,3$			;Bit was clear => OK to continue
+	rei				;Already busy with BPT - REI back
+;
+; Disable interrupts while we're here
+;
+;;	DSBINT	#ipl$_power,r4,ENVIRON=UNIPROCESSOR	;Disable interrupts
+;
+3$:	mb				;Barrier before continuing
+	bis	r31,r0,r5		;Save R0
+	bis	r31,r1,r7		;Save R1
+	bis	r31,r16,r6		;Save R16
+	bis	r31,r17,r4		;Save R17
+	bis	r31,#31,r16		;Get the new IPL into R16
+	mtpr_ipl			;Set IPL to IPL$_POWER (31)
+	bis	r31,r7,r1		;Restore R1
+	bis	r31,r6,r16		;Restore R16
+	bis	r31,r4,r17		;Restore R17
+	bis	r31,r0,r4		;Stash previous IPL in R4
+	bis	r31,r5,r0		;Restore R0
+;
+; We need to check to see if we can acquire ownwership of XDELTA. If not,
+; we're done. If so, then we proceed to register saving.
+;
+	lda	sp,-120(sp)		;Reserve some space on the stack
+	lda	r6,<ownchk_lp-xdt$bpt_lp>(r3) ;Get LP of XDT$OWNER_CHECK
+	stq	r0,(sp)			;Save R0
+	stq	r1,8(sp)		;Save R1
+	stq	r16,16(sp)		;Save R16
+	stq	r17,24(sp)		;Save R17
+	stq	r18,32(sp)		;Save R18
+	stq	r19,40(sp)		;Save R19
+	stq	r20,48(sp)		;Save R20
+	stq	r21,56(sp)		;Save R21
+	stq	r22,64(sp)		;Save R22
+	stq	r23,72(sp)		;Save R23
+	stq	r24,80(sp)		;Save R24
+	stq	r25,88(sp)		;Save R25
+	stq	r26,96(sp)		;Save R26
+	stq	r27,104(sp)		;Save R27
+	stq	r28,112(sp)		;Save R28
+	bis	r31,r31,r25		;No arguments
+	ldq	r26,(r6)		;Load the code address
+	ldq	r27,8(r6)		;Get the procedure descriptor address
+	jsr	r26,(r26)		;Call XDT$OWNER_CHECK
+	bis	r31,r0,r6		;Save return status
+	ldq	r0,(sp)			;Restore R0
+	ldq	r1,8(sp)		;Restore R1
+	ldq	r16,16(sp)		;Restore R16
+	ldq	r17,24(sp)		;Restore R17
+	ldq	r18,32(sp)		;Restore R18
+	ldq	r19,40(sp)		;Restore R19
+	ldq	r20,48(sp)		;Restore R20
+	ldq	r21,56(sp)		;Restore R21
+	ldq	r22,64(sp)		;Restore R22
+	ldq	r23,72(sp)		;Restore R23
+	ldq	r24,80(sp)		;Restore R24
+	ldq	r25,88(sp)		;Restore R25
+	ldq	r26,96(sp)		;Restore R26
+	ldq	r27,104(sp)		;Restore R27
+	ldq	r28,112(sp)		;Restore R28
+	lda	sp,120(sp)		;Restore SP
+	blbs	r6,5$			;Success indicates OK to continue
+;
+; We'll only get here if this CPU could not get XDELTA ownership because
+; some other CPU had it. So we sat around spinning for a while (doing some
+; virtual console stuff if this is the primary), and now, after XDELTA
+; ownership was relinquished, we're here. We need to go back and reexecute the
+; instruction which brought us here because it may have been changed while
+; we were busy doing nothing. We need to clear the synchronization bit and
+; backup the PC before returning.
+;
+	lda	r5,<bpt_sync-xdt$bpt_lp>(r3) ;Get address of sync.
+4$:	ldq_l	r6,(r5)			;Let's see what's in there
+	bic	r6,r2,r6		;Clear the appropriate bit for this CPU
+	stq_c	r6,(r5)			;Write it back
+	blbc	r6,4$			;Atomicity failed - Try again
+	ldq	r6,48(sp)		;Get the saved PC
+	subq	r6,#4,r6		;Back it up to the BPT instruction
+	stq	r6,48(sp)		;And load it back onto the stack
+	rei				;Done
+;
+; First save all the GPRs, PC, and PS as they were prior to executing
+; the BPT. Please notice (and applaud) the clever attempt to do a little
+; instruction scheduling (this should help to explain the bizarre ordering
+; of instructions that follow).
+;
+5$:	lda	r5,<xdt$iregsav-xdt$bpt_lp>(r3)	;Get base of register save area
+	ldq	r6,(sp)			;Get saved R2
+	ldq	r7,8(sp)		;Get saved R3
+	stq	r0,(r5)			;Store R0
+	stq	r1,8(r5)		;Store R1
+	stq	r6,16(r5)		;Store R2
+	stq	r7,24(r5)		;Store R3
+	ldq	r6,16(sp)		;Get saved R4
+	ldq	r7,24(sp)		;Get saved R5
+	stq	r6,32(r5)		;Store R4
+	stq	r7,40(r5)		;Store R5
+	ldq	r6,32(sp)		;Get saved R6
+	ldq	r7,40(sp)		;Get saved R7
+	stq	r6,48(r5)		;Store R6
+	stq	r7,56(r5)		;Store R7
+	stq	r8,64(r5)		;Store R8
+	stq	r9,72(r5)		;Store R9
+	stq	r10,80(r5)		;Store R10
+	stq	r11,88(r5)		;Store R11
+	stq	r12,96(r5)		;Store R12
+	stq	r13,104(r5)		;Store R13
+	stq	r14,112(r5)		;Store R14
+	stq	r15,120(r5)		;Store R15
+	stq	r16,128(r5)		;Store R16
+	stq	r17,136(r5)		;Store R17
+	stq	r18,144(r5)		;Store R18
+	stq	r19,152(r5)		;Store R19
+	stq	r20,160(r5)		;Store R20
+	stq	r21,168(r5)		;Store R21
+	stq	r22,176(r5)		;Store R22
+	stq	r23,184(r5)		;Store R23
+	stq	r24,192(r5)		;Store R24
+	stq	r25,200(r5)		;Store R25
+	stq	r26,208(r5)		;Store R26
+	stq	r27,216(r5)		;Store R27
+	stq	r28,224(r5)		;Store R28
+	stq	r29,232(r5)		;Store R29
+	stq	r31,248(r5)		;Store R31
+	ldq	r6,48(sp)		;Get saved PC
+	ldq	r7,56(sp)		;Get saved PS
+	stq	r6,256(r5)		;Store PC
+	stq	r7,264(r5)		;Store PS
+;
+; Figuring out the correct SP takes a little work. We need to look at the
+; "current mode" in the saved PS to see where we came from. For anything
+; other than kernel mode, we need a PAL call to retrieve the SP. For kernel
+; mode, we need to compute SP by adjusting the current SP by the exception
+; frame stack size and alignment.
+;
+	srl	r7,#3,r6		;Shift the mode into the low-order bits
+	and	r6,#3,r6		;Mask off everything but the mode
+	beq	r6,8$			;Go handle kernel mode
+	cmpeq	r6,#1,r0		;Is it exec mode?
+	beq	r0,6$			;Nope. Go check other modes
+	mfpr_esp			;Get the exec mode stack pointer
+	bis	r31,r0,r6		;Copy it into R6
+	br	r31,9$			;Join common code
+6$:	cmpeq	r6,#2,r0		;Is it supervisor mode?
+	beq	r0,7$			;Nope. Gotta be user.
+	mfpr_ssp			;Get the supervisor mode stack pointer
+	bis	r31,r0,r6		;Copy it into R6
+	br	r31,9$			;Join common code
+7$:	mfpr_usp			;Get the user mode stack pointer
+	bis	r31,r0,r6		;Copy it into R6
+	br	r31,9$			;Join common code
+8$:	srl	r7,#56,r6		;Get SP_ALIGN from saved PS
+	addq	r6,#64,r6		;Add it to exception frame size
+	addq	r30,r6,r6		;Compute SP prior to exception
+9$:	stq	r6,240(r5)		;Store adjusted SP
+;
+; If floating point is currently enabled, we will save all the FP registers
+; also (and pass a flag to the xdt$xdelta_bpt routine).
+;
+	bis	r31,r31,r5		;Clear FP flag
+	mfpr_fen			;Look at the current FEN state
+	blbc	r0,10$			;Disabled - Go right to call
+	lda	r5,<xdt$fregsav-xdt$bpt_lp>(r3)	;Get base of register save area
+	stt	f0,(r5)			;Store F0
+	stt	f1,8(r5)		;Store F1
+	stt	f2,16(r5)		;Store F2
+	stt	f3,24(r5)		;Store F3
+	stt	f4,32(r5)		;Store F4
+	stt	f5,40(r5)		;Store F5
+	stt	f6,48(r5)		;Store F6
+	stt	f7,56(r5)		;Store F7
+	stt	f8,64(r5)		;Store F8
+	stt	f9,72(r5)		;Store F9
+	stt	f10,80(r5)		;Store F10
+	stt	f11,88(r5)		;Store F11
+	stt	f12,96(r5)		;Store F12
+	stt	f13,104(r5)		;Store F13
+	stt	f14,112(r5)		;Store F14
+	stt	f15,120(r5)		;Store F15
+	stt	f16,128(r5)		;Store F16
+	stt	f17,136(r5)		;Store F17
+	stt	f18,144(r5)		;Store F18
+	stt	f19,152(r5)		;Store F19
+	stt	f20,160(r5)		;Store F20
+	stt	f21,168(r5)		;Store F21
+	stt	f22,176(r5)		;Store F22
+	stt	f23,184(r5)		;Store F23
+	stt	f24,192(r5)		;Store F24
+	stt	f25,200(r5)		;Store F25
+	stt	f26,208(r5)		;Store F26
+	stt	f27,216(r5)		;Store F27
+	stt	f28,224(r5)		;Store F28
+	stt	f29,232(r5)		;Store F29
+	stt	f30,240(r5)		;Store F30
+	stt	f31,248(r5)		;Store F31
+	excb				;Required by SRM
+	mf_fpcr	f0			;Get FPCR into F0
+	excb				;Required by SRM
+	stt	f0,256(r5)		;Store FPCR
+	bis	r31,#1,r5		;Set FP flag
+;
+; Now make a standard call to the XDELTA breakpoint handler in the
+; main module. We assume that R3-R5 are preserved across the call.
+; However, we are explicitly trashing R16, R25-R27 in making the call.
+; This is OK since we will be restoring all the registers from the
+; register save area when the routine returns.
+;
+10$:	ldq	r26,(r3)		;Load the code address
+	ldq	r27,8(r3)		;Get the procedure descriptor address
+	bis	r31,#1,r25		;One argument
+	bis	r31,r5,r16		;1st arg => FP flag
+	jsr	r26,(r26)		;Call xdt$xdelta_bpt
+;
+; Restore the floating point registers if floating point is enabled
+;
+	blbc	r5,20$			;If disabled, go right to the GPRs
+	lda	r5,<xdt$fregsav-xdt$bpt_lp>(r3)	;Get base of register save area
+	ldt	f0,256(r5)		;Get FPCR
+	excb				;Required by SRM
+	mt_fpcr	f0			;Load FPCR from F0
+	excb				;Required by SRM
+	ldt	f0,(r5)			;Load F0
+	ldt	f1,8(r5)		;Load F1
+	ldt	f2,16(r5)		;Load F2
+	ldt	f3,24(r5)		;Load F3
+	ldt	f4,32(r5)		;Load F4
+	ldt	f5,40(r5)		;Load F5
+	ldt	f6,48(r5)		;Load F6
+	ldt	f7,56(r5)		;Load F7
+	ldt	f8,64(r5)		;Load F8
+	ldt	f9,72(r5)		;Load F9
+	ldt	f10,80(r5)		;Load F10
+	ldt	f11,88(r5)		;Load F11
+	ldt	f12,96(r5)		;Load F12
+	ldt	f13,104(r5)		;Load F13
+	ldt	f14,112(r5)		;Load F14
+	ldt	f15,120(r5)		;Load F15
+	ldt	f16,128(r5)		;Load F16
+	ldt	f17,136(r5)		;Load F17
+	ldt	f18,144(r5)		;Load F18
+	ldt	f19,152(r5)		;Load F19
+	ldt	f20,160(r5)		;Load F20
+	ldt	f21,168(r5)		;Load F21
+	ldt	f22,176(r5)		;Load F22
+	ldt	f23,184(r5)		;Load F23
+	ldt	f24,192(r5)		;Load F24
+	ldt	f25,200(r5)		;Load F25
+	ldt	f26,208(r5)		;Load F26
+	ldt	f27,216(r5)		;Load F27
+	ldt	f28,224(r5)		;Load F28
+	ldt	f29,232(r5)		;Load F29
+	ldt	f30,240(r5)		;Load F30
+;	ldt	f31,248(r5)		;Load F31
+;
+; Blindly load all GPRs, PC, and PS with whatever XDELTA did to them,
+; restore the IPL, and REI back (R2-R7, the PC and PS are restored onto
+; the stack from which they will be retrieved by REI). Note that R0
+; contains the return status from xdt$xdelta_bpt. That'll be restored last
+; so that we can interpret the return status to decide whether or not
+; the BPT was handled by XDELTA or has to be passed along.
+;
+20$:	lda	r5,<xdt$iregsav-xdt$bpt_lp>(r3)	;Get base of register save area
+	ldq	r1,8(r5)		;Load new R1
+	ldq	r6,16(r5)		;Get new R2
+	ldq	r7,24(r5)		;Get new R3
+	stq	r6,(sp)			;Store new R2
+	stq	r7,8(sp)		;Store new R3
+	ldq	r6,32(r5)		;Get new R4
+	ldq	r7,40(r5)		;Get new R5
+	stq	r6,16(sp)		;Store new R4
+	stq	r7,24(sp)		;Store new R5
+	ldq	r6,48(r5)		;Get new R6
+	ldq	r7,56(r5)		;Get new R7
+	stq	r6,32(sp)		;Store new R6
+	stq	r7,40(sp)		;Store new R7
+	ldq	r8,64(r5)		;Load new R8
+	ldq	r9,72(r5)		;Load new R9
+	ldq	r10,80(r5)		;Load new R10
+	ldq	r11,88(r5)		;Load new R11
+	ldq	r12,96(r5)		;Load new R12
+	ldq	r13,104(r5)		;Load new R13
+	ldq	r14,112(r5)		;Load new R14
+	ldq	r15,120(r5)		;Load new R15
+	ldq	r16,128(r5)		;Load new R16
+	ldq	r17,136(r5)		;Load new R17
+	ldq	r18,144(r5)		;Load new R18
+	ldq	r19,152(r5)		;Load new R19
+	ldq	r20,160(r5)		;Load new R20
+	ldq	r21,168(r5)		;Load new R21
+	ldq	r22,176(r5)		;Load new R22
+	ldq	r23,184(r5)		;Load new R23
+	ldq	r24,192(r5)		;Load new R24
+	ldq	r25,200(r5)		;Load new R25
+	ldq	r26,208(r5)		;Load new R26
+	ldq	r27,216(r5)		;Load new R27
+	ldq	r28,224(r5)		;Load new R28
+	ldq	r29,232(r5)		;Load new R29
+;	ldq	r30,240(r5)		;Load new R30
+;	ldq	r31,248(r5)		;Load new R31
+	ldq	r6,256(r5)		;Get new PC
+	ldq	r7,264(r5)		;Get new PS
+	stq	r6,48(sp)		;Store new PC
+	stq	r7,56(sp)		;Store new PS
+	bis	r31,r0,r7		;Get copy of R0 in R7
+	ldq	r0,(r5)			;Load new R0
+;
+; Clear the sync flag for the next time around
+;
+	mb				;Complete writes before clearing flag
+	lda	r5,<bpt_sync-xdt$bpt_lp>(r3) ;Get address of sync.
+50$:	ldq_l	r6,(r5)			;Snag the contents
+	bic	r6,r2,r6		;Clear the bit for this CPU
+	stq_c	r6,(r5)			;Write it back
+	blbc	r6,50$			;Atomicity failed - Try again
+;
+; R7 contains the return status from the call to xdt$xdelta_bpt at this
+; point. We've saved and restored ALL the registers across the call and
+; now must either REI back to where we came from (if we handled this BPT)
+; or else pass control to the OS BPT handler. If we need to transfer control
+; to the OS, we have to restore the original IPL before we do so.
+;
+	blbs	r7,60$			;We handled it. We're done.
+;;	ENBINT		r4		;Reenable interrupts
+;
+	bis	r31,r0,r2		;Save R0
+	bis	r31,r1,r5		;Save R1
+	bis	r31,r16,r6		;Save R16
+	bis	r31,r17,r7		;Save R17
+	bis	r31,r4,r16		;Get the previous IPL into R16
+	mtpr_ipl			;Restore the IPL
+	bis	r31,r2,r0		;Restore R0
+	bis	r31,r5,r1		;Restore R1
+	bis	r31,r6,r16		;Restore R16
+	bis	r31,r7,r17		;Restore R17
+	ldq	r2,<state_adr-xdt$bpt_lp>(r3) ;Get address of EXE$GL_STATE
+	beq	r2,60$			;If it's zero, not linked with SYS
+	ldl	r2,(r2)			;Retrieve the contents
+	and	r2,#boostate$m_init,r2	;Test the INIT bit.
+	beq	r2,60$			;If zero, not safe to call EXE$BREAK
+	lda	r3,<exebr_lp-xdt$bpt_lp>(r3) ;Get LP of EXE$BREAK
+	ldq	r2,(r3)			;Load the code address
+	beq	r2,60$			;If it's zero, just give up
+	ldq	r3,8(r3)		;Get the procedure descriptor address
+	beq	r3,60$			;If it's zero, must be twilight zone
+	jsr	r31,(r2)		;Jump to EXE$BREAK
+;
+60$:	rei				;REI back to wherever
+
+
+	.SUBTITLE "xdt$exception - XDELTA Exception Handler"
+;
+; xdt$exception - XDELTA Exception Handler
+;
+; FUNCTIONAL DESCRIPTION:
+;
+;	This routine is invoked directly via a PAL call through an SCB
+; vector entry to handle XDELTA exceptions. All exceptions in this version
+; of XDELTA are "unexpected" since we attempt to find all user-specified
+; exceptions ahead of time.
+;	This routine effectively does a single-level unwind. In other words,
+; the routine which caused the exception will be forced to immediately return
+; to its caller with the exception reason in R0 as the error return status.
+; If the caller cares about an error return status of any kind, exceptions
+; will be handled in the same way.
+;	Accomplishing this feat requires a dependency on the calling standard
+; and proper interpretation of register contents. The saved procedure
+; descriptor is key to managing the unwind.
+;	Every routine consists of some prologue code, the routine body, and
+; some epilogue code. Since the prologue and epilogue code are generated by
+; the compiler to save and restore state, we assume they're bug free and that
+; all exceptions occur within the routine body. This being the case, we must
+; simulate the epilogue code by restoring any saved registers prior to
+; forcing the routine to return to its caller, effectively just skipping over
+; the routine body code after the instruction which caused the exception.
+;	Note that this routine contains some self-modifying code and is not
+; reentrant. Since it only executes in the context of XDELTA at IPL 31 while
+; holding the XDELTA lock (in an SMP environment), it is considered "safe" to
+; do so. It was done this way to avoid dozens of conditional branches in
+; favor of a handful of straight-line instructions. I know...it's not a good
+; excuse...but what the heck...
+;
+; INPUTS:
+;
+;	R2 = SCB vector
+;	R3 = SCB parameter - The exception reason
+;
+;	0(SP)  = Saved R2
+;	8(SP)  = Saved R3
+;	16(SP) = Saved R4
+;	24(SP) = Saved R5
+;	32(SP) = Saved R6
+;	40(SP) = Saved R7
+;	48(SP) = Saved PC
+;	56(SP) = Saved PS
+;
+; OUTPUTS:
+;
+;	None (this routine never returns to its caller)
+;
+; IMPLICIT INPUTS:
+;
+;	None
+;
+; IMPLICIT OUTPUTS:
+;
+;	None
+;
+; SIDE EFFECTS:
+;
+;	This routine never returns to its caller. Instead, the routine which
+; got the exception returns immediately to its caller with the exception
+; reason as the return status in R0. R1 is also destroyed and R28 is
+; destroyed in processing heavyweight procedures.
+;
+;--
+
+xdt$exception::
+;
+; Set the return status equal to the exception reason. Note that we assume
+; FUNC_RETURN is either 0 or 1 for 64-bit or 32-bit sign-extended values in
+; R0 (no floating point).
+;
+	or	r31,r3,r0		;Store exception reason in R0
+	or	r31,sp,r3		;Remember the "current" SP
+;
+; First thing to do is locate the "current" procedure descriptor
+; 
+	lda	r2,(r29)		;Retrieve the address in FP
+	ldq	r7,(r2)			;Extract the first quadword
+	and	r7,#7,r4		;Test the low 3 bits
+	bne	r4,5$			;Got the PD in R2
+	ldq	r2,(r2)			;This had better be it!
+	ldq	r7,(r2)			;Extract the first quadword
+;
+; Now that we have the PD, determine if this is a lightweight or heavyweight
+; procedure.
+;
+5$:	and	r7,#15,r4		;Mask off the lower 4 bits of the PD
+	cmpeq	r4,#10,r5		;Is it a lightweight procedure?
+	beq	r5,100$			;False => heavyweight
+;
+; This is a lightweight procedure. Fixing up the stack pointer is a piece
+; of cake. Well, maybe not a piece of "cake"...First, I have to figure out
+; what SP was prior to the exception occurring....which depends on the mode
+; we were in when it happened. Then we adjust SP by the fixed stack size from
+; the PD.
+;
+	ldq	r4,56(r3)		;Get saved PS
+	srl	r4,#3,r5		;Shift the mode into the low-order bits
+	and	r5,#3,r5		;Mask off everything but the mode
+	beq	r5,9$			;Go handle kernel mode
+	lda	sp,-32(sp)		;Space for 4 registers on the stack
+	stq	r0,(sp)			;Save R0
+	stq	r1,8(sp)		;Save R1
+	stq	r16,16(sp)		;Save R16
+	stq	r17,24(sp)		;Save R17
+	cmpeq	r5,#1,r6		;Is it exec mode?
+	beq	r6,6$			;Nope. Go check other modes
+	mfpr_esp			;Get the exec mode stack pointer
+	bis	r31,r0,r5		;Copy it into R5
+	br	r31,8$			;Join common code
+6$:	cmpeq	r5,#2,r6		;Is it supervisor mode?
+	beq	r6,7$			;Nope. Gotta be user.
+	mfpr_ssp			;Get the supervisor mode stack pointer
+	bis	r31,r0,r5		;Copy it into R5
+	br	r31,8$			;Join common code
+7$:	mfpr_usp			;Get the user mode stack pointer
+	bis	r31,r0,r5		;Copy it into R5
+8$:	ldq	r0,(sp)			;Restore R0
+	ldq	r1,8(sp)		;Restore R1
+	ldq	r16,16(sp)		;Restore R16
+	ldq	r17,24(sp)		;Restore R17
+;	lda	sp,32(sp)		;Restore SP unnecessary here
+	br	r31,10$			;Join common code
+9$:	srl	r4,#56,r4		;Get SP_ALIGN from saved PS
+	addq	r4,#64,r4		;Add it to exception frame size
+	addq	sp,r4,r5		;Compute SP prior to exception
+10$:	ldl	r4,16(r2)		;Get the fixed stack size from the PD
+	addq	r4,r5,sp		;Add it to SP from before the exception
+;
+; The stack's all set. Next we need to restore the saved FP. Quickly grab
+; your barf bag. What you're about to see isn't pretty, but afterall, this
+; is XDELTA. So what's a little self-modifying code...
+;
+; And the confusing mess below temporarily gets around an assembler
+; code generation problem when forward-referencing code labels
+;
+	br	r31,20$			;Just branch around this hack
+40$:	or	r31,r31,r29		;Reset the frame pointer
+	br	r31,45$			;Now branch around this other hack
+;
+20$:	extbl	r7,#2,r4		;Get the saved FP register number
+	ldah	r2,^x3E0(r31)		;Create RA operand register mask
+	sll	r4,#21,r4		;Put it into position
+	bsr	r5,30$			;Establish locality
+30$:	ldl	r6,<40$-30$>(r5)	;Get the instruction
+	bic	r6,r2,r6		;Zero out the RA operand field
+	or	r4,r6,r6		;Modify the RA register operand
+	stl	r6,<40$-30$>(r5)	;Write back the modified instruction
+	imb				;Flush the icache
+	br	r31,40$			;Go execute the modified instruction
+;
+; Get the return address into some known scratch register
+;
+50$:	or	r31,r31,r1		;Get the return address into R1
+	br	r31,55$			;Branch around the rest of this hack
+;
+45$:	extbl	r7,#3,r4		;Get the saved RA register number
+	sll	r4,#21,r4		;Put it into position
+	ldl	r6,<50$-30$>(r5)	;Get the instruction
+	bic	r6,r2,r6		;Zero out the RA operand field
+	or	r4,r6,r6		;Modify the RA register operand
+	stl	r6,<50$-30$>(r5)	;Write back the modified instruction
+	imb				;Flush the icache
+	br	r31,50$			;Go execute the modified instruction
+55$:
+;
+; Before returning, restore R2-R7 from the exception frame.
+;
+	ldq	r7,40(r3)		;Reload R7
+	ldq	r6,32(r3)		;Reload R6
+	ldq	r5,24(r3)		;Reload R5
+	ldq	r4,16(r3)		;Reload R4
+	ldq	r2,(r3)			;Reload R2
+	ldq	r3,8(r3)		;Reload R3
+;
+; We assume this is a "normal" return and not an REI return.
+;
+	jsr	r31,(r1)		;Return to routine's caller
+;
+; The following code handles a single-level unwind from a heavyweight
+; procedure (which is actually easier than a lightweight procedure). We'll
+; first check if this routine uses a fixed or variable size stack and then
+; reset the stack pointer accordingly. For SP-based procedures, we have to
+; determine SP at the time the exception occurred...which, in turn, depends
+; upon the mode we were in...
+;
+100$:	and	r7,#^x80,r5		;Test the flag bit
+	bne	r5,110$			;If nonzero, then FP base (var. stack)
+	ldq	r4,56(r3)		;Get saved PS
+	srl	r4,#3,r5		;Shift the mode into the low-order bits
+	and	r5,#3,r5		;Mask off everything but the mode
+	beq	r5,108$			;Go handle kernel mode
+	lda	sp,-32(sp)		;Space for 4 registers on the stack
+	stq	r0,(sp)			;Save R0
+	stq	r1,8(sp)		;Save R1
+	stq	r16,16(sp)		;Save R16
+	stq	r17,24(sp)		;Save R17
+	cmpeq	r5,#1,r6		;Is it exec mode?
+	beq	r6,105$			;Nope. Go check other modes
+	mfpr_esp			;Get the exec mode stack pointer
+	bis	r31,r0,r5		;Copy it into R5
+	br	r31,107$		;Join common code
+105$:	cmpeq	r5,#2,r6		;Is it supervisor mode?
+	beq	r6,106$			;Nope. Gotta be user.
+	mfpr_ssp			;Get the supervisor mode stack pointer
+	bis	r31,r0,r5		;Copy it into R5
+	br	r31,107$		;Join common code
+106$:	mfpr_usp			;Get the user mode stack pointer
+	bis	r31,r0,r5		;Copy it into R5
+107$:	ldq	r0,(sp)			;Restore R0
+	ldq	r1,8(sp)		;Restore R1
+	ldq	r16,16(sp)		;Restore R16
+	ldq	r17,24(sp)		;Restore R17
+;	lda	sp,32(sp)		;Restore SP unnecessary here
+	br	r31,109$		;Join common code
+108$:	srl	r4,#56,r4		;Get SP_ALIGN from saved PS
+	addq	r4,#64,r4		;Add it to exception frame size
+	addq	sp,r4,r5		;Compute SP prior to exception
+109$:	extwl	r7,#2,r6		;Get the RSA_OFFSET
+	ldl	r4,16(r2)		;Get the fixed stack size
+	addq	r6,r5,r28		;Compute start of RSA
+	addq	r4,r5,sp		;Reset the stack pointer
+	br	r31,120$		;Join common code
+110$:	extwl	r7,#2,r6		;Get the RSA_OFFSET
+	ldl	r4,16(r2)		;Get the fixed stack size
+	addq	r6,r29,r28		;Compute start of RSA
+	addq	r4,r29,sp		;Reset the stack pointer
+;
+; The stack's all set. Next we need to restore all the saved registers from
+; the register save area (we assume no floating point once again). First,
+; however, we restore the registers pushed onto the stack for the exception
+; frame (these will be the valid contents of the registers if there isn't
+; a corresponding bit in the IREG mask).
+;
+120$:	ldl	r1,24(r2)		;Get the IREG mask from the PD first
+	ldq	r7,40(r3)		;Reload R7
+	ldq	r6,32(r3)		;Reload R6
+	ldq	r5,24(r3)		;Reload R5
+	ldq	r4,16(r3)		;Reload R4
+	ldq	r2,(r3)			;Reload R2
+	ldq	r3,8(r3)		;Reload R3
+;
+; Now comes the fun part: restoring the registers themselves. Since we happen
+; to be using a few registers in doing this (scratch registers which
+; hopefully never need to be restored), we sometimes won't restore a
+; register although we still update the RSA pointer appropriately. This is
+; done for R0, R1, and R28. Note that since R29 (FP) should always be found
+; somewhere in the register save area, there's no point in checking R1 (the
+; IREG mask) for zero along the way.
+;
+	ldq	r26,(r28)		;Unconditionally load the return address
+	addq	r28,#8,r28		;Adjust the RSA address
+	blbc	r1,125$			;Is R0 to be restored?
+	addq	r28,#8,r28		;Just adjust RSA w/o restoring R0
+125$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,130$			;Is R1 to be restored?
+	addq	r28,#8,r28		;Just adjust RSA w/o restoring R1
+130$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,135$			;Is R2 to be restored?
+	ldq	r2,(r28)		;Hey, finally one we can restore
+	addq	r28,#8,r28		;Adjust RSA
+135$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,140$			;Is R3 to be restored?
+	ldq	r3,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+140$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,145$			;Is R4 to be restored?
+	ldq	r4,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+145$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,150$			;Is R5 to be restored?
+	ldq	r5,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+150$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,155$			;Is R6 to be restored?
+	ldq	r6,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+155$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,160$			;Is R7 to be restored?
+	ldq	r7,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+160$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,165$			;Is R8 to be restored?
+	ldq	r8,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+165$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,170$			;Is R9 to be restored?
+	ldq	r9,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+170$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,175$			;Is R10 to be restored?
+	ldq	r10,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+175$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,180$			;Is R11 to be restored?
+	ldq	r11,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+180$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,185$			;Is R12 to be restored?
+	ldq	r12,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+185$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,190$			;Is R13 to be restored?
+	ldq	r13,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+190$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,195$			;Is R14 to be restored?
+	ldq	r14,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+195$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,200$			;Is R15 to be restored?
+	ldq	r15,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+200$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,205$			;Is R16 to be restored?
+	ldq	r16,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+205$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,210$			;Is R17 to be restored?
+	ldq	r17,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+210$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,215$			;Is R18 to be restored?
+	ldq	r18,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+215$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,220$			;Is R19 to be restored?
+	ldq	r19,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+220$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,225$			;Is R20 to be restored?
+	ldq	r20,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+225$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,230$			;Is R21 to be restored?
+	ldq	r21,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+230$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,235$			;Is R22 to be restored?
+	ldq	r22,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+235$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,240$			;Is R23 to be restored?
+	ldq	r23,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+240$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,245$			;Is R24 to be restored?
+	ldq	r24,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+245$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,250$			;Is R25 to be restored?
+	ldq	r25,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+250$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,255$			;Is R26 to be restored?
+	ldq	r26,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+255$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,260$			;Is R27 to be restored?
+	ldq	r27,(r28)		;Restore it
+	addq	r28,#8,r28		;Adjust RSA
+260$:	srl	r1,#1,r1		;Look at the next bit in the mask
+	blbc	r1,265$			;Is R28 to be restored?
+	addq	r28,#8,r28		;Just adjust RSA w/o restoring R28
+265$:
+;	srl	r1,#1,r1		;Look at the next bit in the mask
+;	blbc	r1,300$			;Is R29 (FP) to be restored? Hope so!
+	ldq	r29,(r28)		;Restore it. We don't care about rest.
+;
+; The return status is already in R0. Note that we assume FUNC_RETURN
+; is either 0 or 1 for 64-bit or 32-bit sign-extended values in R0
+; (no floating point).
+;
+300$:	jsr	r31,(r26)		;Return to routine's caller
+
+
+	.SUBTITLE "xdt$ipl14_handler - IPL 14 ISR"
+;++
+; xdt$ipl14_handler - IPL 14 ISR
+;
+; FUNCTIONAL DESCRIPTION:
+;
+;	This routine is invoked directly (via SCB vector) in response
+; to IPL 14 software interrupts when XDELTA is loaded and linked with SYS.
+; This routine merely calls INI$BRK and REI's.
+;
+; INPUTS:
+;
+;	R2 = SCB vector
+;	R3 = SCB parameter - Preloaded linkage pointer
+;
+;	0(SP)  = Saved R2
+;	8(SP)  = Saved R3
+;	16(SP) = Saved R4
+;	24(SP) = Saved R5
+;	32(SP) = Saved R6
+;	40(SP) = Saved R7
+;	48(SP) = Saved PC
+;	56(SP) = Saved PS
+;
+; OUTPUTS:
+;
+;	None
+;
+; IMPLICIT INPUTS:
+;
+;	None
+;
+; IMPLICIT OUTPUTS:
+;
+;	None
+;
+; SIDE EFFECTS:
+;
+;	Nothing too hideous...I hope
+;
+;--
+
+xdt$ipl14_handler::			;ISR entry point
+;
+; Find the linkage pair for INI$BRK. If either the code address or
+; procedure descriptor address are zero, we'll punt. Otherwise, we'll
+; call INI$BRK and then REI.
+;
+	lda	r3,<inibrk_lp-xdt$bpt_lp>(r3) ;Get LP of INI$BRK
+	ldq	r2,(r3)			;Load the code address
+	beq	r2,10$			;If it's zero, just give up
+	ldq	r3,8(r3)		;Get the procedure descriptor address
+	beq	r3,10$			;If it's zero, must be twilight zone
+	bis	r31,r26,r4		;Save copy of R26 in R4
+	jsr	r26,(r2)		;Call INI$BRK
+	bis	r31,r4,r26		;Restore R26 from R4
+;
+10$:	rei				;REI back to wherever
+
+	.end

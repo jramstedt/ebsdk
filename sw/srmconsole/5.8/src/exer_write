@@ -1,0 +1,137 @@
+#+
+# ============================================================================
+# = exer_write - Randomly do non-destructive writes to a device.             =
+# ============================================================================
+#
+# OVERVIEW:
+#
+#       Use exer to run a non-destructive write test on one or more devices.
+#       The data is read and written in packets of 2048 bytes.
+#
+#       Seek to a random block on the device then read a 2048 byte packet of
+#       data then write that same data back to the same location on the device.
+#	Then read the written data back and compare it to the 
+#	data originally read and display any discrepancies.
+#
+#	This is repeated until one of the following conditions occurs:
+###	
+#	1 All blocks on the device(s) have been read for the number of
+#		passes specified by the d_passes environment variable.
+#	2 The exer process has been killed via ^C or by the kill command.
+##	
+#
+#	Nothing is displayed unless an error occurs.
+#
+#   COMMAND FORM:
+#
+#       exer_write ( [<device>...] )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       <device> - Specifies the device name to be exercised. 
+#		   Defaults to du*.* dk*.* dr*.*,
+#		   all online DSSI, SCSI, and RAID disks.
+#
+#   COMMAND OPTION(S):
+#
+#	None
+#
+#   COMMAND EXAMPLE(S):
+#~
+#       >>>exer_write	# Run on all, if any, disks that are online.
+#~
+#   COMMAND REFERENCES:
+#
+#	exer_read
+#
+#-
+echo 'EXECUTING THIS COMMAND WILL DESTROY DISK DATA'
+echo '    OR DATA ON THE SPECIFIED DEVICES'
+echo 'Do you really want to continue? [Y/(N)]:'
+line <tt >tee:tmp$$/nl
+if (grep '[yY]' >nl <tmp$$) then
+else
+	exit `echo 1;rm tmp${p}`
+fi
+
+#set device list not present
+set aa_dvx_spec$$ 1 2>nl
+set a_err$$ 1 2>nl
+#create file for list of devices that are read-only
+echo -n > dvx_list$$
+
+# screen out some of the invalid syntax cases
+for i in $* ; do
+	case $i in
+	    "-sec") ;;
+	  "[0-9]*") ;;
+	  	 *) if (check -f $i) then
+#dvx list present on command line
+			set aa_dvx_spec$$ 0
+			ls -l $i|find 0 >tmp$$
+			if (grep <tmp$$ w >nl) then
+			else
+				chmod +w $i
+				echo $i >> dvx_list$$
+			fi
+		    else
+			echo device not found
+			set a_err$$ 0
+		    fi ;;
+	esac
+done
+
+if (eval a_err$$ >nl) then
+	clear aa_dvx_spec$$ a_err$$
+	rm dvx_list$$ tmp$$
+	exit 1
+fi
+
+# setup arg_list with command line device list or default device list
+echo $* >arg_list$$ -n
+if (eval aa_dvx_spec$$ >nl) then
+#use command line device list
+else
+#use device list default
+	if (ls du*.* >nl) then
+		echo -n " du*.*" >>arg_list$$
+		ls -l du*.*|find 0 >tmp$$
+		if (grep <tmp$$ w >nl) then
+		else
+			chmod +w du*.*
+			echo du*.* >> dvx_list$$
+		fi
+	fi
+	if (ls dk*.* >nl) then
+		echo -n " dk*.*" >>arg_list$$
+		ls -l dk*.*|find 0 >tmp$$
+		if (grep <tmp$$ w >nl) then
+		else
+			chmod +w dk*.*
+			echo dk*.* >> dvx_list$$
+		fi
+	fi
+	if (ls dr*.* >nl) then
+		echo -n " dr*.*" >>arg_list$$
+		ls -l dr*.*|find 0 >tmp$$
+		if (grep <tmp$$ w >nl) then
+		else
+			chmod +w dr*.*
+			echo dr*.* >> dvx_list$$
+		fi
+	fi
+fi
+clear aa_dvx_spec$$
+
+if (exer -bc 4 `cat arg_list${p}` -a "?r-w-Rc") then
+#set exit status to success
+	echo -n 0 >tmp$$
+else
+	echo -n 1 >tmp$$
+fi
+
+#make devices that were read-only, read-only again
+chmod -w `cat dvx_list${p}`
+
+rm arg_list$$ dvx_list$$
+exit `cat tmp${p};rm tmp${p}`

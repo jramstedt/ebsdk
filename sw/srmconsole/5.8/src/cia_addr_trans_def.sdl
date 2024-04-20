@@ -1,0 +1,205 @@
+{ Copyright (c) 1993 by
+{ Digital Equipment Corporation, Maynard, Massachusetts.
+{ All rights reserved.
+{
+{ This software is furnished under a license and may be used and copied
+{ only  in  accordance  of  the  terms  of  such  license  and with the
+{ inclusion of the above copyright notice.  This software or any  other
+{ copies thereof may not be provided or otherwise made available to any
+{ other person.  No title to and  ownership of the  software is  hereby
+{ transferred.
+{
+{ The information in this software is  subject to change without notice
+{ and  should  not  be  construed  as a commitment by Digital Equipment
+{ Corporation.
+{
+{ Digital assumes no responsibility for the use  or  reliability of its
+{ software on equipment which is not supplied by Digital.
+{
+MODULE CIA_ADDR_TRANS_DEF IDENT "V1.0";
+
+
+/*
+/* Window base register 0-3
+/* 
+AGGREGATE pci_win_base UNION 
+    PREFIX wbase_;
+
+    by_field STRUCTURE;
+    	w_en BITFIELD LENGTH 1-^ MASK;
+    	sg BITFIELD LENGTH 2-^ MASK;
+	memcs_enable BITFIELD LENGTH 3-^ MASK;
+	dac_enable BITFIELD LENGTH 4-^ MASK;
+	unused_0 BITFIELD LENGTH 20-^ MASK;
+	w_base BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+END pci_win_base;
+
+/*
+/* Window mask register 0-3
+/*
+
+CONSTANT sz1mb EQUALS %x00000000 PREFIX wmask_;
+CONSTANT sz2mb EQUALS %x00100000 PREFIX wmask_;
+CONSTANT sz4mb EQUALS %x00300000 PREFIX wmask_;
+CONSTANT sz8mb EQUALS %x00700000 PREFIX wmask_;
+CONSTANT sz16mb EQUALS %x00f00000 PREFIX wmask_;
+CONSTANT sz32mb EQUALS %x01f00000 PREFIX wmask_;
+CONSTANT sz64mb EQUALS %x03f00000 PREFIX wmask_;
+CONSTANT sz128mb EQUALS %x07f00000 PREFIX wmask_;
+CONSTANT sz256mb EQUALS %x0ff00000 PREFIX wmask_;
+CONSTANT sz512mb EQUALS %x1ff00000 PREFIX wmask_;
+CONSTANT sz1gb EQUALS %x3ff00000 PREFIX wmask_;
+CONSTANT sz2gb EQUALS %x7ff00000 PREFIX wmask_;
+CONSTANT sz4gb EQUALS %xfff00000 PREFIX wmask_;
+
+AGGREGATE pci_win_mask UNION 
+    PREFIX wmask_;
+
+    by_field STRUCTURE;
+	unused_0 BITFIELD LENGTH 20-^ MASK;
+	w_mask BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END pci_win_mask;
+
+/*
+/* Translation Base register 0-3
+/*
+AGGREGATE pci_trn_base UNION 
+    PREFIX tbase_;
+
+    by_field STRUCTURE;
+	unused_0 BITFIELD LENGTH 8-^ MASK;
+	t_base BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END pci_trn_base;
+
+/*
+/* Window DAC base register
+/*
+AGGREGATE pci_wdac_base UNION 
+    PREFIX wdac_;
+
+    by_field STRUCTURE;
+	base BITFIELD LENGTH 8-^ MASK;
+	unused BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END pci_wdac_base;
+
+
+/*
+/* Lockable Translation Buffer Tag 0-3
+/*
+CONSTANT locktb_tag_count EQUALS 4;
+
+AGGREGATE pci_lock_tbtag UNION 
+    PREFIX locktbtag_;
+
+    by_field STRUCTURE;
+	valid BITFIELD LENGTH 1-^ MASK;
+	locked BITFIELD LENGTH 2-^ MASK;
+	dac BITFIELD LENGTH 3-^ MASK;
+	unused_0 BITFIELD LENGTH 15-^ MASK;
+	tb_tag BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END pci_lock_tbtag;
+
+/*
+/* Translation Buffer Tag 4-7
+/*
+CONSTANT tb_tag_count EQUALS 4;
+
+AGGREGATE pci_tbtag UNION 
+    PREFIX tbtag_;
+
+    by_field STRUCTURE;
+	valid BITFIELD LENGTH 1-^ MASK;
+	unused_0 BITFIELD LENGTH 2-^ MASK;
+	dac BITFIELD LENGTH 3-^ MASK;
+	unused_1 BITFIELD LENGTH 15-^ MASK;
+	tb_tag BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END pci_tbtag;
+
+/*
+/* Translation Buffer Page Register [0-7] [0-3]
+/* 
+CONSTANT tb_page_count EQUALS 4;
+
+AGGREGATE pci_tbpage UNION 
+    PREFIX tbpage_;
+
+    by_field STRUCTURE;
+	valid BITFIELD LENGTH 1-^ MASK;
+	page_address BITFIELD LENGTH 22-^ MASK;
+	unused BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END pci_tbpage;
+
+
+
+/* Define constants to build base address of 0x8760000000
+
+CONSTANT cia_a_addr_trans EQUALS %X876;
+CONSTANT cia_v_addr_trans EQUALS 28;
+
+/*
+/* PCI Window management and Scatter/gather registers - 0x8760000000
+/*
+
+AGGREGATE cia_addr_trans STRUCTURE;
+
+    fill_0 BYTE DIMENSION %X100-: FILL;
+    tbia LONGWORD;			/* 0x100 from base
+    fill_1 BYTE DIMENSION %X400-: FILL;	
+    w_base0 pci_win_base;		/* 0x400 from base
+    w_mask0 pci_win_mask;		/* 0x440 from base
+    t_base0 pci_trn_base;		/* 0x480 from base
+    fill_2 BYTE DIMENSION %X500-: FILL;	
+    w_base1 pci_win_base;		/* 0x500 from base
+    w_mask1 pci_win_mask;		/* 0x540 from base
+    t_base1 pci_trn_base;		/* 0x580 from base
+    fill_3 BYTE DIMENSION %X600-: FILL;    
+    w_base2 pci_win_base;		/* 0x600 from base
+    w_mask2 pci_win_mask;		/* 0x640 from base
+    t_base2 pci_trn_base;		/* 0x680 from base
+    fill_4 BYTE DIMENSION %X700-: FILL; 
+    w_base3 pci_win_base;		/* 0x700 from base
+    w_mask3 pci_win_mask;		/* 0x740 from base
+    t_base3 pci_trn_base;		/* 0x780 from base
+    w_dac3 pci_wdac_base;		/* 0x7c0 from base
+    ltb_tag pci_lock_tbtag DIMENSION 4; /* 0x800 from base
+    tb_tag pci_tbtag DIMENSION 4;	/* 0x900 from base
+    fill_6 BYTE DIMENSION %x1000-: FILL;  
+    tb0_page pci_tbpage DIMENSION 4;	/* 0x1000 from base
+    tb1_page pci_tbpage DIMENSION 4;	/* 0x1100 from base
+    tb2_page pci_tbpage DIMENSION 4;    /* 0x1200 from base
+    tb3_page pci_tbpage DIMENSION 4;	/* 0x1300 from base
+    tb4_page pci_tbpage DIMENSION 4;	/* 0x1400 from base
+    tb5_page pci_tbpage DIMENSION 4;	/* 0x1500 from base
+    tb6_page pci_tbpage DIMENSION 4;	/* 0x1600 from base
+    tb7_page pci_tbpage DIMENSION 4;	/* 0x1700 from base
+END cia_addr_trans;
+
+
+END_MODULE CIA_ADDR_TRANS_DEF;

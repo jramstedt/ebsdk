@@ -1,0 +1,132 @@
+;
+; Copyright (C) 1993 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by Digital Equipment
+; Corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by Digital.
+;
+;
+; Abstract:	NCR53C810 scripts for SCSI/DSSI
+;
+; Author:	Stephen F. Shirron
+;
+; Modifications:
+;
+;	sfs	14-Apr-1993	Initial entry.
+;
+
+	.library	"cp$src:n810_script"
+
+	$n810scriptdef
+
+	.mcall	sel,disc,jmp,int,mov,set,clr
+
+	begin	n810
+
+.enable lsb
+
+n810_script::
+
+n810_sel::
+	sel	wait=no,atn=yes,resel=n810_resel
+	int	scsi,wait=yes,phase=msg_out,sense=true
+	int	dssi,wait=yes,phase=cmd,sense=true
+	int	err101,sense=true
+
+.disable lsb
+
+.enable lsb
+
+n810_flush_scsi::
+	andi	<^x7f>,<^x02>
+10$:	jmp	20$,wait=yes,phase=msg_out,sense=false
+	mov	p1=n810_msg_out_buf,p2=1,wait=yes,phase=msg_out
+	jmp	10$,sense=true
+20$:	jmp	30$,wait=yes,phase=cmd,sense=false
+	mov	p1=n810_cmd_buf,p2=1,wait=yes,phase=cmd
+	jmp	10$,sense=true
+30$:	jmp	40$,wait=yes,phase=dat_out,sense=false
+	mov	p1=n810_dat_out_buf,p2=1,wait=yes,phase=dat_out
+	jmp	10$,sense=true
+40$:	jmp	50$,wait=yes,phase=dat_in,sense=false
+	mov	p1=n810_dat_in_buf,p2=1,wait=yes,phase=dat_in
+	jmp	10$,sense=true
+50$:	jmp	60$,wait=yes,phase=sts,sense=false
+	mov	p1=n810_sts_buf,p2=1,wait=yes,phase=sts
+	jmp	10$,sense=true
+60$:	jmp	70$,wait=yes,phase=msg_in,sense=false
+	mov	p1=n810_msg_in_buf,p2=1,wait=yes,phase=msg_in
+	clr	ack=yes
+	int	ok,data=<^x00>,mask=<^x00>,sense=true
+	jmp	10$,sense=true
+70$:	int	err104,sense=true
+
+.disable lsb
+
+.enable lsb
+
+n810_flush_dssi::
+	andi	<^x7f>,<^x02>
+	clr	atn=yes
+10$:	jmp	20$,wait=yes,phase=cmd,sense=false
+	mov	p1=n810_cmd_buf,p2=1,wait=yes,phase=cmd
+	jmp	10$,sense=true
+20$:	jmp	30$,wait=yes,phase=dat_out,sense=false
+	mov	p1=n810_dat_out_buf,p2=1,wait=yes,phase=dat_out
+	jmp	10$,sense=true
+30$:	jmp	40$,wait=yes,phase=sts,sense=false
+	mov	p1=n810_sts_buf,p2=1,wait=yes,phase=sts
+	int	ok,data=<^x1e>,mask=<^x00>,sense=true
+	jmp	10$,sense=true
+40$:	int	err105,sense=true
+
+n810_resel:
+	int	reselected,sense=true
+
+.disable lsb
+
+.align quad
+
+n810_msg_out_buf:
+	.byte	^x80
+
+.align quad
+
+n810_cmd_buf:
+	.byte	^x00
+
+.align quad
+
+n810_dat_out_buf:
+	.byte	^x00
+
+.align quad
+
+n810_dat_in_buf:
+	.blkb	1
+
+.align quad
+
+n810_sts_buf::
+	.blkb	1
+
+.align quad
+
+n810_msg_in_buf:
+	.blkb	1
+
+	end	n810
+
+	.end

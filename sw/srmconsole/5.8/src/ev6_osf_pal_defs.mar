@@ -1,0 +1,276 @@
+;+
+; ev6_osf_pal_defs.mar
+;
+; This file is for osf definitions
+;-
+
+;+
+; Last Edit:	09-Jun-00
+;
+; Edit History
+; Who	When		What
+; ---	----		----
+; ES	25-Sep-96	Added a0 interrupt values to OSF_A0_DEFS.
+;			Added IPL definitions
+; ES	01-Aug-97	Added OSF_IPL__DEV5 and OSF_IPL__DEV6.
+; ES	18-May-98	Added OSFPAL_FUNC__WTINT
+; ES	29-Jun-98	Added SCB__SYS_EVENT
+; ES	08-Jul-99	Added OSFPAL_FUNC__WRVIRBND, WRSYSPTB
+; ES	30-Mar-00	Added WRASN
+; ES	09-Jun-00	Added OSF_P_MISC__CMOV_OK__S,M
+;-
+
+;+
+; CALL_PAL functions
+;-
+.macro	OSFPAL_FUNC_DEFS
+	OSFPAL_FUNC__BPT	= ^x80
+	OSFPAL_FUNC__BUGCHK	= ^x81
+	OSFPAL_FUNC__CALLSYS	= ^x83
+	OSFPAL_FUNC__IMB	= ^x86
+	OSFPAL_FUNC__URTI	= ^x92
+	OSFPAL_FUNC__RDUNIQUE	= ^x9E
+	OSFPAL_FUNC__WRUNIQUE	= ^x9F
+	OSFPAL_FUNC__GENTRAP	= ^XAA
+	OSFPAL_FUNC__CLRFEN	= ^xAE
+
+	OSFPAL_FUNC__HALT	= ^x00
+	OSFPAL_FUNC__CFLUSH	= ^x01
+	OSFPAL_FUNC__DRAINA	= ^x02
+	OSFPAL_FUNC__CSERVE	= ^x09
+	OSFPAL_FUNC__SWPPAL	= ^x0A
+	OSFPAL_FUNC__WRIPIR	= ^x0D
+	OSFPAL_FUNC__RDMCES	= ^x10
+	OSFPAL_FUNC__WRMCES	= ^x11
+	OSFPAL_FUNC__WRVIRBND	= ^x13
+	OSFPAL_FUNC__WRSYSPTB	= ^x14
+	OSFPAL_FUNC__WRFEN	= ^x2B
+	OSFPAL_FUNC__WRVPTPTR	= ^x2D
+	OSFPAL_FUNC__WRASN	= ^x2E
+	OSFPAL_FUNC__SWPCTX	= ^x30
+	OSFPAL_FUNC__WRVAL	= ^x31
+	OSFPAL_FUNC__RDVAL	= ^x32
+	OSFPAL_FUNC__TBI	= ^x33
+	OSFPAL_FUNC__WRENT	= ^x34
+	OSFPAL_FUNC__SWPIPL	= ^x35
+	OSFPAL_FUNC__RDPS	= ^x36
+	OSFPAL_FUNC__WRKGP	= ^x37
+	OSFPAL_FUNC__WRUSP	= ^x38
+	OSFPAL_FUNC__WRPERFMON	= ^x39
+	OSFPAL_FUNC__RDUSP	= ^x3A
+	OSFPAL_FUNC__WHAMI	= ^x3C
+	OSFPAL_FUNC__RETSYS	= ^x3D
+	OSFPAL_FUNC__WTINT	= ^x3E
+	OSFPAL_FUNC__RTI	= ^x3F
+.endm	OSFPAL_FUNC_DEFS
+
+
+;+
+; OSF_P_MISC definition
+;-
+.macro	OSF_P_MISC_DEFS
+	OSF_P_MISC__IPL__S		= 0
+	OSF_P_MISC__IPL__M		= ^x7
+	OSF_P_MISC__CM__S		= 3
+	OSF_P_MISC__CM__M		= ^x1
+	OSF_P_MISC__RSV__S		= 4
+	OSF_P_MISC__RSV__M		= ^xFFF
+
+	OSF_P_MISC__PS__S		= 0
+	OSF_P_MISC__PS__M		= ^xF
+
+	OSF_P_MISC__MCES__MCHK__S	= 16
+	OSF_P_MISC__MCES__SCE__S	= 17
+	OSF_P_MISC__MCES__PCE__S	= 18
+	OSF_P_MISC__MCES__DPC__S	= 19
+	OSF_P_MISC__MCES__DSC__S	= 20
+	OSF_P_MISC__MCES__RSV__S	= 21
+	OSF_P_MISC__MCES__RSV__M	= ^x7
+
+	OSF_P_MISC__SCBV__S		= 24
+	OSF_P_MISC__SCBV__M		= ^xFFFF
+	OSF_P_MISC__MCHK_CODE__S	= 40
+	OSF_P_MISC__MCHK_CODE__M	= ^xFFFF
+;
+; <59> Set for ev68 pass2
+; For istream mchk, no longer need to check for pc near a cmov 
+;
+	OSF_P_MISC__EV68P2__S		= 59
+	OSF_P_MISC__EV68P2__M		= ^x1
+;
+; <61:60> reserved for ev7
+;
+	OSF_P_MISC__SWITCH__S		= 62
+	OSF_P_MISC__PHYS__S		= 63
+.endm	OSF_P_MISC_DEFS
+
+
+;+
+; OSF_PS definition
+;-
+.macro	OSF_PS_DEFS
+	OSF_PS__IPL__S		= 0
+	OSF_PS__IPL__M		= ^x7
+	OSF_PS__CM__S		= 3
+	OSF_PS__CM__M		= ^x1
+.endm	OSF_PS_DEFS
+
+
+;+
+; PTE layout
+;
+;	Loc	Size	name 	function
+;	------	------	------	-----------------------------------
+;	<63:32>	32	PFN	Page Frame Number
+;	<31:16>	16	SOFT	Bits reserved for software use
+;	<13>	1	UWE	User write enable
+;	<12>	1	KWE	Kernel write enable
+;	<9>	1	URE	User read enable
+;	<8>	1	KRE	Kernel read enable
+;	<6:5>	2	GH	Granularity hint
+;	<4>	1	ASM	Wild card address space number match
+;	<3>	1	FOE	Fault On execute
+;	<2>	1	FOW	Fault On Write
+;	<1>	1	FOR	Fault On Read
+; 	<0>	1	V	valid bit
+;-
+
+.macro	OSF_PTE_DEFS
+	OSF_PTE__PFN__S	= 	32
+	OSF_PTE__PFN__M	= 	^xFFFFFFFF
+
+	OSF_PTE__SOFT__S	= 16
+	OSF_PTE__SOFT__M	= ^xFFFF
+
+	OSF_PTE__UWE__S		= 13
+	OSF_PTE__UWE__M		= ^x1
+	OSF_PTE__KWE__S		= 12
+	OSF_PTE__KWE__M		= ^x1
+
+	OSF_PTE__URE__S		= 9
+	OSF_PTE__URE__M		= ^x1
+	OSF_PTE__KRE__S		= 8
+	OSF_PTE__KRE__M		= ^x1
+
+	OSF_PTE__GH__S		= 5
+	OSF_PTE__GH__M		= ^x3
+
+	OSF_PTE__ASM__S		= 4
+	OSF_PTE__ASM__M		= ^x1
+	OSF_PTE__FOE__S		= 3
+	OSF_PTE__FOE__M		= ^x1
+	OSF_PTE__FOW__S		= 2
+	OSF_PTE__FOW__M		= ^x1
+	OSF_PTE__FOR__S		= 1
+	OSF_PTE__FOR__M		= ^x1
+
+	OSF_PTE__V__S		= 0
+	OSF_PTE__V__M		= ^x1
+
+	OSF_PTE__PROT__M	= ^x3300
+
+.endm	OSF_PTE_DEFS
+
+
+;+
+; SYSTEM CONTROL BLOCK (SCB)
+;-
+.macro	OSF_SCB_DEFS
+	SCB__SYS_CORR_ERR	= ^x0620
+	SCB__PROC_CORR_ERR	= ^x0630
+	SCB__PWRFAIL		= ^x0640
+	SCB__PERFMON		= ^x0650
+	SCB__SYSMCHK		= ^x0660
+	SCB__PROCMCHK		= ^x0670
+	SCB__SYS_EVENT		= ^x0680
+	SCB__PASSIVE__REL	= ^x06F0
+.endm	OSF_SCB_DEFS
+
+
+;+
+; PRIVILEGED CONTEXT BLOCK (PCB)
+;-
+.macro	OSF_PCB_DEFS
+	OSF_PCB__STACKS		=  0
+	OSF_PCB__KSP		=  0
+	OSF_PCB__USP		=  8
+	OSF_PCB__PTBR		= 16
+	OSF_PCB__CPC		= 24
+	OSF_PCB__ASN		= 28
+	OSF_PCB__UNQ		= 32
+	OSF_PCB__FEN		= 40
+	OSF_PCB__RSV		= 48
+
+	OSF_PCB__ASN__S		= 32
+	OSF_PCB__ASN__M		= ^xFF
+
+	OSF_PCB__FEN__S		= 0
+	OSF_PCB__FEN__M		= ^x1
+	OSF_PCB__PME__S		= 62
+	OSF_PCB__PME__M		= ^x1
+.endm	OSF_PCB_DEFS
+
+;+
+; Stack frame (FRM)
+;-
+.macro	OSF_FRM_DEFS
+	OSF_FRM__PS		= ^x0000
+	OSF_FRM__PC		= ^x0008
+	OSF_FRM__GP		= ^x0010
+
+	OSF_FRM__A0		= ^x0018
+	OSF_FRM__R16		= ^x0018
+
+	OSF_FRM__A1		= ^x0020
+	OSF_FRM__R17		= ^x0020
+
+	OSF_FRM__A2		= ^x0028
+	OSF_FRM__R18		= ^x0028
+
+	OSF_FRM__SIZE		= ^x0030
+.endm	OSF_FRM_DEFS
+
+;+
+; OSF_A0_DEFS
+;-
+.macro	OSF_A0_DEFS
+	OSF_A0__BPT		= ^x0
+	OSF_A0__BUGCHK		= ^x1
+	OSF_A0__GENTRAP		= ^x2
+	OSF_A0__FEN		= ^x3
+	OSF_A0__OPDEC		= ^x4
+	OSF_A0__ILLOP		= ^x5
+
+	OSF_A0_INT__IP		= ^x0
+	OSF_A0_INT__CLK		= ^x1
+	OSF_A0_INT__CRD		= ^x2
+	OSF_A0_INT__MCHK	= ^x2
+	OSF_A0_INT__DEV		= ^x3
+	OSF_A0_INT__PERFMON	= ^x4
+.endm	OSF_A0_DEFS
+
+;+
+; OSF_MMCSR_DEFS
+;-
+.macro	OSF_MMCSR_DEFS
+	OSF_MMCSR__TNV		= ^x0
+	OSF_MMCSR__ACV		= ^x1
+	OSF_MMCSR__FOR		= ^x2
+	OSF_MMCSR__FOE		= ^x3
+	OSF_MMCSR__FOW		= ^x4
+.endm	OSF_MMCSR_DEFS
+	
+;+
+; OSF_IPL_DEFS
+;-
+.macro	OSF_IPL_DEFS
+	OSF_IPL__IP		= ^x5
+	OSF_IPL__CLK		= ^x5
+	OSF_IPL__MCHK_CRD	= ^x7
+	OSF_IPL__MCHK		= ^x7
+	OSF_IPL__DEV3		= ^x3
+	OSF_IPL__DEV4		= ^x4
+	OSF_IPL__DEV5		= ^x5
+	OSF_IPL__DEV6		= ^x6
+	OSF_IPL__PERFMON	= ^x6
+.endm	OSF_IPL_DEFS

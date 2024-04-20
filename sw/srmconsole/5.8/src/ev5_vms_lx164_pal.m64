@@ -1,0 +1,3846 @@
+.sbttl	"System specific code - AlphaPC 164/LX"
+; This module is for all the system specific code.
+; This version is for the AlphaPC 164/LX.
+.sbttl	"Edit History"
+;+
+; Who		Rev	When		What	
+; ------------	---	-----------	--------------------------------
+; DB		0.1	02-Nov-1992	Start
+; DB		0.2	06-Apr-1993	Add machine check code
+; DB		0.3	06-May-1993	Scache tag parity errors are never retryable
+;					Update reset flows
+; JM		0.4	11-May-1993	Add CRD code; Update Ibox IPRs
+; DB		0.5	11-May-1993	Add disable_crd option
+; DB		0.6	12-May-1993	Typo in reset clear of lock_flag
+; JM		0.7	14-May-1993	Fix typo in crd code (writing mces twice); change 
+;					 hwint_clr from W0C to W1C
+;					PVC fixes
+; DB		0.8	25-May-1993	MB before enabling Dcache in reset
+;					Bug: wrong register used in hwint_clr in sys$crd_ack
+; DB		0.9	26-May-1993	New restriction - no reg file read/write in first 8 cycles of machine check
+;					Remove stash of R0 in sys$double_machine_check & sys$machine_check_while_in_pal 
+;					sys$int_mchk now checks for double_machine_check
+; DB		0.10	02-Jun-1993	Change reset for EGORE
+; DB		0.11	07-Jun-1993	Change reset for EGORE -  load ptbr from r4
+; JM		0.12	15-Jun-1993	Add MB to device interrupt flows (sys$int_2*,sys$int_mchk) after 
+;					  store that acks the interrupt
+; JM		0.13	16-Jun-1993	Interrupts:  pad mt dc_flush
+; DHA 		0.14	29-Jun-1993	Fix RAX reset flow
+; JM		0.15	07-Jul-1993	Remove ic_flush from reset flow - done in hardware
+; JM		0.16	10-aug-1993	Bug: SYS$CSERVE violation of palshadow write -> hw_rei restriction
+; JM		0.17	14-oct-1993	Add code to enable setting physical console flag in ptbr in enter console routine
+;					Add exit console routine (copied from osf - and that from ev4)
+; JM		0.18	1-nov-1993	Fix palshadow reg write ->hw_rei violation in sys$int_perf_cnt and sys$passive_release
+; JM		0.19    29-nov-1993	Use "mchk$crd_cpu_base" instead of "mchk$crd_ei_addr" and "mchk$cpu_base" instead of 
+;						"mchk$exc_addr" for cpu offsets in the logout frames
+;					Bug: replace mchk$mchk_base with mchk$crd_base in crd flow
+;					Change impure pointer to point to cpu specific base - remove local calculations
+;					Change mchk/crd LAoff calculation to be simply mchk$crd_base, mchk$mchk_base
+; DB		0.20	13-Jan-1994	Local (HLO) change: add read/write DC_MODE to CSERVE for mchk testing
+; JM		0.21	17-jan-1994	Add code for mtpr_perfmon -- first attempt at "real code", plus a debug version
+;					Put read/writes to impure area in store_reg1,restore_reg1 macros
+;					Move halt code assignment after calls to update_pcb in several places
+;					Add pvc$jsr to save_state subroutine call in enter_console routine
+; JM		0.22	 1-feb-1994	Move beh_model halt to call_pal$halt from sys$enter_console
+;					Add beh_model code to sys$enter_console to load the exc_addr
+;					Pass mask for mcsr and icsr registers for dvt environment in reset
+; JM		0.23	 4-feb-1994	make more efficient set_sc_bc_ctl routine
+;					Put impure area in pal scratch area, and use former pt_impure for bc_ctl shadow and
+;						performance monitor control bits (now called pt_bcs_pm)
+;						change affects: sys$reset impure initialization, all mchk & crd flows
+;					Change performance monitoring code to minimize impact to swpctx
+;					BUG: crd flow -> R4 = -1  if no frame built
+;					Add performance monitor interrupt code
+;					Change beh_model specific code in sys$int_2* for new dvt's
+;					For passive release case, beh_model code only, raise ipl to 31 & vector to scb (for 
+;						new dvt's)
+; JM		0.24	17-feb-1994	add debug hooks:  initialize debug_ptr, add trace_pc routine, add code to call trace_pc 
+;						in pm interrupt routine.
+;                                               Move kludge_initial_pcbb to before set_sc_bt_ctl to save space; align to
+;                                               128 bytes and make 128 bytes long as per srm
+; JM		0.25	19-feb-1994	add code to exit_console to load impure ptr into r1
+;					add some code minimizations for mtpr_perfmon
+; JM		0.26	22-feb-1994	BUG: sys$reset (enable_debug_pcout only): fix initialization for debug_pcout to 
+;						handle io addresses
+; JM		0.27	24-feb-1994	Initialize the following in sys$reset : pmctr,maf_mode
+;					Local (HLO) changes: 
+;					 Add behavioral model specific halt interrupt clear mechanism
+;					 Remove obsolete beh_model specific mchk interrupt code
+;					 Delete old CSERVE stuff.  Add one function to jump to address in r16 for dvt's.
+; JM		0.28	 1-mar-1994	in exit_console, restore pal_base prior to impure calculation
+; JM		0.29	22-apr-1994	put impure pointer back into pt_impure.  Put bc_ctl shadow and pmctr_ctl in impure area.
+;						(problem in mp systems with putting cpu specific impure pointer into pal scratch 
+;						space --since all share same palcode.)
+; JM		0.30	25-apr-1994	BUG: CFLUSH interrupt check did not take IPL level into account (checking raw interrupt
+;						requests)
+; JM		0.31	 5-may-1994	Remove redundant code from mtpr_perfmon
+; JM		0.32	 9-may-1994	BUG: sys$perfmon - r17 masks for enabling counters flipped, r17 mask
+;						for disabling counters messed up completely.   Mask for
+;						clearing counters calculated wrong.
+;					BUG: sys$reset: initializing location in impure area before cbox init
+; JM		0.33	10-jun-1994	Add code to update SCC and detect PCC wrap in sys$int_clock example code
+;					Add statements to not assemble sys$int_clock and sys$int_interprocessor
+;						(example code -- not called anywhere)
+; JM		0.34	11-jul-1994	Replace hw_rei with hw_rei_stall in exit_console to conform to itbia restriction
+;					 	(itbia was added to save/restore_state routines)
+;					Use mchk$crd_sys_base in place of crd_size for generating system offset in crd flow.
+;					Use mchk$sys_base in place of mchk$sys_ipr1 for generating system offset in mchk flow
+;					Change sys$enter_console to only set physical console flag in ptbr and 
+;						initialize vptbr's to known value (for moving from osf to vms)
+;					Change sys$exit_console to only clear physical console flag in ptbr
+; JM		1.00	 1-aug-1994	Update for Pass2 -- change sys$perfmon flow to use icsr pm bits
+; JM		1.01	 2-aug-1994	Initialize cns$bc_config in reset flow
+;					Add ARITH_AND_MCHK
+; JM		1.02	19-aug-1994	Add checks to *get_addr macros
+;					BUG: Incorrectly generating mode and mux select masks in sys$perfmon
+; JM		1.03	16-sep-1994	Move sys$perfmon code to EV5_VMS_CALLPAL.M64
+; JM 		1.04	 9-jan-1995	Fix to EI_STAT entry in MCHK logout frame -- OR in lower 28 bits (previously wiped out)
+; JM		1.05	 3-mar-1995	Add init of dc_test_ctl; fix pvc$jsr statement in ret from set_sc_bc_ctl
+; ES		1.06	14-mar-1995	(1)Added additional pvc label so that the scloop labels are all above
+;					the value 100. Avoids pvc bug that tests forward jump destination that
+;					has a ret before it tests a backward jump destination that it
+;					should recognize but doesn't (because of the ret). Now the map order
+;					causes the backward jump to be checked first. 
+;					(2)Also, add vms_chm_fix conditional disabling of dcache in reset
+; ES		1.07	21-mar-1995	In cserve, add a br to exit_console to allow for pvc checking in our reltest variation
+; ES		1.08	27-sep-1995	Fix up sys$reset so that egore runs as it should (with hwrpb and evax_boot).
+;					Compute PAL_BASE rather than relying on passed in parameters
+; ER		1.08-1	20-Nov-1996	Initial revision for AlphaPC 164/LX
+; ER		1.08-2  29-Jan-1999	Fixed trashing of logout frame offset in 620 error handler.
+;
+;
+; Entry points
+;	SYS$CFLUSH - Cache flush
+;	SYS$CSERVE - Console service
+;	SYS$MTPR_IPIR - interprocessor interrupts
+;	SYS$HW_INTERRUPT - hardware interrupt
+;	SYS$HALT_INTERRUPT - halt interrupt
+;	SYS$PASSIVE_RELEASE - interrupt, but passive release
+;	SYS$RESET - reset flow
+;	SYS$ENTER_CONSOLE - Common PALcode for ENTERING console
+;	SYS$EXIT_CONSOLE - Common PALcode for EXITING console
+;	SYS$MACHINE_CHECK - Machine check flow
+;	SYS$MCHK_COLLECT_IPRS - Pal bugchecks join the machine check flow
+
+	vvar = 2
+	vmod = 0
+
+    .if ne lx164_system
+;
+; AlphaPC 164/LX system specific library files
+;
+    .sbttl "AlphaPC 164/LX firmware required definitions"
+
+    $pal_def		    ; Console PALcode definition file 
+    $cserve_def		    ; CALL_PAL cserve definition file
+    
+    pyxis_main_csr_def	    ; Pyxis general register definition file
+    pyxis_mem_csr_def	    ; Pyxis memory control register definition file
+    pyxis_addr_trans_def    ; Pyxis PCI address translation definition file
+
+    hlt$c_callback == 33    ; console call-back halt code
+;
+; Machine check codes for AlphaPC 164/LX
+; Add new entries to the end of the table
+;
+; Pyxis detected errors
+;
+    mchk_corr_ecc	== ^x201
+    mchk_unc_ecc	== ^x203
+    mchk_cpu_pe		== ^x205
+    mchk_mem_nem	== ^x207
+    mchk_pci_serr	== ^x209
+    mchk_pci_perr	== ^x20b
+    mchk_pci_adr_pe	== ^x20d
+    mchk_m_abort	== ^x20f
+    mchk_t_abort	== ^x211
+    mchk_pa_pte_inv	== ^x213
+    mchk_from_wrt_err	== ^x215
+    mchk_ioa_timeout	== ^x217
+;
+; Host expansion bus (ISA) bridge detected errors
+;
+    mchk_isa_serr	== ^x219
+    mchk_isa_iochk	== ^x21b
+;
+; Miscellaneous unexpected interrupts 
+;
+    mchk_unexp_int23	== ^x221
+;
+; Interrupt vectors
+;
+    vec_rtc		==  ^x600   ; Real time clock interrupt vector
+    vec_isa_base	==  ^x800   ; Base vector for ISA device interrupts
+    vec_pci_base	==  ^x900   ; Base vector for PCI device interrupts
+;
+; PCI Base Address constants
+;
+    io_base		==  ^x858   ; Base address for PCI Sparse I/O Space Region A
+    cnfg_base		==  ^x870   ; Base address for PCI Sparse Configuration Space
+    iack_base		==  ^x872   ; Base address for PCI Interrupt Acknowledge/Special
+;
+; Dallas DS1287A Real Time Clock (RTC) Definitions
+;
+    rtc_base		== ^xe00    ; TOY CSR base address is at offset 70 << 5
+    rtc_addr		== ^x00	    ; TOY address register (offset 0 << 5 from base) 
+    rtc_data		== ^x20	    ; TOY data register (offset 1 << 5 from base)
+    rtc_csr_c		== ^x0c	    ; CSR C in the TOY chip
+;
+; Intel 82378IB (Saturn I/O) Host Expansion Bus Bridge Definitions
+;
+    p_byte		== ^x0
+    p_word		== ^x1
+    p_tribyte		== ^x2
+    p_dblword		== ^x3
+
+    sio_status		== <^x06@5> ! <p_word@3>
+    sio_rev		== <^x08@5> ! <p_byte@3>
+    sio_ubcsa		== <^x4E@5> ! <p_byte@3>
+    sio_ubcsb		== <^x4F@5> ! <p_byte@3>
+
+    sio_dma_stat0	== ^x08	    ; DMA status register offset (channels 0-3)
+    sio_dma_stat1	== ^xD0	    ; DMA status register offset (channels 4-7)
+    sio_nmisc		== ^x61	    ; NMI status and control register offset
+
+    nmisc_v_serr	== ^x7	    ; SERR status bit
+    nmisc_v_iochk	== ^x6	    ; IOCHK status bit
+    nmisc_v_iochk_en	== ^x3	    ; IOCHK NMI enable bit
+    nmisc_v_serr_en	== ^x2	    ; SERR NMI enable bit
+;
+; Intel 82C59A Priority Interrupt Controller (PIC) Definitions
+;
+    icw1_c1		==  <^x20>  ; Initialization Command Word 1 (Master)
+    icw2_c1		==  <^x21>  ; Initialization Command Word 2 (Master)
+    icw3_c1		==  <^x21>  ; Initialization Command Word 3 (Master)
+    icw4_c1		==  <^x21>  ; Initialization Command Word 4 (Master)
+    imr_c1		==  <^x21>  ; Interrupt Mask Register (Master)
+    ocw1_c1		==  <^x21>  ; Operational Control Word 1 (Master)
+    ocw2_c1		==  <^x20>  ; Operational Control Word 2 (Master)
+    ocw3_c1		==  <^x20>  ; Operational Control Word 3 (Master)
+
+    icw1_c2		==  <^xA0>  ; Initialization Control Word 1 (Slave)
+    icw2_c2		==  <^xA1>  ; Initialization Control Word 2 (Slave)
+    icw3_c2		==  <^xA1>  ; Initialization Control Word 3 (Slave)
+    icw4_c2		==  <^xA1>  ; Initialization Control Word 4 (Slave)
+    imr_c2		==  <^xA1>  ; Interrupt Mask Register (Slave)
+    ocw1_c2		==  <^xA1>  ; Operational Control Word 1 (Slave)
+    ocw2_c2		==  <^xA0>  ; Operational Control Word 2 (Slave)
+    ocw3_c2		==  <^xA0>  ; Operational Control Word 3 (Slave)
+
+    isa_irr		==  <^x0A>  ; Interrupt Request Register
+    isa_isr		==  <^x0B>  ; Interrupt In-Service Register
+;
+; Super I/O controller definitions
+;
+    com1		== ^x3F8    ; COM1 serial port address
+    com2		== ^x2F8    ; COM2 serial port address
+
+    thr			== 0	    ; Transmitter Holding Register
+    rbr			== 0	    ; Receiver Buffer Register
+    dll			== 0	    ; Divisor Latch
+    ier			== 1	    ; Interrupt Enable Register
+    iir			== 2	    ; Interrupt Ident. Register
+    lcr			== 3	    ; Line Control Register
+    mcr			== 4	    ; MODEM Control Register
+    lsr			== 5	    ; Line Status Register
+    msr			== 6	    ; MODEM Status Register
+    scr			== 7	    ; Scratch Pad Register
+
+    lsr_v_thre		== 5	    ; Transmitter Holding Register Empty
+
+;
+; Macro to output an 8-bit ASCII character to the COM1 serial port
+;
+.macro	combott_putc 	c, ?l1
+	lda	r25, io_base(r31)	; I/O and ISA bus base address 	
+	sll	r25, #28, r25
+	lda	r14, com1+lsr(r31)	; line status register
+	sll	r14, #5, r14		; shifted com1 address
+	bis	r14, r25, r25		; or it in with the base address        			
+l1:	ldlp	r14, 0(r25)		; get status register
+	mb				; force out the read 
+	srl	r14, #lsr_v_thre+8, r14	; extract the ready bit
+	blbc    r14, l1			; if not ready to txmit, spin.
+	lda	r25, io_base(r31)	; I/O and ISA bus base address 	
+	sll	r25, #28, r25
+	lda	r14, com1+thr(r31)	; transmit holding register
+	sll	r14, #5, r14		; shifted com1 address
+	bis	r14, r25, r25		; tt port address in rcom
+.if idn <%extract(0,1,c)> <r>
+	and	c, #^xFF, r14
+.iff
+	lda	r14, <c>&^xFF(r31)
+.endc
+	stlp	r14, 0(r25)		; xmit the character
+	mb				; wait for the write
+.endm
+
+.macro	cfw_putc	c, ?l1
+	combott_putc	<c>
+.endm
+
+;
+; Macro to read an 8-bit byte from a PCI sparse I/O space address
+;
+.macro in_byte	port, reg, setup=1
+.if ne setup
+	lda	r25, io_base(r31)
+	sll	r25, #28-5, r25
+	lda	r25, port(r25)
+	sll	r25, #5, r14
+	and	r25, #3, r25
+.endc
+	mb
+	ldlp	reg, 0(r14)
+	mb
+	mb
+	extbl	reg, r25, reg
+.endm
+
+;
+; Macro to write an 8-bit byte to a PCI sparse I/O space address
+;
+.macro	out_byte	port, val, setup=1
+.if ne setup
+	lda	r25, io_base(r31)
+	sll	r25, #28-5, r25
+	lda	r25, port(r25)
+	sll	r25, #5, r14
+	and	r25, #3, r25
+.endc
+.if idn <%extract(0,1,val)> <r>
+	and	val, #^xFF, r13
+.iff
+	lda	r13, <val>&^xFF(r31)
+.endc
+	insbl	r13, r25, r13
+	mb
+	stlp	r13, 0(r14)
+	mb
+	mb
+.endm
+
+;
+; Macro to read a 16-bit word from a PCI sparse I/O space address
+;
+.macro in_word	port, reg, setup=1
+.if ne setup
+	lda	r25, io_base(r31)
+	sll	r25, #28-5, r25
+	lda	r25, port(r25)
+	sll	r25, #5, r14
+	lda	r14, 8(r14)
+	and	r25, #3, r25
+.endc
+	mb
+	ldlp	reg, 0(r14)
+	mb
+	mb
+	extwl	reg, r25, reg
+.endm
+
+;
+; Macro to write a 16-bit word to a PCI sparse I/O space address
+;
+.macro	out_word	port, val, setup=1
+.if ne setup
+	lda	r25, io_base(r31)
+	sll	r25, #28-5, r25
+	lda	r25, port(r25)
+	sll	r25, #5, r14
+	lda	r14, 8(r14)
+	and	r25, #3, r25
+.endc
+.if idn <%extract(0,1,val)> <r>
+	bis	r31, val, r13
+.iff
+	lda	r13, <val>&^xFFFF(r31)
+.endc
+	inswl	r13, r25, r13
+	mb
+	stlp	r13, 0(r14)
+	mb
+	mb
+.endm
+
+;
+; Macro to write an 8-bit hexadecimal value to ISA I/O port 80h.
+;
+.macro	LED_WRITE	val, reg1, reg2
+	lda	reg1, io_base(r31)
+	sll	reg1, #28-5, reg1
+	lda	reg1, ^x80(reg1)
+	sll	reg1, #5, reg1
+.if idn <%extract(0,1,val)> <r>
+	bis	r31, val, reg2
+.iff
+	lda	reg2, <val>&^xFF(r31)
+.endc
+	mb
+	stlp	reg2, 0(reg1)
+	mb
+	mb
+.endm
+
+    .endc
+
+	align_block
+
+.sbttl	"MTPR_IPIR- PALcode for MTPR IPIR instruction"
+SYS$MTPR_IPIR:				; R16 has the processor number.
+  .if ne beh_model
+					; For now, assume that the interrupt is for
+					; the current processor.
+	ldah	r12, ^x1000(r31)	; Base of demon space = FFFFFFFF80000000
+	lda	r14, ^x4(r31)		; 1 in IPL 22 position
+	
+	lda	r13, ^x340(r12)		; interrupt offset
+	nop
+	
+	stq	r14, (r13)		; Notify demon of the interrupt
+	wmb				; Push out the store.
+  .endc
+	hw_rei
+
+
+;+
+; SYS$HW_INTERRUPT
+;
+; On entry -
+;	r8  - isr
+;	r13 - ipl
+;	r14 - intid
+;
+; On exit to POST_INTERRUPT -
+; 	r12 - savedPC
+; 	r13 - SCB offset
+; 	pt7 - new IPL
+; 	pt8 - new PS<IP>
+;	pt0 - R4
+;	
+;-
+	align_block
+SYS$HW_INTERRUPT:
+	cmpeq	r14, #ipl$machine_check, r12
+	bne	r12, sys$int_mchk_or_crd 	; Check for level 31 interrupt (machine check or crd)
+
+	cmpeq	r14, #ipl$powerfail, r12
+	bne	r12, sys$int_powerfail		; Check for level 30 interrupt (powerfail)
+
+	cmpeq	r14, #ipl$perf_count, r12
+	bne	r12, sys$int_perf_cnt		; Check for level 29 interrupt (performance counters)
+
+	mtpr	r14, pt7			; Stash new IPL for stack builder
+	bis	r31, #<1@PS$V_IP>, r25		; A 1 in PS<IP> position
+
+	mtpr	r25, pt8			; Stash PS<IP> for stack builder
+	mfpr	r12, exc_addr			; Get PC for stack builder
+
+	nop
+	mtpr	r4, pt0				; Save R4 for stack builder
+
+	cmpeq	r14, #23, r25
+	bne	r25, sys$int_23 		; Check for level 23 interrupt
+	
+	cmpeq	r14, #22, r25
+	bne	r25, sys$int_22 		; Check for level 22 interrupt (might be 
+						;  interprocessor or timer interrupt)
+
+	cmpeq	r14, #21, r25
+	bne	r25, sys$int_21 		; Check for level 21 interrupt
+
+	cmpeq	r14, #20, r25
+	bne	r25, sys$int_20			; Check for level 20 interrupt (might be corrected 
+						; system error interrupt)
+
+
+	mfpr	r12, exc_addr			; ooops, something is wrong
+	br	r31, pal$pal_bug_check
+
+
+
+
+.sbttl	sys$crd_scrub_mem
+
+	;+
+	;
+	; sys$crd_scrub_mem
+	;	called
+	;	jsr r13, sys$crd_scrub_mem
+	;	r0 = addr of cache block 
+	;
+	;-
+
+	
+	
+	align_block	; align for branch target
+sys$crd_scrub_mem:
+	; now find error in memory, and attempt to scrub that cache block
+	; This routine just scrubs the failing octaword
+	; Only need to "touch" one quadword per octaword to accomplish the scrub
+	srl	r0, #39, r9		; get high bit of bad pa
+	blbs	r9, 10$			; don't attempt fixup on IO space addrs
+	nop				; needed to align the ldqpl to octaword boundary
+	nop				;             "
+
+	ldqpl 	r9,  0(r0) 		; attempt to read the bad memory
+					; location
+					;    (Note bits 63:40,3:0 of ei_addr 
+					;     are set to 1, but as long as 
+					;     we are doing a phys ref, should 
+					;     be ok)
+	nop				; Needed to keep the Ibox from swapping the ldqpl into E1
+
+	stqpc 	r9,  0(r0) 		; Store it back if it is still there.
+					; If store fails, location already 
+					;  scrubbed by someone else	
+
+	;at this point, ei_stat could be locked due to a new corr error on the ld, 
+	;so read ei_stat to unlock AFTER this routine.
+
+	pvc$jsr	crd_scrub_mem, bsr=1, dest=1
+10$:	ret	r31, (r13)		; and back we go
+
+
+;+
+; SYS$INT_MCHK_OR_CRD
+;
+; On entry -
+;	r8  - isr
+;	r13 - ipl
+;	r14 - intid
+;
+; On exit to POST_INTERRUPT -
+; 	r12 - savedPC
+; 	r13 - SCB offset
+; 	pt7 - new IPL
+; 	pt8 - new PS<IP>;
+;	pt0 - r4
+;-
+	align_block
+
+sys$int_mchk_or_crd:
+	srl	r8, #isr$v_mck, r12
+	blbs	r12, sys$int_mchk
+	;+
+	; Not a Machine check interrupt, so must be an Internal CRD interrupt
+	;-
+
+	mb					;Clear out Cbox prior to reading IPRs
+	mfpr	r12, exc_addr
+
+	srl 	r8, #isr$v_crd, r13		;Check for CRD
+	blbc	r13, pal$pal_bug_check		;If CRD not set, shouldn't be here!!!	
+
+	ldah	r14, ^xfff0(r31)
+	mtpr   	r0, pt0				; save r0 for scratch
+	zap	r14, #^xE0, r14			; Get Cbox IPR base
+	mtpr   	r1, pt1				; save r0 for scratch
+
+	ldqp	r0, ei_addr(r14)		; EI_ADDR IPR
+	ldqp	r10, fill_syn(r14)		; FILL_SYN IPR
+	bis	r0, r10, r31			; Touch lds to make sure they complete before doing scrub
+
+	pvc$jsr	crd_scrub_mem, bsr=1
+	bsr	r13, sys$crd_scrub_mem		; and go scrub
+
+						; ld/st pair in scrub routine will have finished due
+						; to ibox stall of stx_c.  Don't need another mb.
+	ldqp	r25, ei_stat(r14)		; EI_STAT, unlock EI_ADDR, BC_TAG_ADDR, FILL_SYN
+						; Must only be executed once in this flow, and must
+						; be after the scrub routine.
+
+	mfpr	r13, pt_mces			; Get MCES
+	srl	r13, #mces$v_dpc, r14		; Get DPC
+	blbs	r14, sys$crd_no_frame_built		; If dpc set, Skip frame building
+
+
+	; Setup SCB if dpc is not set
+	bis	r13, #<1@mces$v_pce>, r14	; Set MCES<PCE> bit
+	lda	r1, scb$v_proc_corr_err(r31)	; SCB vector
+	sll	r1, #16, r1			; Move SCBv to correct position
+
+	zap	r14, #^x3C, r14			; Clear mchk_code word and SCBv word
+	or	r14, r1, r14			; Insert new SCB vector
+
+	lda	r1, mchk$c_ecc_c(r31)		; Correctable error MCHK code
+	sll	r1, #32, r1			; Move MCHK code to correct position
+	or	r14, r1, r14			; Insert new MCHK code
+	mtpr	r14, pt_misc			; Store updated MCES, MCHK code, and SCBv
+
+	; Get base of the logout area.  
+
+  .if ne beh_model
+	get_impure r14				 ; addr of per-cpu impure area
+	get_addr r14,<pal$logout_area+mchk$crd_base>,r14
+   .endc
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX specific code.
+;
+; R14 - Base address of CRD logout frame = 6000h
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+	lda	r14, pal$logout_base(r31)	; Base address of logout area
+	lda	r14, mchk$crd_base(r14)		; Base address of CRD logout frame
+    .endc
+
+	srl	r13, #mces$v_pce, r1		; Get PCE
+	blbc	r1, sys$crd_write_logout_frame	; If pce is not set, build the frame
+
+	; Set the 2nd error flag in the logout area:
+	
+	lda     r1, 3(r31)			; Set retry and 2nd error flags
+	sll	r1, #30, r1			; Move to bits 31:30 of logout frame flag longword
+	stlp	r1, mchk$crd_flag+4(r14)	; store flag longword
+sys$crd_no_frame_built:
+	lda	r14, -1(r31)			; new r4 (-1 = no frame built)
+	br 	sys$crd_ack                
+                                          
+sys$crd_write_logout_frame:               
+	; should only be here if neither the pce or dpc bits are set
+                                          
+	; Write the first 2 quadwords of the logout area:
+	                                  
+	lda     r1, 1(r31)		  	; Set retry flag
+	sll	r1, #63, r9		  	; Move retry flag to bit 63
+	lda	r1, mchk$crd_size(r9)	  	; Combine retry flag and frame size
+	stqp	r1, mchk$crd_flag(r14)	  	; store flag/frame size
+                                          
+	lda	r1, mchk$crd_sys_base(r31)	; sys offset
+	sll	r1, #32, r1
+	lda	r1, mchk$crd_cpu_base(r1)  	; cpu offset
+	stqp	r1, mchk$crd_offsets(r14) 	; store sys offset/cpu offset into logout frame
+                                          
+	;+                                
+	; Write the mchk code to the logout area
+	; Write error IPRs already fetched to the logout area
+	;-                                
+        mfpr    r1, pt_misc
+	extwl   r1, #4, r1			; extract mchk code field
+
+	stqp	r1, mchk$crd_mchk_code(r14)   
+	stqp	r0, mchk$crd_ei_addr(r14)    
+	stqp	r10, mchk$crd_fill_syn(r14)   
+	stqp	r25, mchk$crd_ei_stat(r14)    
+	stqp	r8, mchk$crd_isr(r14)    
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX specific code.
+;
+;   Fill in the Pyxis specific information with 0's on processor
+;   detected correctable error
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+        stqp	r31, mchk$crd_pyxis_syn(r14)
+        stqp	r31, mchk$crd_pyxis_mear(r14)
+        stqp	r31, mchk$crd_pyxis_mesr(r14)
+        stqp	r31, mchk$crd_pyxis_stat(r14)
+        stqp	r31, mchk$crd_pyxis_err(r14)
+	stqp	r31, mchk$crd_pyxis_err_data(r14)
+    .endc
+
+	lda	r14, mchk$crd_base(r31)			; new r4 (assumes hwrpb LAbase=impure_ptr+pal$logout)
+                                          
+sys$crd_ack:                               
+	mfpr	r0, pt0					; restore r0
+	mfpr	r1, pt1					; restore r1
+
+	lda	r9, 1(r31)
+	sll 	r9, #hwint_clr$v_crdc, r9		; get ack bit for crd
+	mtpr	r9, ev5$_hwint_clr			; ack the crd interrupt
+
+	srl	r13, #mces$v_dpc, r8			; logging enabled?
+	blbs	r8, sys$crd_dismiss_interrupt		; logging not enabled -- just return
+                                          
+	;+
+	; Prepare to exit to pal$post_interrupt, which expects:
+	; r12 - savedPC
+	; r13 - SCB offset
+	; pt7 - new IPL
+	; pt8 - new PS<IP>
+	; pt0 - new R4  	(LAoff )
+	;
+	;-
+
+	bis	r31, ipl$machine_check, r25
+	mtpr	r25, pt7				; Machine check IPL for stack builder
+	lda 	r13, scb$v_proc_corr_err(r31)		; Load SCBV
+
+	mtpr	r14, pt0				; Store LAoff for stack builder
+	mtpr	r31, pt8				; Clear PS<IP> for stack builder
+	br	r31, pal$post_interrupt
+
+sys$crd_dismiss_interrupt:
+	hw_rei
+
+
+;+
+; Machine check interrupt from the system.  Setup and join the
+; regular machine check flow.
+; On exit:
+;       pt0     - saved r0
+;       pt1     - saved r1
+;       pt4     - saved r4
+;       pt5     - saved r5
+;       pt6     - saved r6
+;       pt10    - saved exc_addr
+;       pt_misc<47:32> - mchk code
+;       pt_misc<31:16> - scb vector
+;       r14     - base of Cbox IPRs in IO space
+;       MCES<mchk> is set
+;-
+	align_block
+sys$int_mchk:					
+	lda	r14, mchk$c_sys_hrd_error(r31)
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX specific code.
+;
+;       Code to parse all system detected machine checks. 
+;	The following is done:
+;
+;       - read the error registers on both the PCI host and host
+;	  expansion bus bridges.
+;       - REPEAT
+;         - IF bit is set in the error register THEN 
+;             - Load machine check code in r14
+;
+;   r10, r12, r13, r14, and r25 are used 
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+;
+; Get base address of the Pyxis general registers 
+;
+	lda	r25, pyxis_k_main_csr_base(r31)	; r25 = 00.0000.0874
+	sll	r25, pyxis_v_main_csr_base, r25	; r25 = 87.4000.0000
+;   
+; Read the Pyxis Error Register.  The error mask is applied to the
+; contents of the error register so we only parse for errors that 
+; could have actually caused the interrupt.
+;
+	get_addr    r13, csr_r_pyxis_err, r25	; r13 = address of PYXIS_ERR (87.4000.8200)
+	ldlp	r12, 0(r13)			; r12 = contents of PYXIS_ERR register
+
+	srl	r12, pyxis_err_v_err_valid, r13	; Check if an error occurred
+	blbc	r13, sio_isa_serr		; If not, go check for ISA system errors
+
+	get_addr    r13, csr_r_pyxis_err_mask, r25 ; r13 = address of ERR_MASK (87.4000.8280)
+	ldlp	r13, 0(r13)			; r13 = contents of ERR_MASK register
+
+	and	r12, r13, r12			; r12 = isolated potential error source(s)
+;
+; Machine check code = 203h (Uncorrectable ECC error) parsing
+;
+pyxis_unc_ecc:
+	srl	r12, pyxis_err_v_un_cor_err, r13; Get uncorrectable ECC error to bit 0
+	blbc	r13, pyxis_cpu_pe		; IF this bit is set THEN
+	lda	r14, mchk_unc_ecc(r31)		; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 205h (CPU Detected parity error) parsing
+;
+pyxis_cpu_pe:
+	srl	r12, pyxis_err_v_cpu_pe, r13	; Get CPU parity error to bit 0
+	blbc	r13, pyxis_mem_nem		; IF this bit is set THEN
+	lda	r14, mchk_cpu_pe(r31)		; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 207h (Non-Existent Memory) parsing
+;
+pyxis_mem_nem:
+	srl	r12, pyxis_err_v_mem_nem, r13	; Get Non-existent memory error to bit 0
+	blbc	r13, pyxis_pci_serr		; IF this bit is set THEN
+	lda	r14, mchk_mem_nem(r31)		; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 209h (PCI SERR) parsing
+;
+pyxis_pci_serr:
+	srl	r12, pyxis_err_v_pci_serr, r13	; Get PCI Serr to bit 0
+	blbc	r13, pyxis_pci_perr		; IF this bit is set THEN
+	lda	r14, mchk_pci_serr(r31)		; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 20bh (PCI PERR) parsing
+;
+pyxis_pci_perr:
+	srl	r12, pyxis_err_v_pci_perr, r13	; Get PCI perr to bit 0
+	blbc	r13, pyxis_pci_addr_pe		; IF this bit is set THEN
+	lda	r14, mchk_pci_perr(r31)		; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 20dh (PCI Address parity) parsing
+;
+pyxis_pci_addr_pe:
+	srl	r12, pyxis_err_v_pci_addr_pe, r13 ; Get PCI address parity to bit 0
+	blbc	r13, pyxis_m_abort		; IF this bit is set THEN
+	lda	r14, mchk_pci_adr_pe(r31)	; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 20fh (master abort) parsing
+;
+pyxis_m_abort:
+	srl	r12, pyxis_err_v_rcvd_mas_abt, r13 ; Get Master Abort to bit 0
+	blbc	r13, pyxis_t_abort		; IF this bit is set THEN
+	lda	r14, mchk_m_abort(r31)		; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 211h (target abort) parsing
+;
+pyxis_t_abort:
+	srl	r12, pyxis_err_v_rcvd_tar_abt, r13 ; Get Target Abort to bit 0
+	blbc	r13, pyxis_pa_pte_inv		; IF this bit is set THEN
+	lda	r14, mchk_t_abort(r31)		; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 213h (PA PTE invalid) parsing
+;
+pyxis_pa_pte_inv:
+	srl	r12, pyxis_err_v_pa_pte_inv, r13; Get PA PTE invalid to bit 0
+	blbc	r13, pyxis_ioa_timeout		; IF this bit is set THEN
+	lda	r14, mchk_pa_pte_inv(r31)	; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 217h (IOA Timeout) parsing
+;
+pyxis_ioa_timeout:
+	srl	r12, pyxis_err_v_ioa_timeout, r13 ; Get IOA timeout to bit 0
+	blbc	r13, pyxis_cor_err		; IF this bit is set THEN
+	lda	r14, mchk_ioa_timeout(r31)	; :   Log the error code 
+	br	r31, mchk_end_parse		; ENDIF	
+;
+; Machine check code = 201h (Correctable ECC) parsing
+;
+; Programmer's Note:
+; ------------------
+;   This code really belongs in the INT20 interrupt handler, but a
+;   "feature" in the Pyxis core logic delivers all fatal and non-fatal
+;   system errors via the mchk_irq pin.
+;
+pyxis_cor_err:
+	srl	r12, pyxis_err_v_cor_err, r13	; Get Correctable ECC error to bit 0
+	blbc	r13, mchk_end_parse		; Branch if error bit not set
+
+	mfpr	r13, pt_mces			; Get the contents of the MCES register
+	srl	r13, #mces$v_dsc, r14		; Isolate the MCES<DSC> bit
+	blbs	r14, sys$sce_no_frame_built	; If DSC set, then skip frame building
+;
+; Register Usage:
+;
+;   r13 - Current MCES register contents
+;   r14 - New MCES register contents
+;
+	bis	r13, #<1@mces$v_sce>, r14	; Set the SCE bit in the new MCES
+	lda	r10, scb$v_sys_corr_err(r31)	; Get the SCB vector (620)
+	sll	r10, #16, r10			; Move SCB vector into correct position
+
+	zap	r14, #^x3C, r14			; Clear MCHK code & SCBv fields in new MCES
+	or	r14, r10, r14			; Insert SCBv into new MCES
+
+	lda	r10, mchk_corr_ecc(r31)		; Get correctable ECC error MCHK code
+	sll	r10, #32, r10			; Move MCHK code into correct position
+	or	r14, r10, r14			; Insert MCHK code into new MCES
+	mtpr	r14, pt_misc			; Update the MCES register with new data
+
+	lda	r14, pal$logout_base(r31)
+	lda	r14, mchk$crd_base(r14)		; r14 <- Base address of CRD logout frame
+
+	srl	r13, #mces$v_sce, r10		; Isolate the current MCES<SCE> bit
+	blbc	r10, sys$sce_write_logout_frame ; If SCE is not set, go build the logout frame
+	lda     r10, 3(r31)			; Else, the set retry and 2nd error flag bits
+	sll	r10, #30, r10			; Move retry/error bits to frame flag<31:30>
+	stlp	r10, mchk$crd_flag+4(r14)	; Store the frame flag longword
+	mb
+	br 	r31, sys$sce_ack		; Go acknowledge the system correctable ECC error
+
+sys$sce_no_frame_built:
+        lda     r14, -1(r31)                    ; Indicates no frame built.
+        br      r31, sys$sce_ack
+;
+; Code to log system detected correctable error information.
+;
+; Should only be here if neither the MCES<SCE> or MCES<DSC> 
+; bits are set. Per the Alpha SRM:
+;
+;   IF the MCES<SCE> bit is set THEN
+;	This means that the O/S has yet to see or handle a previous
+;	system correctable error.
+;
+;   IF the MCES<DSC> bit is set THEN
+;	This means that the reporting of system correctable errors 
+;	has been disabled by the O/S.
+;
+;
+;   Corrected Error Logout Frame Layout:
+;
+;        6 6 6                            3 3
+;	 3 2 1                            2 1                              0
+;	+-+-+------------------------------+--------------------------------+
+;  +00:	|R|S|            SBZ               |           Frame Size           |
+;	+-+-+------------------------------+--------------------------------+
+;  +08:	|          System  Offset          |           CPU Offset           |
+;	+----------------------------------+--------------------------------+
+;  +16:	|                    PALcode Specific Information                   |
+;	+-------------------------------------------------------------------+
+; +CPU: |                      CPU Specific Information                     |
+;	+-------------------------------------------------------------------+
+; +SYS: |                    System Specific Information                    |
+;	+-------------------------------------------------------------------+
+;
+; Registers Usage:
+;   
+;	r10 - Scratch
+;	r12 - Scratch
+;	r13 - Temporary copy of the MCES register
+;	r14 - Base address of the PALcode logout frame 
+;	r25 - Base address of Pyxis error registers
+; 
+sys$sce_write_logout_frame:
+;                                          
+; Write the first 2 longwords of the logout frame:
+;
+;   +00:    FRAME SIZE  - Size in bytes of the logout frame, including
+;			  the FRAME SIZE longword.
+;
+;   +04:    FRAME FLAGS - Informational flags
+;	                                  
+	lda     r10, 1(r31)		  	; Set the retry bit.
+	sll	r10, #63, r12		  	; Move retry bit into position.
+	lda	r10, mchk$crd_size(r12)	  	; Combine frame flag and size longwords.
+	stqp	r10, mchk$crd_flag(r14)	  	; Store frame flag/size quadword.
+	mb
+;
+; The next two longwords specify the the offset in bytes from the base
+; of the logout frame to the CPU-specific and system-specific information.
+;
+;   +08:    CPU OFFSET - If this offset is equal to 16, the frame contains
+;			 no PALcode specific information.  If this offset
+;			 is equal to 12, the frame contains no CPU specific
+;			 information.
+;
+;   +12:    SYS OFFSET - If this offset is equal to FRAME SIZE, the frame
+;			 contains no system specific information.
+;
+	lda	r10, mchk$crd_pyxis_syn(r31)	; System info starts at PYXIS_SYN offset.
+	sll	r10, #32, r10			; Move sys offset to high order longword.
+	lda	r10, mchk$crd_ei_addr(r10)  	; CPU info starts at EI_ADDR offset.
+	stqp	r10, mchk$crd_offsets(r14) 	; Store cpu/sys offset in the logout frame.
+	mb
+;
+; Complete the CPU specific portion of the logout frame.
+;
+        mfpr    r10, pt_misc			; Get the contents of the MCES register.
+	extwl   r10, #4, r10			; Extract the MCHK code field.
+	stqp	r10, mchk$crd_mchk_code(r14)    ; Store it in the frame.
+	mb
+;
+; Log 0's for CPU specific registers on system detected correctable errors.
+;
+	stqp	r31, mchk$crd_ei_addr(r14)    
+	stqp	r31, mchk$crd_fill_syn(r14)   
+	stqp	r31, mchk$crd_ei_stat(r14)    
+	stqp	r31, mchk$crd_isr(r14)
+	mb
+;
+; Complete the system specific portion of the logout frame.
+;
+	get_addr r12, csr_r_pyxis_synd, r25	; Get address of PYXIS_SYN register.
+	ldlp	r10, 0(r12)			; Read the register.
+	stqp	r10, mchk$crd_pyxis_syn(r14)	; Store it in the frame.
+	mb
+	get_addr    r12, csr_r_pyxis_mear, r25	; Get address of PYXIS_MEAR register.
+	ldlp	r10, 0(r12)			; Read the register.
+	stqp	r10, mchk$crd_pyxis_mear(r14)	; Store it in the frame.
+	mb
+	get_addr    r12, csr_r_pyxis_mesr, r25	; Get address of PYXIS_MESR register.
+	ldlp	r10, 0(r12)			; Read the register. 
+	stqp	r10, mchk$crd_pyxis_mesr(r14)	; Store it in the frame.
+	mb
+	get_addr    r12, csr_r_pyxis_stat, r25	; Get address of PYXIS_STAT register.
+	ldlp	r10, 0(r12)			; Read the register.
+	stqp	r10, mchk$crd_pyxis_stat(r14)	; Store it in the frame.
+	mb
+	get_addr    r12, csr_r_pyxis_err, r25	; Get address of PYXIS_ERR register.
+	ldlp	r10, 0(r12)			; Read the register.
+	stqp	r10, mchk$crd_pyxis_err(r14)	; Store it in the frame.
+	mb
+	get_addr    r12, csr_r_pyxis_err_data, r25 ; Get address of PYXIS_ERR_DATA register
+	ldlp	r10, 0(r12)			   ; Read the register.
+	stqp	r10, mchk$crd_pyxis_err_data(r14)  ; Store it in the frame.
+	mb
+
+;
+; This code will acknowledge and dismiss the system correctable error 
+; interrupt.  This is done by writing a '1' to the PYXIS_ERR<COR_ERR> bit.
+;
+; Registers Usage:
+;
+;   r10 - Scratch
+;   r12 - Scratch
+;   r13 - Temporary copy of the MCES register
+;   r14 - Offset from the base of the logout area (LAoff)
+;   r25 - Base address of the Pyxis error registers
+;
+sys$sce_ack:
+	get_addr    r12, csr_r_pyxis_err, r25	; Get address of PYXIS_ERR register.
+	lda	r10, 1(r31)			; Get a '1'.
+	sll	r10, pyxis_err_v_cor_err, r10	; Move it into correct bit position.
+	stlp	r10, 0(r12)			; Acknowledge and clear the error.
+	mb
+	ldlp	r10, 0(r12)			; Make sure store completes.
+	srl	r13, #mces$v_dsc, r12		; IF logging is not enabled THEN
+	blbs	r12, sys$passive_release	;     return from where we came
+	srl	r13, #mces$v_sce, r12		; IF unhandled system correctable error present THEN
+	blbs	r12, sys$passive_release	;     return from where we came
+;   
+; Dispatch to the O/S hander to report the system correctable 
+; error.
+;
+; Prepare to exit this flow via pal$post_interrupt, which 
+; expects the following:
+;
+;   r12 - Saved PC
+;   r13 - SCB vector
+;   pt7 - New IPL
+;   pt8 - New PS<IP>
+;   pt0 - Offset from the base of the logout area.
+;
+; Programmer's Note:
+; ------------------
+;   System correctable errors are detected asynchronously to 
+;   processor execution and are corrected by hardware.  These
+;   types of machine checks are supposed to be delivered at
+;   IPL 20 (Alpha SRM - OpenVMS Software (II-A) Section 6.5),
+;   but due to a "feature" in the Pyxis core logic (see 
+;   previous Programmer's Note), these types of machine checks
+;   are being delivered at IPL 31.
+;
+	mfpr	r12, exc_addr			; Get the saved PC.
+        bis     r31, ipl$machine_check, r25	; Machine Check IPL = 31
+        mtpr    r25, pt7
+        lda     r13, scb$v_sys_corr_err(r31)    ; SCB vector = 620
+        mtpr    r14, pt0                        ; LAoff for stack frame
+        mtpr    r31, pt8                        ; Clear interrupt pending bit PS<IP>.
+	br	r31, pal$post_interrupt		; Go build the stack frame and call the handler
+;
+; Machine check code = 219h (ISA SERR errors) parsing
+;
+sio_isa_serr:
+
+	in_byte	    <sio_nmisc>, r12		; Get the contents of the NMISC register
+
+	srl	r12, nmisc_v_serr, r13		; Get SERR status bit in bit 0
+	blbc	r13, sio_isa_iochk		; Not SERR, go check for IOCHK error
+
+	srl	r12, nmisc_v_serr_en, r13	; Get SERR enable bit in bit 0
+	blbs	r13, sio_isa_iochk		; SERR is disabled and cleared
+
+	lda	r14, mchk_isa_serr(r31)		; Load reason for MCHK
+	br	r31, mchk_end_parse		; Go log the error ...
+;
+; Machine check code = 21Bh (ISA IOCHK# errors) parsing
+;
+sio_isa_iochk:
+	srl	r12, nmisc_v_iochk, r13		; Get IOCHK status bit into lsb
+	blbc	r13, mchk_end_parse		; Not IOCHK, - ???
+
+	srl	r12, nmisc_v_iochk_en, r13	; Get IOCHK enable bit into lsb
+	blbs	r13, mchk_end_parse		; IOCHK is disabled and cleared
+
+	lda	r14, mchk_isa_iochk(r31)	; Load reason for MCHK
+;
+; Common code to setup machine so we can join with 
+; the code to log processor detected machine checks
+;
+; Input Registers:
+;
+;	r14 - machine check code 
+;
+mchk_end_parse:
+
+    .endc
+
+	mfpr	r12, exc_addr
+
+	sll	r14, #32, r14			; Move mchk code to position
+	mtpr	r12, pt10			; Stash exc_addr
+
+	mfpr	r12, pt_misc			; Get MCES and scratch
+	mtpr	r0, pt0				; Stash for scratch
+
+	zap	r12, #^x3c, r12			; Clear scratch
+	blbs	r12, sys$double_machine_check   ; MCHK halt if double machine check
+		
+	or	r12, r14, r12			; Combine mchk code 
+	lda	r14, scb$v_sysmchk(r31)		; Get SCB vector
+
+	sll	r14, #16, r14			; Move SCBv to position
+	or	r12, r14, r14			; Combine SCBv
+
+
+	bis	r14, #<1@mces$v_mchk>, r14	; Set MCES<MCHK> bit
+	mtpr	r14, pt_misc			; Save mchk code!scbv!whami!mces
+
+	ldah	r14, ^xfff0(r31)
+	mtpr	r1, pt1				; Stash for scratch
+
+	zap	r14, #^xE0, r14			; Get Cbox IPR base
+	mtpr	r4, pt4
+
+	mtpr	r5, pt5
+
+
+	mtpr	r6, pt6
+	br	r31, sys$mchk_collect_iprs	; Join common machine check flow
+
+
+;+
+;sys$int_2*
+;	Routines to handle device interrupts at IPL 23-20.
+;	System specific method to clear the interrupt, detect passive release,
+;	  detect interprocessor (22),  interval clock (22),  corrected
+;	  system error (20)
+;
+; On entry -
+; 	r12 - savedPC
+;	pt0 - r4
+; 	pt7 - new IPL
+; 	pt8 - new PS<IP>
+;	r13, r14, r25 - available
+;
+; On exit to POST_INTERRUPT -
+; 	r12 - savedPC
+; 	r13 - SCB offset
+; 	pt7 - new IPL
+; 	pt8 - new PS<IP>
+;	pt0 - r4
+;
+;-
+	align_block
+sys$int_23:
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+;   INT23 interrupt handler:
+;
+;        This interrupt is unused on the AlphaPC 164/LX
+;
+;        We will generate a system machine check if we get one of these 
+;        interrupts.
+;
+;
+; Register usage:
+;
+;    r14 - used to hold machine check reason code
+; 
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+	lda	r14, mchk_unexp_int23(r31)	; set the error code
+	br	r31, mchk_end_parse		; go log the interrupt as a machine check
+    .endc	
+
+  .if ne beh_model
+	lda	r13, ^x830(r31)			; For beh model we hardcode dev. interrupts SCB offset
+
+	br	r31, pal$post_interrupt		; Build the stack frame
+
+	align_branch
+interrupt_not_expected:
+	pvc$violate 1003
+	halt
+  .endc	
+
+
+	align_block
+sys$int_22:
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+;   INT22 interrupt handler:
+;
+;       This interrupt is connected to the real time clock on the
+;	AlphaPC 164/LX.
+;
+;       This code will do the following:
+;
+;	 - build up the address for the TOY controller
+;        - write a 0Ch to the index register to point to CSR C
+;	 - read the CSR C to dismiss the clock interrupt
+;	 - get the address of the interrupt handler entry point
+;        - set the interrupt type to 2 (clock interrupt)
+;	 - set the interrupt vector to 600h
+;        - transfer control to the interrupt handler
+;
+;   Register Usage:
+;
+;   r13 - Scratch
+;   r14 - Port address 
+;   r25 - I/O base address
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+
+	lda	r14, io_base(r31)	; r14 = 00.0000.0858
+	sll	r14, #28, r14		; r14 = 85.8000.0000
+	lda	r14, rtc_base(r14)	; r14 = 85.8000.0E00
+	lda	r25, rtc_csr_c(r31)	; set up for csr c
+	stlp	r25, rtc_addr(r14)	; write this to the address register 
+	mb
+	ldlp	r25, rtc_data(r14)	; dismiss interrupt by reading csr c.
+
+	lda	r13, vec_rtc(r31)	; interrupt vector of 600h
+	br	r31, pal$post_interrupt	; Go build stack frame and call the handler	
+
+    .endc
+
+  .if ne beh_model
+	lda	r13, ^x820(r31)			; For beh model we hardcode dev. interrupts SCB offset
+	br	r31, pal$post_interrupt		; Build the stack frame
+
+  .endc
+
+	align_block
+sys$int_21:
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+;   INT21 interrupt handler:
+;
+;   This interrupt is connected to the PCI device interrupts on the 
+;   AlphaPC 164/LX.  The AlphaPC 164/LX has 19 PCI interrupt sources 
+;   (four from each of the four PCI option slots, one from the host
+;   expansion ISA bus bridge, and one each from the on-board IDE and 
+;   USB controllers).
+;
+;   PCI interrupt control logic is implemented as 3 8-bit I/O slaves on the 
+;   ISA bus at address offsets 804h, 805h, and 806h respectively.  Each of 
+;   the PCI interrupts can be individually masked out (disabled) by setting 
+;   the appropriate bit in the registers.  A read of the registers will return 
+;   the state of all pending PCI interrupts and NOT the state of the MASKED 
+;   interrupts.
+;
+;   The layout of the PCI interrupt control registers is as follows:
+;
+;        7       6       5       4       3       2       1       0
+;    +-------+-------+-------+-------+-------+-------+-------+-------+
+;    | INTB0 |  USB  |  IDE  |  ISA  | INTA3 | INTA2 | INTA1 | INTA0 | : 804h
+;    +-------+-------+-------+-------+-------+-------+-------+-------+
+;    | INTD0 | INTC3 | INTC2 | INTC1 | INTC0 | INTB3 | INTB2 | INTB1 | : 805h
+;    +-------+-------+-------+-------+-------+-------+-------+-------+
+;    |  RSVD |  RSVD |  RSVD |  RSVD |  RSVD | INTD3 | INTD2 | INTD1 | : 806h
+;    +-------+-------+-------+-------+-------+-------+-------+-------+
+;
+; Register Usage:
+;
+;	r10 - Base address of PALcode scratch area
+;	r12 - Address of interrupt control registers
+;	r13 - Status of pending interrupts
+;	r14 - Scratch
+;	r25 - Scratch
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+
+	get_impure  r10			; Get base address of impure area
+	fix_impure_ipr	r10
+
+	lda	r12, io_base(r31)	; r12 <- 00.0000.0858
+	sll	r12, #28-5, r12		; r12 <- 04.2C00.0000
+	lda	r12, ^x804(r12)		; r12 <- 04.2C00.0804
+	sll	r12, #5, r12		; r12 <- 85.8001.0080
+	lda	r12, ^x18(r12)		; r12 <- 85.8001.0098
+
+	ldlp	r13, 0(r12)		; Read the interrupt request registers.
+	restore_reg1 intr_mask, r14, r10, ipr=1	; Read shadow copy of interrupt mask.
+
+	eqv	r14, r31, r14		; Compliment the interrupt mask bits.
+	and	r13, r14, r13		; r13 <- bitfield of pending interrupts.
+	zapnot	r13, #^xF, r13		; Only look at low longword of bitfield. 
+
+	beq	r13, sys$passive_release ; No interrupt(s) pending, passive release
+
+	srl	r13, #4, r14		; Is there a pending ISA interrupt?
+	blbs	r14, 120$		; If so, go service it.
+					; Else, fall through to service PCI interrupt.
+
+.sbttl	PCI Device Interrupt Handler
+;----------------------------------------------------------------------
+; Register Usage:
+;
+;	r10 - SCB vector offset
+;	r12 - Return address
+;	r13 - Pending PCI device interrupt status/SCB vector
+;
+; PCI device interrupt SCB vectors = 900h + (irq * 10h),
+;		where irq = 0 to 18.
+;
+	bis	r31, r31, r10		; r10 will contain the SCB offset
+
+100$:	blbs	r13, 110$		; Find 1st interrupt that is pending
+	srl	r13, #1, r13		; If not set, check next bit
+	addq	r10, #1, r10		; Increment for next vector
+	bne	r13, 100$		; Should never fall through ...
+
+110$:	mfpr	r12, exc_addr		; Get return address
+	sll	r10, #4, r10		; Multiply SCB offset by 16
+	lda	r13, vec_pci_base(r10)	; SCB base vector + offset
+	br	r31, pal$post_interrupt	; Go build stack frame and call handler ...
+
+
+.sbttl	ISA Device Interrupt Handler
+;----------------------------------------------------------------------
+; This code performs a PCI interrupt acknowledge cycle to determine the 
+; ISA interrupt vector in the 82C59A PIC.  If the vector is 7, then an 
+; additional check is made to see if it is a passive release or a real 
+; IR7 interrupt.  If it is a real IR7 interrupt, then normal servicing 
+; is done.  If it is not a real IR7 interrupt, then passive release is 
+; signaled and a non-specific EOI command is executed.
+;
+; ISA device interrupts supported via the Intel 82C59A PIC:
+;
+;		IR0	Interval timer
+;		IR1	Keyboard
+;		IR2	Reserved (chains interrupt from slave PIC)
+;		IR3	COM2
+;		IR4	COM1
+;		IR5	Parallel port (or IR7)
+;		IR6	Floppy disk controller
+;		IR7	Parallel port (or IR5)
+;		IR8	Reserved (RTC internal to the SIO)
+;		IR9	Available 
+;		IR10	Available 
+;		IR11	Available 
+;		IR12	Mouse 
+;		IR13	Available 
+;		IR14	IDE
+;		IR15	IDE 
+;
+; Register Usage:
+;
+;	r10 - ISA interrupt vector/SCB offset
+;	r12 - Scratch/Return address
+;	r13 - Scratch/SCB vector
+;	r14 - Scratch
+;
+; ISA device interrupt SCB vectors = 800h + (irq * 10h),
+;		where irq = 0 to 15.
+;
+	align_branch
+
+120$:	lda	r13, iack_base(r31)	; r13 <- 00.0000.0872
+	sll	r13, #28, r13		; r13 <- 87.2000.0000
+	ldlp	r10, 0(r13)		; Perform a PCI interrupt acknowledge cycle
+					; Highest priority ISA interrupt returned in r10
+	and	r10, #^xFF, r10		; Clean returned vector to 8 bits
+	cmpeq	r10, #7, r14		; Check for a passive release
+	bne	r14, 140$		; If so, dismiss non-specific interrupt
+
+130$:	mfpr	r12, exc_addr		; Get return address
+	sll	r10, #4, r10		; Mulitply vector by 16 for SCB offset
+	lda	r13, vec_isa_base(r10)	; SCB base vector + offset
+	br	r31, pal$post_interrupt	; Go build stack frame and call handler ...
+
+	align_branch
+
+140$:
+;
+; Read the In-Service (ISR) register
+;
+	out_byte	<ocw3_c1>, <isa_isr>
+	in_byte		<ocw3_c1>, r13, setup=0
+
+	srl	r13, #7, r13		; Get ISR<7> into low bit
+	blbs	r13, 130$		; If set, go service IR7 interrupt
+;
+; Send a non-specific EOI command to clear the interrupt.
+;
+	out_byte	<ocw2_c2>, <^x20>
+	out_byte	<ocw2_c1>, <^x20>
+
+	br	r31, sys$passive_release
+
+    .endc
+
+  .if ne beh_model
+	lda	r13, ^x810(r31)			; For beh model we hardcode dev. interrupts SCB offset
+	br	r31, pal$post_interrupt		; Build the stack frame
+  .endc
+
+
+	align_block
+sys$int_20:
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+;   INT20 interrupt handler:
+;
+;   System correctable errors are detected asynchronously to 
+;   processor execution and are corrected by hardware.  These
+;   types of machine checks are supposed to be delivered at
+;   IPL 20 (Alpha SRM - OpenVMS Software (II-A) Section 6.5),
+;   but due to a "feature" in the Pyxis core logic (see 
+;   Programmer's Notes in sys$int_mchk), these types of machine 
+;   checks are being delivered at IPL 31.
+;
+;------------------------------------------------------------------------------------
+  .if ne lx164_system
+	pvc$violate 1003
+	halt
+  .endc
+
+  .if ne beh_model
+	lda	r13, ^x800(r31)			; For beh model we hardcode dev. interrupts SCB offset
+	br	r31, pal$post_interrupt		; Build the stack frame
+  .endc
+
+
+;+
+;sys$int_powerfail
+;	A powerfail interrupt has been detected.  Report the interrupt via
+;	pal$post_interrupt.  
+;
+; On exit
+; r12 - savedPC
+; r13 - SCB offset
+; pt0 - r4
+; pt7 - new IPL
+; pt8 - new PS<IP>
+;- 
+	align_branch
+sys$int_powerfail:
+	lda	r25, ipl$powerfail(r31)
+	mfpr	r12, exc_addr
+	
+	bis	r31, #<1@PS$V_IP>, r14		; a 1 in PS<IP> position
+	mtpr	r25, pt7			; Stash new IPL
+	
+	lda	r13, scb$v_pwrfail(r31)		; SCB offset for powerfail
+	mtpr	r14, pt8			; Stash PS<IP>
+
+	mtpr	r4, pt0				; Save R4 for stack builder
+	br	r31, pal$post_interrupt
+
+.if ne 0			; example code
+;+
+;sys$int_clock
+;	An interval clock interrupt has been detected.  Report the interrupt via
+;	pal$post_interrupt.  
+;
+; On exit
+; r12 - savedPC
+; r13 - SCB offset
+; pt0 - r4
+; pt7 - new IPL
+; pt8 - new PS<IP>
+;- 
+	align_branch
+sys$int_clock:
+
+	; update SCC, take care of PCC wrap
+	rpcc	r12			; get cycle counter
+	mfpr	r8, pt_scc		; get SCC
+
+	zap	r8,^xf0, r14		; get low long of SCC
+	or	r31, #1, r13		; get a 1
+
+	sll	r13, #32, r13		; now a 100000000
+	zap	r12,^xf0, r12		; get low long of pcc
+
+	zap	r8,^x0f, r8		; get high long of SCC
+	subq	r12, r14, r14		; if pcc<31:0> le scc<31:0>
+
+	cmovge 	r14, r31, r13		; zero wrap, if wrap did not happen
+	addq	r8, r13, r8		; add wrapper to SCC
+
+	or	r8, r12, r8		; merge
+	mtpr	r8, pt_scc		; update scc
+
+	; setup regs for pal$post_interrupt:
+	lda	r25, ipl$clock(r31)
+	mfpr	r12, exc_addr
+	
+	bis	r31, #<1@PS$V_IP>, r14		; a 1 in PS<IP> position
+	mtpr	r25, pt7			; Stash new IPL
+	
+	lda	r13, scb$v_clock(r31)		; SCB offset for clock
+	mtpr	r14, pt8			; Stash PS<IP>
+
+	mtpr	r4, pt0				; Save R4 for stack builder
+	br	r31, pal$post_interrupt
+.endc
+
+.if ne 0			; example code
+;+
+;sys$int_interprocessor
+;	An interprocessor interrupt has been detected.  Report the interrupt via
+;	pal$post_interrupt.  
+;
+; On exit
+; r12 - savedPC
+; r13 - SCB offset
+; pt0 - r4
+; pt7 - new IPL
+; pt8 - new PS<IP>
+;- 
+	align_branch
+sys$int_interprocessor:
+	lda	r25, ipl$interprocessor(r31)
+	mfpr	r12, exc_addr
+	
+	bis	r31, #<1@PS$V_IP>, r14		; a 1 in PS<IP> position
+	mtpr	r25, pt7			; Stash new IPL
+	
+	lda	r13, scb$v_inter(r31)		; SCB offset for interprocessor
+	mtpr	r14, pt8			; Stash PS<IP>
+
+	mtpr	r4, pt0				; Save R4 for stack builder
+	br	r31, pal$post_interrupt
+.endc
+
+;+
+;sys$int_perf_cnt
+;	A performance counter interrupt has been detected.
+;
+; On exit to POST_INTERRUPT -
+; 	r12 - savedPC
+; 	r13 - SCB offset
+; 	pt7 - new IPL
+; 	pt8 - new PS<IP>
+;	pt0 - r4
+;- 
+	align_branch
+sys$int_perf_cnt:
+	.if eq <enable_debug_ringbuf ! enable_debug_pcout>
+	; "normal" performance counter interrupt flow"
+	mtpr	r14, pt7		; Stash new IPL for stack builder
+	bis	r31, #<1@PS$V_IP>, r25		; A 1 in PS<IP> position
+
+
+	mtpr	r25, pt8			; Stash PS<IP> for stack builder
+	or	r31, r31, r14			; assume interrupt was pc0
+
+	mfpr	r25, isr
+	srl	r25, #isr$v_pc1, r25
+
+	mfpr	r12, exc_addr
+	cmovlbs	r25, #1, r14			; if pc1 set, load 1 into r14
+
+	srl	r25, #1, r25			; get pc2
+	cmovlbs r25, #2, r14			; if pc2 set, load 2 into r14
+
+	lda	r25, 1(r31)			; get a one
+	lda	r13, scb$v_perfmon(r31)		; SCB offset
+
+	mtpr 	r14, pt0			; new r4:  0=pc0, 1=pc1, 2=pc2
+	sll	r25, r14, r25
+
+	sll	r25, #hwint_clr$v_pc0c, r25	; ack only the perf counter that generated the interrupt
+	mtpr	r25, hwint_clr
+
+	br	r31, 	pal$post_interrupt
+
+  .iff
+	;use performance counter interrupt to output debug data
+	pvc$jsr	tracev, bsr=1
+	bsr	r8, sys$trace_pc		; trashes r8,r9,r10
+	
+	lda 	r25, 7(r31)
+	sll	r25, #hwint_clr$v_pc0c, r25	; ack all performance counter interrupts for now.
+	mtpr	r25, hwint_clr
+	hw_rei					; return to code
+  .endc	
+
+;+
+;sys$halt_interrupt
+;	A halt interrupt has been detected.  Pass control to the console.
+;- 
+	align_branch
+sys$halt_interrupt:
+	mtpr	r0, pt0
+
+  .if ne beh_model
+	ldah	r0, ^xC000(r31)		; Get base of demon space
+	lda	r0, ^x340(r0)			; Add interrupt demon offset
+	
+	stqp	r31, 0(r0)			; Ack and clear the interrupt
+
+	mb					; ensure interrupt is really cleared
+   .endc
+	; insert system dependent method for clearing halt interrupt
+
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+; The code below will wait for halt to go away before we try to enter console
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+;
+; wait for halt to go away 
+;
+1$:					; REPEAT
+	mfpr	r25, ev5$_isr		; : Fetch interrupt summary register
+	srl     r25, #isr$v_hlt, r25	; : Get HALT bit
+	blbs	r25, 1$			; UNTIL the halt interrupt goes away
+
+	mfpr	r12, pt_ptbr		 ; Fetch PTBR
+	blbs	r12, sys$passive_release ; Branch if in console mode
+
+    .endc
+
+        pvc$jsr updpcb, bsr=1
+        bsr     r0, pal$update_pcb      ; update the pcb
+
+        lda     r0, hlt$c_hw_halt(r31)  ; set halt code to hw halt
+        br      r31, sys$enter_console  ; enter the console
+
+
+;+
+;sys$passive_release
+;	intid is less than or equal to current ipl, thus
+;	some interrupt was detected but has now gone away.
+; On entry -
+;	r8  - isr
+;	r13 - ipl
+;	r14 - intid
+;
+; On exit to POST_INTERRUPT -
+; 	r12 - savedPC
+; 	r13 - SCB offset
+; 	pt7 - new IPL
+; 	pt8 - new PS<IP>
+;	pt0 - R4
+;	
+;- 
+	align_branch
+sys$passive_release:
+ .if ne beh_model
+	bis	r31, #^x1F, r25		; Get ipl=31
+	mfpr	r12, exc_addr		; Get PC for stack builder
+	mtpr	r4, pt0			; save R4 for stack builder
+	lda	r13, scb$v_passive_rel(r31)
+
+	mtpr	r31, pt8		; ????? (new PS<IP>, but none pending?)
+	mtpr	r25, pt7		; set new ipl to 31 for dvt's
+	br 	r31, pal$post_interrupt
+ .iff
+	mfpr	r31, pt0		; pad pal shadow write -> hw_rei
+	hw_rei				; Not written yet
+ .endc                                                              
+
+.sbttl	"CFLUSH- PALcode for CFLUSH instruction"
+	align_block
+;+
+; SYS$CFLUSH
+; Entry:
+;
+;	R16 - contains the PFN of the page to be flushed
+;
+; Function:
+;	Flush all Dstream caches of 1 entire page
+;
+;-
+SYS$CFLUSH::
+;
+;Note: must be customized for actual Bcache size.  This is just example code.
+;      
+	; convert pfn to addr, and clean off <63:20>
+	sll	r16, #<<page_offset_size_bits>+<63-20>>, r12
+	lda	r13, ^x10(r31)		; assume 16 Mbyte cache
+	sll	r13, #20, r13		; convert to bytes
+
+	srl	r12, #<63-20>, r12	; shift back to normal position
+	xor	r12, r13, r12		; xor addr<18>
+	
+	or	r31, #8192/<32*8>, r13	; get count of loads
+	nop
+
+CFLUSH_LOOP:
+	subq	r13, #1, r13		; decr counter
+ 	mfpr    r25, ev5$_intid         ; Fetch level of interruptor
+
+	ldqp	r31, 32*0(r12)		; do a load
+	ldqp	r31, 32*1(r12)		; do next load
+
+	ldqp	r31, 32*2(r12)		; do next load
+	ldqp	r31, 32*3(r12)		; do next load
+
+	ldqp	r31, 32*4(r12)		; do next load
+	ldqp	r31, 32*5(r12)		; do next load
+
+	ldqp	r31, 32*6(r12)		; do next load
+	ldqp	r31, 32*7(r12)		; do next load
+
+	mfpr    r14, ev5$_ipl           ; Fetch current level
+	lda	r12, <32*8>(r12)	; skip to next cache block addr
+
+ 	cmple   r25, r14, r25           ; R25 = 1 if intid .less than or eql ipl
+	beq	r25, 10$		; if any int's pending, re-queue CFLUSH -- need to check for hlt interrupt???
+
+	bne	r13, CFLUSH_LOOP	; loop till done
+	hw_rei				; back to user
+	
+	align_branch
+10$:					; Here if interrupted
+	mfpr	r12, exc_addr
+	subq	r12, #4, r12		; Backup PC to point to CFLUSH
+	
+	mtpr	r12, exc_addr
+	nop
+	
+	mfpr	r31, pt0		; Pad exc_addr write	
+	hw_rei
+
+.sbttl	"CSERVE- PALcode for CSERVE instruction"
+	align_block
+;+
+; SYS$CSERVE
+;
+; Function:
+;	Various functions for private use of console software
+;
+;	R16 = address to jump to 
+;
+;
+;-
+SYS$CSERVE::
+   .if ne beh_model
+	pvc$violate  1007
+	jmp	r31, (r16)
+   .endc
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+; Platform specific CSERVE functionality
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+;
+; Cserve PALcode for SRM console 
+;
+;   r0<0> = 1, success
+;   r0<0> = 0, failure or function not supported
+;   r0<63:1> = (generally 0, but may be function dependent)
+;
+;
+; 8 - Set Hardware enable bit in ICSR
+;
+	cmpeq	r16, #cserve$set_hwe, r0
+	bne	r0, ena_hwe
+;
+; 9 - Clear Hardware enable bit in ICSR
+;
+	cmpeq	r16, #cserve$clear_hwe, r0
+	bne	r0, dis_hwe
+;
+; 16 - Load long physical
+;
+	cmpeq	r16, #cserve$ldlp, r0
+	bne	r0, cfw_ldlp
+;
+; 17 - store long physical 
+;
+	cmpeq	r16, #cserve$stlp, r0
+	bne	r0, cfw_stlp
+;
+; 64 - Halt 
+;
+	cmpeq	r16, #cserve$halt, r0
+	bne	r0, cfw_halt
+;
+; 65 - Who-Am-I
+;
+	cmpeq	r16, #cserve$whami, r0
+	bne	r0, cfw_whami
+;
+; 66 - Start loaded code 
+;
+	cmpeq	r16, #cserve$start, r0
+	bne	r0, cfw_start
+;
+; 67 - Execute callback
+;
+	cmpeq	r16, #cserve$callback, r0
+	bne	r0, cfw_callback
+;
+; 68 - Write Exception Address (EXC_ADDR) register 
+;
+	cmpeq	r16, #cserve$mtpr_exc_addr, r0
+	bne	r0, cfw_mtpr_exc_addr
+;
+; 69 - Jump to ARC console 
+;
+	cmpeq	r16, #cserve$jump_to_arc, r0
+	bne	r0, cfw_jump_to_arc
+;
+; 52 - enable PCI interrupts
+;
+	cmpeq	r16, #52, r0
+	bne	r0, cfw_pci_intr_enable
+;
+; 53 - disable PCI interrupts
+;
+	cmpeq	r16, #53, r0
+	bne	r0, cfw_pci_intr_disable
+;
+; just return on invalid CSERVE functions
+;
+	hw_rei
+;
+; Enable the Hardware enable bit in ICSR
+;
+	.align quad
+ena_hwe:
+	mfpr	r16, icsr	    ; get the ICSR 
+	lda	r0, 1(r31)	    ; Get a 1
+	sll	r0, icsr$v_hwe, r0  ; Shift it to HWE 
+	bis	r16,r0,r16	    ; Enable hwe
+	mtpr	r16, icsr	    ; store back into chip
+	mfpr	r31, pt0	    ; PVC -- need to wait five cycles between
+	mfpr	r31, pt0	    ; ICSR write and REI
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+	pvc$violate	77
+	hw_rei
+;
+; Disable the hardware enable bit in ICSR
+;
+	.align quad
+
+dis_hwe:
+	mfpr	r16, icsr	    ; get current copy of the ICSR 
+	lda	r0,1(r31)	    ; Get a 1
+	sll	r0,icsr$v_hwe,r0    ; Shift it to correct position
+	bic	r16,r0,r16	    ; Disable hwe
+	mtpr	r16, icsr	    ; store back into chip
+	mfpr	r31, pt0	    ; PVC -- need to wait five cycles between
+	mfpr	r31, pt0	    ; ICSR write and REI
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+	pvc$violate	77
+	hw_rei
+;
+; ldlp - Load longword physical
+;
+;   r17 - Source physical address
+;   r0  - Returned longword of data
+;
+	.align quad
+
+cfw_ldlp:
+	ldlp	r0,0(r17)		; get the data
+	nop				; pad palshadow write
+	hw_rei				; and back we go
+;
+; stlp - Store longword physical
+;
+;   r17 - Destination physical address
+;   r18 - Longword data to write
+;
+	.align quad
+
+cfw_stlp:
+	stlp	r18, 0(r17)		; store the data
+	or	r31, #1, r0		; set success
+	hw_rei				; and back we go
+;
+; halt - cause a hardware halt re-entry
+;
+	.align quad
+
+cfw_halt:
+	mtpr	r0, pt0			; Save R0
+	pvc$jsr 	updpcb, bsr=1
+
+	bsr	r0, pal$update_pcb	; Update the PCB
+	lda	r0, hlt$c_hw_halt(r31)	; Set halt code to hardware halt
+	br	r31, sys$enter_console	; Enter the console
+;
+; Who-Am-I
+;
+;   r0 - Returned processor ID
+;
+	.align quad
+
+cfw_whami:
+	mfpr	r0, pt_misc		; addr of impure area
+	extbl	r0, #1, r0		; extract whami
+	hw_rei				;  and return
+;
+; Start loaded code 
+;
+	.align quad
+
+cfw_start:
+	get_impure  r1			; Get base address of impure area
+	br	r31, sys$exit_console	; Just exit the console
+;
+; Execute a console callback
+;
+	.align quad
+
+cfw_callback:
+	bis	r1, r31, r16		; Restore R16
+	pvc$jsr 	updpcb, bsr=1
+	bsr	r0, pal$update_pcb	; Update the PCB
+	lda	r0, hlt$c_callback(r31)	; Set halt code to callback
+	br	r31, sys$enter_console	; Enter the console
+;
+; Load a new exception address
+;
+;   r17 - New PC value
+;
+	.align quad
+
+cfw_mtpr_exc_addr:
+	mtpr	r17, exc_addr		; Set new exception address
+	mfpr	r31, pt0		; PVC -- need to wait three cycles between
+	mfpr	r31, pt0		; EXC ADDR  write and REI
+	mfpr	r31, pt0
+	hw_rei				;  and return
+;
+; jump to the arc console 
+;
+;   r17 - Jump targe address
+;
+	.align quad
+
+cfw_jump_to_arc:
+	mtpr	r17, exc_addr		; Set new exception address
+
+	get_impure  r3			; Get base address of impure area
+	fix_impure_ipr	r3
+
+	restore_reg1 srom_bc_ctl,    r1,  r3, ipr=1
+	restore_reg1 srom_bc_cfg,    r2,  r3, ipr=1
+	restore_reg1 srom_srom_rev,  r15, r3, ipr=1
+	restore_reg1 srom_proc_id,   r16, r3, ipr=1
+	restore_reg1 srom_mem_size,  r17, r3, ipr=1
+	restore_reg1 srom_cycle_cnt, r18, r3, ipr=1
+	restore_reg1 srom_signature, r19, r3, ipr=1
+	restore_reg1 srom_proc_mask, r20, r3, ipr=1
+	restore_reg1 srom_sysctx,    r21, r3, ipr=1
+
+	mfpr	r31, pt0		; Stall
+	mfpr	r31, pt0		; Stall
+
+	mtpr	r31, itb_ia		; clear the ITB
+	mtpr	r31, dtb_ia		; clear the DTB
+	mtpr	r31, dtb_cm		; set new ps<cm>=0, Mbox copy
+
+	; build PS (IPL=31,CM=K,VMM=0,SW=0)
+	lda	r3, ^X1f(r31)		
+	bis	r31, r31, r11		; set new ps<cm>=0, PALshadow copy
+	mtpr	r31, pt_ps		; set new ps<sw>=0
+	mtpr	r3, ipl			; set new ps<ipl>=0
+	mtpr	r31, ps			; set new ps<cm>=0, Ibox copy
+	mtpr	r31, dtb_cm		; set new ps<cm>=0, Mbox copy
+
+	; ASN
+	; 
+	mtpr	r31, dtb_asn
+	mtpr	r31, itb_asn
+
+	; Interrupts
+	; 
+	mtpr	r31, astrr		; stop ASTs
+	mtpr	r31, aster		; stop ASTs
+	mtpr	r31, sirr		; clear software interrupts
+
+	; Unlock a bunch of chip internal IPRs
+	; 
+	mtpr	r31, exc_sum		; clear out exeception summary and exc_mask
+	mfpr	r31, va			; unlock va, mmstat
+
+	lda	r3, < -			; Clear Icache parity error & timeout status
+		    <1@icperr_stat$v_dpe> ! - 
+		    <1@icperr_stat$v_tpe> ! -
+		    <1@icperr_stat$v_tmr>>(r31)
+	mtpr	r3, icperr_stat			
+
+	lda	r3, < -			; Clear Dcache parity error status
+		    <1@dcperr_stat$v_lock> ! -
+		    <1@dcperr_stat$v_seo>>(r31)
+	mtpr	r3, dcperr_stat			
+;
+; Pyxis initialization
+;
+	lda	r3, pyxis_k_main_csr_base(r31)	; r3 <- 00.0000.0874
+	sll	r3, pyxis_v_main_csr_base, r25	; r3 <- 87.4000.0000
+;
+; zero out HAE_MEM
+;
+	lda	r4, csr_r_hae_mem(r3)	; r4 <- 87.4000.0400 
+	stlp	r31, 0(r4)
+	mb
+
+	lda	r3, pyxis_a_addr_trans(r31) ; r3 <- 00.0000.0876
+	sll	r3, pyxis_v_addr_trans, r3  ; r3 = 87.6000.0000
+;
+; zero out window base registers
+;
+	lda	r4, w_base0(r3)		; zero out window 0
+	stlp	r31, 0(r4)		;
+	mb
+	lda	r4, w_base1(r3)		; zero out window 1
+	stlp	r31, 0(r4)		;
+	mb
+	lda	r4, w_base2(r3)		; zero out window 2
+	stlp	r31, 0(r4)		;
+	mb
+	lda	r4, w_base3(r3)		; zero out window 3
+	stlp	r31, 0(r4)		;
+	mb
+;
+; disable all pci interrupts
+;
+	lda	r3, io_base(r31)	; r3 <- 00.0000.0858
+	sll	r3, #28-5, r3		; r3 <- 04.2C00.0000
+	lda	r3, ^x804(r3)		; r3 <- 04.2C00.0804
+	sll	r3, #5, r3		; r3 <- 85.8001.0080
+	lda	r3, ^x18(r3)		; r3 <- 85.8001.0098
+
+	lda	r0, -1(r31) 
+	stlp	r0, 0(r3)
+	
+	mfpr	r31, pt0		; PT write and REI
+	mfpr	r31, pt0
+	hw_rei				;  and return
+;
+; Enable PCI interrupts
+;
+;   r17 - IRQ number
+;   r0  - New interrupt mask 
+;
+	.align quad
+
+cfw_pci_intr_enable:
+
+	get_impure  r12			; Get base address of impure area
+	fix_impure_ipr	r12
+
+	restore_reg1 intr_mask, r0, r12, ipr=1	; Read shadow copy of mask.
+
+	and	r17, #^x1F, r13		; Make sure IRQ is in the range 0 - 31
+
+        cmpeq   r13, #4, r10		; Check for ISA
+        bne     r10, 10$		; If ISA, skip (always enabled)
+
+	lda     r10, 1(r31)             ; Get a '1'
+        sll     r10, r13, r10           ; Shift to correct bit position
+        bic     r0, r10, r0             ; Clear (enabale) the bit
+
+	store_reg1  intr_mask, r0, r12, ipr=1	; Update shadow copy of mask
+
+	lda	r12, io_base(r31)	; r12 <- 00.0000.0858
+	sll	r12, #28-5, r12		; r12 <- 04.2C00.0000
+	lda	r12, ^x804(r12)		; r12 <- 04.2C00.0804
+	sll	r12, #5, r12		; r12 <- 85.8001.0080
+	lda	r12, ^x18(r12)		; r12 <- 85.8001.0098
+        stlp	r0, 0(r12)		; Update the mask registers
+	mb
+	mb
+10$:	
+	mfpr	r31, pt0		; PVC - PALshadow write -> HW_REI in 0, 1
+	mfpr	r31, pt0		;
+	hw_rei				; and back we go
+;
+; Disable PCI interrupts
+;
+;   r17 - IRQ number
+;   r0  - New interrupt mask
+;
+	.align quad
+
+cfw_pci_intr_disable:
+
+	get_impure  r12			; Get base address of impure area
+	fix_impure_ipr	r12
+
+	restore_reg1 intr_mask, r0, r12, ipr=1	; Read shadow copy of mask.
+
+	and	r17, #^x1F, r13		; Make sure IRQ is in range 0 - 31
+
+        cmpeq   r13, #4, r10		; Check for ISA
+        bne     r10, 10$		; If ISA, skip (always enabled)
+
+	lda	r10, 1(r31)		; Get a '1'
+	sll	r10, r13, r10		; Shift to correct bit position
+	bis	r0, r10, r0		; Set (disable) the bit
+
+	store_reg1  intr_mask, r0, r12, ipr=1	; Update shadow copy of mask
+
+	lda	r12, io_base(r31)	; r12 <- 00.0000.0858
+	sll	r12, #28-5, r12		; r12 <- 04.2C00.0000
+	lda	r12, ^x804(r12)		; r12 <- 04.2C00.0804
+	sll	r12, #5, r12		; r12 <- 85.8001.0080
+	lda	r12, ^x18(r12)		; r12 <- 85.8001.0098
+        stlp	r0, 0(r12)		; Update the mask registers
+	mb
+	mb
+10$:
+	mfpr	r31, pt0		; PVC - PALshadow write -> HW_REI in 0, 1
+	mfpr	r31, pt0		;
+	hw_rei				; and back we go
+;
+; End of AlphaPC 164/LX firmware specific CSERVE code 
+;
+    .iff
+	br	r31, SYS$EXIT_CONSOLE	; allows pvc checking of exit_console
+					; in reltest variation
+    .endc
+
+	align_block
+.sbttl	"System specific RESET code"
+;+
+;  RESET code
+;	Entry state:
+;       r0 = whami
+;       r1 = pal_base + offset past branch in trap$reset
+;       r2 = base of scratch area
+;       r3 = halt code
+;       r4 = ptbr (egore only)
+;	r15 = icsr mask (acore only)
+;	r16 = mcsr mask (acore only)
+;	and the following 3 if init_cbox is enabled:
+;       r5 = sc_ctl
+;       r6 = bc_ctl
+;       r7 = bc_cnfg
+;
+;-
+  .if eq rax_mode
+sys$reset:
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+; Save the parameters passed in from the SROM:
+;
+;	r1	bcache control
+;	r2	bcache configuration
+;	r15	encoded srom.s rcs revision
+;	r16	processor identification
+;	r17	size of contiguous, good memory
+;	r18	cycle count in picoseconds
+;	r19	signature (DECBh) in <31:16> and
+;		system revision id in <15:0>
+;	r20	active processor mask
+;	r21	system context value
+;
+; Note we are using the following hard-coded values:
+;
+;    r0 (whami)		= 0
+;    r1 (palbase)	= pal$pal_base (from pal_def.mar)
+;    r2 (impure area)	= pal$impure_base from (pal_def.mar)
+;    r3 (halt code)	= 0
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+
+	srl	r19, #16, r4		; Shift SROM signature into low word
+	get_addr r5, ^xDECB, r31	; Load the validation pattern
+	zapnot	r4, #3, r4		; Clear all but low word
+	cmpeq	r4, r5, r6		; Is the SROM signature valid?
+	beq	r6, 10$			; If not, don't save parameters
+
+	sget_addr r4, pal$impure_base, r31	 ; Base of impure area
+	sget_addr r5, pal$impure_common_size, r31; Size of common area
+	addq    r4, r5, r4			 ; Base of specific area
+
+	fix_impure_ipr	r4
+	store_reg1      srom_bc_ctl,    r1, r4, ipr=1
+	store_reg1      srom_bc_cfg,    r2, r4, ipr=1
+	store_reg1      srom_srom_rev,  r15, r4, ipr=1
+	store_reg1      srom_proc_id,   r16, r4, ipr=1
+	store_reg1      srom_mem_size,  r17, r4, ipr=1
+	store_reg1      srom_cycle_cnt, r18, r4, ipr=1
+	store_reg1      srom_signature, r19, r4, ipr=1
+	store_reg1      srom_proc_mask, r20, r4, ipr=1
+	store_reg1      srom_sysctx,    r21, r4, ipr=1
+10$:
+	get_addr r1, pal$pal_base, r31
+	get_addr r2, pal$impure_base, r31
+	bis	r31, r31, r0		; whami = 0
+	bis	r31, r31, r3		; halt_code = system reset 
+	bis	r31, r31, r19		; clear SROM signature
+
+	LED_WRITE   <^xA0>, r4, r5
+
+    .endc
+
+;	mtpr	r31, ic_flush_ctl	; do not flush icache - flushed in hardware before srom load
+	mtpr	r31, itb_ia		; clear the ITB
+	mtpr	r31, dtb_ia		; clear the DTB
+
+;	bic	r1, #^xFF, r1		; clear offset (we know offset is small and base is page-aligned
+	mtpr	r1, pal_base		; initialize PAL_BASE
+
+	lda	r1, <1@mces$v_dpc>(r31) ; 1 in disable processor correctable error
+	insbl	r0, #1, r0		; isolate whami in correct pt_misc position
+	or	r0, r1, r1		; combine whami and mces
+	mtpr	r1, pt_misc		; store whami and mces, swap bit clear
+
+	; CPU specific impure pointer
+	extbl   r0, #1, r0              ;get whami again
+	.if ne lx164_system
+	lda	r1, pal$impure_specific_size(r31)
+	mulq	r0, r1, r1		; Get offset to CPU specific area
+	lda	r2, pal$impure_base(r31); Get base address of impure area
+	addq	r2, r1, r2		; Add base to the CPU offset
+	lda	r0, pal$impure_common_size(r31) ; Offset to common area
+	.iff
+	mulq    r0, #<<pal$impure_specific_size+mchk$size+mchk$crd_size>/8>, r0 ; whami * per_node size/8
+	addq    r0, #pal$impure_common_size/8, r0; add common area
+	sll     r0, #3, r0              ; * 8
+	.endc
+	addq    r2, r0, r2              ; addr our impure area offset
+	wr_impure_ptr r2		; initialize per-cpu impure area ptr (r2 = src)
+
+	zapnot	r3, #1, r0		; isolate halt code
+	mtpr	r0, pt0			; save entry type
+
+; Add ev56 byte/word eco enable
+
+	ldah	r1, <<1@<icsr$v_sde-16>> ! <1@<icsr$v_fpe-16>> ! <1@<icsr$v_byt-16>>>(r31)
+  .if ne acore
+	bis	r1, r15, r1		; OR in icsr mask
+  .endc
+.if eq disable_crd
+	bis	r31, #1, r0
+	sll	r0, icsr$v_crde, r0	; A 1 in iscr<corr_read_enable>
+	or	r0, r1, r1		; Set the bit
+.endc
+	mtpr	r1, icsr		; ICSR - Shadows enabled, Floating point enable, correct
+					;	read per assembly option
+
+	; Mbox/Dcache init
+  .if ne acore
+	mtpr	r16, mcsr
+  .iff
+	mtpr	r31, mcsr
+  .endc
+	mb
+	lda     r1, ^x1FFF(R31)
+        mtpr    r1, dc_test_ctl         ; initialize tag index to all 1's.
+
+	lda	r1, <1@dc_mode$v_dc_ena>(r31)
+	align_branch
+
+.if ne vms_chm_fix
+	mtpr	r31, dc_mode		; turn Dcache off
+.iff
+	mtpr	r1, dc_mode		; turn Dcache on
+.endc
+	nop
+	
+	mfpr	r31, pt0		; No Mbox instr in 1,2,3,4
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+
+	mtpr	r31, dc_flush		; flush Dcache
+	mtpr	r31, maf_mode
+
+
+	; build PS (IPL=31,CM=K,VMM=0,SW=0)
+	lda	r1, ^X1F(r31)		
+	bis	r31, r31, r11		; set new ps<cm>=0, PALshadow copy
+	mtpr	r31, pt_ps		; set new ps<sw>=0
+	mtpr	r1, ipl			; set new ps<ipl>=0
+	mtpr	r31, ps			; set new ps<cm>=0, Ibox copy
+	mtpr	r31, dtb_cm		; set new ps<cm>=0, Mbox copy
+
+	; ASN
+	mtpr	r31, dtb_asn
+	mtpr	r31, itb_asn
+
+	; Interrupts
+	mtpr	r31, astrr		; stop ASTs
+	mtpr	r31, aster		; stop ASTs
+	mtpr	r31, sirr		; clear software interrupts
+	lda	r9, ^x67(r31)
+	sll	r9, #hwint_clr$v_pc0c, r9
+	mtpr	r9, hwint_clr		; Clear hardware interrupt requests
+
+	; Cycle counter
+	or	r31, #1, r9		; get a one
+	sll	r9, #32, r9		; shift to <32>
+	mtpr	r31, cc			; clear Cycle Counter
+	mtpr	r9, cc_ctl		; clear and enable the Cycle Counter
+	mtpr	r31, pt_scc		; clear System Cycle Counter
+
+
+	; Unlock a bunch of chip internal IPRs
+	mtpr	r31, exc_sum		; clear out exeception summary and exc_mask
+	mfpr	r31, va			; unlock va, mmstat
+	lda	r8, <<1@icperr_stat$v_dpe> ! <1@icperr_stat$v_tpe> ! <1@icperr_stat$v_tmr>>(r31)
+	mtpr	r8, icperr_stat			; Clear Icache parity error & timeout status
+	lda	r8, <<1@dcperr_stat$v_lock> ! <1@dcperr_stat$v_seo>>(r31)
+	mtpr	r8, dcperr_stat			; Clear Dcache parity error status
+
+	; Misc PALtemps
+	or	r31, #1, r1		; get bogus scbb value
+	mtpr	r1, pt_scbb		; load scbb
+	mtpr	r31, pt_prbr		; clear out prbr
+	mfpr	r1, pal_base
+	get_addr r1, <kludge_initial_pcbb-pal$base>, r1, verify=0; get address for temp pcbb
+	mtpr	r1, pt_pcbb		; load pcbb
+	lda	r1, 2(r31)		; get a two
+	sll	r1, #32, r1		; gen up upper bits
+	mtpr	r1, pt_vptbr		; set l3 virt base
+	mtpr	r1, mvptbr
+	mtpr	r1, ivptbr
+	mtpr	r31, pt_ptbr
+	rc	r0			; clear intr_flag
+	mtpr	r31, pt_trap
+	; clear performance counters
+	mtpr	r31, pmctr	
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+; 
+;  - Save the CPU type in the impure area.
+;  - Get BC_CONTROL from SROM parameter save area and enable machine checks,
+;    as well as, store a shadow copy in impure area (needed for perfmon PALcode).
+;  - Get BC_CONFIG from SROM parameter save area and save a shadow copy in the 
+;    impure area.
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+
+	lda	r12, <pal$impure_base + impure$cpu_type_offset>(r31)
+;
+; get and save the CPU type 
+;
+	ldah	r13, ^xfff0(r31)	; r13 <- CBOX base pointer 
+	zapnot	r13, #^x1F, r13		; : 
+	ldqp	r13, ei_stat(r13)	; r13 <- contents of EI_STAT register
+	srl	r13, #24, r13		; r13 <- CPU pass field
+	and	r13, #15, r13		; :
+	br	r14, 15$
+	.long	0,0			; 0000 = 
+	.long	1,7			; 0001 = EV56 P1
+	.long	1,5			; 0010 = EV5 P2 and P2.2
+	.long	3,5			; 0011 = EV5 P3
+	.long	5,5			; 0100 = EV5 P4
+	.long	2,7			; 0101 = EV56 P2
+	.long	2,5			; 0110 = EV5 P2.3
+	.long	4,5			; 0111 = EV5 P3.2
+	.long	0,0			; 1000 = 
+	.long	0,0			; 1001 = 
+	.long	0,0			; 1010 = 
+	.long	0,0			; 1011 = 
+	.long	0,0			; 1100 = 
+	.long	0,0			; 1101 = 
+	.long	0,0			; 1110 = 
+	.long	0,5			; 1111 = EV5 P1
+15$:	s8addq	r13, r14, r13
+	ldlp	r14, 0(r13)
+	stlp	r14, 0(r12)		; save the CPU pass type
+	ldlp	r14, 4(r13)
+	stlp	r14, 4(r12)		; save CPU type
+;
+; Modify the BC_CONTROL to enable machine checks 
+;
+	get_impure  r1				; Get base address of impure area
+	fix_impure_ipr	r1
+
+	restore_reg1 srom_signature, r0, r1, ipr=1 ; Read copy of SROM signature
+	srl	r0, #16, r0			; Shift SROM signature into low word
+	get_addr r2, ^xDECB, r31		; Load the validation pattern
+	zapnot	r0, #3, r0			; Clear all but low word
+	cmpeq	r0, r2, r0			; Is the SROM signature valid?
+	beq	r0, 20$				; If not, don't trust saved parameters
+
+	restore_reg1 srom_bc_ctl, r0, r1, ipr=1 ; Read SROM copy of bc_ctl
+
+	lda	r2, 1(r31)			; get a 1
+	sll	r2, #bc_ctl$v_ei_dis_err, r2	; put it into position
+	bic	r0, r2, r0			; clear disable error bit
+	lda	r2, 1(r31)			; get a 1
+	sll	r2, #bc_ctl$v_corr_fill_dat, r2	; put it into postion
+	bic	r0, r2, r0			; enable error correction
+
+	store_reg1 srom_bc_ctl, r0, r1, ipr=1	; Write back updated value
+
+	ldah	r14, ^xfff0(r31)		;
+	zap	r14, #^xE0, r14			; Get Cbox IPR base
+	mb					; PVC ... must precede with a MB
+	stqp	r0, bc_ctl(r14)			; Write new value to EV5
+	mb					; PVC ... MB must follow bc_ctl write 
+
+	store_reg1 bc_ctl, r0, r1, ipr =1	; Write to BC_CTL shadow
+;   
+; Write the current BC_CONFIG to shadow in impure area
+;
+	restore_reg1 srom_bc_cfg, r0, r1, ipr=1	; Read SROM copy of bc_cfg
+	store_reg1 bc_config, r0, r1, ipr=1	; Initialize cns$bc_config
+20$:
+	LED_WRITE   <^xA1>, r14, r13, 
+
+    .endc
+
+  .if ne init_cbox
+	;   Only init the Scache and the Bcache if there have been no previous
+	;   cacheable  dstream loads or stores.
+	;
+	;   Inputs:
+        ;       r5    - sc_ctl
+        ;       r6    - bc_ctl
+        ;       r7    - bc_cnfg
+
+	ldah	r0, ^xfff0(r31)
+	zap	r0, #^xE0, r0		; Get Cbox IPR base
+	ldqp	r19, ev5$_sc_ctl(r0)	; read current sc_ctl
+temp = <<<1@bc_ctl$v_ei_dis_err> + <1@bc_ctl$v_ei_ecc_or_parity> + <1@bc_ctl$v_corr_fill_dat>>@-1>
+	lda	r20, temp(r31) 		; create default bc_ctl (bc disabled, errors disabled, ecc mode)
+	sll	r20, #1, r20
+temp = ^x017441				; default bc_config
+	get_addr r21, temp, r31		; create default bc_config
+	lda	r23, <1@sc_ctl$v_sc_flush>(r31)	;set flag to invalidate scache in set_sc_bc_ctl
+
+	pvc$jsr rollover1, bsr=1	; force pvc labels over 100 in scloop
+	pvc$jsr rollover2, bsr=1	; force pvc labels over 100 in scloop
+	pvc$jsr rollover3, bsr=1	; force pvc labels over 100 in scloop
+	pvc$jsr scbcctl, bsr=1
+	bsr	r10, set_sc_bc_ctl
+	update_bc_ctl_shadow r6, r23	; update bc_ctl shadow using r6 as input; r23 gets adjusted impure pointer
+	store_reg1	bc_config, r7, r23, ipr=1	; initialize cns$bc_config
+  .endc
+
+	; clear pmctr_ctl in impure area
+	update_pmctr_ctl	r31, r0		; initialize pmctr_ctl register
+
+	ldah	r14, ^xfff0(r31)
+	zap	r14, #^xE0, r14		; Get Cbox IPR base
+	ldqp	r13, sc_stat(r14)	; Clear sc_stat and sc_addr
+	ldqp	r8, ei_stat(r14)
+	ldqp	r9, ei_stat(r14)	; Clear ei_stat, ei_addr, bc_tag_addr, fill_syn
+	bis	r8, r9, r8		; touch ldqp registers to ensure loads complete before store
+	get_impure r13
+	stqpc	r31, 0(r13)		; Clear lock_flag
+
+        assume <enable_debug_ringbuf + enable_debug_pcout> lt 2
+        .if ne <enable_debug_ringbuf>
+
+          ; set up pointer for debug ring buffer
+          ; note the data area pointer and bic mask must be set up so
+          ; that the alignment of the data area pointer will ensure that
+          ; the bic mask will clear the pointer at the correct size
+          ; in this case, use top 1Mb of 32MB address space,
+          ; so, address = 32MB-1MB and bic mask = 1MB
+
+          get_addr r1, <1*1024*1024>, r31; generate bic mask -- debug area is 1mb long
+          sll   r1, #32, r1             ; shift to high long
+          get_addr r1, <<32*1024*1024>-<1*1024*1024>>, r1; debug area is at 32mb-1Mb
+	  wr_debug_ptr	r1, r0		; initialize debug_ptr
+					; save size of trace ?
+        .endc
+        .if ne <enable_debug_pcout>
+	  .if ndf debug$io_addr
+		debug$io_addr = 0	; debug$io_addr = some io space bitbucket address --?????
+	  .endc
+          get_addr r1, <debug$io_addr@-32>, r31, verify=0	; load high 32 bits
+	  sll 	r1, #32, r1
+	  get_addr r8, <debug$io_addr>, r31, verify=0	; load low 32 bits of address
+	  zap	r8, #^xF0, r8		; get rid of sign extend
+	  or 	r8, r1, r1
+	  wr_debug_ptr	r1, r0		; initialize debug_ptr
+        .endc
+                                                                                                     
+
+
+
+  .if ne acore				; Test starts at 40000(hex).  Preload the TBs for that
+					; address as well.
+	ldah	r8, 4(r31)		; For EXC_ADDR
+	mtpr	r8, exc_addr		; EXC_ADDR to 40000 (hex)
+	srl	r8, #page_offset_size_bits, r9   ; Start to make PTE for address 40000
+        sll     r9, #32, r9
+        lda     r9, ^x7F01(r9)          ; Make PTE, V set, all RE set, all but UWE set
+	mtpr	r9, dtb_pte		; ACORE hack, load TB with 1-1 translation for address 40000
+	mtpr	r8, itb_tag		; ACORE hack, load TB with 1-1 translation for address 40000
+
+	mtpr	r8, dtb_tag
+	mtpr	r9, itb_pte
+
+	hw_rei_stall
+
+  .endc
+  .if ne egore
+;
+; Set up to be SRM compliant and to access fake HWRPB
+;
+	get_addr r8, <^x20000000>, r31
+	mtpr	r8, exc_addr
+
+	get_addr sp, <^x207fe000>, r31
+	mtpr	r30, pt_ksp
+
+	get_addr r8, <^x4000>, r31
+	mtpr	r8, pt_ptbr
+
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+	hw_rei
+
+  .endc
+
+  .if df old_egore			; Test starts at 202000(hex).
+					; Set up for MM
+
+	
+	lda	r8, ^xFFFc(r31)
+	sll	r8, #32, r8
+
+ 	mtpr	r8, mvptbr
+	mtpr	r8, ivptbr
+
+	mtpr	r8, pt_vptbr
+	mtpr	r4, pt_ptbr
+
+
+	ldah	r8, ^x20(r31)		; For EXC_ADDR
+	lda	r8, ^x2000(r8)		;
+	mtpr	r8, exc_addr		; EXC_ADDR to 202000 (hex)
+	mfpr	r31, pt0
+
+
+	hw_rei
+
+  .endc
+
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+; This code was added to do the following:
+;
+; - Get and save address of UNIX (OSF/1) PALcode (for SWPPAL instruction).
+; - Save the address of where UNIX needs to enter VMS PALcode on console 
+;   entry
+; - Do some platform specific hardware initialization
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+;
+; Initialize the PCI interrupt mask.
+;
+; An interrupt is disabled by writing a '1' to the mask
+; register.  An interrupt is enabled by writing a '0'.
+;
+; Keep a shadow copy of the mask to the impure area since
+; the mask registers are write-only.
+;
+	br	r13, 30$
+	.long	^xFFFFFFEF
+30$:	ldlp	r14, 0(r13)
+
+	lda	r2, io_base(r31)	; r2 <- 00.0000.0858
+	sll	r2, #28-5, r2		; r2 <- 04.2C00.0000
+	lda	r2, ^x804(r2)		; r2 <- 04.2C00.0804
+	sll	r2, #5, r2		; r2 <- 85.8001.0080
+	lda	r2, ^x18(r2)		; r2 <- 85.8001.0098
+	stlp	r14, 0(r2)		; Write the mask registers
+	mb
+	mb
+
+	get_impure  r2			; Get base address of impure area
+	fix_impure_ipr	r2
+
+	store_reg1  intr_mask, r14, r2, ipr=1	; Save a shadow copy of the mask.
+
+	LED_WRITE   <^xA2>, r0, r2
+;
+; Save address of UNIX (OSF/1) PALcode base. Write pal$osfpal_base
+; (defined at 18000h) to offset pal$enter_osf in the common impure area.
+;
+	get_addr r2, pal$enter_osf, r31	; initialize the pointer to osf pal
+	get_addr r0, pal$osfpal_base, r31
+	stqp	r0, 0(r2)	
+	mb
+;
+; Save address of vms$enter_console to offset pal$enter_console_ptr
+; in the common impure area.
+;
+	get_addr r2, pal$enter_console_ptr, r31	; get location to save enter console pointer
+
+	align_branch
+
+	bis	r31, r31, r31			;
+	br	r0, get_entry_addr		; get address of console entry point for OSF
+	.address	vms$enter_console
+get_entry_addr:
+	ldqp	 r0, 0(r0)		; get the offset
+	mfpr	 r1, pal_base		; get the pal base
+	addq	 r0, r1, r0		; console entry = offset + pal_base
+	stqp	 r0, 0(r2)		; write it to the impure area 
+	mb
+
+	LED_WRITE   <^xA3>, r0, r2
+
+    .endc
+
+;	p4_fixup$fixup_routine
+
+	mfpr	r0, pt0			; get entry type
+	br	r31, sys$enter_console	; enter the cosole
+
+    .if ne lx164_system
+
+	.align	quad
+t = .
+. = pal$base + 8
+	.long	<vvar@24> ! <pal_type@16> ! <vmaj@8> ! <vmin@0>
+. = t
+
+    .endc
+
+  .iff					; Start RAX reset flow
+	; For RAX:
+	; 	r0    - icsr at first, then used for cbox ipr base offset
+	; 	r2    - mcsr
+	;	r3    - dc_mode
+	;	r4    - maf_mode
+	;	r5    - sc_ctl
+	; 	r6    - bc_ctl
+	; 	r7    - bc_cnfg
+
+sys$reset:
+	mtpr	r31, ev5$_dtb_cm	; set mbox mode to kernel
+        mtpr 	r31, ev5$_ps            ; set Ibox mode to kernel 
+
+        mtpr 	r0, ev5$_icsr		; Load ICSR 
+        mtpr    r2, ev5$_mcsr
+
+	mfpr	r8, pal_base
+	ldah	r0, ^xfff0(r31)
+
+	zap	r0, #^xE0, r0		; Get Cbox IPR base
+	mtpr	r31, ev5$_itb_asn	; clear asn
+	
+	ldqp	r19, ev5$_sc_ctl(r0)	; read current sc_ctl
+
+temp = <<<1@bc_ctl$v_ei_dis_err> + <1@bc_ctl$v_ei_ecc_or_parity> + <1@bc_ctl$v_corr_fill_dat>>@-1>
+	lda	r20, temp(r31) 		; create default bc_ctl (bc disabled, errors disabled, ecc mode)
+	sll	r20, #1, r20
+
+temp = ^x017441				; default bc_config
+	get_addr r21, temp, r31		; create default bc_config
+	lda	r23, <1@sc_ctl$v_sc_flush>(r31)	;set flag to invalidate scache in set_sc_bc_ctl
+
+	pvc$jsr rollover3, bsr=1	; force pvc labels over 100 in scloop
+	pvc$jsr rollover4, bsr=1	; force pvc labels over 100 in scloop
+	pvc$jsr rollover5, bsr=1	; force pvc labels over 100 in scloop
+	pvc$jsr scbcctl, bsr=1
+	bsr	r10, set_sc_bc_ctl
+
+	update_bc_ctl_shadow	r6, r2	; write to bc_ctl shadow.   adjusted impure pointer returned in r2
+	store_reg1	pmctr_ctl, r31, r2, ipr=1	; initialize pmctr_ctl
+	store_reg1	bc_config, r7, r2, ipr=1	; initialize cns$bc_config
+
+	mtpr 	r3, ev5$_dc_mode	; write dc_mode
+	mtpr	r31, ev5$_dc_flush	; flush dcache
+
+	mtpr	r31, ev5$_exc_sum	; clear exc_sum - E1 only
+	mtpr	r31, ev5$_exc_mask	; clear exc_mask - E1 only
+
+	ldah	r2, 4(r31)		; For EXC_ADDR
+	mtpr	r2, ev5$_exc_addr	; EXC_ADDR to 40000 (hex)
+
+	mtpr	r31, ev5$_sirr		; Clear SW interrupts (for ISP)
+	mtpr 	r4, ev5$_maf_mode	; write maf_mode
+
+	mtpr	r31, ev5$_alt_mode	; set alt_mode to kernel
+        mtpr 	r31, ev5$_itb_ia        ; clear ITB
+
+	lda	r1, ^x1F(r31)		; For IPL
+	mtpr	r1, ev5$_ipl		; IPL to 1F
+
+	lda	r9, ^x67(r31)
+	sll	r9, #hwint_clr$v_pc0c, r9
+	mtpr	r9, hwint_clr		; Clear hardware interrupt requests
+
+	mtpr	r31, ev5$_aster		; disable AST interrupts
+
+	mtpr	r31, ev5$_astrr		; clear AST requests
+	mtpr	r31, ev5$_dtb_ia	; clear dtb
+
+	mtpr	r31, pt_ps		; pal local copy of mode
+	mtpr	r31, pt_trap
+
+	srl	r2, #page_offset_size_bits, r9   ; Start to make PTE for address 40000
+        sll     r9, #32, r9
+
+        lda     r9, ^x7F01(r9)          ; Make PTE, V set, all RE set, all but UWE set
+ 	nop
+
+	mtpr	r9, dtb_pte		; RAX hack, load TB with 1-1 translation for address 40000
+	mtpr	r2, itb_tag		; RAX hack, load TB with 1-1 translation for address 40000
+	
+	mtpr	r2, dtb_tag
+	mtpr	r9, itb_pte
+
+	and	r31, r31, r0		; clear deposited registers, note: r2 already overwritten
+	and	r31, r31, r3
+
+	and	r31, r31, r4
+	and	r31, r31, r5
+
+	and	r31, r31, r6
+	and	r31, r31, r7
+
+	hw_rei				;May need to be a rei_stall since
+					;we write to TB's above
+					;However, it currently works ok. (JH)
+.endc
+
+	.if ne <enable_debug_ringbuf ! enable_debug_pcout>
+	
+	.sbttl	TRACE_PC	debugging trace code
+	
+	; +
+	; called jsr, r8, sys$trace_pc
+	; writes a single quad word @pal$debug_ptr with
+	; <31:0>= callers pc, <63:32>=exc_addr<31:0>
+	; wraps pal$debug_ptr, at 8 bits(?).
+	; uses r8,r9,r10
+	;-
+
+	align_branch		; align for branch target
+sys$trace_pc::
+	get_debug_ptr	r10
+
+	.if ne enable_debug_pcout
+
+	  mfpr	r9, exc_addr		; get trap pc
+	  stqp	r9, 0(r10)
+	  mfpr	r9, pt_ptbr
+	  stqp	r9, 8(r10)
+	  wmb				; and force out
+    	.endc
+
+
+	.if ne enable_debug_ringbuf
+	  sll	r8, #32, r8		; move trap pc to high long
+	  zap	r10, #^xf0, r9		; remove limit from addr
+	  or	r8, r9, r8		; r8= retpc/dataaddr
+	  srl	r10, #32, r9		; move bic mask to low long
+	  bic	r8, r9, r9		; r9=junk/clean_dataaddr
+					; r8=retpc/junk
+	  addl	r9, #0, r9		; r9=clean_dataaddr
+	  zap	r8, #^x0f, r8		; r8=retpc/zero
+	  or	r8, r9, r8		; r8=retpc/dataaddr
+	  zap	r10, #^x0f, r9		; remove old addr
+	  xor	r8, r9, r9		; insert new addr
+	  zap	r8, #^x0f, r8		; remove new addr
+	  xor	r8, r9, r9		; restore bit mask
+					; r9, mask/newaddr
+					; r8 retpc/zero
+ 	  srl	r8, #32, r8		; r8=retpc
+	
+	  mfpr	r10, exc_addr		; get trap pc
+	  sll	r10, #32, r10		; move trap pc to high long
+	  or	r10, r8, r8		; merge data, low long caller, hi, traper
+	  blbs	r9, 5$			; don't log if paused
+	  addl	r9, #0, r10		; clean data pointer (high half is limit) -- gets rid of the bic mask
+	  stqp	r8, 0(r10)		; store the quad in memory
+
+	  ldlp	r8, 0(r10)		; restore callers pc
+
+	  ; note, tbump_size must be a power of 2, or the wrapper, will screw up.
+	  tbump_size = 8
+;	  .iif ne <enable_debug_sptrace! enable_debug_pstrace ! enable_debug_astentrace>, tbump_size = 16
+;	  .iif ne <enable_debug_trace2reg>, tbump_size = 32
+
+	  addq	r9, #tbump_size, r10	; bump pointer
+	  wr_debug_ptr r10, r9	 ; stash away new pointer
+
+	  ;+
+	  ; this code is used to watch for memory corruptions at known PA's
+	  ; on every entry it looks for the data cell of interest to go to zero
+	  ; if it does we halt, else we continue
+	  ;
+;	  get_addr r9, <^x012780>, r31	; get an addr
+;	  ldq/p r9, (r9)			; fetch the data
+;	  bne	r9, 5$			; continue if not a zero, else
+;	  get_addr r9, <^x012780>, r31	; get an addr
+;	  stl/p r9, (r9)			; change data to no, zero
+;	  pvc$violate	1002
+;	  .long ^xbf			;  halt
+	  ;-
+
+5$:	  addl	r8, #0, r8		; clean data pointer (high half is limit)
+	.endc
+
+	pvc$jsr	tracev, dest=1
+	ret	r31, (r8)		; back we go
+
+
+.endc
+
+
+.sbttl	"SYS$ENTER_CONSOLE - Common PALcode for ENTERING console"
+
+	align_block
+
+; SYS$enter_console
+;
+; Entry:
+;	Entered when PAL wants to enter the console.
+;	usually as the result of a HALT instruction or button,
+;	or catastrophic error.
+;
+; Regs on entry...
+;
+;	R0 	= halt code
+;	pt0	<- r0
+;
+; Function:
+;
+;	Save all readable machine state, and "call" the console
+;	
+; Returns:
+;
+;	None - we're really changing state here, eh ? 
+;
+; Notes:
+;
+;	In these routines, once the save state routine has been executed,
+;	the remainder of the registers become scratchable, as the only
+;	"valid" copy of them is the "saved" copy.
+;
+;	Any registers or PTs that are modified before calling the save 
+;	routine will have there data lost. The code below will save all
+;	state, but will loose pt 0,4,5.
+;	
+;-
+SYS$ENTER_CONSOLE::
+				; "Real" code
+	mtpr	r1, pt4
+	mtpr	r3, pt5
+;
+; UNIX PALcode will jump here on UNIX's sys$enter_console 
+; 
+VMS$ENTER_CONSOLE::
+	get_impure	r1			; addr of cpu specific impure area
+	pvc$jsr	savsta, bsr=1
+	bsr	r3, pal$save_state
+	; All GPRs are now available as scratch
+	; TB's have been flushed
+
+	; build PS (IPL=31,CM=K,VMM=0,SW=0)
+	lda	r3, ^X1E(r31)		; Make it 1e instead?
+	bis	r31, r31, r11		; set new ps<cm>=0, PALshadow copy
+	mtpr	r31, pt_ps		; set new ps<sw>=0
+	mtpr	r3, ipl			; set new ps<ipl>=0
+	mtpr	r31, ps			; set new ps<cm>=0, Ibox copy
+	mtpr	r31, dtb_cm		; set new ps<cm>=0, Mbox copy
+
+	; ASN
+	mtpr	r31, dtb_asn
+	mtpr	r31, itb_asn
+
+	; Interrupts
+	mtpr	r31, astrr		; stop ASTs
+	mtpr	r31, aster		; stop ASTs
+	mtpr	r31, sirr		; clear software interrupts
+
+	lda	r9, ^x67(r31)
+	sll	r9, #hwint_clr$v_pc0c, r9
+	mtpr	r9, hwint_clr		; Clear hardware interrupt requests
+
+	; Enable physical mode will go here:
+    .if ne enable_physical_console
+	mfpr	r25, pt_ptbr
+	bis	r25, #1, r25		; set physical console flag
+	mtpr	r25, pt_ptbr
+
+	mtpr	r31, pt_vptbr		; set vptbr address for physical VMS console
+	mtpr	r31, mvptbr
+	mtpr	r31, ivptbr
+     .endc
+
+	mfpr	r0, pt_whami
+	extbl	r0, #1, r0		; shift to bit 0	
+	lda	r2, <1@mces$v_dpc>(r31) ; 1 in disable processor correctable error
+	insbl	r0, #1, r0		; isolate whami in correct pt_misc position
+	or	r0, r2, r2		; combine whami and mces
+	mtpr	r2, pt_misc		; store whami and mces, swap bit clear
+
+        br      r1, 10$                 ; Get current PC
+10$:	get_addr r1, <pal$base-10$>, r1	; Compute PALcode base address
+	mtpr	r1, pal_base		;
+	get_addr r1, <kludge_initial_pcbb-pal$base>, r1, verify=0 ; Get dummy PCB address
+        mtpr    r1, pt_pcbb             ; Set PCBB
+
+	; Put code here to find console entry and load exc_addr
+     .if ne beh_model
+	; get address to jump to from scratch area
+	; should read pal_base, but dvt's always load at 0
+	lda	r14, <pal$enter_cns_address-pal$base>(r31)
+	ldqp    r2, 0(r14)              ; Get SCBV 
+	bic	r2, #3, r2		; Clean new PC
+	mtpr	r2, ev5$_exc_addr	; Give Ibox new PC.  E1.  1 bubble to hw_rei.
+     .endc
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+; The console's entry point value is fixed at pal$console_base (20000h).
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+	get_addr r0, pal$console_base, r31
+	mtpr	r0, exc_addr			; write it to the exc address 
+
+;	LED_WRITE   <^xA4>, r1, r2
+
+    .endc
+
+	br	r31, pal$ic_flush		; Routine to flush icache and hw_rei
+
+
+.sbttl	"SYS$EXIT_CONSOLE - Common PALcode for ENTERING console"
+;+
+; sys$exit_console
+;
+; Entry:
+;	Entered when console wants to reenter PAL.
+;	usually as the result of a CONTINUE.
+;
+;
+; Regs' on entry...
+;
+;
+; Function:
+;
+;	Restore all readable machine state, and return to user code.
+;	
+;
+;	
+;-
+
+	align_block
+SYS$EXIT_CONSOLE::
+	;Disable physical mode:
+
+    .if ne enable_physical_console
+	mfpr	r25, pt_ptbr
+	bic	r25, #1, r25		; clear physical console flag
+	mtpr	r25, pt_ptbr
+     .endc
+
+	get_impure r1
+
+	; clear lock and intr_flags prior to leaving console
+	rc	r31			; clear intr_flag
+	; lock flag cleared by restore_state
+	pvc$jsr	rststa, bsr=1
+	bsr	r3, pal$restore_state	; go restore all state
+					; note, R1 and R3 are NOT restored
+					; by restore_state.
+	; TB's have been flushed
+
+	ldqp	r3, cns$gpr+<8*3>(r1)		; restore r3
+	ldqp	r1, cns$gpr+8(r1)		; restore r1
+	hw_rei_stall				; back to user
+
+
+.sbttl	"SYS$MACHINE_CHECK - Machine check PAL"
+	align_block
+;+
+;sys$machine_check
+; 	A machine_check trap has occurred.  The Icache has been flushed.
+;
+;-
+sys$machine_check::
+						; Need to fill up the refill buffer (32 instructions) and
+						; then flush the Icache again.
+						; Also, due to possible 2nd Cbox register file write for
+						; uncorrectable errors, no register file read or write for 7 cycles.
+
+	nop
+	mtpr	r0, pt0				; Stash for scratch -- OK if Cbox overwrites r0 later
+
+	nop
+	nop
+
+	nop
+	nop
+
+	nop
+	nop
+
+	nop
+	nop
+						; 10 instructions; 5 cycles
+
+	nop
+	nop
+
+	nop
+	nop
+
+						; Register file can now be written
+	lda	r0, scb$v_procmchk(r31)		; SCB vector
+	mfpr	r13, pt_mces			; Get MCES
+	sll	r0, #16, r0			; Move SCBv to correct position
+	bis	r13, #<1@mces$v_mchk>, r14	; Set MCES<MCHK> bit
+
+
+	zap	r14, #^x3C, r14			; Clear mchk_code word and SCBv word 
+	mtpr	r14, pt_mces
+						; 20 instructions
+
+	nop
+	or	r14, r0, r14			; Insert new SCB vector
+	lda	r0, mchk$c_proc_hrd_error(r31)	; MCHK code
+	mfpr	r12, exc_addr
+
+	sll	r0, #32, r0			; Move MCHK code to correct position
+	mtpr	r4, pt4
+	or	r14, r0, r14			; Insert new MCHK code
+	mtpr	r14, pt_misc			; Store updated MCES, MCHK code, and SCBv
+
+	ldah	r14, ^xfff0(r31)
+	mtpr	r1, pt1				; Stash for scratch - 30 instructions
+
+	zap	r14, #^xE0, r14			; Get Cbox IPR base
+	mtpr	r12, pt10			; Stash exc_addr
+
+
+
+	mtpr	r31, ic_flush_ctl			; Second Icache flush, now it is really flushed.
+	blbs	r13, sys$double_machine_check		; MCHK halt if double machine check
+	blbs	r12, sys$machine_check_while_in_pal	; MCHK halt if machine check in pal
+
+	mtpr	r6, pt6
+	mtpr	r5, pt5
+
+
+	
+	;+
+	; Start to collect the IPRs.  Common entry point for mchk flows.
+	;
+	; Current state:
+	;	pt0	- saved r0
+	;	pt1	- saved	r1
+	;	pt4	- saved r4
+	;	pt5	- saved r5
+	;	pt6	- saved r6
+	;	pt10	- saved exc_addr
+	;	pt_misc<47:32> - mchk code 
+	;	pt_misc<31:16> - scb vector
+	;	r14	- base of Cbox IPRs in IO space
+	;	r0, r1, r4, r5, r6, r12, r13, r25 - available
+	;	r8, r9, r10 - available as all loads are physical
+	;	MCES<mchk> is set
+	;
+	;-
+
+	align_branch
+sys$mchk_collect_iprs:	
+	mfpr	r1, icperr_stat
+	mfpr	r8, dcperr_stat
+
+	mb						; MB before reading Scache IPRs
+	mtpr	r31, dc_flush				; Flush the Dcache
+	
+	mfpr	r31, pt0				; Pad Mbox instructions from dc_flush
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+	mfpr	r31, pt0
+
+	ldqp	r9, sc_addr(r14)			; SC_ADDR IPR
+	bis	r9, r31, r31				; Touch ld to make sure it completes before
+							; read of SC_STAT
+	ldqp	r10, sc_stat(r14)			; SC_STAT, also unlocks SC_ADDR
+
+	ldqp	r12, ei_addr(r14)			; EI_ADDR IPR
+	ldqp	r13, bc_tag_addr(r14)			; BC_TAG_ADDR IPR
+	ldqp	r0, fill_syn(r14)			; FILL_SYN IPR
+	bis	r12, r13, r31				; Touch lds to make sure they complete before reading EI_STAT
+	bis	r0, r0, r31				; Touch lds to make sure they complete before reading EI_STAT
+	ldqp	r25, ei_stat(r14)			; EI_STAT, unlock EI_ADDR, BC_TAG_ADDR, FILL_SYN
+	ldqp	r31, ei_stat(r14)			; Read again to insure it is unlocked
+
+
+	
+
+	;+
+	; Look for nonretryable cases
+	; In this segment:
+	;	r5<0> = 1 means retryable
+	;	r4, r6, and r14 are available for scratch
+	;
+	;-
+
+
+	bis	r31, r31, r5				; Clear local retryable flag
+	srl	r25, #<ei_stat$v_bc_tperr>, r25		; Move EI_STAT status bits to low bits
+	
+	lda	r4, 1(r31)
+	sll	r4, #<icperr_stat$v_tmr>, r4
+	and 	r1, r4, r4				; Timeout reset
+	bne	r4, sys$cpu_mchk_not_retryable
+
+	and	r8, #<1@dcperr_stat$v_lock>, r4		; DCache parity error locked
+	bne	r4, sys$cpu_mchk_not_retryable
+
+	lda	r4, 1(r31)
+	sll	r4, #sc_stat$v_sc_scnd_err, r4
+	and	r10, r4, r4				; 2nd Scache error occurred
+	bne	r4, sys$cpu_mchk_not_retryable
+	
+
+	bis	r31, #^xa3, r4				; EI_STAT Bcache Tag Parity Error, Bcache Tag Control
+							; Parity Error, Interface Parity Error, 2nd Error
+
+	and	r25, r4, r4
+	bne	r4, sys$cpu_mchk_not_retryable
+	
+	bis	r31, #<1@<ei_stat$v_unc_ecc_err-ei_stat$v_bc_tperr>>, r4
+	and	r25, r4, r4				; Isolate the Uncorrectable Error Bit
+	bis	r31, #<1@<ei_stat$v_fil_ird-ei_stat$v_bc_tperr>>, r6
+	cmovne	r6, #0, r4				; r4 = 0 if IRD or if No Uncorrectable Error
+        bne     r4, sys$cpu_mchk_not_retryable		
+
+	lda	r4, 7(r31)
+	and 	r10, r4, r4				; Isolate the Scache Tag Parity Error bits
+	bne	r4, sys$cpu_mchk_not_retryable		; All Scache Tag PEs are not retryable
+
+
+	lda	r4, ^x7f8(r31)
+	and	r10, r4, r4				; Isolate the Scache Data Parity Error bits
+	srl	r10, #<sc_stat$v_cbox_cmd>, r6
+	and	r6, #^x1f, r6				; Isolate Scache Command field
+	subq	r6, #1, r6				; Scache Iread command = 1
+	cmoveq	r6, #0, r4				; r4 = 0 if IRD or if No Parity Error
+        bne     r4, sys$cpu_mchk_not_retryable
+
+	; Look for the system unretryable cases here....
+
+	mfpr	r4, isr					; mchk_interrupt pin asserted
+	srl	r4, #isr$v_mck, r4
+	blbs	r4, sys$cpu_mchk_not_retryable
+
+
+
+	;+
+	; Look for retryable cases
+	; In this segment:
+	;	r5<0> = 1 means retryable
+	;	r6 - holds the mchk code
+	;	r4 and r14 are available for scratch
+	;
+	;-
+
+
+	; Within the chip, the retryable cases are Istream errors
+	lda	r4, 3(r31)
+	sll	r4, #icperr_stat$v_dpe, r4
+	and	r1, r4, r4
+	cmovne	r4, #1, r5				; Retryable if just Icache parity error
+
+
+	lda	r4, ^x7f8(r31)
+	and	r10, r4, r4				; Isolate the Scache Data Parity Error bits
+	srl	r10, #<sc_stat$v_cbox_cmd>, r14
+	and	r14, #^x1f, r14				; Isolate Scache Command field
+	subq	r14, #1, r14				; Scache Iread command = 1
+	cmovne	r4, #1, r4				; r4 = 1 if Scache data parity error bit set
+	cmovne	r14, #0, r4				; r4 = 1 if Scache PE and Iread
+	bis	r4, r5, r5				; Accumulate
+
+
+	bis	r31, #<1@<ei_stat$v_unc_ecc_err-ei_stat$v_bc_tperr>>, r4
+	and	r25, r4, r4				; Isolate the Uncorrectable Error Bit
+	and	r25, #<1@<ei_stat$v_fil_ird-ei_stat$v_bc_tperr>>, r14 ; Isolate the Iread bit
+	cmovne	r4, #1, r4				; r4 = 1 if uncorr error
+	cmoveq	r14, #0, r4				; r4 = 1 if uncorr and Iread
+	bis	r4, r5, r5				; Accumulate
+
+	mfpr	r6, pt_misc
+	extwl	r6, #4, r6				; Fetch mchk code
+	cmovne	r5, #mchk$c_retryable_ird, r6		; Set mchk code 
+
+
+
+	; In the system, the retryable cases are ...
+	; (code here handles beh model read NXM)
+
+	.if ne beh_model
+	ldah	r4, ^xC000(r31)			; Get base of demon space
+	lda	r4, ^x550(r4)			; Add NXM demon flag offset
+	
+	ldqp	r4, 0(r4)			; Read the demon register
+	lda	r14, mchk$c_read_nxm(r31) 
+	cmovlbs	r4, r14, r6			; Set mchk code if read NXM
+	cmovlbs	r4, #1, r4			
+	bis	r4, r5, r5			; Accumulate retry bit
+	.endc
+
+
+	;+
+	; Write the logout frame
+	;
+	; Current state:
+	;	r0	- fill_syn
+	;	r1	- icperr_stat
+	;	r4	- available
+	; 	r5<0>  	- retry flag
+	;	r6     	- mchk code
+	;	r8	- dcperr_stat
+	;	r9	- sc_addr
+	;	r10	- sc_stat
+	;	r12	- ei_addr
+	;	r13	- bc_tag_addr
+	;	r14	- available
+	;	r25	- ei_stat (shifted)
+	;	pt0	- saved r0
+	;	pt1	- saved	r1
+	;	pt4	- saved r4
+	;	pt5	- saved r5
+	;	pt6	- saved r6
+	;	pt10	- saved exc_addr
+	;
+	;-
+
+
+	;+
+	; Get base of the logout area.  
+	;-
+
+sys$mchk_write_logout_frame:
+  .if ne beh_model
+
+	get_impure	r14				; addr of cpu specific impure area
+	get_addr r14,<pal$logout_area+mchk$mchk_base>,r14
+   .endc
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;
+; R14 - Base address of machine check logout frame = 6000h + size of CRD frame
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+	lda	r14, pal$logout_base(r31)
+	lda	r14, mchk$mchk_base(r14)		; r14 <- Base address of MCHK logout frame
+    .endc
+
+	; Write the first 2 quadwords of the logout area:
+	
+	sll	r5, #63, r5				; Move retry flag to bit 63
+	lda	r4, mchk$size(r5)			; Combine retry flag and frame size
+	stqp	r4, mchk$flag(r14)			; store flag/frame size
+	lda	r4, mchk$sys_base(r31)			; sys offset
+	sll	r4, #32, r4
+	lda	r4, mchk$cpu_base(r4)			; cpu offset
+	stqp	r4, mchk$offsets(r14)			; store sys offset/cpu offset into logout frame
+
+	;+
+	; Write the mchk code to the logout area
+	; Write error IPRs already fetched to the logout area
+	; Restore some GPRs from PALtemps
+	;-
+
+	mfpr	r5, pt5
+	stqp	r6, mchk$mchk_code(r14)
+	mfpr	r4, pt4
+	stqp	r1, mchk$ic_perr_stat(r14)
+	mfpr	r6, pt6
+	stqp	r8, mchk$dc_perr_stat(r14)
+	mfpr	r1, pt1
+	stqp	r9, mchk$sc_addr(r14)		
+	stqp	r10, mchk$sc_stat(r14)		
+	stqp	r12, mchk$ei_addr(r14)
+	stqp	r13, mchk$bc_tag_addr(r14)
+	stqp	r0,  mchk$fill_syn(r14)
+	mfpr	r0, pt0
+	sll	r25, #<ei_stat$v_bc_tperr>, r25		; Move EI_STAT status bits back to expected position
+	; retrieve lower 28 bits again from ei_stat and restore before storing to logout frame
+	ldah    r13, ^xfff0(r31)
+	zapnot  r13, #^x1f, r13
+	ldqp    r13, ei_stat(r13)
+	sll     r13, #64-ei_stat$v_bc_tperr, r13
+	srl     r13, #64-ei_stat$v_bc_tperr, r13
+	or      r25, r13, r25
+	stqp	r25, mchk$ei_stat(r14)
+
+
+
+	;+
+	; complete the CPU-specific part of the logout frame
+	;-
+
+	mchk_logout	mm_stat
+	mchk_logout	va			; Unlocks VA and MM_STAT
+	mchk_logout	isr
+	mchk_logout	icsr
+	mchk_logout	pal_base
+	mchk_logout	exc_mask
+	mchk_logout	exc_sum
+
+	ldah	r13, ^xfff0(r31)
+	zap	r13, #^xE0, r13			; Get Cbox IPR base
+	ldqp	r13, ld_lock(r13)		; Get ld_lock IPR
+	stqp	r13, mchk$ld_lock(r14)		; and stash it in the frame
+
+	;+
+	; complete the PAL-specific part of the logout frame
+	;-
+
+	t = 0		
+	  .repeat 24
+	  pt_mchk_logout \t
+	  t = t + 1
+	  .endr
+
+	stqp	r8,  mchk$shadow(r14)
+	stqp	r9,  mchk$shadow+8(r14)
+	stqp	r10, mchk$shadow+16(r14)
+	stqp	r11, mchk$shadow+24(r14)
+	stqp	r12, mchk$shadow+32(r14)
+	stqp	r13, mchk$shadow+40(r14)
+	stqp	r14, mchk$shadow+48(r14)
+	stqp	r25, mchk$shadow+56(r14)
+
+	;+
+	; Log system specific info here
+	;-
+
+	.if ne beh_model
+	ldah	r8, ^xC000(r31)			; Get base of demon space
+	lda	r8, ^x550(r8)			; Add NXM flag offset
+	
+	ldqp	r8, 0(r8)			; Read the register
+	stqp	r8, mchk$sys_ipr1(r14)		; Store into system-specific part of logout
+	stqp	r31, 0(r8)			; Clear the NXM flag
+	.endc
+
+;------------------------------------------------------------------------------------
+; AlphaPC 164/LX Specific code.
+;  
+;  Uncorrectable error machine check frame builder.  This code will do the 
+;  following:
+;
+;  - log the following registers
+;
+;	o Pyxis error register mask
+;       o Pyxis syndrome register
+;	o Pyxis memory address register
+;	o Pyxis memory status register
+;	o Pyxis PCI error status register 0
+;       o Pyxis PCI error status register 1	
+;	o Pyxis PCI error status register 2
+;	o Pyxis error status register
+;       o Pyxis error register 
+;	o Intel 82378IB configuration registers
+;	o Intel 82C59A interrupt mask register
+;	o Intel 82C59A in-service register
+;	o Intel 82C59A interrupt request register
+;	o Intel 82378IB NMI status and control register
+;	o Intel 82378IB DMA status registers
+; 
+; - clear the error by writing the error registers with the data read
+;
+;------------------------------------------------------------------------------------
+    .if ne lx164_system
+;
+; build the base address for the error registers (87.4000.8000h)
+;
+	lda	r12, pyxis_k_main_csr_base(r31)	    ; r12 <- 00.0000.0874
+	sll	r12, pyxis_v_main_csr_base, r12	    ; r12 <- 87.4000.0000
+;
+; log the registers
+;	
+	get_addr    r13, csr_r_pyxis_err_mask, r12  ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_err_mask(r14)	    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+	
+	get_addr    r13, csr_r_pyxis_synd, r12	    ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_syn(r14)	    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+	
+	get_addr    r13, csr_r_pyxis_mear, r12	    ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_mear(r14)	    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+	
+	get_addr    r13, csr_r_pyxis_mesr, r12	    ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_mesr(r14)	    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+	
+	get_addr    r13, csr_r_pyxis_err_data, r12  ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_err_data(r14)	    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+
+	get_addr    r13, csr_r_pyxis_pci_err0, r12  ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pci_err0(r14)		    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+	
+	get_addr    r13, csr_r_pyxis_pci_err1, r12  ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pci_err1(r14)		    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+
+	get_addr    r13, csr_r_pyxis_pci_err2, r12  ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pci_err2(r14)		    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+	
+	get_addr    r13, csr_r_hae_mem, r12	    ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_hae_mem(r14)	    ; Get address of logout frame
+	stqp	r8, 0(r25)			    ; log it away .....
+
+	get_addr    r13, csr_r_pyxis_stat, r12	    ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_stat(r14)	    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+
+	get_addr    r13, csr_r_pyxis_err, r12	    ; Get address of register
+	ldlp	r8, 0(r13)			    ; Read the register
+	lda	r25, mchk$pyxis_err(r14)	    ; Get address of logout frame 
+	stqp	r8, 0(r25)			    ; log it away .....
+	mb
+;
+; clear any pending system uncorrectable errors
+;	
+	lda	r8, ^xffe(r31)		    ; get a mask of all system uncorrectable errors 
+	stqp	r8, 0(r13)		    ; Error register is write to clear 
+	mb
+	ldqp	r8, 0(r13)		    ; make sure it gets out there ....
+;
+; Save current Pyxis CFG register value and setup Pyxis for 
+; type 0 PCI configuration cycle ...
+;
+	get_addr    r13, csr_r_cfg, r12	    ; r13 <- 87.4000.0480
+	ldlp	r8, 0(r13)		    ; r8 = saved contents of Pyxis CFG
+	stlp	r31, 0(r13)		    ; Set CFG for type 0 PCI configuration cycle
+	mb
+;
+; build the PCI configuration space address for the Intel 82378IB
+;
+	lda	r13, cnfg_base(r31)	    ; r13 <- 00.0000.0870
+	sll	r13, #28, r13		    ; r13 <- 87.0000.0000
+	ldah	r13, ^x8(r13)		    ; r13 <- 87.0008.0000
+;
+; First save device status and revision
+;
+        lda     r25, sio_status(r13)	    ; Address of device status register
+        ldlp    r12, 0(r25)		    ; Read device status register
+        srl     r12, #16, r12		    ; Shift data into proper byte lane
+        zap     r12, #^xFC, r12		    ; Clean unwanted bits
+	lda	r25, mchk$sio_status(r14)   ; Get address of logout frame
+        stqp    r12, 0(r25)		    ; Log it away .....
+        mb				    ; Make sure it gets there.
+
+        lda     r25, sio_rev(r13)	    ; Address of revision register
+        ldlp    r12, 0(r25)		    ; Read revision register
+        zap     r12, #^xFE, r12		    ; Clean unwanted bits
+	lda	r25, mchk$sio_rev(r14)	    ; Get address of logout frame
+        stqp	r12, 0(r25)		    ; Log it away .....
+        mb				    ; Make sure it gets there.
+;
+; Save the utility bus chip select registers
+;
+        lda     r25, sio_ubcsa(r13)	    ; Address of UBCSA register
+        ldlp    r12, 0(r25)		    ; Read the UBCSA register
+        srl     r12, #16, r12		    ; Shift data into proper byte lane
+        zap     r12, #^xFE, r12		    ; Clean unwanted data
+	lda	r25, mchk$sio_ubcsa(r14)    ; Get address of logout frame
+        stqp    r12, 0(r25)		    ; Log it away .....
+        mb				    ; Make sure it gets there.
+
+        lda     r25, sio_ubcsb(r13)	    ; Address of UBCSB register
+        ldlp    r12, 0(r25)		    ; Read the UBCSB register
+        srl     r12, #24, r12		    ; Shift data into proper byte lane
+        zap     r12, #^xFE, r12		    ; Clean unwanted bits
+	lda	r25, mchk$sio_ubcsb(r14)    ; Get address of logout frame
+        stqp    r12, 0(r25)		    ; Log it away .....
+        mb				    ; Make sure it gets there.
+;
+; Restore Pyxis CFG register
+;
+	lda	r12, pyxis_k_main_csr_base(r31) ; r12 <- 00.0000.0874
+	sll	r12, pyxis_v_main_csr_base, r12 ; r12 <- 87.4000.0000
+
+	get_addr    r13, csr_r_cfg, r12	    ; r13 <- 87.4000.0480
+	stlp	r8, 0(r13)
+	mb
+;
+; The in_byte/out_byte macros will clobber r13, r14, and r25 so move
+; r14 (base address of logout area) to r12 for now (we'll restore the
+; base address of the logout frame to r14 at the end of this flow).
+;
+	bis	r31, r14, r12		    ; r12 <- Address of logout area
+;
+; Save the IMR, IRR, and ISR interrupt controller registers
+;
+        in_byte	<imr_c1>, r8		    ; Read the master IMR register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_imr0(r12)	    ; Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+
+        in_byte	<imr_c2>, r8		    ; Read the slave IMR register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_imr1(r12)	    ; Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+
+        out_byte    <ocw3_c1>, <isa_irr>    ; Set up for master IRR register read
+        in_byte	    <ocw3_c1>, r8	    ; Read the IRR register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_irr0(r12)	    ; Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+
+        out_byte    <ocw3_c2>, <isa_irr>    ; Set up for slave IRR register read
+        in_byte	    <ocw3_c2>, r8	    ; Read the IRR register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_irr1(r12)	    ; Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+
+        out_byte    <ocw3_c1>, <isa_isr>    ; Set up for master ISR register read
+        in_byte	    <ocw3_c1>, r8	    ; Read the ISR register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_isr0(r12)	    ; Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+
+        out_byte    <ocw3_c2>, <isa_isr>    ; Set up for slave ISR register read
+        in_byte	    <ocw3_c2>, r8	    ; Read the ISR register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_isr1(r12)	    ; Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+;
+; Save the NMI status and control register
+;
+	in_byte	<sio_nmisc>, r8		    ; Read the NMI status and control register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_nmisc(r12)    ; Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+;
+; Clear any pending NMI errors
+;	
+	bis	r8, #<3@nmisc_v_serr_en>, r13 ; Set the SERR and IOCHK enable bits
+	and	r13, #^x0F, r13		    ; Clear status bits for write
+	out_byte    <sio_nmisc>, r13	    ; Write NMI status and control register
+
+	bis	r31, r8, r13		    ; Copy back original NMISC contents
+	and	r13, #^x0F, r13		    ; Clear status bits for write
+	out_byte    <sio_nmisc>, r13	    ; Write NMI status and control register
+;
+; Save the DMA status registers
+;
+	in_byte	<sio_dma_stat0>, r8	    ; Read the DMA status register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_dma_stat0(r12); Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+
+        in_byte	<sio_dma_stat1>, r8	    ; Read the DMA status register
+        zap     r8, #^xFE, r8		    ; Clean unwanted bits
+	lda	r25, mchk$sio_dma_stat1(r12); Get address of logout frame
+        stqp    r8, 0(r25)		    ; Log it away .....
+	mb
+
+	bis	r31, r12, r14		    ; r14 <- restored address of logout area
+
+    .endc
+
+	; Unlock IPRs
+	lda	r8, <<1@dcperr_stat$v_lock> ! <1@dcperr_stat$v_seo>>(r31)
+	mtpr	r8, dcperr_stat			; Clear Dcache parity error status
+
+	lda	r8, <<1@icperr_stat$v_dpe> ! <1@icperr_stat$v_tpe> ! <1@icperr_stat$v_tmr>>(r31)
+	mtpr	r8, icperr_stat			; Clear Icache parity error & timeout status
+
+        pvc$jsr armc, bsr=1
+        bsr     r12, sys$arith_and_mchk     	; go check for and deal with arith trap
+
+	mtpr	r31, exc_sum			; Clear Exception Summary
+
+	mfpr	r25, pt10			
+	stqp	r25, mchk$exc_addr(r14)		; must be after sys$arith_and_mchk call
+
+	pt_mchk_logout 9			; save pt_ps again after sys$arith_and_mchk call
+
+	;+
+	; Prepare to exit to pal$post_interrupt, which expects:
+	; r12 - savedPC
+	; r13 - SCB offset
+	; pt7 - new IPL
+	; pt8 - new PS<IP>
+	; pt0 - new R4  	(LAoff)
+	;
+	;-
+
+
+
+	mfpr	r12, pt10			; Get saved exc_addr	
+	bis	r31, ipl$machine_check, r25
+	mtpr	r25, pt7			; Machine check IPL for stack builder
+	mfpr	r13, pt_misc
+	extwl	r13, #2, r13			; Fetch SCB vector
+
+	lda	r14, mchk$mchk_base(r31)	; assumes hwrpb LAbase=impure_ptr+pal$logout
+	mtpr	r14, pt0			; Store LAoff for stack builder
+	mtpr	r31, pt8			; Clear PS<IP> for stack builder
+	br	r31, pal$post_interrupt
+
+sys$cpu_mchk_not_retryable:
+	mfpr	r6, pt_misc
+	extwl	r6, #4, r6				; Fetch mchk code
+	br	r31,  sys$mchk_write_logout_frame	;
+	
+
+;+
+;sys$double_machine_check - a machine check was started, but MCES<MCHK> was
+;	already set.  We will now double machine check halt.
+;
+;	pt0 - old R0
+;
+;+
+sys$double_machine_check:
+        pvc$jsr updpcb, bsr=1
+        bsr    r0, pal$update_pcb       ; update the pcb
+	lda	r0, hlt$c_dbl_mchk(r31)
+
+	br	r31, sys$enter_console
+
+
+;+
+;sys$machine_check_while_in_pal - a machine check was started, exc_addr points to
+;	a PAL PC.  We will now machine check halt.
+;
+;	pt0 - old R0
+;
+;+
+sys$machine_check_while_in_pal:
+        pvc$jsr updpcb, bsr=1
+        bsr    r0, pal$update_pcb       ; update the pcb
+
+	lda	r0, hlt$c_mchk_from_pal(r31)
+	br	r31, sys$enter_console
+
+
+sys$arith_and_mchk:
+	; on entry:
+	;  r12= return address
+	;  pt10 = exc_addr
+	;  r14 = logout frame pointer
+	; r8,r9,r10 available 
+	; r13, r25 - available
+	; pt7, pt0, pt8 - available
+
+	; on exit:
+	;  pt10 = new exc_addr
+	;  r14 = logout frame pointer
+	;  r4 = new R4 (exc_mask)
+	;  r5 = new R5 (exc_sum)
+	;  pt_ps, r11  = new PS 
+
+	
+	mfpr	r13, ev5$_exc_sum		; Get exception summary IPR
+	srl	r13, #exc_sum$v_swc, r13		; shift data to correct position
+	bne	r13, handle_arith_and_mchk	; skip arith fault unless needed
+        pvc$jsr armc, bsr=1, dest=1
+        ret     r31, (r12)			; back we go if no arith under mchk
+
+handle_arith_and_mchk:
+	get_addr r25, <pal$ksp_invalid-pal$base>, r31	; mm err rtn
+	mtpr	 r25, pt_trap	
+
+	; just before stack build...
+	mtpr	r12, pt7			; move return address to pt7
+	mtpr	r13, pt8			; move exc_sum to pt8
+	mtpr	r14, pt0			; save logout frame pointer in pt0
+	mfpr	r12, pt10			; get exc_addr in r12 for fault handling routine if stq faults
+
+
+	; now build the KM ARITH stack frame
+	; but do not dispatch the exception
+	
+        mtpr    r31, ev5$_dtb_cm        ; Set Mbox current mode to kernel - no virt ref for next 2 cycles
+
+        mfpr    r25, pt_pcbb            ; Get PCBB - E1.
+
+        addq    r25, r11, r25           ; Point to current mode SP in HWPCB
+        beq     r11, arith_and_mchk_cont ; Skip stack swap if already in kernel mode
+
+        stqp    r30, PCB$Q_KSP(r25)     ; Save old SP
+        mfpr    r30, pt_ksp             ; Get Kernel SP
+
+arith_and_mchk_cont:
+        and     sp, #63, r25            ; Isolate SP unaligned bits
+
+        bic     sp, #63, sp             ; Round down stack
+        mtpr    r31, ev5$_ps            ; Set Ibox current mode to kernel - no hw_rei for 2 cycles
+
+                                        ; The first store may trap (TBmiss or fault).  The subsequent stores
+                                        ; are all to the same page, and thus won't trap.
+
+
+pal$post_arith_km_trap_stq::
+        stq     r2, <FRM$V_R2-64>(sp)   ; Write R2 to the stack
+
+
+	;;from ev4:		--check need for /a !
+
+	stq	r3,  <FRM$V_R3-64>(sp)	; save r3
+	stq	r4,  <FRM$V_R4-64>(sp)	; save r4
+	stq	r5,  <FRM$V_R5-64>(sp)	; save r5
+	stq	r6,  <FRM$V_R6-64>(sp)	; save r6
+	stq	r7,  <FRM$V_R7-64>(sp)	; save r7
+
+	bic	r12, #3, r12		; clear low 2 bits of old pc --needed?
+	stq	r12, <FRM$V_PC-64>(sp)	; save PC
+
+	
+	mfpr    r13, pt_ps              ; Get current PS
+	sll	r25, #PS$V_SP, r25	; shift to correct position for PS
+	mfpr    r14, ev5$_ipl           ; Fetch IPL
+	or      r13, r11, r13           ; Combine CM and SW bits for PS
+	sll     r14, #PS$V_IPL, r14     ; Shift IPL to PS position
+	mtpr    r31, pt_ps		; New PS<SW> = 0.
+	or      r14, r13, r14           ; Get IPL into PS
+	bis     r31, r31, r11           ; New PALshadow current mode = 0
+	or      r14, r25, r14           ; Get SP_ALIGN into PS
+	stq	r14, <FRM$V_PS-64>(sp)	; save old PS
+
+	mfpr	r14, pt_scbb		; get scbb
+	lda	r14, SCB$V_ARITH(r14)
+	mfpr	r12, pt7		; restore return address
+	ldqp	r2, 0(r14)		; get scbv
+	mfpr    r4, ev5$_exc_mask	; new R4 = exc_mask
+	ldqp	r3, 8(r14)		; get scbp
+	mfpr	r5, pt8			; new R5 = exc_sum
+
+
+	subq    sp, #64, sp             ; Decrement stack pointer
+	mfpr	r14, pt0		; restore logout frame pointer
+	bic	r2, #3, r2		; clean low bits of new pc
+	mtpr	r31, pt_trap		; clear pt_trap
+	mtpr	r2, pt10		; set new pc
+
+        pvc$jsr armc, bsr=1, dest=1
+        ret     r31, (r12)
+
+
+.sbttl KLUDGE_INITIAL_PCBB - PCB for Boot use only
+
+align_128_bytes				; align to 128b boundary
+
+KLUDGE_INITIAL_PCBB::			; PCB is 128 bytes long
+	.repeat 16
+	.quad   0
+	.endr
+
+.sbttl "SET_SC_BC_CTL subroutine"
+;
+; Subroutine to set the SC_CTL, BC_CONFIG, and BC_CTL registers and flush the Scache
+; There must be no outstanding memory references -- istream or dstream -- when
+; these registers are written.  EV5 prefetcher is difficult to turn off.  So,
+; this routine needs to be exactly 32 instructions long; the final jmp must
+; be in the last octaword of a page (prefetcher doesn't go across page)
+;  
+;
+; Register expecations:
+;	r0	base address of CBOX iprs
+;       r5      value to set sc_ctl to (flush bit is added in)
+;       r6      value to set bc_ctl to
+;	r7	value to set bc_config to 
+;	r10	return address
+; 	r19     old sc_ctl value
+; 	r20	old value of bc_ctl
+;	r21	old value of bc_config
+;	r23	flush scache flag
+; Register usage:
+;       r17     sc_ctl with flush bit cleared
+;	r22	loop address
+;
+;
+	align_page <32*4>		; puts start of routine at page boundary minus 32 longwords.
+set_sc_bc_ctl:
+	br	r22, sc_ctl_loop	;this branch must be in the same 4 instruction block as it's dest
+					; r22 gets address of sc_ctl_loop 
+sc_ctl_loop:
+	pvc$jsr	scloop, dest=1
+	mb
+	mb
+
+	bis 	r5, r23, r5		;r5 <- same sc_ctl with flush bit set (if flag set in r23)
+
+	stqp	r19, ev5$_sc_ctl(r0)	; write sc_ctl
+	stqp	r20, ev5$_bc_ctl(r0)	; write bc_ctl
+	bis	r31, r6, r20		; update r20 with new bc_ctl for 2nd time through loop
+        stqp    r21, bc_config(r0)  	; write bc_config register
+	bis	r31, r7, r21		; update r21 with new bc_config for 2nd time through loop
+
+	bic 	r19, #<1@sc_ctl$v_sc_flush>, r17	;r17 <- same sc_ctl without flush bit set
+							;NOTE: only works because flush bit is in lower 16 bits
+
+	wmb				; don't merge with other writes
+	stqp	r17, ev5$_sc_ctl(r0)	; write sc_ctl without flush bit
+	ldqp	r17, ev5$_sc_ctl(r0)	; read sc_ctl
+	bis	r17, r17, r17		; stall until the data comes back
+	bis	r31, r5, r19		; update r19 with new sc_ctl for 2nd time through loop
+
+	; fill with requisite number of nops (unops ok) to make exactly 32 instructions in loop
+	t = 0		
+	  .repeat 15
+	  unop
+	  t = t + 1
+	  .endr
+
+	; macro64 will not use hints, which are necessary to make the prefetcher behave properly
+	; therefore, define special "myjmp" opcode to include the hint:
+        $opdef  mnemonic= myjmp, -
+                format= <custom=iregister, iregister, branch_offset>, -
+                encoding= <26:31=^X1A, 21:25=%OP1,16:20=%OP2,14:15=^X00,0:13=%op3>
+
+	pvc$jsr	scloop
+	myjmp	r22,r22,sc_ctl_loop	; first time, jump to sc_ctl_loop (hint will cause prefetcher to go to loop instead
+					;       of straight) ; r22 gets address of sc_ctl_done
+					; 2nd time, code continues at sc_ctl_done (I hope)
+sc_ctl_done:
+	pvc$jsr	scloop, dest=1
+	pvc$jsr scbcctl, bsr=1, dest=1
+	ret	r31, (r10)		; return to where we came from
+
+;
+;
+;.sbttl DATSALL - Align to 2 page boundary incase linked with other pal's
+;	t1 = .-pal$base
+;	t = t1+<<8192*2>-1>
+;	t = t & ^xFFFFC000
+;	t = t-t1
+;	.BLKL t
+;	.end
+;
+
+;
+; provide alignment for OSF PALcode  ....
+;
+. = <PAL$PAL_SIZE>
+

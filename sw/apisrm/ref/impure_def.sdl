@@ -1,0 +1,124 @@
+/* file:	impure.sdl
+/*
+/* Copyright (C) 1990 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	PAL impure scratch area data structure definitions for
+/*		Alpha firmware.
+/*
+/* Author:	David Mayo
+/*		jds - Jim Sawin
+/*
+/* Modifications:
+/*
+/*	ajb	01-may-1992	Add structure that describes the pal version.
+/*
+/*	jds	07-May-1991	Added HIRR/HIER defs.
+/* 
+/*	jds	14-Mar-1991	Added AT & ASTEN defs; added CNS$PT_OFFSET
+/*				def.
+/*
+/* 	jds	28-Feb-1991	Added PAL temp assignments for IPRs &
+/*				pal$impure_base.
+/*
+/*	dtm	27-Feb-1991	Initial entry.
+/*
+module	$pal_impure;
+/*
+/* PAL temp register allocations for IPRs:
+/*
+constant PT$_ICCSR equals 2;
+constant PT$_IMPURE equals 7;
+constant PT$_INTTABLE equals 8;
+constant PT$_PS equals 9;
+constant PT$_SCC equals 10;
+constant PT$_UNQ equals 11;
+constant PT$_INTMASK equals 22;
+constant PT$_PRBR equals 24;
+constant PT$_MCES equals 25;
+constant PT$_WHAMI equals 27;
+constant PT$_PTBR equals 28;
+constant PT$_L3VIRT equals 29;
+constant PT$_SCBB equals 30;
+constant PT$_PCBB equals 31;
+/*
+/* Structure of the processor-specific impure area
+/*
+aggregate impure struct prefix "" tag "";
+	cns$flag	quadword;
+	cns$hlt	quadword;
+	cns$gpr	quadword dimension 32;
+	cns$fpr	quadword dimension 32;
+	cns$mchkflag quadword;
+	constant CNS$PT_OFFSET equals .;
+	cns$pt	quadword dimension 32;
+	cns$exc_addr	quadword;
+	cns$pal_base	quadword;
+	cns$hirr	quadword;
+	cns$hier	quadword;
+	cns$mm_csr	quadword;
+	cns$va	quadword;
+	cns$biu_addr	quadword;
+	cns$biu_stat	quadword;
+	cns$dc_addr	quadword;
+	cns$fill_addr	quadword;
+	cns$dc_stat	quadword;
+	cns$fill_syndrome	quadword;
+	cns$bc_tag	quadword;
+	cns$abox_ctl	quadword;
+	cns$biu_ctl	quadword;
+	cns$fpcsr	quadword;
+	cns$pal_type	quadword;
+	cns$work_request	quadword;
+	cns$t1		quadword;
+	cns$t12		quadword;
+	cns$t13		quadword;
+	cns$t14		quadword;
+	cns$t15		quadword;
+	cns$t16		quadword;
+	cns$t17		quadword;
+	cns$t18		quadword;
+	cns$t19		quadword;
+	constant CNS$SIZE equals (.+7) & %xfff8;
+end impure;
+/* 
+/* HIRR/HIER defs:
+/* 
+constant HIRR$V_SIRR equals 14;
+constant HIRR$S_SIRR equals 15;
+constant HIRR$V_ASTRR equals 29;
+constant HIRR$S_ASTRR equals 4;
+constant HIER$V_SIER equals 14;
+constant HIER$S_SIER equals 15;
+constant HIER$V_ASTER equals 29;
+constant HIER$S_ASTER equals 4;
+
+/*
+/* ICCSR defs:
+/*
+constant ICCSR$V_FEN equals 42;
+
+aggregate PALVERSION struct prefix "" tag "";
+	minor	byte unsigned;
+	major	byte unsigned;
+	is_v	byte unsigned;
+	xxx	byte unsigned;
+end PALVERSION;
+
+end_module;

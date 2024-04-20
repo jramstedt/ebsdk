@@ -1,0 +1,122 @@
+{ Copyright (c) 1988 by
+{ Digital Equipment Corporation, Maynard, Massachusetts.
+{ All rights reserved.
+{
+{ This software is furnished under a license and may be used and copied
+{ only  in  accordance  of  the  terms  of  such  license  and with the
+{ inclusion of the above copyright notice.  This software or any  other
+{ copies thereof may not be provided or otherwise made available to any
+{ other person.  No title to and  ownership of the  software is  hereby
+{ transferred.
+{
+{ The information in this software is  subject to change without notice
+{ and  should  not  be  construed  as a commitment by Digital Equipment
+{ Corporation.
+{
+{ Digital assumes no responsibility for the use  or  reliability of its
+{ software on equipment which is not supplied by Digital.
+{
+
+MODULE cia_mem_csr_def IDENT "x0.1";
+
+/*
+/*
+/* The following is the base address of the system configuration registers in
+/* the CIA.  This value must be shifted left 28 places to yield the proper
+/* value, thus simplifying the load of the address into registers.
+/*
+CONSTANT cia_k_mem_csr_base EQUALS %X875;	/* sysconfig base
+CONSTANT cia_v_mem_csr_base EQUALS 28;	/* sysconfig base extent
+
+/*
+/*
+/*  Memory Configuration Register bitfields
+/*
+aggregate MCFGR union fill prefix mcfgr_;
+    displacement byte dimension %x40;	/* space used by this register
+    whole longword;
+    field structure fill;
+	mem_port	bitfield mask length 1-^;	/* <0>
+	reserved_1	bitfield mask length 4-^;	/* <3:1>
+	cache_size	bitfield mask length 7-^;	/* <6:4>
+	reserved_2	bitfield mask length 8-^;	/* <7>
+	ref_rate	bitfield mask length 18-^;	/* <17:8>
+	ref_burst	bitfield mask length 20-^;	/* <19:18>
+	tmg_r0		bitfield mask length 22-^;	/* <21:20>
+	long_cbr_cas	bitfield mask length 23-^;	/* <22>
+	reserved_3	bitfield mask length 26-^;	/* <25:23>
+	dly_idle_bc	bitfield mask length 28-^;	/* <27:26>
+	reserved_4	bitfield mask length 29-^;	/* <28>
+	early_idle_bc	bitfield mask length 30-^;	/* <29>
+	reserved_5	bitfield mask length 32-^;	/* <31:30>
+    end field;
+end MCFGR;
+	
+/*
+/*
+/*  Memory Base Address Register
+/*
+aggregate MBA union prefix mba_ fill;
+    displacement byte dimension %X40;	/* space used by this register
+    whole longword;
+    field structure fill;
+	side0_valid bitfield mask length 1-^;		/* [0]
+	row_type    bitfield mask length 3-^;		/* [2:1]
+	reserved_0  bitfield mask length 4-^;		/* [3]
+	msk	    bitfield mask length 9-^;		/* [8:4]
+	reserved_1  bitfield mask length 15-^;		/* [14:9]
+	side1_valid bitfield mask length 16-^;		/* [15]
+	pattern	    bitfield mask length 26-^;		/* [25:16]
+	reserved_2  bitfield mask length 28-^;		/* [27:26]
+	timing	    bitfield mask length 30-^;		/* [29:28]
+	reserved_3  bitfield mask length 32-^;		/* [31:30]
+    end field;
+end MBA;	
+
+/*
+/*
+/*  Memory Timing Register
+/*
+aggregate MTMG union prefix mtmg_ fill;
+    displacement byte dimension %X40;		/* space used by this register
+    whole longword;
+    field structure fill;
+	r1 bitfield mask length 2-^;		/* [1:0] row address hold  
+	r2 bitfield mask length 4-^;		/* [3:2] row address hold
+	r3 bitfield mask length 6-^;		/* [5:4] read, cycle time 
+	r4 bitfield mask length 8-^;		/* [7:6] read, delay from MEM_RD_RDY to CAS assertion
+	r5 bitfield mask length 10-^;		/* [9:8] read, cas pulse width
+	r6 bitfield mask length 12-^;		/* [11:10] read, column address hold
+	w1 bitfield mask length 14-^;		/* [13:12] writes, non-linked victim, delay from start to MEM_WR
+	w4 bitfield mask length 17-^;		/* [16:14] writes, MEM_WR to CAS assert
+ 	pre bitfield mask length 18-^;		/* [17] RAS Pre-charge delay __0=no delay, 1=delay 30 ns
+	v3 bitfield mask length 20-^;		/* [19:18] write, cycle time 
+	v4 bitfield mask length 23-^;		/* [22:20] linked victim, MEM_WR to CAS assertion
+	reserved_0 bitfield mask length 24-^;	/* [23]   unused
+	v5 bitfield mask length 26-^;		/* [25:24] write, victim, CAS pulse width
+	v6 bitfield mask length 28-^;		/* [27:26] victim/write, column address hold
+	rv bitfield mask length 30-^;		/* [29:28] read-victim, delay from MEM_RD_RDY de-assertion to MEM_WR
+	rd_dly bitfield mask length 32-^;	/* [31:30] select clk the dsw will use to capture memory data 0=CLK, 1=CLK2X
+    end field;
+end MBA;	
+
+/*
+/*
+/*  CIA Memory CSR Register Block
+/*
+/*  This block of registers contains at all of the registers modelled in the
+/*  structures above in the address space order in which they will appear on the
+/*  machine.
+/*
+aggregate CIA_MEM_CSR structure;
+    mcfgr	MCFGR;				/* Memory Configuration Register
+    offset_0 byte dimension %x600-:;
+    mba MBA dimension 16;		/* Mem Base Addr Register Array
+    offset_1 byte dimension %xB00-:;
+    mtmg MTMG dimension 3;		/* Mem Timing Register Array
+end CIA_MEM_CSR;
+
+/*
+/*
+END_MODULE cia_mem_csr_def;
+

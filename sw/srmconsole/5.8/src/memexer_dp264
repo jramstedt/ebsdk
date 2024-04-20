@@ -1,0 +1,67 @@
+#+
+# ============================================================================
+# = memexer - Invoke Gray code memory exerciser.                             =
+# ============================================================================
+#
+# OVERVIEW:
+#
+#	Start the requested number of memory tests running in the background.
+#	Randomly allocate and test blocks of memory two times the size of
+#	the bcache using all available memory. The pass count is 0 to run
+#	the started tests forever.
+#
+#      	Nothing is displayed unless an error occurs.
+#
+#   COMMAND FORM:
+#
+# 	memexer ( [<number>] )
+#
+#   COMMAND ARGUMENT(S):
+#
+#       <number> - Specifies the number of memory test processes to start.
+#		   The default is 1.
+#
+#   COMMAND OPTION(S):
+#
+#	None
+#
+#   COMMAND EXAMPLE(S):
+#
+# 	Start two memtests running in the background.  Test in blocks
+#	of 2 times the bacache size across all available memory.
+#~
+#       >>>memexer 2
+#       >>>show_status
+#        ID       Program      Device       Pass  Hard/Soft Bytes Written  Bytes Read
+#       -------- ------------ ------------ ------ --------- ------------- -------------
+#       00000001         idle system            0    0    0             0             0
+#       00000107      memtest memory           10    0    0     541065216     541065216
+#       00000108      memtest memory           10    0    0     541065216     541065216
+#       >>>
+#~
+#   COMMAND REFERENCES:
+#
+#	memexer_mp
+#
+#-
+if (eval $# > nl) then
+	set aa_lp_cnt$$ 1 2>nl
+else
+	set aa_lp_cnt$$ $1 2>nl
+fi
+
+if (eval `show config | element -i 2 -l 8` 4 == >nl) then
+    set aa_value_bcc 2 2>nl
+else
+    set aa_value_bcc 4 2>nl
+fi
+set aa_2x_cache_size `eval -ix -x $aa_value_bcc 200000 *` 2>nl
+# debug show aa_2x_cache_size
+while (eval -id -d "aa_lp_cnt$$ 0 ==" > nl)
+do
+	memtest -bs $aa_2x_cache_size -rb -p 0&
+	eval -id -d "aa_lp_cnt$$ aa_lp_cnt$$ 1 - =" > nl
+done
+clear aa_lp_cnt$$
+clear aa_value_bcc
+clear aa_2x_cache_size

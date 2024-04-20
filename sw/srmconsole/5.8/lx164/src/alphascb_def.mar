@@ -1,0 +1,179 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:26:22 by OpenVMS SDL EV1-33     
+;  Source:  27-OCT-1997 16:46:43 AFW_USER$:[CONSOLE.V58.COMMON.SRC]ALPHASCB_DEF. 
+; ********************************************************************************************************************************
+;  file:	alpha_scb_def.sdl
+; 
+;  Copyright (C) 1987, 1988 by
+;  Digital Equipment Corporation, Maynard, Massachusetts.
+;  All rights reserved.
+; 
+;  This software is furnished under a license and may be used and copied
+;  only  in  accordance  of  the  terms  of  such  license  and with the
+;  inclusion of the above copyright notice. This software or  any  other
+;  copies thereof may not be provided or otherwise made available to any
+;  other person.  No title to and  ownership of the  software is  hereby
+;  transferred.
+; 
+;  The information in this software is  subject to change without notice
+;  and  should  not  be  construed  as a commitment by digital equipment
+;  corporation.
+; 
+;  Digital assumes no responsibility for the use  or  reliability of its
+;  software on equipment which is not supplied by digital.
+; 
+; 
+;  Facility:	Alpha Console
+; 
+;  Abstract:	SCB definitions for Alpha
+; 
+;  Modifications:
+; 
+; 
+ 
+	.MACRO	$scbdef,..EQU=<=>,..COL=<:>
+SCB$Q_000'..equ'0                       ;  000	unused 		unused
+SCB$Q_FLOAT_DISABLE'..equ'1             ;  010	float_disable   Floating disabled
+SCB$Q_020'..equ'2                       ;  020	unused 		unused
+SCB$Q_030'..equ'3                       ;  030	unused 		unused
+SCB$Q_040'..equ'4                       ;  040	unused 		unused
+SCB$Q_050'..equ'5                       ;  050	unused 		unused
+SCB$Q_060'..equ'6                       ;  060	unused 		unused
+SCB$Q_070'..equ'7                       ;  070	unused 		unused
+SCB$Q_ACCVIO'..equ'8                    ;  080	accvio		Access violation
+SCB$Q_TNV'..equ'9                       ;  090	tnv		Translation not valid
+SCB$Q_FAULT_ON_READ'..equ'10            ;  0A0  fault_on_read   Fault on data stream read
+SCB$Q_FAULT_ON_WRITE'..equ'11           ;  0B0  fault_on_write  Fault on data stream write
+SCB$Q_FAULT_ON_EXE'..equ'12             ;  0C0  fault_on_read   Fault on Istream access
+SCB$Q_0D0'..equ'13                      ;  0D0	unused 		unused
+SCB$Q_0E0'..equ'14                      ;  0E0	unused 		unused
+SCB$Q_0F0'..equ'15                      ;  0F0	unused 		unused
+SCB$Q_100'..equ'16                      ;  100	unused 		unused
+SCB$Q_110'..equ'17                      ;  110	unused 		unused
+SCB$Q_120'..equ'18                      ;  120	unused 		unused
+SCB$Q_130'..equ'19                      ;  130	unused 		unused
+SCB$Q_140'..equ'20                      ;  140	unused 		unused
+SCB$Q_150'..equ'21                      ;  150	unused 		unused
+SCB$Q_160'..equ'22                      ;  160	unused 		unused
+SCB$Q_170'..equ'23                      ;  170	unused 		unused
+SCB$Q_180'..equ'24                      ;  180	unused 		unused
+SCB$Q_190'..equ'25                      ;  190	unused 		unused
+SCB$Q_1A0'..equ'26                      ;  1A0	unused 		unused
+SCB$Q_1B0'..equ'27                      ;  1B0	unused 		unused
+SCB$Q_1C0'..equ'28                      ;  1C0	unused 		unused
+SCB$Q_1D0'..equ'29                      ;  1D0	unused 		unused
+SCB$Q_1E0'..equ'30                      ;  1E0	unused 		unused
+SCB$Q_1F0'..equ'31                      ;  1F0	unused 		unused
+SCB$Q_ARITHMETIC'..equ'32               ;  200	arithmetic	Arithmetic           
+SCB$Q_210'..equ'33                      ;  210	unused 		unused
+SCB$Q_220'..equ'34                      ;  220	unused 		unused
+SCB$Q_230'..equ'35                      ;  230	unused 		unused
+SCB$Q_KERNEL_AST'..equ'36               ;  240	kernel_ast	Kernel mode AST
+SCB$Q_EXEC_AST'..equ'37                 ;  250	exec_ast	Executive mode AST
+SCB$Q_SUPER_AST'..equ'38                ;  260	super_ast	Supervisor mode AST
+SCB$Q_USER_AST'..equ'39                 ;  270	user_ast	User mode AST
+SCB$Q_UNALIGNED'..equ'40                ;  280	unaligned	Unaligned fault
+SCB$Q_290'..equ'41                      ;  290	unused 		unused
+SCB$Q_2A0'..equ'42                      ;  2A0	unused 		unused
+SCB$Q_2B0'..equ'43                      ;  2B0	unused 		unused
+SCB$Q_2C0'..equ'44                      ;  2C0	unused 		unused
+SCB$Q_2D0'..equ'45                      ;  2D0	unused 		unused
+SCB$Q_2E0'..equ'46                      ;  2E0	unused 		unused
+SCB$Q_2F0'..equ'47                      ;  2F0	unused 		unused
+SCB$Q_300'..equ'48                      ;  300	unused 		unused
+SCB$Q_310'..equ'49                      ;  310	unused 		unused
+SCB$Q_320'..equ'50                      ;  320	unused 		unused
+SCB$Q_330'..equ'51                      ;  330	unused 		unused
+SCB$Q_340'..equ'52                      ;  340	unused 		unused
+SCB$Q_350'..equ'53                      ;  350	unused 		unused
+SCB$Q_360'..equ'54                      ;  360	unused 		unused
+SCB$Q_370'..equ'55                      ;  370	unused 		unused
+SCB$Q_380'..equ'56                      ;  380	unused 		unused
+SCB$Q_390'..equ'57                      ;  390	unused 		unused
+SCB$Q_3A0'..equ'58                      ;  3A0	unused 		unused
+SCB$Q_3B0'..equ'59                      ;  3B0	unused 		unused
+SCB$Q_3C0'..equ'60                      ;  3C0	unused 		unused
+SCB$Q_3D0'..equ'61                      ;  3D0	unused 		unused
+SCB$Q_3E0'..equ'62                      ;  3E0	unused 		unused
+SCB$Q_3F0'..equ'63                      ;  3F0	unused 		unused
+SCB$Q_BREAKPOINT'..equ'64               ;  400	breakpoint	Breakpoint           
+SCB$Q_BUGCHECK'..equ'65                 ;  410	bugcheck	Bugcheck
+SCB$Q_ILLEGAL_INSTR'..equ'66            ;  420	Illegal_instr	Illegal instruction
+SCB$Q_ILLEGAL_PAL_OP'..equ'67           ;  430  Illegal_pal_op  Illegal PAL operand
+SCB$Q_440'..equ'68                      ;  440	unused 		unused
+SCB$Q_450'..equ'69                      ;  450	unused 		unused
+SCB$Q_460'..equ'70                      ;  460	unused 		unused
+SCB$Q_470'..equ'71                      ;  470	reserved        Reserved for performance monitor
+SCB$Q_CHMK'..equ'72                     ;  480	CHMK		CHMK
+SCB$Q_CHME'..equ'73                     ;  490	CHME		CHME
+SCB$Q_CHMS'..equ'74                     ;  4A0	CHMS		CHMS
+SCB$Q_CHMU'..equ'75                     ;  4B0	CHMU		CHMU
+SCB$Q_4C0'..equ'76                      ;  4C0	reserved	reserved for Digital
+SCB$Q_4D0'..equ'77                      ;  4D0	reserved	reserved for Digital
+SCB$Q_4E0'..equ'78                      ;  4E0	reserved	reserved for Digital
+SCB$Q_4F0'..equ'79                      ;  4F0	reserved	reserved for Digital
+SCB$Q_500'..equ'80                      ;  500	unused 		unused
+SCB$Q_SL1'..equ'81                      ;  510	SL1     	Software level 1     
+SCB$Q_SL2'..equ'82                      ;  520	SL2		Software level 2
+SCB$Q_SL3'..equ'83                      ;  530	SL3		Software level 3
+SCB$Q_SL4'..equ'84                      ;  540	SL4		Software level 4
+SCB$Q_SL5'..equ'85                      ;  550	SL5		Software level 5
+SCB$Q_SL6'..equ'86                      ;  560	SL6		Software level 6
+SCB$Q_SL7'..equ'87                      ;  570	SL7		Software level 7
+SCB$Q_SL8'..equ'88                      ;  580	SL8		Software level 8
+SCB$Q_SL9'..equ'89                      ;  590	SL9		Software level 9
+SCB$Q_SLA'..equ'90                      ;  5A0	SLA		Software level A
+SCB$Q_SLB'..equ'91                      ;  5B0	SLB		Software level B
+SCB$Q_SLC'..equ'92                      ;  5C0	SLC		Software level C
+SCB$Q_SLD'..equ'93                      ;  5D0	SLD		Software level D
+SCB$Q_SLE'..equ'94                      ;  5E0	SLE		Software level E
+SCB$Q_SLF'..equ'95                      ;  5F0	SLF		Software level F
+SCB$Q_INTV'..equ'96                     ;  600	intv		Interval clock interrupt
+SCB$Q_INTERPROCESSOR'..equ'97           ;  610	interprocessor  Interprocessor interrupt
+SCB$Q_SYS_CORR_ERR'..equ'98             ;  620	sys_corr_err    System corrected error interrupt
+SCB$Q_PR_CORR_ERR'..equ'99              ;  630	pr_corr_err	Processor corrected error
+SCB$Q_POWER_FAIL'..equ'100              ;  640	power_fail	Power failure interrupt
+SCB$Q_650'..equ'101                     ;  650	unused		Unused
+SCB$Q_SYS_MCHK'..equ'102                ;  660	sys_mchk	System machine check
+SCB$Q_PR_MCHK'..equ'103                 ;  670	pr_mchk		Processor machine check 
+SCB$Q_680'..equ'104                     ;  680	680		Reserved - processor specific
+SCB$Q_690'..equ'105                     ;  690	690		Reserved - processor specific
+SCB$Q_6A0'..equ'106                     ;  6A0	6A0		Reserved - processor specific
+SCB$Q_6B0'..equ'107                     ;  6B0	6B0		Reserved - processor specific
+SCB$Q_6C0'..equ'108                     ;  6C0  6C0		unused
+SCB$Q_6D0'..equ'109                     ;  6D0  6D0		unused
+SCB$Q_6E0'..equ'110                     ;  6E0  6E0		unused
+SCB$Q_6F0'..equ'111                     ;  6F0	6F0		unused
+; 
+SCB_ENTRIES'..equ'512
+SCB_ENTRY_SIZE'..equ'16
+MAX_EXC_VECTOR'..equ'103
+; +
+;  ===============================================
+;  = SCBV - auxillary scb vector                 =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+; 	
+; 
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      routine|	address	   | address of routine to be called
+;                             |	       	   | 
+;                      p0     |	address    | parameter to be passed
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+scbv$S_SCBV'..equ'12
+SCBV'..equ'0
+scbv$l_pd'..equ'0                       ;  PD for called routine
+scbv$l_p0'..equ'4
+scbv$l_p1'..equ'8
+	.ENDM

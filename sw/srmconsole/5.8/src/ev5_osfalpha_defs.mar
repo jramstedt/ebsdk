@@ -1,0 +1,154 @@
+	.MACRO	$OSF_ALPHADEFS
+	  OSF_ALPHADEF_VER == 5	; Flag the version number of this file.
+	.ENDM
+
+
+	.MACRO	$OSF_PSDEF,$GBL
+	$DEFINI	OSFPS,$GBL
+;+
+; PS Layout - PS
+;	Loc	Size	name 	function
+;	------	------	-----	-----------------------------------
+;	<0:2>	3	IPL	Prio level
+;	<3>	1	CM	Current Mode
+;-
+
+
+$EQU	OSFPS$V_mode		3
+$EQU	OSFPS$M_mode		<1@OSFPS$V_mode>
+$EQU	OSFPS$V_ipl		0
+$EQU	OSFPS$M_ipl		<7@OSFPS$V_ipl>
+
+$EQU	OSFIPL$C_MCHK		7
+$EQU	OSFIPL$C_RT		6
+$EQU	OSFIPL$C_CLK		5
+$EQU	OSFIPL$C_DEV1		4
+$EQU	OSFIPL$C_DEV0		3
+$EQU	OSFIPL$C_SW1		2
+$EQU	OSFIPL$C_SW0		1
+$EQU	OSFIPL$C_ZERO		0
+
+$EQU	OSFINT$C_MCHK		2
+$EQU	OSFINT$C_CLK		1
+$EQU	OSFINT$C_DEV		3
+$EQU	OSFINT$C_IP		0		
+$EQU	OSFINT$C_perf		4
+$EQU	OSFINT$C_passrel	5		
+
+	$DEFEND	OSFPS,$GBL,DEF
+	.ENDM
+
+
+;+
+; PTE layout - symbol prefix osfpte$
+;
+;	Loc	Size	name 	function
+;	------	------	------	-----------------------------------
+;	<63:32>	32	PFN	Page Frame Number
+;	<31:16>	16	SOFT	Bits reserved for software use
+;	<15:14>	2
+;	<13>	1	UWE	User write enable
+;	<12>	1	KWE	Kernel write enable
+;	<11:10>	2
+;	<9>	1	URE	User read enable
+;	<8>	1	KRE	Kernel read enable
+;	<7:6>	2	RES	Reserved SBZ 
+;	<5>	1	HPF	Huge Page Flag
+;	<4>	1	ASM	Wild card address space number match
+;	<3>	1	FOE	Fault On execute
+;	<2>	1	FOW	Fault On Write
+;	<1>	1	FOR	Fault On Read
+; 	<0>	1	V	valid bit
+;-
+
+	.MACRO	$OSF_PTEDEF,$GBL
+	$DEFINI	OSFPTE,$GBL
+
+$EQU	osfpte$V_PFN	32
+$EQU	osfpte$M_SOFT	<^XFFFF0000>
+$EQU	osfpte$V_SOFT	16
+$EQU	osfpte$M_UWE	<^X2000>
+$EQU	osfpte$V_UWE	13
+$EQU	osfpte$M_KWE	<^X1000>
+$EQU	osfpte$V_KWE	12
+$EQU	osfpte$M_URE	<^X0200>
+$EQU	osfpte$V_URE	 9
+$EQU	osfpte$M_KRE	<^X0100>
+$EQU	osfpte$V_KRE	 8
+$EQU	osfpte$M_HPF	<^X0020>
+$EQU	osfpte$V_HPF	5
+$EQU	osfpte$M_ASM	<^X0010>
+$EQU	osfpte$V_ASM	4
+$EQU	osfpte$M_FOE	<^X0008>
+$EQU	osfpte$V_FOE	3
+$EQU	osfpte$M_FOW	<^X0004>
+$EQU	osfpte$V_FOW	2
+$EQU	osfpte$M_FOR	<^X0002>
+$EQU	osfpte$V_FOR	1
+$EQU	osfpte$M_V	<^X0001>
+$EQU	osfpte$V_V	0
+
+$EQU	osfpte$m_ksegbits	<osfpte$m_kre+osfpte$m_kwe+osfpte$m_v+osfpte$m_asm>
+$EQU	osfpte$m_prot	<osfpte$m_ure+osfpte$m_uwe+osfpte$m_kre+osfpte$m_kwe>
+
+	$DEFEND	OSFPTE,$GBL,DEF
+	.ENDM
+
+
+;+
+; VA layout - symbol prefix VA$
+;
+;	Loc	Size	name 	function
+;	------	------	-------	-----------------------------------
+;	<42:33>	10	SEG1	First seg table offset for mapping
+;	<32:23>	10	SEG2	Second seg table offset for mapping
+;	<22:13>	10	SEG3	Third seg table offset for mapping
+;	<12:0>	13	OFFSET	Byte within page
+;-
+	.MACRO	$OSF_VADEF,$GBL
+	$DEFINI	OSFVA,$GBL
+$EQU	OSFVA$M_OFFSET	<^X000000001FFF>
+$EQU	OSFVA$V_OFFSET	0
+$EQU	OSFVA$M_SEG3	<^X0000007FE000>
+$EQU	OSFVA$V_SEG3	13
+$EQU	OSFVA$M_SEG2	<^X0001FF800000>
+$EQU	OSFVA$V_SEG2	23	
+$EQU	OSFVA$M_SEG1	<^X7FE00000000>
+$EQU	OSFVA$V_SEG1	33	
+
+	$DEFEND	OSFVA,$GBL,DEF
+	.ENDM
+
+;+
+; PRIVILEGED CONTEXT BLOCK (PCB)
+;-
+	.MACRO	$OSF_PCBDEF,$GBL
+	$DEFINI	OSFPCB,$GBL
+$EQU	OSFPCB$Q_KSP	<^X0000>
+$EQU	OSFPCB$Q_USP	<^X0008>
+$EQU	OSFPCB$Q_MMPTR	<^X0010>
+$EQU	OSFPCB$L_cc	<^X0018>
+$EQU	OSFPCB$L_asn	<^X001C>
+$EQU	OSFPCB$Q_UNiQUE <^X0020>
+$EQU	OSFPCB$Q_FEN	<^X0028>
+$EQU	OSFPCB$V_PME	62
+
+
+	$DEFEND	OSFPCB,$GBL,DEF
+	.ENDM
+
+;+
+; Stack Frame
+;-
+	.MACRO	$OSF_SFDEF,$GBL
+	$DEFINI	OSFSF,$GBL
+$EQU	OSFSF$PS	<^X0000>
+$EQU	OSFSF$PC	<^X0008>
+$EQU	OSFSF$GP	<^X0010>
+$EQU	OSFSF$a0	<^X0018>
+$EQU	OSFSF$a1	<^X0020>
+$EQU	OSFSF$a2	<^X0028>
+$EQU	OSFSF$C_SIZE	<^X0030>
+
+	$DEFEND	OSFSF,$GBL,DEF
+	.ENDM

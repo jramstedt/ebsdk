@@ -1,0 +1,188 @@
+/* file:	ansi_def.sdl
+/*
+/* Copyright (C) 1987, 1988 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Facility:	EVAX/Cobra firmware
+/*
+/* Abstract:	This file describes data structures used by the ansi
+/*		parser.
+/*
+/* Author:	AJ Beaverson
+/*
+/* Modifications:
+/*
+/*	jrk	06-Oct-1994	Align structures.
+/*
+/*	ajb	03-Aug-1990	Remove facility codes from structure elements.
+/*
+/*      ajb	11-Apr-90	Adapted from KA670 code.
+/*
+
+module CP_CONST;
+
+constant (
+    NUL, SOH, STX, ETX, EOT, ENQ, ACK, BEL,  BS,  HT,  LF,  VT,  FF,
+     CR,  SO,  SI, DLE, XON, DC2, XOFF, DC4, NAK, SYN, ETB, CAN,  EM,
+    SUB, ESC,  FS,  GS,  RS,  US, SPACE )
+equals 0 increment 1 ;
+
+constant (
+    DEL, ,,,, IND, NEL, SSA, ESA, HTS, HTJ, VTS, PLD, PLU,  RI, SS2, SS3,
+    DCS, PU1, PU2, STS, CCH,  MW, SPA, EPA,,,,   CSI,  ST, OSC,  PM, APC )
+equals 127 increment 1;
+
+constant (
+	A, B, C, D, E, F, G, H, I, J, K, L, M, N, O, P, Q, R, S, T,
+	U, V, W, X, Y, Z
+) equals 1 increment 1 prefix "CTRL" tag "";
+
+
+end_module;
+
+module $ANSI;
+
+/*+
+/* ===============================================
+/* = ANSI - state for an ansi parser             =
+/* ===============================================
+/*
+/* STRUCTURE OVERVIEW:
+/*
+/*      This data structure contains all the state needed
+/*	for the reentrant ansi parser in the alpha console.
+/*
+/* STRUCTURE MEMBERS:
+/*:
+/*       ----------------------------------------------------------------------
+/*       Structure Members    | Data Type  | Description
+/*       ----------------------------------------------------------------------
+/*                  il_overfl |       bit  | overflow bit that is set if too
+/*                            |            | many intermediates are encountered
+/*                            |            |
+/*                  pv_overfl |       bit  | set if we overflow the parameter
+/*                            |            | space
+/*                            |            |
+/*                  buf_overfl|       bit  | character history buffer overflow
+/*                            |            |
+/*                  error     |       bit  | generic syntax error
+/*                            |            |
+/*                  states    | byte array | state history.  This keeps track of
+/*                            |            | the last n states of the parser.
+/*                            |            |
+/*                       c    |      byte  | Current input character. Set to ESC
+/*                            |            | or CSI when valid ESC or CSI is
+/*                            |            | present
+/*                            |            |
+/*                    pchar   |     byte   | Non digit or ; encountered
+/*                            |            |
+/*                    pvc     |     byte   | Number of parameters found
+/*                            |            |
+/*                    pval    | word array | Vector of parameters
+/*                            |            |
+/*                    ilc     |     byte   | Number of intermediates found
+/*                            |            |
+/*                    ilist   | byte array | Vector of found intermediates
+/*                            |            |
+/*                    buf     | byte array | last n characters read in
+/*                            |            |
+/*                    bufix   | longword   | index into above buffer
+/*:      ----------------------------------------------------------------------
+/*
+/*--
+aggregate ANSI structure prefix "" tag "";
+	il_overfl	bitfield mask;		/* intermediate list overflow
+	pv_overfl	bitfield mask;		/* parameter list overflow
+	error		bitfield mask;
+	buf_overfl	bitfield mask;		/* input buffer overflow
+	reserved	bitfield length 4;
+	states	      	byte dimension 4;	/* previous 4 states
+	rvalue		byte;			/* last value returned
+	c		byte unsigned;		/* last character processed
+	pchar		byte unsigned;
+	pvc		byte;			/* number of parameters
+	ilc		byte;			/* number of intermediates
+	ilist		byte dimension 3;	/* intermediate list
+	resvd		byte dimension 3;
+	buf		byte dimension 32;	/* last n characters processed
+	pval		longword dimension 8;	/* parameter values
+	bufix		longword;		
+end ANSI;
+
+/*
+/* Tokens recognized by the get_keystroke routine.
+/*
+constant (
+	"C0",		/* all C0 codes 
+	"GL",		/* all GL codes
+	"DEL",		/* delete, 7/15
+	"C1",
+	"GR",
+	"ESC",
+	"CSI",
+	"0",
+	"1",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+	"DASH",
+	"COMMA",
+	"PERIOD",
+	"ENTER",
+	"PF1",
+	"PF2",
+	"PF3",
+	"PF4",
+	"F6",
+	"F7",
+	"F8",
+	"F9",
+	"F10",
+	"F11",
+	"F12",
+	"F13",
+	"F14",
+	"HELP",
+	"DO",
+	"F17",
+	"F18",
+	"F19",
+	"F20",
+	"FIND",
+	"INSERT",
+	"REMOVE",
+	"SELECT",
+	"PREV",
+	"NEXT",
+	"CUP",
+	"CUD",
+	"CUL",
+	"CUR",
+	"MAX"
+) equals %x8000 increment 1 prefix "KEY" tag "";
+
+constant ANSI_ACCEPT equals 0;		/* current state is an accepting state
+constant ANSI_NEEDMORE equals 1;	/* need more input
+
+end_module;                    

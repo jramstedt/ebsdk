@@ -1,0 +1,654 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:24:19 by OpenVMS SDL EV1-33     
+;  Source:   5-NOV-1996 11:04:02 AFW_USER$:[CONSOLE.V58.COMMON.SRC]PYXIS_MAIN_CS 
+; ********************************************************************************************************************************
+ 
+	.MACRO	pyxis_main_csr_def,..EQU=<=>,..COL=<:> ; IDENT x0.1
+; 
+;  The following is the base address of the system configuration registers in
+;  the PYXIS.  This value must be shifted left 28 places to yield the proper
+;  value, thus simplifying the load of the address into registers.
+; 
+pyxis_k_main_csr_base'..equ'2164        ;  sysconfig base
+pyxis_v_main_csr_base'..equ'28          ;  sysconfig base extent
+; 
+;  PCI configuration register 
+; 
+pci_k_cfgtype0'..equ'0
+pci_k_cfgtype1'..equ'1
+cfg_m_cfg_type'..equ'^X3
+cfg_m_unused_0'..equ'^XFFFFFFFC
+cfg_S_PYXIS_PCI_CFG'..equ'64
+PYXIS_PCI_CFG'..equ'0
+cfg_S_by_field'..equ'4
+cfg_r_by_field'..equ'0
+cfg_S_cfg_type'..equ'2
+cfg_v_cfg_type'..equ'0
+cfg_S_unused_0'..equ'30
+cfg_v_unused_0'..equ'2
+cfg_l_whole'..equ'0
+cfg_S_displacement'..equ'64
+cfg_b_displacement'..equ'0
+; 
+;   PYXIS flash ctrl
+; 
+;  FLASH CONTROL REGISTER
+pyxis_flash_m_wp_width'..equ'^XF
+pyxis_flash_m_disable_time'..equ'^XF0
+pyxis_flash_m_access_time'..equ'^XF00
+pyxis_flash_m_low_enable'..equ'^X1000
+pyxis_flash_m_high_enable'..equ'^X2000
+pyxis_flash_m_ctrl_reserved1'..equ'^XFFFFC000
+pyxis_flash_S_displacement'..equ'64
+pyxis_flash_b_displacement'..equ'0      ;  space used by this register
+pyxis_flash_l_whole'..equ'0
+pyxis_flash_S_wp_width'..equ'4
+pyxis_flash_v_wp_width'..equ'0          ;  [3:0]
+pyxis_flash_S_disable_time'..equ'4
+pyxis_flash_v_disable_time'..equ'4      ;  [7:4]
+pyxis_flash_S_access_time'..equ'4
+pyxis_flash_v_access_time'..equ'8       ;  [11:8]
+pyxis_flash_v_low_enable'..equ'12       ;  [12]
+pyxis_flash_v_high_enable'..equ'13      ;  [13]
+pyxis_flash_S_ctrl_reserved1'..equ'18
+pyxis_flash_v_ctrl_reserved1'..equ'14   ;  [31:14]
+; 
+;  PYXIS Control Register 
+; 
+;  suggested value is ??
+; 
+pyxis_ctrl_m_pci_en'..equ'^X1
+pyxis_ctrl_m_reserved_1'..equ'^X2
+pyxis_ctrl_m_pci_loop_en'..equ'^X4
+pyxis_ctrl_m_fst_bb_en'..equ'^X8
+pyxis_ctrl_m_pci_mst_en'..equ'^X10
+pyxis_ctrl_m_pci_mem_en'..equ'^X20
+pyxis_ctrl_m_pci_req64_en'..equ'^X40
+pyxis_ctrl_m_pci_ack64_en'..equ'^X80
+pyxis_ctrl_m_addr_pe_en'..equ'^X100
+pyxis_ctrl_m_perr_en'..equ'^X200
+pyxis_ctrl_m_fillerr_en'..equ'^X400
+pyxis_ctrl_m_mchkerr_en'..equ'^X800
+pyxis_ctrl_m_ecc_chk_en'..equ'^X1000
+pyxis_ctrl_m_assert_idle_bc'..equ'^X2000
+pyxis_ctrl_m_reserved_2'..equ'^XFC000
+pyxis_ctrl_m_rd_type'..equ'^X300000
+pyxis_ctrl_m_rd_use_history'..equ'^X400000
+pyxis_ctrl_m_reserved_3'..equ'^X800000
+pyxis_ctrl_m_rl_type'..equ'^X3000000
+pyxis_ctrl_m_rl_use_history'..equ'^X4000000
+pyxis_ctrl_m_reserved_4'..equ'^X8000000
+pyxis_ctrl_m_rm_type'..equ'^X30000000
+pyxis_ctrl_m_rm_use_history'..equ'^X40000000
+pyxis_ctrl_m_reserved_5'..equ'^X80000000
+pyxis_ctrl_S_displacement'..equ'64
+pyxis_ctrl_b_displacement'..equ'0       ;  space used by this register
+pyxis_ctrl_l_whole'..equ'0
+pyxis_ctrl_v_pci_en'..equ'0             ;  [0]
+pyxis_ctrl_v_reserved_1'..equ'1         ;  [1]
+pyxis_ctrl_v_pci_loop_en'..equ'2        ;  [2]
+pyxis_ctrl_v_fst_bb_en'..equ'3          ;  [3]
+pyxis_ctrl_v_pci_mst_en'..equ'4         ;  [4]
+pyxis_ctrl_v_pci_mem_en'..equ'5         ;  [5]
+pyxis_ctrl_v_pci_req64_en'..equ'6       ;  [6]
+pyxis_ctrl_v_pci_ack64_en'..equ'7       ;  [7]
+pyxis_ctrl_v_addr_pe_en'..equ'8         ;  [8]
+pyxis_ctrl_v_perr_en'..equ'9            ;  [9]
+pyxis_ctrl_v_fillerr_en'..equ'10        ;  [10]
+pyxis_ctrl_v_mchkerr_en'..equ'11        ;  [11]
+pyxis_ctrl_v_ecc_chk_en'..equ'12        ;  [12]
+pyxis_ctrl_v_assert_idle_bc'..equ'13    ;  [13]
+pyxis_ctrl_S_reserved_2'..equ'6
+pyxis_ctrl_v_reserved_2'..equ'14        ;  [14-19]
+pyxis_ctrl_S_rd_type'..equ'2
+pyxis_ctrl_v_rd_type'..equ'20           ;  [20:21]
+pyxis_ctrl_v_rd_use_history'..equ'22    ;  [22]
+pyxis_ctrl_v_reserved_3'..equ'23        ;  [23]
+pyxis_ctrl_S_rl_type'..equ'2
+pyxis_ctrl_v_rl_type'..equ'24           ;  [24:25]
+pyxis_ctrl_v_rl_use_history'..equ'26    ;  [26]
+pyxis_ctrl_v_reserved_4'..equ'27        ;  [27]
+pyxis_ctrl_S_rm_type'..equ'2
+pyxis_ctrl_v_rm_type'..equ'28           ;  [28:29]
+pyxis_ctrl_v_rm_use_history'..equ'30    ;  [30]
+pyxis_ctrl_v_reserved_5'..equ'31        ;  [31]
+;  PYXIS Control Register 
+; 
+;  suggested value is ??
+; 
+pyxis_ctrl1_m_ioa_ben'..equ'^X1
+pyxis_ctrl1_m_reserved_1'..equ'^XE
+pyxis_ctrl1_m_pci_mwin_en'..equ'^X10
+pyxis_ctrl1_m_reserved_2'..equ'^XE0
+pyxis_ctrl1_m_pci_link_en'..equ'^X100
+pyxis_ctrl1_m_reserved_3'..equ'^XE00
+pyxis_ctrl1_m_lw_par_mode'..equ'^X1000
+pyxis_ctrl1_m_reserved_4'..equ'^XFFFFE000
+pyxis_ctrl1_S_displacement'..equ'64
+pyxis_ctrl1_b_displacement'..equ'0      ;  space used by this register
+pyxis_ctrl1_l_whole'..equ'0
+pyxis_ctrl1_v_ioa_ben'..equ'0           ;  [0]
+pyxis_ctrl1_S_reserved_1'..equ'3
+pyxis_ctrl1_v_reserved_1'..equ'1        ;  [3:1]
+pyxis_ctrl1_v_pci_mwin_en'..equ'4       ;  [4]
+pyxis_ctrl1_S_reserved_2'..equ'3
+pyxis_ctrl1_v_reserved_2'..equ'5        ;  [7:5]
+pyxis_ctrl1_v_pci_link_en'..equ'8       ;  [8]
+pyxis_ctrl1_S_reserved_3'..equ'3
+pyxis_ctrl1_v_reserved_3'..equ'9        ;  [9:11]
+pyxis_ctrl1_v_lw_par_mode'..equ'12      ;  [12]
+pyxis_ctrl1_S_reserved_4'..equ'19
+pyxis_ctrl1_v_reserved_4'..equ'13       ;  [31]
+; 
+;  Hardware Address extension register for memory
+; 
+haemem_m_unused_0'..equ'^X3
+haemem_m_addr_ext_3'..equ'^XFC
+haemem_m_unused_1'..equ'^X700
+haemem_m_addr_ext_2'..equ'^XF800
+haemem_m_unused_2'..equ'^X1FFF0000
+haemem_m_addr_ext_1'..equ'^XE0000000
+haemem_S_PCI_HAE_MEM'..equ'64
+PCI_HAE_MEM'..equ'0
+haemem_S_by_field'..equ'4
+haemem_r_by_field'..equ'0
+haemem_S_unused_0'..equ'2
+haemem_v_unused_0'..equ'0               ;  [1:0]
+haemem_S_addr_ext_3'..equ'6
+haemem_v_addr_ext_3'..equ'2             ;  [7:2]
+haemem_S_unused_1'..equ'3
+haemem_v_unused_1'..equ'8               ;  [10:8]
+haemem_S_addr_ext_2'..equ'5
+haemem_v_addr_ext_2'..equ'11            ;  [15:11]
+haemem_S_unused_2'..equ'13
+haemem_v_unused_2'..equ'16              ;  [28:16]
+haemem_S_addr_ext_1'..equ'3
+haemem_v_addr_ext_1'..equ'29            ;  [31:29]
+haemem_l_whole'..equ'0
+haemem_S_displacement'..equ'64
+haemem_b_displacement'..equ'0
+; 
+;  Hardware Address extension register for I/O
+; 
+haeio_m_unused_0'..equ'^X1FFFFFF
+haeio_m_addr_ext'..equ'^XFE000000
+haeio_S_PCI_HAE_IO'..equ'64
+PCI_HAE_IO'..equ'0
+haeio_S_by_field'..equ'4
+haeio_r_by_field'..equ'0
+haeio_S_unused_0'..equ'25
+haeio_v_unused_0'..equ'0                ;  [24:0]
+haeio_S_addr_ext'..equ'7
+haeio_v_addr_ext'..equ'25               ;  [31:25]
+haeio_l_whole'..equ'0
+haeio_S_displacement'..equ'64
+haeio_b_displacement'..equ'0
+; 
+;  PCI latency register
+;  
+pci_lat_m_unused_0'..equ'^XFF
+pci_lat_m_latency'..equ'^XFF00
+pci_lat_m_unused_1'..equ'^XFFFF0000
+pci_lat_S_PCI_LAT'..equ'64
+PCI_LAT'..equ'0
+pci_lat_S_by_field'..equ'4
+pci_lat_r_by_field'..equ'0
+pci_lat_S_unused_0'..equ'8
+pci_lat_v_unused_0'..equ'0
+pci_lat_S_latency'..equ'8
+pci_lat_v_latency'..equ'8
+pci_lat_S_unused_1'..equ'16
+pci_lat_v_unused_1'..equ'16
+pci_lat_l_whole'..equ'0
+pci_lat_S_displacement'..equ'64
+pci_lat_b_displacement'..equ'0
+; 
+;  PYXIS diagnostic Force Error register
+;  
+pci_err_k_none'..equ'0
+pci_err_k_lo_lwrd'..equ'268435456
+pci_err_k_hi_lwrd'..equ'536870912
+pci_err_k_addr'..equ'805306368
+pyxis_diag_m_unused_0'..equ'^X1
+pyxis_diag_m_use_check'..equ'^X2
+pyxis_diag_m_unused_1'..equ'^XFFFFFFC
+pyxis_diag_m_fpe_pci_low'..equ'^X10000000
+pyxis_diag_m_fpe_pci_hi'..equ'^X20000000
+pyxis_diag_m_unused_2'..equ'^X40000000
+pyxis_diag_m_fpe_to_ev5'..equ'^X80000000
+pyxis_diag_S_PYXIS_DIAG'..equ'64
+PYXIS_DIAG'..equ'0
+pyxis_diag_S_by_field'..equ'4
+pyxis_diag_r_by_field'..equ'0
+pyxis_diag_v_unused_0'..equ'0           ;  [0]
+pyxis_diag_v_use_check'..equ'1          ;  [1]
+pyxis_diag_S_unused_1'..equ'26
+pyxis_diag_v_unused_1'..equ'2           ;  [27:2]
+pyxis_diag_v_fpe_pci_low'..equ'28       ;  [28]
+pyxis_diag_v_fpe_pci_hi'..equ'29        ;  [29]
+pyxis_diag_v_unused_2'..equ'30          ;  [30]
+pyxis_diag_v_fpe_to_ev5'..equ'31        ;  [31]
+pyxis_diag_l_whole'..equ'0
+pyxis_diag_S_displacement'..equ'64
+pyxis_diag_b_displacement'..equ'0
+; 
+;  Diagnostic Check bit register
+;  
+diag_check_m_ecc'..equ'^XFF
+diag_check_m_unused_0'..equ'^XFFFFFF00
+diag_check_S_DIAG_CHECK'..equ'64
+DIAG_CHECK'..equ'0
+diag_check_S_by_field'..equ'4
+diag_check_r_by_field'..equ'0
+diag_check_S_ecc'..equ'8
+diag_check_v_ecc'..equ'0
+diag_check_S_unused_0'..equ'24
+diag_check_v_unused_0'..equ'8
+diag_check_l_whole'..equ'0
+diag_check_S_displacement'..equ'64
+diag_check_b_displacement'..equ'0
+; 
+;  Performance Monitor register - 0x8740004000 
+; 
+perfm_m_low_cnt'..equ'^XFFFF
+perfm_m_high_cnt'..equ'^XFFFF0000
+perfm_S_PYXIS_PERFMON'..equ'64
+PYXIS_PERFMON'..equ'0
+perfm_S_by_field'..equ'4
+perfm_r_by_field'..equ'0
+perfm_S_low_cnt'..equ'16
+perfm_v_low_cnt'..equ'0
+perfm_S_high_cnt'..equ'16
+perfm_v_high_cnt'..equ'16
+perfm_l_whole'..equ'0
+perfm_S_displacement'..equ'64
+perfm_b_displacement'..equ'0
+; 
+;  Performance Monitor Control register - 0x8740004040 
+; 
+perfc_m_low_sel'..equ'^XFF
+perfc_m_unused_0'..equ'^XF00
+perfc_m_low_cnt_cyc'..equ'^X1000
+perfc_m_low_cnt_clr'..equ'^X2000
+perfc_m_low_err_stop'..equ'^X4000
+perfc_m_low_cnt_strt'..equ'^X8000
+perfc_m_high_sel'..equ'^X70000
+perfc_m_unused_1'..equ'^XFF80000
+perfc_m_high_cnt_cyc'..equ'^X10000000
+perfc_m_high_cnt_clr'..equ'^X20000000
+perfc_m_high_err_stop'..equ'^X40000000
+perfc_m_high_cnt_strt'..equ'^X80000000
+perfc_S_PYXIS_PERFCTL'..equ'64
+PYXIS_PERFCTL'..equ'0
+perfc_S_by_field'..equ'4
+perfc_r_by_field'..equ'0
+perfc_S_low_sel'..equ'8
+perfc_v_low_sel'..equ'0
+perfc_S_unused_0'..equ'4
+perfc_v_unused_0'..equ'8
+perfc_v_low_cnt_cyc'..equ'12
+perfc_v_low_cnt_clr'..equ'13            ;  write only bit
+perfc_v_low_err_stop'..equ'14
+perfc_v_low_cnt_strt'..equ'15
+perfc_S_high_sel'..equ'3
+perfc_v_high_sel'..equ'16
+perfc_S_unused_1'..equ'9
+perfc_v_unused_1'..equ'19
+perfc_v_high_cnt_cyc'..equ'28
+perfc_v_high_cnt_clr'..equ'29           ;  write only bit
+perfc_v_high_err_stop'..equ'30
+perfc_v_high_cnt_strt'..equ'31
+perfc_l_whole'..equ'0
+perfc_S_displacement'..equ'64
+perfc_b_displacement'..equ'0
+; 
+;  PYXIS Revision register
+;  
+pyxis_rev_m_revision'..equ'^XFF
+pyxis_rev_m_is_pyxis'..equ'^X100
+pyxis_rev_m_unused_1'..equ'^XFFFFFE00
+pyxis_rev_S_PYXIS_REV'..equ'64
+PYXIS_REV'..equ'0
+pyxis_rev_S_by_field'..equ'4
+pyxis_rev_r_by_field'..equ'0
+pyxis_rev_S_revision'..equ'8
+pyxis_rev_v_revision'..equ'0
+pyxis_rev_v_is_pyxis'..equ'8
+pyxis_rev_S_unused_1'..equ'23
+pyxis_rev_v_unused_1'..equ'9
+pyxis_rev_l_whole'..equ'0
+pyxis_rev_S_displacement'..equ'64
+pyxis_rev_b_displacement'..equ'0
+; 
+;  PYXIS error register
+;  
+pyxis_err_m_cor_err'..equ'^X1
+pyxis_err_m_un_cor_err'..equ'^X2
+pyxis_err_m_cpu_pe'..equ'^X4
+pyxis_err_m_mem_nem'..equ'^X8
+pyxis_err_m_pci_serr'..equ'^X10
+pyxis_err_m_pci_perr'..equ'^X20
+pyxis_err_m_pci_addr_pe'..equ'^X40
+pyxis_err_m_rcvd_mas_abt'..equ'^X80
+pyxis_err_m_rcvd_tar_abt'..equ'^X100
+pyxis_err_m_pa_pte_inv'..equ'^X200
+pyxis_err_m_ioa_timeout'..equ'^X800
+pyxis_err_m_lost_cor_err'..equ'^X10000
+pyxis_err_m_lost_un_cor_err'..equ'^X20000
+pyxis_err_m_lost_cpu_pe'..equ'^X40000
+pyxis_err_m_lost_mem_nem'..equ'^X80000
+pyxis_err_m_lost_perr'..equ'^X200000
+pyxis_err_m_lost_pci_addr_pe'..equ'^X400000
+pyxis_err_m_lost_rcvd_mas_abt'..equ'^X800000
+pyxis_err_m_lost_rcvd_tar_abt'..equ'^X1000000
+pyxis_err_m_lost_pa_pte_inv'..equ'^X2000000
+pyxis_err_m_lost_ioa_timeout'..equ'^X8000000
+pyxis_err_m_err_valid'..equ'^X80000000
+pyxis_err_S_PYXIS_ERR'..equ'64
+PYXIS_ERR'..equ'0
+pyxis_err_S_by_field'..equ'4
+pyxis_err_r_by_field'..equ'0
+pyxis_err_v_cor_err'..equ'0
+pyxis_err_v_un_cor_err'..equ'1
+pyxis_err_v_cpu_pe'..equ'2
+pyxis_err_v_mem_nem'..equ'3
+pyxis_err_v_pci_serr'..equ'4
+pyxis_err_v_pci_perr'..equ'5
+pyxis_err_v_pci_addr_pe'..equ'6
+pyxis_err_v_rcvd_mas_abt'..equ'7
+pyxis_err_v_rcvd_tar_abt'..equ'8
+pyxis_err_v_pa_pte_inv'..equ'9
+pyxis_err_v_pyxis_err_reserved1'..equ'10
+pyxis_err_v_ioa_timeout'..equ'11
+pyxis_err_S_pyxis_err_reserved2'..equ'4
+pyxis_err_v_pyxis_err_reserved2'..equ'12
+pyxis_err_v_lost_cor_err'..equ'16
+pyxis_err_v_lost_un_cor_err'..equ'17
+pyxis_err_v_lost_cpu_pe'..equ'18
+pyxis_err_v_lost_mem_nem'..equ'19
+pyxis_err_v_pyxis_err_reserved3'..equ'20
+pyxis_err_v_lost_perr'..equ'21
+pyxis_err_v_lost_pci_addr_pe'..equ'22
+pyxis_err_v_lost_rcvd_mas_abt'..equ'23
+pyxis_err_v_lost_rcvd_tar_abt'..equ'24
+pyxis_err_v_lost_pa_pte_inv'..equ'25
+pyxis_err_v_pyxis_err_reserved4'..equ'26
+pyxis_err_v_lost_ioa_timeout'..equ'27
+pyxis_err_S_pyxis_err_reserved5'..equ'3
+pyxis_err_v_pyxis_err_reserved5'..equ'28
+pyxis_err_v_err_valid'..equ'31
+pyxis_err_l_whole'..equ'0
+pyxis_err_S_displacement'..equ'64
+pyxis_err_b_displacement'..equ'0
+; 
+;  PYXIS stat register
+; 
+pyxis_stat_m_pci_status_0'..equ'^X1
+pyxis_stat_m_pci_status_1'..equ'^X2
+pyxis_stat_m_ioa_valid_3_0'..equ'^XF0
+pyxis_stat_m_tlb_miss'..equ'^X800
+pyxis_stat_S_PYXIS_STAT'..equ'64
+PYXIS_STAT'..equ'0
+pyxis_stat_S_by_field'..equ'4
+pyxis_stat_r_by_field'..equ'0
+pyxis_stat_v_pci_status_0'..equ'0
+pyxis_stat_v_pci_status_1'..equ'1
+pyxis_stat_S_reserved1'..equ'2
+pyxis_stat_v_reserved1'..equ'2
+pyxis_stat_S_ioa_valid_3_0'..equ'4
+pyxis_stat_v_ioa_valid_3_0'..equ'4
+pyxis_stat_S_reserved2'..equ'3
+pyxis_stat_v_reserved2'..equ'8
+pyxis_stat_v_tlb_miss'..equ'11
+pyxis_stat_S_reserved3'..equ'20
+pyxis_stat_v_reserved3'..equ'12
+pyxis_stat_l_whole'..equ'0
+pyxis_stat_S_displacement'..equ'64
+pyxis_stat_b_displacement'..equ'0
+; 
+;  PYXIS err mask register
+;  
+pyxis_err_mask_m_cor_err'..equ'^X1
+pyxis_err_mask_m_un_cor_err'..equ'^X2
+pyxis_err_mask_m_cpu_pe'..equ'^X4
+pyxis_err_mask_m_mem_nem'..equ'^X8
+pyxis_err_mask_m_pci_serr'..equ'^X10
+pyxis_err_mask_m_perr'..equ'^X20
+pyxis_err_mask_m_pci_addr_pe'..equ'^X40
+pyxis_err_mask_m_rcvd_mas_abt'..equ'^X80
+pyxis_err_mask_m_rcvd_tar_abt'..equ'^X100
+pyxis_err_mask_m_pa_pte_inv'..equ'^X200
+pyxis_err_mask_m_ioa_timeout'..equ'^X800
+pyxis_err_mask_S_PYXIS_ERR_MASK'..equ'64
+PYXIS_ERR_MASK'..equ'0
+pyxis_err_mask_S_by_field'..equ'4
+pyxis_err_mask_r_by_field'..equ'0
+pyxis_err_mask_v_cor_err'..equ'0
+pyxis_err_mask_v_un_cor_err'..equ'1
+pyxis_err_mask_v_cpu_pe'..equ'2
+pyxis_err_mask_v_mem_nem'..equ'3
+pyxis_err_mask_v_pci_serr'..equ'4
+pyxis_err_mask_v_perr'..equ'5
+pyxis_err_mask_v_pci_addr_pe'..equ'6
+pyxis_err_mask_v_rcvd_mas_abt'..equ'7
+pyxis_err_mask_v_rcvd_tar_abt'..equ'8
+pyxis_err_mask_v_pa_pte_inv'..equ'9
+pyxis_err_mask_v_reserved1'..equ'10
+pyxis_err_mask_v_ioa_timeout'..equ'11
+pyxis_err_mask_S_reserved2'..equ'20
+pyxis_err_mask_v_reserved2'..equ'12
+pyxis_err_mask_l_whole'..equ'0
+pyxis_err_mask_S_displacement'..equ'64
+pyxis_err_mask_b_displacement'..equ'0
+; 
+;  PYXIS Syndrome register
+;  
+pyxis_synd_m_err_synd0'..equ'^XFF
+pyxis_synd_m_err_synd1'..equ'^XFF00
+pyxis_synd_m_raw_check_bits'..equ'^XFF0000
+pyxis_synd_m_corr_err0'..equ'^X1000000
+pyxis_synd_m_corr_err1'..equ'^X2000000
+pyxis_synd_m_uncorr_err0'..equ'^X4000000
+pyxis_synd_m_uncorr_err1'..equ'^X8000000
+pyxis_synd_S_PYXIS_SYND'..equ'8
+PYXIS_SYND'..equ'0
+pyxis_synd_S_by_field'..equ'4
+pyxis_synd_r_by_field'..equ'0
+pyxis_synd_S_err_synd0'..equ'8
+pyxis_synd_v_err_synd0'..equ'0
+pyxis_synd_S_err_synd1'..equ'8
+pyxis_synd_v_err_synd1'..equ'8
+pyxis_synd_S_raw_check_bits'..equ'8
+pyxis_synd_v_raw_check_bits'..equ'16
+pyxis_synd_v_corr_err0'..equ'24
+pyxis_synd_v_corr_err1'..equ'25
+pyxis_synd_v_uncorr_err0'..equ'26
+pyxis_synd_v_uncorr_err1'..equ'27
+pyxis_synd_S_reserved1'..equ'4
+pyxis_synd_v_reserved1'..equ'28
+pyxis_synd_l_whole'..equ'0
+pyxis_synd_S_displacement'..equ'8
+pyxis_synd_b_displacement'..equ'0
+; 
+;  PYXIS error data register
+;  
+pyxis_err_data_m_data'..equ'^XFFFFFFFF
+pyxis_err_data_S_PYXIS_ERR_DATA'..equ'64
+PYXIS_ERR_DATA'..equ'0
+pyxis_err_data_S_by_field'..equ'4
+pyxis_err_data_r_by_field'..equ'0
+pyxis_err_data_S_data'..equ'32
+pyxis_err_data_v_data'..equ'0
+pyxis_err_data_l_whole'..equ'0
+pyxis_err_data_S_displacement'..equ'64
+pyxis_err_data_b_displacement'..equ'0
+; 
+;  PYXIS mem err addr register
+;  
+pyxis_mear_m_mem_port_addr_31_4'..equ'^XFFFFFFF0
+pyxis_mear_S_PYXIS_MEAR'..equ'64
+PYXIS_MEAR'..equ'0
+pyxis_mear_S_by_field'..equ'4
+pyxis_mear_r_by_field'..equ'0
+pyxis_mear_S_mear_reserved'..equ'4
+pyxis_mear_v_mear_reserved'..equ'0
+pyxis_mear_S_mem_port_addr_31_4'..equ'28
+pyxis_mear_v_mem_port_addr_31_4'..equ'4
+pyxis_mear_l_whole'..equ'0
+pyxis_mear_S_displacement'..equ'64
+pyxis_mear_b_displacement'..equ'0
+; 
+;  PYXIS mem err stat register
+;  
+pyxis_mesr_m_mem_adr_39_32'..equ'^XFF
+pyxis_mesr_m_dma_rd_nxm'..equ'^X100
+pyxis_mesr_m_dma_wr_nxm'..equ'^X200
+pyxis_mesr_m_cpu_rd_nxm'..equ'^X400
+pyxis_mesr_m_cpu_wr_nxm'..equ'^X800
+pyxis_mesr_m_io_rd_nxm'..equ'^X1000
+pyxis_mesr_m_io_wr_nxm'..equ'^X2000
+pyxis_mesr_m_victim_nxm'..equ'^X4000
+pyxis_mesr_m_tlbfill_nxm'..equ'^X8000
+pyxis_mesr_m_oword_index'..equ'^X30000
+pyxis_mesr_m_data_cycle_type'..equ'^X1F00000
+pyxis_mesr_m_seq_state'..equ'^XFE000000
+pyxis_mesr_S_PYXIS_MESR'..equ'64
+PYXIS_MESR'..equ'0
+pyxis_mesr_S_by_field'..equ'4
+pyxis_mesr_r_by_field'..equ'0
+pyxis_mesr_S_mem_adr_39_32'..equ'8
+pyxis_mesr_v_mem_adr_39_32'..equ'0
+pyxis_mesr_v_dma_rd_nxm'..equ'8
+pyxis_mesr_v_dma_wr_nxm'..equ'9
+pyxis_mesr_v_cpu_rd_nxm'..equ'10
+pyxis_mesr_v_cpu_wr_nxm'..equ'11
+pyxis_mesr_v_io_rd_nxm'..equ'12
+pyxis_mesr_v_io_wr_nxm'..equ'13
+pyxis_mesr_v_victim_nxm'..equ'14
+pyxis_mesr_v_tlbfill_nxm'..equ'15
+pyxis_mesr_S_oword_index'..equ'2
+pyxis_mesr_v_oword_index'..equ'16
+pyxis_mesr_S_reserved1'..equ'2
+pyxis_mesr_v_reserved1'..equ'18
+pyxis_mesr_S_data_cycle_type'..equ'5
+pyxis_mesr_v_data_cycle_type'..equ'20
+pyxis_mesr_S_seq_state'..equ'7
+pyxis_mesr_v_seq_state'..equ'25
+pyxis_mesr_l_whole'..equ'0
+pyxis_mesr_S_displacement'..equ'64
+pyxis_mesr_b_displacement'..equ'0
+; 
+;  PYXIS PCI_ERR0 register
+;  
+pyxis_pci_err0_m_dma_cmd'..equ'^XF
+pyxis_pci_err0_m_dma_dac'..equ'^X20
+pyxis_pci_err0_m_window'..equ'^XF00
+pyxis_pci_err0_m_master_state'..equ'^XF0000
+pyxis_pci_err0_m_target_state'..equ'^XF00000
+pyxis_pci_err0_m_pci_cmd'..equ'^XE000000
+pyxis_pci_err0_m_pci_dac'..equ'^X10000000
+pyxis_pci_err0_S_PYXIS_PCI_ERR0'..equ'64
+PYXIS_PCI_ERR0'..equ'0
+pyxis_pci_err0_S_by_field'..equ'4
+pyxis_pci_err0_r_by_field'..equ'0
+pyxis_pci_err0_S_dma_cmd'..equ'4
+pyxis_pci_err0_v_dma_cmd'..equ'0
+pyxis_pci_err0_v_reserved1'..equ'4
+pyxis_pci_err0_v_dma_dac'..equ'5
+pyxis_pci_err0_S_reserved2'..equ'2
+pyxis_pci_err0_v_reserved2'..equ'6
+pyxis_pci_err0_S_window'..equ'4
+pyxis_pci_err0_v_window'..equ'8
+pyxis_pci_err0_S_reserved3'..equ'4
+pyxis_pci_err0_v_reserved3'..equ'12
+pyxis_pci_err0_S_master_state'..equ'4
+pyxis_pci_err0_v_master_state'..equ'16
+pyxis_pci_err0_S_target_state'..equ'4
+pyxis_pci_err0_v_target_state'..equ'20
+pyxis_pci_err0_v_reserved4'..equ'24
+pyxis_pci_err0_S_pci_cmd'..equ'3
+pyxis_pci_err0_v_pci_cmd'..equ'25
+pyxis_pci_err0_v_pci_dac'..equ'28
+pyxis_pci_err0_S_reserved5'..equ'3
+pyxis_pci_err0_v_reserved5'..equ'29
+pyxis_pci_err0_l_whole'..equ'0
+pyxis_pci_err0_S_displacement'..equ'64
+pyxis_pci_err0_b_displacement'..equ'0
+; 
+;  PYXIS PCI error 1 register
+;  
+pyxis_pci_err1_m_data'..equ'^XFFFFFFFF
+pyxis_pci_err1_S_PYXIS_PCI_ERR1'..equ'64
+PYXIS_PCI_ERR1'..equ'0
+pyxis_pci_err1_S_by_field'..equ'4
+pyxis_pci_err1_r_by_field'..equ'0
+pyxis_pci_err1_S_data'..equ'32
+pyxis_pci_err1_v_data'..equ'0
+pyxis_pci_err1_l_whole'..equ'0
+pyxis_pci_err1_S_displacement'..equ'64
+pyxis_pci_err1_b_displacement'..equ'0
+; 
+;  PYXIS PCI error 2 register
+;  
+pyxis_pci_err2_m_data'..equ'^XFFFFFFFF
+pyxis_pci_err2_S_PYXIS_PCI_ERR2'..equ'64
+PYXIS_PCI_ERR2'..equ'0
+pyxis_pci_err2_S_by_field'..equ'4
+pyxis_pci_err2_r_by_field'..equ'0
+pyxis_pci_err2_S_data'..equ'32
+pyxis_pci_err2_v_data'..equ'0
+pyxis_pci_err2_l_whole'..equ'0
+pyxis_pci_err2_S_displacement'..equ'64
+pyxis_pci_err2_b_displacement'..equ'0
+; 
+;   PYXIS Main CSR .....
+; 
+;   This block of registers contains at all of the registers modelled in the
+;   structures above in the address space order in which they will appear on the
+;   machine.
+; 
+csr_S_PYXIS_MAIN_CSR'..equ'35008
+PYXIS_MAIN_CSR'..equ'0
+csr_S_offset'..equ'128
+csr_b_offset'..equ'0
+csr_r_pyxis_rev'..equ'128               ;  PYXIS revision - 0x80
+csr_r_pci_lat'..equ'192                 ;  PCI latency - 0xc0
+csr_r_pyxis_ctrl'..equ'256              ;  PYXIS control - 0x100
+csr_r_pyxis_ctrl1'..equ'320             ;  PYXIS control - 0x100
+csr_S_offset_1'..equ'128
+csr_b_offset_1'..equ'384
+csr_r_pyxis_flash'..equ'512             ;  PYXIS config - 0x200
+csr_S_offset_2'..equ'448
+csr_b_offset_2'..equ'576
+csr_r_hae_mem'..equ'1024                ;  MEM HAE - 0x400    
+csr_r_hae_io'..equ'1088                 ;  IO HAE -  0x440
+csr_r_cfg'..equ'1152                    ;  PCI Config - 0x480
+csr_S_offset_4'..equ'6976
+csr_b_offset_4'..equ'1216
+csr_r_pyxis_diag'..equ'8192             ;  PYXIS Force error register - 0x2000
+csr_S_offset_5'..equ'4032
+csr_b_offset_5'..equ'8256
+csr_r_diag_check'..equ'12288            ;  Diagnostic Check bit - 0x3000
+csr_S_offset_6'..equ'4032
+csr_b_offset_6'..equ'12352
+csr_r_pyxis_perf_mon'..equ'16384        ;  Performance Monitor Ctr - 0x4000
+csr_r_pyxis_perf_cntl'..equ'16448       ;  Performance monitor Ctl - 0x4040
+csr_S_offset_7'..equ'16768
+csr_b_offset_7'..equ'16512
+csr_r_pyxis_err'..equ'33280             ; pyxis err 0x8200
+csr_r_pyxis_stat'..equ'33344            ; pyxis stat 0x8240
+csr_r_pyxis_err_mask'..equ'33408        ; pyxis err mask 0x8280
+csr_S_offset_8'..equ'64
+csr_b_offset_8'..equ'33472
+csr_r_pyxis_synd'..equ'33536            ; pyxis synd 0x8300
+csr_r_pyxis_err_data'..equ'33544        ; pyxis err_data 0x8308
+csr_S_offset_9'..equ'184
+csr_b_offset_9'..equ'33608
+csr_r_pyxis_MEAR'..equ'33792            ; pyxis mear 0x8400
+csr_r_pyxis_mesr'..equ'33856            ; pyxis MESR 0x8440
+csr_S_offset_B'..equ'896
+csr_b_offset_B'..equ'33920
+csr_r_pyxis_pci_err0'..equ'34816        ; pyxis_pci_err0  0x8800
+csr_r_pyxis_pci_err1'..equ'34880        ; pyxis_pci_err0  0x8840
+csr_r_pyxis_pci_err2'..equ'34944        ; pyxis_pci_err0  0x8880
+	.ENDM

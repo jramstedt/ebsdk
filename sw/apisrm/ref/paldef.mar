@@ -1,0 +1,1118 @@
+	.MACRO	$PALDEFS
+	PALDEF_VER == 3		; Flag the version number of this file.
+	.ENDM
+
+
+	.MACRO	$PAL_FUNC,$GBL
+	$DEFINI	PAL_FUNC,$GBL
+
+$EQU	PAL_FUNC_BPT		<128>
+$EQU	PAL_FUNC_BUGCHK		<129>
+$EQU	PAL_FUNC_CHME		<130>
+$EQU	PAL_FUNC_CHMK		<131>
+$EQU	PAL_FUNC_CHMS		<132>
+$EQU	PAL_FUNC_CHMU		<133>
+$EQU	PAL_FUNC_IMB		<134>
+$EQU	PAL_FUNC_INSQHIL	<135>
+$EQU	PAL_FUNC_INSQTIL	<136>
+$EQU	PAL_FUNC_INSQHIQ	<137>
+$EQU	PAL_FUNC_INSQTIQ	<138>
+$EQU	PAL_FUNC_INSQUEL	<139>
+$EQU	PAL_FUNC_INSQUEQ	<140>
+$EQU	PAL_FUNC_INSQUELD	<141>
+$EQU	PAL_FUNC_INSQUEQD	<142>
+$EQU	PAL_FUNC_PROBER		<143>
+$EQU	PAL_FUNC_PROBEW		<144>
+$EQU	PAL_FUNC_RD_PS		<145>
+$EQU	PAL_FUNC_REI		<146>
+$EQU	PAL_FUNC_REMQHIL	<147>
+$EQU	PAL_FUNC_REMQTIL	<148>
+$EQU	PAL_FUNC_REMQHIQ	<149>
+$EQU	PAL_FUNC_REMQTIQ	<150>
+$EQU	PAL_FUNC_REMQUEL	<151>
+$EQU	PAL_FUNC_REMQUEQ	<152>
+$EQU	PAL_FUNC_REMQUELD	<153>
+$EQU	PAL_FUNC_REMQUEQD	<154>
+$EQU	PAL_FUNC_SWASTEN	<155>
+$EQU	PAL_FUNC_WR_PS_SW	<156>
+$EQU	PAL_FUNC_RSCC		<157>
+$EQU	PAL_FUNC_READ_UNQ	<158>
+$EQU	PAL_FUNC_WRITE_UNQ	<159>
+$EQU	PAL_FUNC_AMOVRR		<160>
+$EQU	PAL_FUNC_AMOVRM		<161>
+$EQU	PAL_FUNC_INSQHILR	<162>
+$EQU	PAL_FUNC_INSQTILR	<163>
+$EQU	PAL_FUNC_INSQHIQR	<164>
+$EQU	PAL_FUNC_INSQTIQR	<165>
+$EQU	PAL_FUNC_REMQHILR	<166>
+$EQU	PAL_FUNC_REMQTILR	<167>
+$EQU	PAL_FUNC_REMQHIQR	<168>
+$EQU	PAL_FUNC_REMQTIQR	<169>
+$EQU	PAL_FUNC_TRAP		<170>
+$EQU	PAL_FUNC_CLRFEN		<174>
+
+
+
+
+
+$EQU	PAL_FUNC_CFLUSH		<1>
+$EQU	PAL_FUNC_DRAINA		<2>
+$EQU	PAL_FUNC_HALT		<0>
+$EQU	PAL_FUNC_LDQP		<3>
+$EQU	PAL_FUNC_STQP		<4>
+$EQU	PAL_FUNC_SWPCTX		<5>
+$EQU	PAL_FUNC_MFPR_ASN	<6>
+$EQU	PAL_FUNC_MTPR_ASTEN	<7>
+$EQU	PAL_FUNC_MTPR_ASTSR	<8>
+$EQU	PAL_FUNC_CSERVE		<9>
+$EQU	PAL_FUNC_SWPPAL		<10>
+$EQU	PAL_FUNC_MFPR_FEN	<11>
+$EQU	PAL_FUNC_MTPR_FEN	<12>
+$EQU	PAL_FUNC_MTPR_IPIR	<13>
+$EQU	PAL_FUNC_MFPR_IPL	<14>
+$EQU	PAL_FUNC_MTPR_IPL	<15>
+$EQU	PAL_FUNC_MFPR_MCES	<16>
+$EQU	PAL_FUNC_MTPR_MCES	<17>
+$EQU	PAL_FUNC_MFPR_PCBB	<18>
+$EQU	PAL_FUNC_MFPR_PRBR	<19>
+$EQU	PAL_FUNC_MTPR_PRBR	<20>
+$EQU	PAL_FUNC_MFPR_PTBR	<21>
+$EQU	PAL_FUNC_MFPR_SCBB	<22>
+$EQU	PAL_FUNC_MTPR_SCBB	<23>
+$EQU	PAL_FUNC_MTPR_SIRR	<24>
+$EQU	PAL_FUNC_MFPR_SISR	<25>
+$EQU	PAL_FUNC_MFPR_TBCHK	<26>
+$EQU	PAL_FUNC_MTPR_TBIA	<27>
+$EQU	PAL_FUNC_MTPR_TBIAP	<28>
+$EQU	PAL_FUNC_MTPR_TBIS	<29>
+$EQU	PAL_FUNC_MFPR_ESP	<30>
+$EQU	PAL_FUNC_MTPR_ESP	<31>
+$EQU	PAL_FUNC_MFPR_SSP	<32>
+$EQU	PAL_FUNC_MTPR_SSP	<33>
+$EQU	PAL_FUNC_MFPR_USP	<34>
+$EQU	PAL_FUNC_MTPR_USP	<35>
+$EQU	PAL_FUNC_MTPR_TBISD	<36>
+$EQU	PAL_FUNC_MTPR_TBISI	<37>
+$EQU	PAL_FUNC_MFPR_ASTEN	<38>
+$EQU	PAL_FUNC_MFPR_ASTSR	<39>
+$EQU	PAL_FUNC_VMS2OSF	<40>
+$EQU	PAL_FUNC_MFPR_VPTBASE	<41>
+$EQU	PAL_FUNC_MTPR_VPTBASE	<42>
+$EQU	PAL_FUNC_MTPR_PERFMON	<43>
+
+$EQU	PAL_FUNC_MFPR_DATAFX	<45>
+$EQU	PAL_FUNC_MTPR_DATAFX	<46>
+
+$EQU	PAL_FUNC_MTPR_EXC_ADDR	<59>
+$EQU	PAL_FUNC_QUILTPOINT	<60>
+
+$EQU	PAL_FUNC_MFPR_WHAMI	<63>
+
+
+; the following for dvt's and test only
+$EQU	PAL_FUNC_RESERVED_DVT	<254>
+$EQU	PAL_FUNC_RESERVED_SIM	<255>
+$EQU	PAL_FUNC_NPHALT		<191>
+
+	$DEFEND	PAL_FUNC,$GBL,DEF
+	.ENDM
+
+
+.MACRO	$OSF_PAL_FUNC,$GBL
+	$DEFINI	OSFPAL_FUNC,$GBL
+
+	OSFPAL == 1
+
+
+$EQU	OSFPAL_FUNC_BPT			<128>
+$EQU	OSFPAL_FUNC_BUGCHK		<129>
+$EQU	OSFPAL_FUNC_CALLSYS		<131>
+$EQU	OSFPAL_FUNC_IMB			<134>
+$EQU	OSFPAL_FUNC_URTI		<146>
+$EQU	OSFPAL_FUNC_GENTRAP		<170>
+$EQU	OSFPAL_FUNC_RDUNIQUE		<158>
+$EQU	OSFPAL_FUNC_WRUNIQUE		<159>
+$EQU	OSFPAL_FUNC_CLRFEN		<174>
+$EQU	OSFPAL_FUNC_NPHALT		<191>
+$EQU	OSFPAL_FUNC_HALT		<00>
+$EQU	OSFPAL_FUNC_CFLUSH		<01>
+$EQU	OSFPAL_FUNC_CSERVE		<09>
+$EQU	OSFPAL_FUNC_SWPPAL		<10>
+$EQU	OSFPAL_FUNC_WRIPIR		<13>
+$EQU	OSFPAL_FUNC_DRAINA		<02>
+$EQU	OSFPAL_FUNC_RDMCES		<16>
+$EQU	OSFPAL_FUNC_WRMCES		<17>
+$EQU	OSFPAL_FUNC_WRPERFMON		<57>
+$EQU	OSFPAL_FUNC_RTI			<63>
+$EQU	OSFPAL_FUNC_RETSYS		<61>
+$EQU	OSFPAL_FUNC_WHAMI		<60>
+$EQU	OSFPAL_FUNC_RDUSP		<58>
+$EQU	OSFPAL_FUNC_WRUSP		<56>
+$EQU	OSFPAL_FUNC_WRKGP		<55>
+$EQU	OSFPAL_FUNC_RDPS		<54>
+$EQU	OSFPAL_FUNC_SWPIPL		<53>
+$EQU	OSFPAL_FUNC_WRENT		<52>
+$EQU	OSFPAL_FUNC_TBI			<51>
+$EQU	OSFPAL_FUNC_RDVAL		<50>
+$EQU	OSFPAL_FUNC_WRVAL		<49>
+$EQU	OSFPAL_FUNC_SWPCTX		<48>
+$EQU	OSFPAL_FUNC_WRVPTPTR		<45>
+$EQU	OSFPAL_FUNC_WRFEN		<43>
+
+	$DEFEND	OSFPAL_FUNC,$GBL,DEF
+	.ENDM
+
+	.MACRO	$PAL_HW_VECTORS,$GBL
+	$DEFINI	PAL_HW_VECTORS,$GBL
+
+
+$EQU	PAL_HW_RESET_BASE	<^X0000>
+$EQU	PAL_HW_MCHK_BASE	<^X0020>
+$EQU	PAL_HW_ARITH_BASE	<^X0060>
+$EQU	PAL_HW_INTERRUPT_BASE	<^X00E0>
+$EQU	PAL_HW_DTB_FAULT_BASE	<^X01E0>
+$EQU	PAL_HW_ITB_MISS_BASE	<^X03E0>
+$EQU	PAL_HW_ITB_ACV_BASE	<^X07E0>
+$EQU	PAL_HW_NDTB_MISS_BASE	<^X08E0>
+$EQU	PAL_HW_PDTB_MISS_BASE	<^X09E0>
+$EQU	PAL_HW_UNALIGN_BASE	<^X11E0>
+$EQU	PAL_HW_OPCDEC_BASE	<^X13E0>
+$EQU	PAL_HW_FEN_BASE		<^X17E0>
+$EQU	PAL_HW_CALLPAL_BASE	<^X2000>
+$EQU	PAL_HW_FREE_BASE	<^X4000>
+
+$EQU	PAL_HW_RESET_SIZE	<^X0020>
+$EQU	PAL_HW_MCHK_SIZE	<^X0040>
+$EQU	PAL_HW_ARITH_SIZE	<^X0080>
+$EQU	PAL_HW_INTERRUPT_SIZE	<^X0100>
+$EQU	PAL_HW_DTB_FAULT_SIZE	<^X0200>
+$EQU	PAL_HW_ITB_MISS_SIZE	<^X0400>
+$EQU	PAL_HW_ITB_ACV_SIZE	<^X0100>
+$EQU	PAL_HW_NDTB_MISS_SIZE	<^X0100>
+$EQU	PAL_HW_PDTB_MISS_SIZE	<^X0800>
+$EQU	PAL_HW_UNALIGN_SIZE	<^X0200>
+$EQU	PAL_HW_OPCDEC_SIZE	<^X0400>
+$EQU	PAL_HW_FEN_SIZE		<^X0820>
+$EQU	PAL_HW_CALLPAL_SIZE	<^X2000>
+$EQU	PAL_HW_FREE_SIZE	<^X4000>
+
+	$DEFEND	PAL_HW_VECTORS,$GBL,DEF
+	.ENDM
+
+	.MACRO	$HALT_CODES,$GBL
+	$DEFINI	HALT_CODES,$GBL
+
+$EQU	HLT$C_RESET		0
+$EQU	HLT$C_HW_HALT		1
+$EQU	HLT$C_KSP_INVAL		2
+$EQU	HLT$C_SCBB_INVAL	3
+$EQU	HLT$C_PTBR_INVAL	4
+$EQU	HLT$C_SW_HALT		5
+$EQU	HLT$C_DBL_MCHK		6
+$EQU    HLT$C_MCHK_FROM_PAL	7
+$EQU    HLT$C_START             32
+$EQU    HLT$C_CALLBACK          33
+; halt codes above 255 reserved for platform specific errors
+	$DEFEND	HALT_CODES,$GBL,DEF
+	.ENDM
+
+	.MACRO	$MCHK_CODES,$GBL
+	$DEFINI	MCHK_CODES,$GBL
+
+$EQU	MCHK$C_TPERR			64@1
+$EQU	MCHK$C_TCPERR			65@1
+$EQU	MCHK$C_HERR			66@1
+$EQU	MCHK$C_ECC_C			67@1
+$EQU	MCHK$C_ECC_NC			68@1
+$EQU    MCHK$C_UNKNOWN		        69@1
+$EQU	MCHK$C_CACKSOFT			70@1
+$EQU    MCHK$C_BUGCHECK			71@1
+$EQU	MCHK$C_OS_BUGCHECK		72@1
+$EQU	MCHK$C_DCPERR			73@1
+$EQU	MCHK$C_ICPERR			74@1
+$EQU	MCHK$C_C3_TAG_PAR		128@1
+; mchk codes above 255 reserved for platform specific errors
+
+	$DEFEND	MCHK_CODES,$GBL,DEF
+	.ENDM
+
+	.MACRO	$MMCSR_DEF,$GBL
+	$DEFINI	MMCSR,$GBL
+
+$EQU	MMCSR$V_WR		0
+$EQU	MMCSR$V_ACV		1
+$EQU	MMCSR$V_FOR		2
+$EQU	MMCSR$V_FOW		3
+$EQU	MMCSR$V_RA		4
+$EQU	MMCSR$V_OPC		9
+
+$EQU	MMCSR$M_WR		<1@MMCSR$V_WR>
+$EQU	MMCSR$M_ACV		<1@MMCSR$V_ACV>
+$EQU	MMCSR$M_FOR		<1@MMCSR$V_FOR>
+$EQU	MMCSR$M_FOW		<1@MMCSR$V_FOW>
+$EQU	MMCSR$M_RA		<^x1F@MMCSR$V_RA>
+$EQU	MMCSR$M_OPC		<^x3F@MMCSR$V_OPC>
+
+	$DEFEND	MMCSR,$GBL,DEF
+	.ENDM
+
+
+
+	.MACRO	$OSF_MMCSR_DEF,$GBL
+	$DEFINI	OSFMMCSR,$GBL
+
+$EQU	MMCSR$C_TNV		<^B00000000>
+$EQU	MMCSR$C_ACV		<^B00000001>
+$EQU	MMCSR$C_FOR		<^B00000010>
+$EQU	MMCSR$C_FOE		<^B00000011>
+$EQU	MMCSR$C_FOW		<^B00000100>
+	$DEFEND	OSFMMCSR,$GBL,DEF
+	.ENDM
+
+
+	.MACRO	$BIU_DEF,$GBL
+	$DEFINI	BIU,$GBL
+
+
+; biu_stat
+$EQU	BIU$V_HERR		<0>	; Hard error
+$EQU	BIU$V_SERR		<1>	; Soft error
+$EQU	BC$V_TPERR		<2>	; Tag probe ram error
+$EQU	BC$V_TCPERR		<3>	; Tag probe control error
+$EQU	BIU$V_CMD		<4>	; cycle type
+$EQU	BIU$V_SEO		<7>	; Second biu error
+$EQU	FILL$V_ECC		<8>	; ECC error
+$EQU	FILL$V_CRD		<9>	; Corrected error
+$EQU	FILL$V_DPERR		<10>	; Data parity error
+$EQU	FILL$V_IRD		<11>	; I-cache read error
+$EQU	FILL$V_QW		<12>	; qw
+$EQU	FILL$V_SEO		<14>	; Second ecc/fill error
+
+$EQU	BIU$M_HERR		<1@BIU$V_HERR>
+$EQU	BIU$M_SERR		<1@BIU$V_SERR>
+$EQU	BC$M_TPERR		<1@BC$V_TPERR>
+$EQU	BC$M_TCPERR		<1@BC$V_TCPERR>
+$EQU	BIU$M_CMD		<1@BIU$V_CMD>
+$EQU	BIU$M_SEO		<1@BIU$V_SEO>
+$EQU	FILL$M_ECC		<1@FILL$V_ECC>
+$EQU	FILL$M_CRD		<1@FILL$V_CRD>
+$EQU	FILL$M_DPERR		<1@FILL$V_DPERR>
+$EQU	FILL$M_IRD		<1@FILL$V_IRD>
+$EQU	FILL$M_QW		<1@FILL$V_QW>
+$EQU	FILL$M_SEO		<1@FILL$V_SEO>
+
+; biu_ctl
+$EQU	BC$V_EN			<0>	; Backup cache enable
+$EQU	BC$V_ECC		<1>	; ECC vs parity selector
+$EQU	BC$V_OE			<2>	; Output enable
+$EQU	BC$V_FHIT		<3>	; Backup cache forced hit
+$EQU	BC$V_RD_SPD		<4>	; Backup cache read speed
+$EQU	BC$V_WR_SPD		<8>	; Backup cache write speed
+$EQU	BC$V_DELAY_WDATA	<12>	; Delay write data
+$EQU	BC$V_WE_CTL		<13>	; Backup cache write control enable
+$EQU	BC$V_SIZE		<28>	; Backup cache size
+$EQU	BC$V_PA_DIS		<32>	; Backup pa disable
+$EQU	BC$V_BYTE_PARITY	<37>	; EV45 Enable byte parity
+$EQU	BC$V_SYS_WRAP		<38>	; Read wrapped data
+$EQU	BC$V_IMAP_EN		<39>	; EV45 Assert dmapwe_h on istream backe read
+$EQU	BC$V_BURST_SPD		<40>	; Burst speed
+$EQU	BC$V_BURST_ALL		<43>	; Burst all
+$EQU	BC$V_FAST_LOCK		<44>	; EV45 Fast lock enable
+
+$EQU	BC$M_BURST_SPD		<7@BC$V_BURST_SPD>
+
+$EQU	FILL$V_LO	<0>	; ECC symdrome bits for low longword
+$EQU	FILL$V_HI	<7>	; ECC symdrome bits for high longword
+
+;$EQU	BC$V_HIT	<0>	; Backup cache hit
+;$EQU	BC$V_TAG	<0>	; Backup cache hit
+
+
+	$DEFEND	BIU,$GBL,DEF
+	.ENDM
+
+	.MACRO	$DC_DEF,$GBL
+	$DEFINI	DC,$GBL
+
+$EQU	DC$V_HIT		<3>	; D-cache hit
+$EQU	DC$V_DC_ERR		<4>	; D-cache parity error
+$EQU	DC$V_IC_ERR		<5>	; I-cache parity error
+$EQU	DC$V_INT		<9>	; Integer load/store
+$EQU	DC$V_LW			<10>	; Data length is long
+$EQU	DC$V_VAX_FP		<11>	; Floating point load/store
+$EQU	DC$V_LOCK		<12>	; LDx/L or STx/C caused error
+$EQU	DC$V_STORE		<13>	; Store
+$EQU	DC$V_SEO		<14>	; Second error occurred
+
+	$DEFEND	DC,$GBL,DEF
+	.ENDM
+
+	.MACRO	$ABOX_DEF,$GBL
+	$DEFINI	ABOX,$GBL
+
+; abox_ctl
+$EQU	ABOX$V_WB_DIS		<0>	; Write buffer unload disable (diag only)
+$EQU	ABOX$V_MCHK		<1>	; Machine check enable
+$EQU	ABOX$V_CRD		<2>	; Corrected read data interrupt enable
+$EQU	ABOX$V_SBUF		<3>	; Stream buffer enable
+$EQU	ABOX$V_KSEGNT		<4>	; NT kseg mode
+$EQU	ABOX$V_KSEG		<5>	; OSF kseg mode
+$EQU	ABOX$V_STC_NORESLT	<7>	; STC noresult
+$EQU	ABOX$V_NCACH_NDISTRB	<8>	; Ncache Ndisturb
+$EQU	ABOX$V_DTB_RR		<9>	; DTB Round Robin replacement
+$EQU	ABOX$V_DC		<10>	; D-cache enable
+$EQU	ABOX$V_DC_FHIT		<11>	; D-cache forced hit
+$EQU	ABOX$V_DC_16K		<12>	; Ev 45's 16kb cache option
+$EQU	ABOX$V_F_TAG_ERR	<13>	; Ev 45's gen  bad cache tag parity
+$EQU	ABOX$V_C_NOCHK_PAR	<14>	; Ev 45's cache parity disable
+$EQU	ABOX$V_DOUBLE_INVAL	<15>	; Ev 45's double inval mode enable
+
+	$DEFEND	ABOX,$GBL,DEF
+	.ENDM
+
+	.MACRO	$ICCSR_DEF,$GBL
+	$DEFINI	ICCSR,$GBL
+
+$EQU	ICCSRW$V_PC1		0	; Performance counter 1
+$EQU	ICCSRW$V_EV3		1	; EV3 present
+$EQU	ICCSRW$V_EV4P2		2	; EV4 PASS 2 present
+$EQU	ICCSRW$V_PC0		3	; Performance counter 0
+$EQU	ICCSRW$V_VKSEG		5	; Virtual Kseg mode
+$EQU	ICCSRW$V_MUX0		8	; Performance counter mux 0
+$EQU	ICCSRW$V_MUX1		32	; Performance counter mux 1
+$EQU	ICCSRW$V_VAX		35	; VAX mode enable
+$EQU	ICCSRW$V_BPE		36	; branch prediction enable
+$EQU	ICCSRW$V_JSE		37	; JSR stack enable
+$EQU	ICCSRW$V_BHE		38	; Branch history enable
+$EQU	ICCSRW$V_DI		39	; Dual issue enable
+$EQU	ICCSRW$V_HWE		40	; HW_xxxx in Kernel mode enable
+$EQU	ICCSRW$V_KSEG		41	; Kseg mode
+$EQU	ICCSRW$V_FPE		42	; FPU enable
+$EQU	ICCSRW$V_PME0		44	; PME0
+$EQU	ICCSRW$V_PME1		45	; PME1
+$EQU	ICCSRW$V_DATAFX		46	; DATAFX
+$EQU	ICCSRW$V_ASN		47	; ASN
+
+$EQU	ICCSRR$V_EV3		3	; EV3 present
+
+	$DEFEND	ICCSR,$GBL,DEF
+	.ENDM
+
+
+;+
+; Define EXC_SUM bits
+;-
+	.MACRO	$EXC_SUM, $GBL
+	$DEFINI	$EXC_SUM, $GBL
+
+
+$EQU	EXSUM$V_SWC		2	; Software completion
+$EQU	EXSUM$V_INV		3	; Ivalid operation
+$EQU	EXSUM$V_DZE		4	; Div by zero
+$EQU	EXSUM$V_FOV		5	; Floating point overflow
+$EQU	EXSUM$V_UNF		6	; Floating point underflow
+$EQU	EXSUM$V_INE		7	; Floating point inexact
+$EQU	EXSUM$V_IOV		8	; Floating convert to integer overflow
+$EQU	EXSUM$V_MSK		33	; Write mask window
+
+$EQU	EXSUM$M_SWC		<1@EXSUM$V_SWC>
+$EQU	EXSUM$M_INV		<1@EXSUM$V_INV>
+$EQU	EXSUM$M_DZE		<1@EXSUM$V_DZE>
+$EQU	EXSUM$M_FOV		<1@EXSUM$V_FOV>
+$EQU	EXSUM$M_UNF		<1@EXSUM$V_UNF>
+$EQU	EXSUM$M_INE		<1@EXSUM$V_INE>
+$EQU	EXSUM$M_IOV		<1@EXSUM$V_IOV>
+
+	$DEFEND	$EXC_SUM,$GBL, DEF
+	.ENDM
+
+;+
+; Define xIRR bits
+;-
+	.MACRO	$HIRR, $GBL
+	$DEFINI	$HIRR, $GBL
+
+$EQU	HIRRW$V_PC0		<08>
+$EQU	HIRRW$V_PC1		<15>
+$EQU	HIRRW$V_SLC		<13>
+$EQU	HIRRW$V_SIRR		<33>
+$EQU	HIRRW$V_ASTRR		<48>
+
+$EQU	HIRRR$V_HWR		<01>
+$EQU	HIRRR$V_SWR		<02>
+$EQU	HIRRR$V_ATR		<03>
+$EQU	HIRRR$V_CRD		<04>
+$EQU	HIRRR$V_HIRR53		<05>
+$EQU	HIRRR$V_HIRR20		<10>
+$EQU	HIRRR$V_PC1		<08>
+$EQU	HIRRR$V_PC0		<09>
+$EQU	HIRRR$V_SLR		<13>
+$EQU	HIRRR$V_SIRR		<14>
+$EQU	HIRRR$V_ASTRR		<29>
+
+$EQU	HIRRR$M_HWR		<1@HIRRR$V_HWR>
+$EQU	HIRRR$M_SWR		<1@HIRRR$V_SWR>
+$EQU	HIRRR$M_ATR		<1@HIRRR$V_ATR>
+$EQU	HIRRR$M_CRD		<1@HIRRR$V_CRD>
+$EQU	HIRRR$M_SIRR		<^x7fff@HIRRR$V_SIRR>
+
+$EQU	HIERR$V_CRE		<04>
+$EQU	HIERR$V_HIER53		<05>
+$EQU	HIERR$V_PC0		<09>
+$EQU	HIERR$V_PC1		<08>
+$EQU	HIERR$V_HIER20		<10>
+$EQU	HIERR$V_SLE		<13>
+$EQU	HIERR$V_SIER		<14>
+$EQU	HIERR$V_ASTER		<29>
+
+$EQU	HIERW$V_CRE		<02>
+$EQU	HIERW$V_PC0		<08>
+$EQU	HIERW$V_HIER		<09>
+$EQU	HIERW$V_PC1		<15>
+$EQU	HIERW$V_SLE		<32>
+
+$EQU	HIERW$V_SIER		<33>
+$EQU	HIERW$V_ASTER		<48>
+
+	$DEFEND	$HIRR,$GBL, DEF
+	.ENDM
+
+	.MACRO	$SL_CLR, $GBL
+	$DEFINI	$SL_CLR, $GBL
+
+$EQU	SL_CLR$V_CRD		<02>
+$EQU	SL_CLR$V_PC0		<08>
+$EQU	SL_CLR$V_PC1		<15>
+$EQU	SL_CLR$V_SLC		<32>
+	$DEFEND	$SL_CLR,$GBL, DEF
+	.ENDM
+
+	.MACRO	$MXR,$GBL
+	$DEFINI	$MXR,$GBL
+
+ev3$IPR_IBOX = 1@5
+ev3$IPR_ABOX = 1@6
+ev3$IPR_PAL  = 1@7
+
+$EQU	DTB_CTL		<ev3$IPR_ABOX ! 0>
+$EQU	DTB_PTE		<ev3$IPR_ABOX ! 2>
+$EQU	DPTE_TEMP	<ev3$IPR_ABOX ! 3>
+$EQU	MM_CSR		<ev3$IPR_ABOX ! 4>
+$EQU	VA		<ev3$IPR_ABOX ! 5>
+
+
+$EQU	ITBZAP		<ev3$IPR_IBOX ! 6>
+$EQU	DTBZAP		<ev3$IPR_ABOX ! 6>
+$EQU	xTBZAP		<ev3$IPR_IBOX ! ev3$IPR_ABOX ! 6>
+assume	<itbzap & ^x1f> eq <dtbzap & ^x1f> ; ITBx and DTBx index not equal
+
+$EQU	ITBASM		<ev3$IPR_IBOX ! 7>
+$EQU	DTBASM		<ev3$IPR_ABOX ! 7>
+$EQU	xTBASM		<ev3$IPR_IBOX ! ev3$IPR_ABOX ! 7>
+assume	<itbasm & ^x1f> eq <dtbasm & ^x1f> ; ITBx and DTBx index not equal
+
+$EQU	ITBIS		<ev3$IPR_IBOX ! 8>
+$EQU	DTBIS		<ev3$IPR_ABOX ! 8>
+
+
+$EQU	BIU_ADDR	<ev3$IPR_ABOX ! 9>
+$EQU	BIU_STAT	<ev3$IPR_ABOX ! 10>
+$EQU	DC_ADDR		<ev3$IPR_ABOX ! 11>
+$EQU	DC_STAT		<ev3$IPR_ABOX ! 12>
+$EQU	FILL_ADDR	<ev3$IPR_ABOX ! 13>	
+$EQU	ABOX_CTL	<ev3$IPR_ABOX ! 14>
+$EQU	ALT_MODE	<ev3$IPR_ABOX ! 15>
+$EQU	CC		<ev3$IPR_ABOX ! 16>
+$EQU	CC_CTL		<ev3$IPR_ABOX ! 17>
+$EQU	BIU_CTL		<ev3$IPR_ABOX ! 18>
+$EQU	FILL_SYNDROME	<ev3$IPR_ABOX ! 19>
+$EQU	BC_TAG		<ev3$IPR_ABOX ! 20>
+$EQU	FLUSH_IC	<ev3$IPR_ABOX ! 21>
+$EQU    FLUSH_IC_ASM	<ev3$IPR_ABOX ! 23>
+
+
+$EQU	TB_TAG		<ev3$IPR_IBOX ! 0>
+$EQU	ITB_PTE		<ev3$IPR_IBOX ! 1>
+$EQU	ICCSR		<ev3$IPR_IBOX ! 2>
+
+
+$EQU	IPTE_TEMP	<ev3$IPR_IBOX ! 3>
+$EQU	EXC_ADDR	<ev3$IPR_IBOX ! 4>
+$EQU	SL_RCV		<ev3$IPR_IBOX ! 5>		; serial line receive
+
+$EQU	PS		<ev3$IPR_IBOX ! 9>
+$EQU	EXC_SUM		<ev3$IPR_IBOX ! 10>
+$EQU	PAL_BASE	<ev3$IPR_IBOX ! 11>
+$EQU	HIRR		<ev3$IPR_IBOX ! 12>
+$EQU	SIRR		<ev3$IPR_IBOX ! 13>
+$EQU	ASTRR		<ev3$IPR_IBOX ! 14>
+$EQU	HIER		<ev3$IPR_IBOX ! 16>
+$EQU	SIER		<ev3$IPR_IBOX ! 17>
+$EQU	ASTER		<ev3$IPR_IBOX ! 18>
+$EQU	SL_CLR		<ev3$IPR_IBOX ! 19>		; serial line clear
+$EQU	SL_XMIT		<ev3$IPR_IBOX ! 22>		; serial line transmit
+
+	$DEFEND	$MXR,$GBL,DEF
+	.ENDM
+
+
+
+	.MACRO	$VMS_MXR,$GBL
+	$DEFINI	$VMSMXR,$GBL
+
+ev3$IPR_IBOX = 1@5
+ev3$IPR_ABOX = 1@6
+ev3$IPR_PAL  = 1@7
+
+
+$EQU	pt0		<ev3$IPR_PAL  ! 0>
+$EQU	pt1		<ev3$IPR_PAL  ! 1>
+$EQU	pt2		<ev3$IPR_PAL  ! 2>
+$EQU	PT2_ICCSR	<ev3$IPR_PAL  ! ev3$IPR_IBOX ! 2>
+assume	<iccsr & ^x1f> eq <pt2 & ^x1f> ; PT2 and ICCSR index not equal
+$EQU	pt3		<ev3$IPR_PAL  ! 3>
+$EQU	pt4		<ev3$IPR_PAL  ! 4>
+$EQU	pt5		<ev3$IPR_PAL  ! 5>
+$EQU	pt6		<ev3$IPR_PAL  ! 6>
+$EQU	pt7		<ev3$IPR_PAL  ! 7>
+$EQU	pt8		<ev3$IPR_PAL  ! 8>
+$EQU	pt9		<ev3$IPR_PAL  ! 9>
+$EQU	PT9_PS		<ev3$IPR_PAL  ! ev3$IPR_IBOX ! 9>
+assume	<ps & ^x1f> eq <pt9 & ^x1f> ; PT2 and PS index not equal
+$EQU	pt10		<ev3$IPR_PAL  ! 10>
+$EQU	pt11		<ev3$IPR_PAL  ! 11>
+$EQU	pt12		<ev3$IPR_PAL  ! 12>
+$EQU	pt13		<ev3$IPR_PAL  ! 13>
+$EQU	pt14		<ev3$IPR_PAL  ! 14>
+$EQU	pt15		<ev3$IPR_PAL  ! 15>
+$EQU	PT15_ALT_MODE	<ev3$IPR_PAL  ! ev3$IPR_ABOX ! 15>
+assume	<alt_mode & ^x1f> eq <pt15 & ^x1f> ; PT15 and ALT_MODE index not equal
+$EQU	pt16		<ev3$IPR_PAL  ! 16>
+$EQU	pt17		<ev3$IPR_PAL  ! 17>
+$EQU	pt18		<ev3$IPR_PAL  ! 18>
+$EQU	pt19		<ev3$IPR_PAL  ! 19>
+$EQU	pt20		<ev3$IPR_PAL  ! 20>
+$EQU	pt21		<ev3$IPR_PAL  ! 21>
+$EQU	pt22		<ev3$IPR_PAL  ! 22>
+$EQU	pt23		<ev3$IPR_PAL  ! 23>
+$EQU	pt24		<ev3$IPR_PAL  ! 24>
+$EQU	pt25		<ev3$IPR_PAL  ! 25>
+$EQU	pt26		<ev3$IPR_PAL  ! 26>
+$EQU	pt27		<ev3$IPR_PAL  ! 27>
+$EQU	pt28		<ev3$IPR_PAL  ! 28>
+$EQU	pt29		<ev3$IPR_PAL  ! 29>
+$EQU	pt30		<ev3$IPR_PAL  ! 30>
+$EQU	pt31		<ev3$IPR_PAL  ! 31>
+
+	$DEFEND	$VMSMXR,$GBL,DEF
+	.ENDM
+
+	.MACRO	$OSF_MXR,$GBL
+	$DEFINI	$OSFMXR,$GBL
+
+ev3$IPR_IBOX = 1@5
+ev3$IPR_ABOX = 1@6
+ev3$IPR_PAL  = 1@7
+
+$EQU	pt0		<ev3$IPR_PAL  ! 0>
+$EQU	pt1		<ev3$IPR_PAL  ! 1>
+$EQU	pt2		<ev3$IPR_PAL  ! 2>
+$EQU	PT2_ICCSR	<ev3$IPR_PAL  ! ev3$IPR_IBOX ! 2>
+assume	<iccsr & ^x1f> eq <pt2 & ^x1f> ; PT2 and ICCSR index not equal
+$EQU	pt3		<ev3$IPR_PAL  ! 3>
+$EQU	pt4		<ev3$IPR_PAL  ! 4>
+$EQU	pt5		<ev3$IPR_PAL  ! 5>
+$EQU	pt6		<ev3$IPR_PAL  ! 6>
+$EQU	pt7		<ev3$IPR_PAL  ! 7>
+$EQU	impureptr	<ev3$IPR_PAL  ! 07>
+$EQU	pt8		<ev3$IPR_PAL  ! 8>
+$EQU	pt9		<ev3$IPR_PAL  ! 9>
+$EQU	pt9_Ps		<ev3$IPR_PAL  ! ev3$IPR_IBOX ! 9>
+assume	<ps & ^x1f> eq <pt9 & ^x1f> ; PT9 and PS index not equal
+
+$EQU	pt10		<ev3$IPR_PAL  ! 10>
+$EQU	pt11		<ev3$IPR_PAL  ! 11>
+$EQU	pt12		<ev3$IPR_PAL  ! 12>
+$EQU	pt13		<ev3$IPR_PAL  ! 13>
+$EQU	pt14		<ev3$IPR_PAL  ! 14>
+$EQU	pt15		<ev3$IPR_PAL  ! 15>
+$EQU	pt16		<ev3$IPR_PAL  ! 16>
+$EQU	pt17		<ev3$IPR_PAL  ! 17>
+$EQU	pt18		<ev3$IPR_PAL  ! 18>
+$EQU	pt19		<ev3$IPR_PAL  ! 19>
+$EQU	pt20		<ev3$IPR_PAL  ! 20>
+$EQU	pt22		<ev3$IPR_PAL  ! 22>
+$EQU	pt24		<ev3$IPR_PAL  ! 24>
+$EQU	pt25		<ev3$IPR_PAL  ! 25>
+$EQU	pt28		<ev3$IPR_PAL  ! 28>
+$EQU	pt31		<ev3$IPR_PAL  ! 31>
+$EQU	entint		<ev3$IPR_PAL  ! 10>
+$EQU	entArith	<ev3$IPR_PAL  ! 12>
+$EQU	entmm		<ev3$IPR_PAL  ! 13>
+$EQU	entuna		<ev3$IPR_PAL  ! 14>
+$EQU	entsys		<ev3$IPR_PAL  ! 15>
+$EQU	entif		<ev3$IPR_PAL  ! 16>
+$EQU	usp		<ev3$IPR_PAL  ! 18>
+$EQU	ksp		<ev3$IPR_PAL  ! 19>
+$EQU	kgp		<ev3$IPR_PAL  ! 20>
+$EQU	pt21		<ev3$IPR_PAL  ! 21>
+$EQU	intmask 	<ev3$IPR_PAL  ! 22>
+$EQU	pt23		<ev3$IPR_PAL  ! 23>
+$EQU	sysval		<ev3$IPR_PAL  ! 24>
+$EQU	mces		<ev3$IPR_PAL  ! 25>
+$EQU	pt26		<ev3$IPR_PAL  ! 26>
+$EQU	pt27		<ev3$IPR_PAL  ! 27>
+$EQU	mmptr		<ev3$IPR_PAL  ! 28>
+$EQU	pt29		<ev3$IPR_PAL  ! 29>
+$EQU	vptptr		<ev3$IPR_PAL  ! 29>
+$EQU	pt30		<ev3$IPR_PAL  ! 30>
+$EQU	pcbb		<ev3$IPR_PAL  ! 31>
+
+	$DEFEND	$OSFMXR,$GBL,DEF
+	.ENDM
+
+
+
+	.MACRO	$EV4_DEFS,$GBL
+	$DEFINI	$EV4DEFS,$GBL
+
+	$PAL_HW_VECTORS	GLOBAL
+	$ICCSR_DEF	GLOBAL
+	$HIRR		GLOBAL
+	$SL_CLR		GLOBAL
+	$BIU_DEF	GLOBAL
+	$ABOX_DEF	GLOBAL
+	$DC_DEF		GLOBAL
+	$MMCSR_DEF	GLOBAL
+	$EXC_SUM	GLOBAL
+	$MXR		GLOBAL
+
+	page_seg_size_bits	= 10
+	page_offset_size_bits	= 13
+	page_size_bytes		= 8192
+	va_size_bits		= 43
+	pa_size_bits		= 45
+
+	$DEFEND	$EV4DEFS,$GBL,DEF
+	.ENDM
+
+
+
+
+	.MACRO	$TVDEF,$GBL
+	$DEFINI	$TV,$GBL
+
+$DEF	TV_CPU$SET_INT
+
+$EQU	TV$V_NODE		28
+$EQU	TV$V_SPACE		32
+
+
+$EQU	TV$V_CPU_SLOT		<^x00000000>
+$EQU	TV$V_CPU_CTL		<^x00800000>
+$EQU	TV$V_CPU_CTL_RUN	32
+$EQU	TV$V_CPU_CTL_HALT	33
+
+$EQU	TV$V_CPU_ISR		<^x01000000>
+$EQU	TV$V_CPU_IRR		<^x01800000>
+$EQU	TV$V_CPU_ISR_IPL20H	53
+$EQU	TV$V_CPU_ISR_IPL20L	32
+$EQU	TV$V_CPU_ISR_IPL21H	55
+$EQU	TV$V_CPU_ISR_IPL21L	54
+$EQU	TV$V_CPU_ISR_IPL22H	58
+$EQU	TV$V_CPU_ISR_IPL22L	56
+$EQU	TV$V_CPU_ISR_PROC	59
+$EQU	TV$V_CPU_ISR_IPL23H	61
+$EQU	TV$V_CPU_ISR_IPL23L	60
+$EQU	TV$V_CPU_ISR_RESERVED	62
+$EQU	TV$V_CPU_ISR_TIME	63
+
+
+$EQU	IOM$V_NI_DEV 	0
+$EQU	IOM$V_SCSI_DEV	1
+$EQU	IOM$V_TTY_DEV	2
+$EQU	IOM$V_ATTN_DEV	5
+
+$EQU	IOM$V_SHIFT	5
+$EQU	IOM$V_DEV	<0+IOM$V_SHIFT>
+$EQU	IOM$V_REG	<3+IOM$V_SHIFT>
+$EQU	IOM$V_BELL	<7+IOM$V_SHIFT>
+
+$EQU	IOM$V_SETBELL	6
+
+$EQU	IOM$V_BELL_REG	0
+$EQU	IOM$V_BASE_REG	1
+$EQU	IOM$V_ICR_REG	2
+
+
+
+
+$EQU	TV$V_IOM_ATTN_DOORBELL	<<IOM$V_BELL_REG@IOM$V_REG>! <IOM$V_ATTN_DEV@IOM$V_DEV> ! <IOM$V_SETBELL@IOM$V_BELL>>
+
+
+	$DEFEND	$tv,$GBL,DEF
+	.ENDM
+
+
+	.macro	ecc_syndromes
+
+
+	ECC$D0SYN	== <^x4F>
+	ECC$D1SYN	== <^x4A>
+	ECC$D2SYN	== <^x52>
+	ECC$D3SYN	== <^x54>
+	ECC$D4SYN	== <^x57>
+	ECC$D5SYN	== <^x58>
+	ECC$D6SYN	== <^x5B>
+	ECC$D7SYN	== <^x5D>
+	ECC$D8SYN	== <^x23>
+	ECC$D9SYN	== <^x25>
+	ECC$D10SYN	== <^x26>
+	ECC$D11SYN	== <^x29>
+	ECC$D12SYN	== <^x2A>
+	ECC$D13SYN	== <^x2C>
+	ECC$D14SYN	== <^x31>
+	ECC$D15SYN	== <^x34>
+	ECC$D16SYN	== <^x0E>
+	ECC$D17SYN	== <^x0B>
+	ECC$D18SYN	== <^x13>
+	ECC$D19SYN	== <^x15>
+	ECC$D20SYN	== <^x16>
+	ECC$D21SYN	== <^x19>
+	ECC$D22SYN	== <^x1A>
+	ECC$D23SYN	== <^x1C>
+	ECC$D24SYN	== <^x62>
+	ECC$D25SYN	== <^x64>
+	ECC$D26SYN	== <^x67>
+	ECC$D27SYN	== <^x68>
+	ECC$D28SYN	== <^x6B>
+	ECC$D29SYN	== <^x6D>
+	ECC$D30SYN	== <^x70>
+	ECC$D31SYN	== <^x75>
+
+	ECC$D32SYN	== <^x01>
+	ECC$D33SYN	== <^x02>
+	ECC$D34SYN	== <^x04>
+	ECC$D35SYN	== <^x08>
+	ECC$D36SYN	== <^x10>
+	ECC$D37SYN	== <^x20>
+	ECC$D38SYN	== <^x40>
+
+
+	.endm
+
+
+
+	.MACRO $LCADEFS
+	  LCADEF_VER == 1
+	.ENDM
+
+	.MACRO $LCA4_DEFS,$GBL
+	$DEFINI LCA4_DEF,$GBL
+
+;+
+; Memory mapped CSRs
+;
+; MEM$CSR_BASE is the base address of the memory controller CSRs
+; shifted right by 28 bits.
+;-
+
+$EQU  	MEM$CSR_BASE	<^x12>
+
+$EQU 	MEM$Q_BCR0	<^x0>	; Bank Configuration 0
+$EQU	MEM$Q_BCR1	<^x8>	; Bank Configuration 1
+$EQU	MEM$Q_BCR2	<^x10>	; Bank Configuration 2
+$EQU	MEM$Q_BCR3	<^x18>	; Bank Configuration 3
+$EQU 	MEM$Q_BMR0	<^x20>	; Bank Mask 0
+$EQU	MEM$Q_BMR1	<^x28>	; Bank Mask 1
+$EQU	MEM$Q_BMR2	<^x30>	; Bank Mask 2
+$EQU	MEM$Q_BMR3	<^x38>	; Bank Mask 3
+$EQU 	MEM$Q_BTR0	<^x40>	; Bank Timing 0
+$EQU	MEM$Q_BTR1	<^x48>	; Bank Timing 1
+$EQU	MEM$Q_BTR2	<^x50>	; Bank Timing 2
+$EQU	MEM$Q_BTR3	<^x58>	; Bank Timing 3
+$EQU	MEM$Q_GTR	<^x60>	; Global Timing
+$EQU	MEM$Q_ESR	<^x68>	; Error Status
+$EQU	MEM$Q_EAR	<^x70>	; Error Address
+$EQU	MEM$Q_CAR	<^x78>	; Bcache Control
+$EQU	MEM$Q_VGR	<^x80>	; Video and Graphics Control
+$EQU	MEM$Q_PLM	<^x88>	; Plane Mask
+$EQU	MEM$Q_FOR	<^x90>	; Foreground
+
+;+
+; Bank Configuration layout
+;
+; 	loc     size name function
+;	------- ---- ---- --------
+; 	<28:20> 9    BASE base address 
+; 	<14>    1    BAV  bank valid
+; 	<13>    1    SBE  split bank
+; 	<12>    1    BWE  byte write
+; 	<11>    1    WRM  write mode
+; 	<10>    1    ERM  error mode
+; 	<9:6>   4    RAS  row addr select
+;-
+
+$EQU	BCR$V_RAS   	6
+$EQU	BCR$M_RAS	<^xf@BCR$V_RAS>
+$EQU	BCR$V_ERM   	10
+$EQU	BCR$M_ERM	<1@BCR$V_ERM>
+$EQU	BCR$V_WRM   	11
+$EQU	BCR$M_WRM	<1@BCR$V_WRM>
+$EQU	BCR$V_BWE   	12
+$EQU	BCR$M_BWE	<1@BCR$V_BWE>
+$EQU	BCR$V_SBE   	13
+$EQU	BCR$M_SBE	<1@BCR$V_SBE>
+$EQU	BCR$V_BAV   	14
+$EQU	BCR$M_BAV	<1@BCR$V_BAV>
+$EQU	BCR$V_BASE  	20
+$EQU	BCR$M_BASE	<^x1ff@BCR$V_BASE>
+
+;+
+; Bank Mask
+;-
+$EQU	BMR$V_MASK	20	; BMR<28:20>
+$EQU	BMR$M_MASK	<^x1ff@BMR$V_MASK>
+
+;+
+; Bcache control register (CAR) layout
+;	loc     size name function
+;	------- ---- ---- --------
+;	<14>    1    WHD  write hold
+;	<13:11> 3    WRS  write speed
+;	<10:8>  3    RDS  read speed
+;	<7:5>   3    SIZE size
+;	<4>     1    ECE  ecc enable
+;	<3>     1    WWP  write wrong parity
+;	<2>     1    ETP  parity enable
+;	<0>     1    BCE  enable
+;-
+$EQU	CAR$V_BCE  	0
+$EQU	CAR$M_BCE	<1@CAR$V_BCE>
+$EQU	CAR$V_ETP   	2
+$EQU	CAR$M_ETP	<1@CAR$V_ETP>
+$EQU	CAR$V_WWP   	3
+$EQU	CAR$M_WWP	<1@CAR$V_WWP>
+$EQU	CAR$V_ECE   	4
+$EQU	CAR$M_ECE	<1@CAR$V_ECE>
+$EQU	CAR$V_SIZE  	5
+$EQU	CAR$M_SIZE	<7@CAR$V_SIZE>
+$EQU	CAR$V_RDS   	8
+$EQU	CAR$M_RDS	<7@CAR$V_RDS>
+$EQU	CAR$V_WRS  	11
+$EQU	CAR$M_WRS	<7@CAR$V_WRS>
+$EQU	CAR$V_WHD  	14
+$EQU	CAR$M_WHD	<1@CAR$V_WHD>
+
+;+
+; Error Status Register Bit Summary
+;	  Loc	Size	Name	    Function
+;	 -----	----	----	    ---------------------------------
+;	   <12>	  1	NXM   	    Non-existant memory address
+;	   <11>	  1	ICE         Ignore corrected errors
+;	   <10>	  1	MHE    	    Multiple hard errors
+;	    <9>   1	MSE         Multiple soft errors
+;	    <7>	  1	CTE         Cache tag parity error
+;	    <4>	  1	SOR         Error source (0=cache, 1=DRAM)
+;	    <3>	  1	WRE         Error access type (0=read, 1=write)
+;	    <2>	  1	UEE	    Uncorrectable ECC error
+;	    <1>	  1	CEE	    Correctable ECC error
+;	    <0>	  1	EAV	    Error address valid
+;-
+
+$EQU	ESR$V_NXM	12
+$EQU	ESR$M_NXM	<1@ESR$V_NXM>
+$EQU	ESR$V_ICE      	11
+$EQU	ESR$M_ICE      	<1@ESR$V_ICE>
+$EQU	ESR$V_MHE    	10
+$EQU	ESR$M_MHE      	<1@ESR$V_MHE>
+$EQU	ESR$V_MSE      	9 
+$EQU	ESR$M_MSE     	<1@ESR$V_MSE>
+$EQU	ESR$V_CTE      	7 
+$EQU	ESR$M_CTE       <1@ESR$V_CTE>
+$EQU	ESR$V_SOR       4
+$EQU	ESR$M_SOR      	<1@ESR$V_SOR>
+$EQU	ESR$V_WRE      	3
+$EQU	ESR$M_WRE      	<1@ESR$V_WRE>
+$EQU	ESR$V_UEE	2
+$EQU	ESR$M_UEE    	<1@ESR$V_UEE>
+$EQU	ESR$V_CEE	1
+$EQU	ESR$M_CEE	<1@ESR$V_CEE>
+$EQU	ESR$V_EAV	0
+$EQU	ESR$M_EAV	<1@ESR$V_EAV>
+
+;+
+; mask for all write-1-to-clear bits in esr
+;-
+$EQU 	ESR$M_INIT	<<ESR$M_CEE>!<ESR$M_UEE>!<ESR$M_CTE>!<ESR$M_NXM>!<ESR$M_MSE>!<ESR$M_MHE>!<ESR$M_ICE>>
+
+;+
+; mask fo all write-1-to-clear bits in esr except cee and mse 
+;	- used to acknowledge correctable errors
+;-
+$EQU 	ESR$M_ERR_NOT_CEE 	<<ESR$M_UEE>!<ESR$M_CTE>!<ESR$M_NXM>!<ESR$M_MHE>>
+
+;+ 
+; mask for all write-1-to-clear bits in esr except cee and mse, 
+; plus other bits which could be non-zero 
+;	- used to find correctable errors
+;-
+$EQU	ESR$M_NOT_CEE	<<ESR$M_UEE>!<ESR$M_CTE>!<ESR$M_NXM>!<ESR$M_MHE>!<ESR$M_EAV>!<ESR$M_WRE>!<ESR$M_SOR>!<ESR$M_ICE>>
+
+;+
+; Error Address Register
+;	loc     size name function
+;	------- ---- ---- --------
+;	<2:0>   3    MUX0 Performance Counter Mux 0
+;	<28:3>	26   QEA  Quadword Error Address
+;	<31:29> 3    MUX1 Performance Counter Mux 1
+;-
+
+$EQU	EAR$V_MUX0	0
+$EQU	EAR$V_QEA	3
+$EQU	EAR$V_MUX1	29
+
+;+
+; PCI Bus Controller (IOC) Register Definitions
+; These are memory mapped CSRs
+;
+; IOC$CSR_BASE is the base address of the I/O controller CSRs
+; shifted right by 28 bits.
+;+
+$EQU	IOC$CSR_BASE	<^x18>
+
+;+
+; Offsets to other PCI controller CSRs 
+;-
+$EQU	IOC$Q_HAE	<^x0>		; Host address extension 
+$EQU	IOC$Q_CONF	<^x20>		; Configuration cycle type 
+$EQU	IOC$Q_STAT0	<^x40>		; Error status 
+$EQU	IOC$Q_STAT1	<^x60>		; Error address 
+$EQU	IOC$Q_TBIA	<^x80>		; Scatter gather TB invalidate 
+$EQU	IOC$Q_TBEN	<^xa0>		; Scatter gather TB enable 
+$EQU	IOC$Q_PCI_RST	<^xc0>		; PCI reset 
+$EQU	IOC$Q_W_BASE0	<^x100>		; Window Base 0
+$EQU	IOC$Q_W_BASE1	<^x120>		; Window Base 1
+$EQU	IOC$Q_W_MASK0	<^x140>		; Window Mask 0
+$EQU	IOC$Q_W_MASK1	<^x160>		; Window Mask 1
+$EQU	IOC$Q_T_BASE0	<^x180>		; Translated Base 0
+$EQU	IOC$Q_T_BASE1	<^x1a0>		; Translated Base 1
+
+
+;+
+; Error Status Register Bit Summary
+;	 Loc	Size	Name	    Function
+;	 -----	----	----	    ---------------------------------
+;	<31:13>	 19 	NBR   	    Error address
+;	<10:8>	  3	CODE	    Error type
+;	<7>	  1	TREF	    Target window reference indicator
+;	<6>	  1	THIT	    TB hit indicator
+;	<5>	  1	LOST	    Lost error
+;	<4>	  1	ERR         Error status valid
+;	<3:0>	  4	CMD	    PCI command field of error cycle
+;-
+
+$EQU	STAT0$V_NBR	13
+$EQU	STAT0$V_CODE    8
+$EQU	STAT0$M_CODE    <7@STAT0$V_CODE>
+$EQU	STAT0$V_TREF   	7
+$EQU	STAT0$M_TREF	<1@STAT0$V_TREF>
+$EQU	STAT0$V_THIT	6
+$EQU	STAT0$M_THIT   	<1@STAT0$V_THIT>
+$EQU	STAT0$V_LOST	5 
+$EQU	STAT0$M_LOST    <1@STAT0$V_LOST>
+$EQU	STAT0$V_ERR    	4 
+$EQU	STAT0$M_ERR     <1@STAT0$V_ERR>
+$EQU	STAT0$V_CMD     0
+$EQU	STAT0$M_CMD     <^xf@STAT0$V_CMD>               
+
+;+
+; Mask for all write-1-to-clear bits
+;-
+$EQU	STAT0$M_INIT	<<STAT0$M_LOST>!<STAT0$M_ERR>>
+$EQU	STAT0$M_ERR	<<STAT0$M_LOST>!<STAT0$M_ERR>>
+
+;+
+; Host Address Extension register
+;-
+$EQU	HAE$V_HAE	27
+$EQU	HAE$M_HAE	<^x1f@HAE$V_HAE>
+
+;+
+; Window Base Summary
+;	Loc	Size	Name	    Function
+;	-----	----	----	    ---------------------------------
+;	<33>	  1	WEN	    Window Enable
+;	<32>	  1	SG	    Scatter Gather Enable 
+;	<31:20>	 12 	WBASE	    Window Base
+;-
+
+$EQU	WEN$V_WEN	33
+$EQU	WEN$M_WEN	<1@WEN$V_WEN>
+$EQU	WEN$V_SG	32
+$EQU	WEN$M_SG	<1@WEN$V_SG>
+$EQU	WEN$V_WBASE	20
+
+;+
+; PCI Reset Summary
+;	Loc	Size	Name	    Function
+;	-----	----	----	    ---------------------------------
+;	<6>	  1	PCI_RST	    PCI Reset Bit
+;-
+
+$EQU	PCI_RST$V_PCI_RST	6
+$EQU	PCI_RST$M_PCI_RST      	<1@PCI_RST$V_PCI_RST>
+
+;+
+; Short logout frame offsets (which differ from ev4)
+;
+; These 4 take the place of:
+;	las$biu_stat
+;	las$biu_addr
+;	las$fill_syndrome
+;	las$fill_addr
+; none of which exist for lca
+;-
+$EQU	LAS$Q_ESR	las$biu_stat
+$EQU	LAS$Q_EAR	las$biu_addr
+$EQU	LAS$Q_STAT0	las$fill_syndrome
+$EQU	LAS$Q_STAT1	las$fill_addr
+
+;+
+; Long logout frame offsets (which differ from ev4)
+;
+; These 5 take the place of:
+;	laf$biu_stat
+;	laf$biu_addr
+;	laf$biu_ctl
+;	laf$fill_syndrome
+;	laf$fill_addr
+; none of which exist for lca
+;-
+$EQU	LAF$Q_ESR	laf$biu_stat
+$EQU	LAF$Q_EAR	laf$biu_addr
+$EQU	LAF$Q_CAR	laf$biu_ctl
+$EQU	LAF$Q_STAT0	laf$fill_syndrome
+$EQU	LAF$Q_STAT1	laf$fill_addr
+
+;+
+; HIRR/HIER
+;
+; The IERR (IO Controller Error) and MERR (Memory Controller Error)
+; bits take the position of ev4 interrupt pins 3 and 4.  
+; (LCA4 only has 3 external interrupt pins)
+;-
+$EQU	HIRRR$V_IERR	<5>
+$EQU	HIRRR$M_IERR	<1@HIRRR$V_IERR>
+$EQU	HIRRR$V_MERR	<6>
+$EQU	HIRRR$M_MERR	<1@HIRRR$V_MERR>
+
+$EQU	HIERW$V_IERR	<12>
+$EQU	HIERW$V_MERR	<13>
+$EQU	HIERR$V_IERR	<5>
+$EQU	HIERR$V_MERR	<6>
+
+$EQU	HIERW$M_CRE	<1@HIERW$V_CRE>
+
+	$DEFEND LCA4_DEF,$GBL,DEF
+	.ENDM

@@ -1,0 +1,133 @@
+;---------------------------------------------------------------------
+;        [ Copyright (c) 1999 Alpha Processor Inc.] - Unpublished Work
+;          All rights reserved
+; 
+;    This file contains source code written by Alpha Processor, Inc.
+;    It may not be used without express written permission. The
+;    expression of the information contained herein is protected under
+;    federal copyright laws as an unpublished work and all copying
+;    without permission is prohibited and may be subject to criminal
+;    and civil penalties. Alpha Processor, Inc.  assumes no
+;    responsibility for errors, omissions, or damages caused by the use
+;    of these programs or from use of the information contained herein.
+;  
+;---------------------------------------------------------------------
+;+
+; ev6_debug_macros.mar
+;-
+
+;+
+; Last Edit:	17-May-2000
+;
+; Edit History
+; Who	When		What
+; ---	----		----
+; SCLT	17-May-2000	Initial implementation of debug macros
+;
+; SCLT	07-Jun-2000	Addition of string-dumping macros for SROM UART
+;
+;-
+
+; Store away scratch registers needed so debug doesn't interfere with
+; other operation
+
+.macro save_debug_r0
+	hw_stq/p r0, PT__DBG0( p_temp )
+.endm  save_debug_r0
+.macro restore_debug_r0
+	hw_ldq/p r0, PT__DBG0( p_temp )
+.endm  restore_debug_r0
+
+.macro save_debug_r1
+	hw_stq/p r1, PT__DBG1( p_temp )
+.endm  save_debug_r1
+.macro restore_debug_r1
+	hw_ldq/p r1, PT__DBG1( p_temp )
+.endm  restore_debug_r1
+
+.macro save_debug_r2
+	hw_stq/p r2, PT__DBG2( p_temp )
+.endm  save_debug_r2
+.macro restore_debug_r2
+	hw_ldq/p r2, PT__DBG2( p_temp )
+.endm  restore_debug_r2
+
+.macro save_debug_r3
+	hw_stq/p r3, PT__DBG3( p_temp )
+.endm  save_debug_r3
+.macro restore_debug_r3
+	hw_ldq/p r3, PT__DBG3( p_temp )
+.endm  restore_debug_r3
+
+
+
+
+
+;
+; Write a longword to the PCI bus that can be picked up by a
+; PCI bus analyser.  Fast, low-level debug.
+;
+
+; DBGREG_PCI_RAW:
+; dump 64-bit register to PCI IO-space address given
+
+.macro DBGREG_PCI_RAW addr,rdata,tmp
+
+	lda     tmp, ^x801(r31)
+	sll     tmp, #8, tmp		; 0x0000000000080100
+	bis     tmp, #^xFC, tmp		; 0x00000000000801FC
+	sll     tmp, #24, tmp		; 0x00000801FC000000
+	lda	tmp, addr(tmp)		; mix in IO addr
+	hw_stq/p     rdata, 0(tmp)
+	mb
+
+.endm  DBGREG_PCI_RAW
+
+
+; DBG_PCI_RAW:
+; dump immediate data value to PCI IO-space address given
+
+.macro DBG_PCI_RAW addr,idata,reg0,reg1
+
+	lda	reg1, idata(r31)	; convert immediate data to register
+	DBGREG_PCI_RAW addr,reg1,reg0
+
+.endm  DBG_PCI_RAW
+
+
+; DBG_PCI:
+; dump immediate data to PCI IO-space given using saved/restored registers
+; (needs valid p_temp)
+
+.macro DBG_PCI addr,data
+
+	save_debug_r0
+	save_debug_r1
+	DBG_PCI_RAW addr,data,r0,r1
+	restore_debug_r0
+	restore_debug_r1
+
+.endm  DBG_PCI
+
+
+; DBGREG_PCI:
+; dump a register to PCI IO-space address given using saved/restored registers
+; (needs valid p_temp)
+
+.macro DBGREG_PCI addr,rdata
+
+	save_debug_r0
+	DBGREG_PCI_RAW addr,rdata,r0
+	restore_debug_r0
+
+.endm  DBGREG_PCI
+
+
+
+; DBGSTR_SROM:
+; dump a 4-byte ASCII string to the SROM UART as a brief text code
+
+.macro DBGSTR_SROM str
+
+
+.endm DBGSTR_SROM

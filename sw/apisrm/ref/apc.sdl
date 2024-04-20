@@ -1,0 +1,58 @@
+/* file: APC.SDL
+/*
+/* Copyright (C) 1993, 1996 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.    
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*         
+/*         
+/* Abstract:	AlphaPC platform common defintions.
+/*         
+/* Author: 	Eric Goehl
+/*         
+/* Modifications:
+/*         
+/*	egg	01-Aug-1996	Initial port taken from EB164.SDL
+
+module $apccommon;
+           
+constant APC$PRIMARY_CPU 	equals 0;
+
+/*         
+/*  Definitions for all Evaluation Board and AlphaPC motherboard 
+/*  platforms supported by Digital Semiconductor.
+/*         
+                                                 
+constant PLATFORM_EB64  	equals 0;
+constant PLATFORM_EB64P    	equals 1;
+constant PLATFORM_PC64 	   	equals 2; 
+constant PLATFORM_PCI64    	equals 3;
+constant PLATFORM_EB66     	equals 4;
+constant PLATFORM_EB66P    	equals 5;
+constant PLATFORM_EB164 	equals 6;
+constant PLATFORM_PC164    	equals 7;
+constant PLATFORM_PC264 	equals 8;
+constant PLATFORM_LAST  	equals 9;
+
+/*
+/* Common firmware revision numbers used on AlphaPC platforms. 
+/*
+constant FW_BL_MAJOR equals 4;	/* major firmware revision
+constant FW_BL_MINOR equals 5;  /* minor revision
+
+constant APC_PLATFORM	equals 1;
+
+end_module;

@@ -1,0 +1,68 @@
+/* file:	rawhide.sdl
+/*
+/* Copyright (C) 1990 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Rawhide specific definitions for Alpha firmware.
+/*
+/* Author:	David Mayo
+/*
+/* Modifications:
+/*
+/*	dtm	2-Nov-1994	Initial entry.
+/*
+module	$rawhide;
+
+/*
+/* Laser specific parameters of the HWRPB
+/*
+constant HWRPB$_PAGESIZE equals %x2000;	/* System page size in bytes
+constant HWRPB$_PAGEBITS equals 13;     /* System page size in bits
+constant HWRPB$_PA_SIZE equals 40;	/* Physical address size in bits
+constant HWRPB$_ASN_MAX equals 127;	/* Maximum ASN value
+constant HWRPB$_SYSVAR equals %x65;	/* System variation (OR in member id in HWRPB.C)
+constant HWRPB$_SYSREV equals " A01";	/* System revision
+constant HWRPB$_NPROC equals 4;		/* Number of processor supported
+constant HWRPB$_CC_FREQ equals 100000000; /* cycle counter frequency (@10ns)
+constant HWRPB$_ICLK_FREQ equals %x4b0000; /* interval timer frequency
+constant HWRPB$_SYSTYPE equals 22;	/* Alpha system type (Rawhide)
+
+constant SLOT$_CPU_TYPE equals 5;	/* Processor type (EV5)
+constant SLOT$_CPU_VAR equals 3;	/* Processor Variation (VAX/IEEE FP)
+
+constant CTB$MAX_UNITS equals 1;	/* 3 console terminal UARTS
+
+constant CTB$CSR0 equals %x80007f00;	/* Base CSR address for LOC port
+constant CTB$CSR0_H equals %xF9;	/* High order bits - Base CSR address
+constant CTB$TX_IPL0 equals 21;		/* Transmit interrupt IPL for LOC port
+constant CTB$TX_SCB0 equals %x840;	/* Transmit vector for LOC port
+constant CTB$RX_IPL0 equals 21;		/* Receive interrupt IPL for LOC port
+constant CTB$RX_SCB0 equals %x840;	/* Receive vector for LOC port
+
+constant COM1_VECTOR  equals %x84;	/* serial port COM1 vector irq4
+constant COM2_VECTOR  equals %x83;	/* serial port COM2 vector irq3
+constant KEYBD_VECTOR equals %x81;	/* keyboard vector         irq1
+constant LPT_VECTOR   equals %x87;	/* parallel port vector	   irq7
+constant MOUSE_VECTOR equals %x8c;	/* mouse    vector	   irq12
+
+constant NCR810_VECTOR equals %xb4;	/* ncr53c810 vector	 
+
+constant ISP_MODEL equals 1;
+constant RAWHIDE_HW equals 0;
+end_module;

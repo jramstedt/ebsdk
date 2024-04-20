@@ -1,0 +1,352 @@
+#
+# file: lx164_files.bld - build file for AlphaPC 164/LX SRM Console firmware
+#
+include cp$src:options.bld
+
+platform LX164
+architecture ALPHA
+
+option EV5
+option BWX
+option APC_PLATFORM
+option TGA 1
+option FULL_TGA 0
+option SECURE
+option BOOTP_SUPPORT
+option DIAG_SUPPORT
+option SYMBOLS 0
+option XDELTA_ON 0
+option HIGH_BOOT_PTEPAGES 1
+option BACKING_STORE
+
+value MAX_MEMORY_CHUNK		2
+value MAX_ELBUF			8192
+value HEAP_SIZE			720896
+value EEROM_BASE		983040
+value EEROM_LENGTH		65536
+value DEFAULT_PSEC_PER_CYCLE	2000
+
+file	alphamm.c			group base
+file	ansi.c				group base
+file	aputchar.c			group base
+file	atoi.c				group base
+#
+# There are two shells available, a full featured Bourne shell (blex.c),
+# and a minimal command line tokeninzer (ash.c).  Pick only one.
+#
+file	blex.c				group base
+file	bshell.c			group base
+file	bshell_cmd.c			group base
+#
+file	boot.c				group base
+file	builtins.c			group base
+file	call_backs.c			group base
+file	callbacks_alpha.mar	
+file	date.c				group base
+file	dynamic.c			group base
+file	entry.c				group base
+file	ev_action.c			group base
+file	exdep.c				group base
+file	externdata.c			group base
+file	filesys.c			group base
+file	hwrpb.c				group base
+file	hwrpbtt_driver.c		group driver
+file	ie.c				group base
+file	iobq_cmd.c			group base
+file	isacfg.c			group base
+file	isp1020_edit.c			group base
+file	kernel.c			group base
+file	kernel_support.c		group base
+file	kernel_alpha.mar		group base
+file	memset.c			group base
+file	mopdl_driver.c			group driver
+file	moplp_driver.c			group driver
+file	msgtxt.c			group data
+file	ni_datalink.c			group driver
+file	pke_driver.c			group driver
+file	pke_script.mar
+file	printf.c			group base
+file	probe_io.c			group base
+file	process.c			group base
+file	qscan.c				group base
+file	queue.c				group base
+file	random.c			group base
+file	readline.c			group base
+file	regexp.c			group base
+file	scsi.c				group driver
+file	semaphore.c			group base
+file	show_hwrpb.c			group base
+file	show_map.c			group base
+file	setshow.c			group base
+file	shellsort.c			group base
+file	startstop.c			group base
+file	strfunc.c			group base
+file	timer.c				group base
+file	uptime.c			group base
+file    xcmd.c				group base   
+file	xlate.c				group base
+#
+# Platform-specific files
+#
+file	lx164.c				group base
+file    lx164_init.c			group base
+file    lx164_mcheck.c			group base
+file    lx164_io.c			group base
+file	lx164_util.mar
+file	memconfig_lx164.c		group base
+file	powerup_lx164.c			group base
+file	show_config_lx164.c		group base
+file	ebflash_support.c		group driver
+#
+# Files needed for the extended command set
+# 
+file	allocfree.c
+file	bpt.c
+file	cat.c
+file	check.c
+file	chmod.c
+file	cmp.c
+file	decode_alpha.c
+file	diag_support.c
+file	diag_evs.c
+file	echo.c
+file	edit.c
+file	eval.c
+file	exer.c
+file	find_field.c
+file	grep.c
+file	hd.c
+file	help.c
+file	inst_alpha.mar
+file	line.c
+file	login_cmd.c
+file	ls.c
+file	moprc_driver.c
+file	moprctt_driver.c
+file	more.c
+file	net.c
+file	ps.c
+file	rm.c
+file	secure.c
+file	sem_cmd.c
+file    simport.c
+file	sleep.c
+file	sort.c
+file	sound.c
+file 	symbols.c
+file	tms380fw.c
+file	tr.c
+file	truefalse.c
+file	validate.c
+file	wc.c
+#
+# Option Files 
+#
+file    tga_driver_port.c		group 0
+file   	tga_driver_stip.c		group 0
+file   	tga_driver_bt485.c		group 0
+file   	tga_driver_bt463.c		group 0
+file   	tga_driver_visual.c		group 0
+file   	tga_driver_support.c		group 0
+file   	tga_driver_busio.c		group 0
+#
+# Xdelta Debugger
+#
+#file	xdelta.mar
+#file	xdelta_isrs.mar
+#
+# Memory and Network Diagnostics
+#
+file	memtest.c		
+file	memtest_gray_lw.c
+file	memtest_alpha.mar	
+file	memtest_march.c
+file	memtest_random.c
+file	memtest_victim.c
+file	nettest.c	
+#
+# TGA Diagnostics
+#
+#file	tga_driver_copy.c
+#file	tga_driver_line.c
+#
+#file   tga_test.c
+#file	tga_test_bool.c
+#file	tga_test_box.c
+#file	tga_test_chair.c
+#file	tga_test_cnfg.c
+#file	tga_test_copy.c
+#file	tga_test_edit.c
+#file	tga_test_flash.c
+#file	tga_test_font.c
+#file	tga_test_init.c
+#file	tga_test_int.c
+#file	tga_test_line.c
+#file	tga_test_pack.c
+#file	tga_test_patt.c
+#file	tga_test_plane.c
+#file	tga_test_pshift.c
+#file	tga_test_reg.c
+#file	tga_test_simz.c
+#file	tga_test_stip.c
+#file	tga_test_vdac_463.c  
+#file	tga_test_vdac_485.c
+#file	tga_test_verify.c
+#file	tga_test_vram.c
+#file	tga_test_stereo.c
+#file	tga_version.c
+#
+# Driver Initialization
+#
+# Lines that have a name in column 0 and a value as the second
+# field are entered into the Driver Startup Table (dst).  The 
+# second field indicates what phase the driver is started in.
+#
+# Start up the phase 0 drivers:
+# Initialize the TOY driver and low level stuff that must be 
+# started at this point.
+#
+driver	nl_driver.c		0	group driver
+driver	rd_driver.c		0	group driver
+driver 	toy_driver.c		0	group driver
+#
+# Start up the phase 1 drivers:
+#
+driver	pci_driver.c		1	group driver
+driver	from_driver.c		1	group driver
+driver	nvram_driver.c		1	group driver
+#
+# Start up the phase 3 drivers:
+# Terminal class driver must start before the terminal port drivers.
+# kbd_driver MUST be started after graphics drivers & before serial port driver
+#
+driver	tt_driver.c     	3	group driver
+driver	tga_driver.c		3	group driver
+driver	vga_bios_driver.c	3	group driver
+driver  kbd_driver.c		3	group driver
+driver	combo_driver.c		3	group driver
+#
+# Start up the phase 4 drivers:
+# Event Driver must start after console initialization done
+#
+driver	ev_driver.c     	4	group driver
+driver	el_driver.c		4	group driver
+driver	pmem_driver.c		4	group driver
+driver	vmem_driver.c		4	group driver
+driver	examine_driver.c	4	group driver
+driver	ev5_ipr_driver.c	4	group driver
+driver	gpr_driver.c    	4	group driver
+driver	pt_driver.c     	4	group driver
+driver	ps_driver.c     	4	group driver
+driver	ndbr_driver.c		4	group driver
+driver	mop_driver.c		4	group driver
+driver	fpr_driver.c    	4	group driver
+driver	pi_driver.c		4	group driver
+driver	decode_driver.c		4	group driver
+driver  tee_driver.c		4	group driver
+#
+# Start up the phase 5 drivers:
+#
+driver	para_driver.c		5	group driver
+driver	inet_driver.c 		5	group driver
+driver	fat_driver.c		5	group driver
+#
+# IDE/ATAPI driver
+#
+driver	dq_driver.c		5	group driver
+#
+# ISA ethernet driver for adapter with the LEMAC chip
+#
+driver	de205_driver.c 		5	group driver
+#
+# Floppy diskette driver 
+#
+driver	dv_driver.c		5	group driver
+#
+# SCSI bus poller for NCR/Symbios 810/875 controllers
+#
+driver	n810_driver.c		5	group driver
+#
+# PCI NVRAM Driver
+#
+driver  pci_nvram_driver.c      5       group driver
+#
+# PCI FDDI driver for the DEFPA adapter
+#
+driver  pdq_driver.c            5       group driver
+#
+# PCI Token ring driver
+#
+driver  dw_driver.c             5       group driver
+#
+# PCI SCSI RAID driver for the Mylex DAC960 adapter
+#
+driver dac960_driver.c          5       group driver
+#
+# PCI SCSI driver for the KZPSA adapter
+#
+driver pks_driver.c             5       group driver
+#
+# SCSI driver for adapters employing Qlogic ISP1020 chips
+#
+driver isp1020_driver.c		5       group driver
+#
+# PCI ethernet driver for the DECchip 2104x/2114x adapters
+#
+driver ew_driver.c		5       group driver
+#
+# Intel 82558 ethernet adapter
+#
+driver	ei_driver.c		5	group driver
+#
+# SCSI driver for Adaptec AIC78xx adapters
+#
+driver	aic78xx_driver.c	5	group driver
+file	aic78xx_him_hwm.c		group driver
+file	aic78xx_him_rsm.c		group driver
+file	aic78xx_him_xlm.c		group driver
+#
+# The built in file system.
+#
+# Encapsulated files are taken from their VMS sources and put 
+# directly into the firmware's file system as a named file.  
+# To add a new file, use the keyword "encapsulate", the VMS 
+# filename, and the name you want the file to have in the 
+# firmware.
+#
+#
+# Corporate FW CD Update Utility Scripts
+#
+encapsulate	cp$src:eb_fwupdate	fwupdate	 ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+#
+# ISA configuration scripts to facilitate adding known devices
+#
+encapsulate	cp$src:isacfg_de205	add_de205	 ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+#
+# Diagnostic scripts
+#
+encapsulate	cp$src:test_eb164	test		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:memexer_eb164	memexer		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:sys_exer_eb164	sys_exer	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate     cp$src:floppy_write     floppy_write    ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:exer_read	exer_read	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:exer_write	exer_write	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:tgax             tgax		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:show_status	show_status	ATTR$M_READ|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:kill_diags_eb164 kill_diags	ATTR$M_READ|ATTR$M_EXECUTE	-script
+encapsulate     cp$src:showit           showit          ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:dqtest		dqtest		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+#
+# When you want the symbol table driver in your image, you have to have
+# the driver itself, the variable list (i.e. the symbol table), and
+# a list of symbols that you want included/excluded.  The inclusion
+# exclusion commands take as arguments regular expressions that are
+# applied to the symbol table.
+#
+# NOTE: regular expressions are AWK style regular expressions, which
+# are NOT the same as regular expressions in other contexts!
+#
+#driver	sym_driver.c		0
+#file	vlist.c
+#sym_include	[a-zA-Z0-9_\$]+
+#sym_exclude	vlist msg_.*

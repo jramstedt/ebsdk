@@ -1,0 +1,37 @@
+  #                                     
+  # if memory_test == none, skip everything.        
+  #                 
+if (show memory_test  | grep -v none > nl) then
+   if (eval `show config | element -i 2 -l 8` 4 == >nl) then
+       set aa_value_bcc 2 2>nl
+   else  
+       set aa_value_bcc 4 2>nl
+   fi    
+   set aa_2x_cache_size `eval -ix -x $aa_value_bcc 200000 *` 2>nl
+   for i in 1 2 3 4; do                             
+     set 2>nl mstart `info 1 | grep -i good | elem -i 6 -l $i| find 0 -d :`
+     set 2>nl mend `info 1 | grep -i good | elem -i 6 -l $i| find 1 -d : \
+               | find 0 -d ')'`                     
+     if (eval>nl `sho mstart|wc -w` 1 \<=) then     
+       if (eval>nl -ix -x mstart %x40000000 \>=) then            
+           # Add twenty to start address for allocation header storage.
+         set>nl mstart `eval -ix -x mstart 20 +`    
+                                                    
+#         echo memtest -bs $aa_2x_cache_size -sa $mstart  -ea $mend        
+              memtest -bs $aa_2x_cache_size -sa $mstart  -ea $mend             
+       else                                                     
+         if (show memory_test  | grep full > nl) then
+#           echo memtest -bs $aa_2x_cache_size -sa $mstart  -ea $mend -z
+                 memtest -bs $aa_2x_cache_size -sa $mstart  -ea $mend -z
+         fi                      
+       fi                        
+     fi                          
+   done;                         
+   clear >nl mstart                  
+   clear >nl mend
+   clear >nl aa_2x_cache_size
+   clear >nl aa_value_bcc
+else
+  show memory_test
+  echo Memory test skipped...                    
+fi                            

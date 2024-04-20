@@ -1,0 +1,386 @@
+#
+# $Log: Makefile.general,v $
+# Revision 1.1  1999/04/22 15:38:43  stig
+# Re-structured for addition of hal, executables now go to bin subdir
+#
+# Revision 1.1.1.1  1998/12/29 21:36:20  paradis
+# Initial CVS checkin
+#
+# Revision 1.34  1996/07/18  14:24:38  asher
+# Have LIBLOC directory get created if it doesn't exist.
+#
+# Revision 1.33  1995/12/06  20:56:05  asher
+# Move build of cld files into Makefile.general
+#
+# Revision 1.32  1995/09/26  17:13:07  asher
+# Add LDLIBS to shared object link.
+#
+# Revision 1.31  1995/09/21  14:46:39  asher
+# Add LDFLAGS to shared library link command.
+#
+# Revision 1.30  1995/09/07  15:49:18  tatham
+# Added allfiles target
+#
+# Revision 1.29  1995/07/05  17:28:11  asher
+# Don't try to build a .so if STATIC is defined.
+#
+# Revision 1.28  1995/06/30  10:20:55  asher
+# If STATIC defined, add -non_shared to link.
+#
+# Revision 1.27  1995/06/26  22:22:24  asher
+# Put back all quiet "@"'s on recursive make calls.
+#
+# Revision 1.26  1995/06/26  14:21:13  asher
+# Another typo.
+#
+# Revision 1.25  1995/06/26  13:40:03  asher
+# Fix stupid typo.
+#
+# Revision 1.24  1995/06/26  13:24:56  asher
+# Switch to /bin/sh.
+#
+# Revision 1.23  1995/06/16  18:55:03  asher
+# Add INCLUDE=N to preventinclude of dependencies.
+#
+# Revision 1.22  1995/06/15  20:24:17  asher
+# Remove it again.
+#
+# Revision 1.21  1995/06/15  20:22:25  asher
+# Add ADDITIONAL_INTER_SRCS to REAL_SRCS.
+#
+# Revision 1.20  1995/06/14  23:14:41  asher
+# Fix rpath stuff to get an absolute pathname.
+#
+# Revision 1.19  1995/06/14  20:08:51  asher
+# Add rpath to ld command for images with .so files by default.
+#
+# Revision 1.18  1995/06/14  18:02:40  asher
+# Allow makefiles without MAIN_TARGET defined.
+#
+# Revision 1.17  1995/05/26  17:36:34  asher
+# Third try for -nocurrent_include option.
+#
+# Revision 1.16  1995/05/26  17:18:52  asher
+# Second change for -nocurrent_include.
+#
+# Revision 1.15  1995/05/26  17:16:43  asher
+# Make -nocurrent_include only get added for c++ compiles.
+#
+# Revision 1.14  1995/05/22  20:46:02  asher
+# Fix make clean to use OBJLOC.
+#
+# Revision 1.13  1995/03/23  20:04:46  asher
+# Allow manual Makefile name specification.
+#
+# Revision 1.12  1995/03/17  16:35:21  asher
+# Silence the recursive make.
+#
+# Revision 1.11  1995/03/06  15:56:45  asher
+# Auto create object directory.
+#
+# Revision 1.10  1995/02/13  22:37:26  asher
+# Remove absolute path from makedepend image.
+#
+# Revision 1.9  1995/02/10  18:18:37  asher
+# Update for new defnr.
+#
+# Revision 1.8  1995/02/09  16:40:53  asher
+# Fix RCS check to work correctly indenpendant of directory structure.
+#
+#
+
+ifndef DEPENDFILE
+DEPENDFILE =$(MAKEFILE).d
+endif
+
+FLEX_SRCS := $(filter %.l, $(SRCS))
+BISON_SRCS := $(filter %.y, $(SRCS))
+CLD_SRCS := $(filter %.cld, $(SRCS))
+C_SRCS := $(filter %.c, $(SRCS))
+CXX_SRCS := $(filter %.cxx, $(SRCS))
+HXX_SRCS := $(filter %.hxx, $(SRCS))
+
+FLEX_INTER_SRCS := $(addsuffix .lex.c, $(basename $(FLEX_SRCS)))
+
+BISON_INTER_SRCS := $(addsuffix .tab.c, $(basename $(BISON_SRCS)))
+ifeq ($(findstring v,$(BISONFLAGS)),v)
+ADDITIONAL_INTER_SRCS += $(addsuffix .output, $(basename $(BISON_SRCS)))
+endif
+ifeq ($(findstring d,$(BISONFLAGS)),d)
+ADDITIONAL_INTER_SRCS += $(addsuffix .tab.h, $(basename $(BISON_SRCS)))
+endif
+
+ifdef CLIPMEMBER
+CLD_CXX_INTER_SRCS = $(addsuffix .cxx, $(basename $(CLD_SRCS)))
+CLD_CXX_OBJS = $(addsuffix .o, $(basename $(CLD_SRCS)))
+else
+CLD_C_INTER_SRCS := $(addsuffix .c, $(basename $(CLD_SRCS)))
+CLD_C_OBJS := $(addsuffix .o, $(basename $(CLD_SRCS)))
+endif
+CLD_INTER_SRCS =  $(CLD_C_INTER_SRCS) $(CLD_CXX_INTER_SRCS)
+CLD_OBJS := $(CLD_C_OBJS) $(CLD_CXX_OBJS)
+
+REAL_SRCS += $(filter-out %.o %.a %.so, $(SRCS)) $(FLEX_INTER_SRCS) $(BISON_INTER_SRCS) $(CLD_INTER_SRCS)
+
+FLEX_OBJS := $(addsuffix .lex.o, $(basename $(FLEX_SRCS)))
+BISON_OBJS := $(addsuffix .tab.o, $(basename $(BISON_SRCS)))
+C_OBJS := $(addsuffix .o, $(basename $(C_SRCS)))
+CXX_OBJS := $(addsuffix .o, $(basename $(CXX_SRCS)))
+
+INTER_OBJS := $(FLEX_OBJS) $(BISON_OBJS) $(CLD_OBJS) $(C_OBJS) $(CXX_OBJS)
+OBJS := $(INTER_OBJS) $(filter %.o %.a %.so, $(SRCS))
+
+INCLUDE_DIRS := $(subst :, ,$(HEADER_AREAS))
+#
+# Tell GNU Make where to look for certain files.
+#
+vpath %.h $(HEADER_AREAS)
+vpath %.hxx $(HEADER_AREAS)
+vpath %.l $(SOURCE_AREAS)
+vpath %.y $(SOURCE_AREAS)
+vpath %.c $(SOURCE_AREAS)
+vpath %.cxx $(SOURCE_AREAS)
+vpath %.dnr $(SOURCE_AREAS)
+vpath %.cld $(SOURCE_AREAS)
+vpath RCS/%,v $(SOURCE_AREAS)
+
+ifndef OBJECT_AREAS
+OBJECT_AREAS = $(OBJLOC)
+endif
+
+vpath %.o $(OBJECT_AREAS)
+
+ifndef CLIP
+CLIP = clip
+endif
+
+ifndef DEFNR
+DEFNR = defnr
+endif
+
+ifndef NOCURRINCL
+NOCURRINCL = y
+endif
+
+ifeq ($(findstring cxx, $(CXX)),cxx)
+ifeq ($(strip $(NOCURRINCL)),y)
+CPPFLAGS += -nocurrent_include
+endif
+endif
+
+CPPFLAGS += $(addprefix -I, $(INCLUDE_DIRS))
+
+ifdef STATIC
+LDFLAGS += -non_shared
+endif
+
+.PHONY: all clean totalclean allobjects
+
+ifndef MAKEFILE
+MAKEFILE=Makefile
+MAKEOPT =
+else
+MAKEOPT =-f $(MAKEFILE)
+endif
+
+ALL_DEPENDS = $(LIBLOC) $(OBJLOC) $(filter-out %.a %.so, $(OBJS))
+
+ifdef MAIN_TARGET
+all : $(ALL_DEPENDS)
+	@ $(MAKE) $(MAKEOPT) $(MAIN_TARGET)
+else
+all : $(ALL_DEPENDS)
+endif
+
+$(LIBLOC) $(OBJLOC) :
+	mkdir $@
+
+% : %,v
+% : RCS/%,v
+
+# "rcsdiff $?" uses the dependancy to get make everything happen in the
+# correct directory.  If it was "rcsdiff $@", then the full path of where
+# the current source file was found would be used, causing the rcsdiff
+# to use the wrong RCS library.
+#
+ifeq ($(strip $(USE_RCS)),y)
+$(MAKEFILE) $(CO_SRCS) $(filter-out %.o %.a %.so, $(SRCS)): % : RCS/%,v
+	@- (rcsdiff $@ $? > /dev/null 2> /dev/null; if (test $$? != 0) then co $?; fi;)
+endif
+
+$(FLEX_INTER_SRCS): %.lex.c : %.l
+	$(FLEX) $(FLEXFLAGS) -t $< > $@
+
+$(BISON_INTER_SRCS): %.tab.c : %.y
+	$(BISON) $(BISONFLAGS) -b $(basename $(notdir $<)) $< 
+
+CLIPFLAGS += $(addprefix -INCLUDE , $(INCLUDE_DIRS))
+
+$(CLD_CXX_INTER_SRCS): %.cxx : %.cld
+	$(CLIP) $(CLIPFLAGS) $< -member $(CLIPMEMBER) -header $(CLIPHEADER)
+
+$(CLD_C_INTER_SRCS): %.c : %.cld
+	$(CLIP) $(CLIPFLAGS) $<
+
+$(FLEX_OBJS) $(BISON_OBJS) $(CLD_C_OBJS) $(C_OBJS): %.o : %.c
+	$(CC) -c $(CPPFLAGS) $(CFLAGS) $< -o $(OBJLOC)/$(notdir $@)
+
+$(CLD_CXX_OBJS) $(CXX_OBJS): %.o : %.cxx
+	$(CXX) -c $(CPPFLAGS) $(CXXFLAGS) $< -o $(OBJLOC)/$(notdir $@)
+
+# First check for shared library.
+#
+ifndef STATIC
+ifneq ($(filter %.so, $(MAIN_TARGET)),)
+$(filter %.so, $(MAIN_TARGET)): %.so : $(filter-out %.so, $(OBJS))
+	ld -shared -update_registry $(dir $@)so_locations -no_archive -o $@ $(LDFLAGS) $^ $(filter %.so, $(OBJS)) -L/usr/lib/cmplrs/cxx $(LDLIBS) -lc -lcxx
+endif
+endif
+# Second check if the main target is an archive file.
+#
+ifneq ($(filter %.a, $(MAIN_TARGET)),)
+$(filter %.a, $(MAIN_TARGET)): %.a : $(filter-out %.a %.so, $(OBJS))
+	ar rv $@ $?
+endif
+ifneq ($(filter-out %.a %.so, $(MAIN_TARGET)),)
+# Finally, if the main target isn't an archive or shared library,
+# then it must be an image.  (We don't know how to make anything 
+# else!)
+#
+# Determine link command to use ($(CXX) or $(CC)).
+#
+ifneq ($(strip $(CLD_CXX_OBJS) $(CXX_OBJS)),)
+LINKCMD = $(CXX)
+else
+LINKCMD = $(CC)
+endif
+ifneq ($(filter %.so, $(OBJS)),)
+ifndef RPATH
+empty:=
+space:=$(empty) $(empty)
+SODIRS := $(strip $(subst / , ,$(dir $(filter %.so, $(OBJS)))$(space)))
+ABSDIRS := $(foreach dir,$(SODIRS),$(strip $(shell if (test -L $(dir)) then /usr/bin/ls -l $(dir) | sed 's/.*-> //'; fi; if (test ! -L $(dir)) then echo $(dir); fi;)))
+#ABSDIRS := $(foreach dir,$(SODIRS),$(dir))
+RPATH = -rpath $(subst $(space),:,$(ABSDIRS))
+endif
+endif
+
+$(filter-out %.a %.so, $(MAIN_TARGET)): % : $(filter-out %.so, $(OBJS))
+	rm -f $@
+	$(LINKCMD) -o $@ $(LDFLAGS) $^ $(filter %.so, $(OBJS)) $(RPATH) $(LDLIBS)
+endif
+
+totalclean : clean
+	- rm -f $(MAIN_TARGET)
+
+clean : 
+	- rm -f $(FLEX_INTER_SRCS) $(BISON_INTER_SRCS) $(CLD_INTER_SRCS) $(ADDITIONAL_INTER_SRCS)
+	- rm -f $(addprefix $(OBJLOC)/, $(INTER_OBJS))
+
+MAKEFILE_AWK_SCRIPT = ' NR == 1 {\
+ nhdirs = split($$0, inputdirs, ":");\
+ for (cdir=1; cdir<=nhdirs; ++cdir) {\
+  for(i=1; i<=cdir; ++i) {\
+   if (length(inputdirs[cdir]) > length(hdirs[i])) {\
+    for (j=cdir; j>=i; --j) {\
+     hdirs[j+1] = hdirs[j];\
+    }\
+    break;\
+   }\
+  }\
+  hdirs[i] = inputdirs[cdir];\
+  if (substr(hdirs[i],length(hdirs[i]),1) != "/")\
+   hdirs[i] = hdirs[i] "/";\
+ }\
+ next;\
+} \
+NR == 2 {\
+ nsdirs = split($$0, inputdirs, ":");\
+ for (cdir=1; cdir<=nsdirs; ++cdir) {\
+  for(i=1; i<=cdir; ++i) {\
+   if (length(inputdirs[cdir]) > length(sdirs[i])) {\
+    for (j=cdir; j>=i; --j) {\
+     sdirs[j+1] = sdirs[j];\
+    }\
+    break;\
+   }\
+  }\
+  sdirs[i] = inputdirs[cdir];\
+  if (substr(sdirs[i],length(sdirs[i]),1) != "/")\
+   sdirs[i] = sdirs[i] "/";\
+ }\
+ next;\
+} \
+NR != 1	{ foundcolon = 0; numwords = split($$0, word);\
+ for(i=1; i <= numwords; i++) {\
+  if (foundcolon) {\
+   for (j=1; j<=nhdirs; ++j) {\
+    place = index(word[i],hdirs[j]);\
+    if (place == 1) {\
+     word[i] = substr(word[i],length(hdirs[j])+1,length(word[i])-length(hdirs[j]));\
+    }\
+   }\
+  } else {\
+   for (j=1; j<=nsdirs; ++j) {\
+    place = index(word[i],sdirs[j]);\
+    if (place == 1) {\
+     word[i] = substr(word[i],length(sdirs[j])+1,length(word[i])-length(sdirs[j]));\
+    }\
+   }\
+  }\
+  if (index(word[i], ":") != 0)\
+   foundcolon = 1;\
+ }\
+ if (foundcolon) { printf "$(DEPENDFILE)"; for (i=1; i <= numwords; i++) printf " %s", word[i]; printf "\n"; next; }\
+}\
+	{ print; } '
+
+ifndef DEPEND_AREAS
+DEPEND_AREAS := $(HEADER_AREAS)
+endif
+
+DEPEND_DIRS := $(subst :, ,$(DEPEND_AREAS))
+DEPEND_INCLUDES := $(addprefix -I, $(DEPEND_DIRS))
+
+ifndef MAKEDEPEND
+MAKEDEPEND = makedepend
+endif
+
+ifndef DEPENDFLAGS
+DEPENDFLAGS = -Y -N
+endif
+
+
+$(DEPENDFILE) : $(MAKEFILE) $(REAL_SRCS) $(CO_SRCS)
+	@ echo -n Making dependencies...
+	@ cat /dev/null > $(DEPENDFILE)
+	@ $(MAKEDEPEND) $(DEPENDFLAGS) -f$(DEPENDFILE) $(DEPEND_INCLUDES) -- $(filter-out -I%, $(CPPFLAGS)) -- $(filter $(addprefix %, $(REAL_SRCS)), $^)
+	@ (echo $(HEADER_AREAS); echo $(SOURCE_AREAS); cat $(DEPENDFILE)) | awk $(MAKEFILE_AWK_SCRIPT) > $(DEPENDFILE).new
+	@ mv $(DEPENDFILE).new $(DEPENDFILE)
+	@ rm -f $(DEPENDFILE).bak
+	@ echo done.
+
+ifneq ($(INCLUDE),N)
+include $(DEPENDFILE)
+endif
+
+
+
+#
+# All the files which are part of the current source pool, including the
+# Makefile.
+#
+
+FILE_LIST = $(filter-out %.o %.a %.so, $(SRCS)) $(MAKEFILE)
+
+#
+# Rule to allow access to all the files which make up the current source
+# pool.
+#
+
+ifndef FILESACTION
+FILESACTION=echo
+endif
+
+allfiles :
+	@ sh -c 'for i in $(FILE_LIST); do $(FILESACTION) $$i; done'

@@ -1,0 +1,26 @@
+! Link modules for DPUPDATE
+	cp$obj:callbacks_alpha.obj,-
+	cp$obj:kernel_alpha.obj,-
+	cp$obj:pc264_util.obj,-
+	cp$obj:inst_alpha.obj,-
+	cp$obj:pke_script.obj,-
+	cp$obj:pue_script.obj,-
+	cp$obj:grp_base.obj,-
+	cp$obj:grp_command.obj,-
+	cp$obj:grp_driver.obj,-
+	cp$obj:grp_data.obj,-
+	cp$obj:encap_add_de205.obj,-
+	cp$obj:encap_memexer.obj,-
+	cp$obj:encap_testmem.obj,-
+	cp$obj:encap_sys_exer.obj,-
+	cp$obj:encap_show_status.obj,-
+	cp$obj:encap_kill_diags.obj,-
+	cp$obj:encap_showit.obj,-
+	cp$obj:encap_pwrup.obj,-
+	cp$obj:encap_test.obj,-
+	cp$obj:encap_mfgtest.obj,-
+	cp$obj:encap_set_flag.obj,-
+	cp$obj:encap_fwupdate.obj,-
+	cp$obj:encap_readme.obj,-
+	cp$obj:encap_save_nvram.obj,-
+	cp$obj:encap_restore_nvram.obj

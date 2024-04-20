@@ -1,0 +1,52 @@
+                      
+	svmin = 1			; PC264-specific VMS edit number
+	osf_svmin = 1			; PC264-specific OSF edit number
+
+	max_cpuid = 2
+
+        ev6_p1 = 0
+        ev6_p2 = 1
+	ev6_p3 = 0
+	fp_count = 0
+	egore = 0
+	beh_model = 0
+	console = 1
+	check_interrupt_pending = 0	; Calls sys__deassert_interrupt when 1
+	pc264_system = 0		; AlphaPC 264 platform
+	goby_system = 1			; Goby (inc irongate) based system
+	nautilus_system = 1		; UP1000/UP1100 platform
+	tinosa_system = 0		; Tinosa mothetboard system
+	shark_system = 0		; Shark motherboard system
+	api_platform = 1		; API Platform.
+	do_leds = 0
+	pc264_system_debug = 0
+	force_multi_issue = 0
+	reset_pio_retry_counter = 0
+	clrmap = 0
+	mchk_en = 1
+	dctag_par_en = 1
+	dcdat_err_en = 1
+	tb_mb_en = 0
+	pte_eco = 1
+	kseg_hack = 0
+	spinlock_hack = 1
+	force_path = 0
+	force_path2 = 1
+        check_ebox_iprs = 1
+
+.include "cp$src:ledcodes.mar"
+.include "cp$src:ev6_defs.mar"
+.include "cp$src:ev6_redefine_defs.mar"
+.include "cp$src:ev6_pal_temps.mar"
+.include "cp$src:ev6_alpha_defs.mar"
+.include "cp$src:ev6_vms_pal_defs.mar"
+.include "cp$src:ev6_osf_pal_defs.mar"
+.include "cp$src:ev6_pal_macros.mar"
+.include "cp$src:ev6_pc264_pal_macros.mar"
+.include "cp$src:pal_def.mar"
+.include "cp$src:impure_def.mar"
+
+	$pal_impure
+	$pal_logout
+	$pal_def
+	$cserve_def

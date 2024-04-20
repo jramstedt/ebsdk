@@ -1,0 +1,91 @@
+/*
+/* Copyright (C) 1993 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Definitions shared by PALcode and console code
+/*
+/* Author:	Stephen F. Shirron
+/*
+/* Modifications:
+/*
+/*	sfs	05-Aug-1993	Initial entry.
+/*	J.Uban	23-Feb-1994	Medulla CSERVE entries.
+/*	J.Uban	04-Mar-1994	Medulla CSERVE entries.
+/*	J.Uban	13-Jul-1994	Medulla CSERVE entries for watchdog diags.
+/*
+
+module $pal_def;
+
+constant PAL$PAL_BASE				equals %x8000;
+constant PAL$PAL_SIZE				equals %xc000;
+constant PAL$OSFPAL_BASE			equals %x14000;
+constant PAL$OSFPAL_SIZE			equals %x8000;
+constant PAL$PRIMARY				equals %x388;
+constant PAL$IPL_TABLE_BASE			equals %x400;
+constant PAL$HWRPB_BASE				equals %x2000;
+constant PAL$HWRPB_SIZE				equals %x2000;
+constant PAL$IMPURE_BASE			equals %x4000;
+constant PAL$IMPURE_COMMON_SIZE			equals %x200;
+constant PAL$IMPURE_SPECIFIC_SIZE		equals %x600;
+constant PAL$LOGOUT_BASE			equals %x6000;
+constant PAL$LOGOUT_SPECIFIC_SIZE		equals %x400;
+constant PAL$CONSOLE_BASE			equals %x1c000;
+constant PAL$HALT_BUTTON_PRESSED		equals %x100;
+
+constant IMPURE$PCB_OFFSET			equals %x10;
+constant IMPURE$PROF_OFFSET			equals %x40;
+constant IMPURE$QUILT_OFFSET			equals %x40;
+constant IMPURE$UART_OFFSET			equals %x70;
+constant IMPURE$CPU_TYPE_OFFSET			equals %x80;
+constant IMPURE$PLATFORM_SCRATCH_OFFSET		equals %x100;
+
+constant MP$RESTART				equals 1;
+constant MP$HALT				equals 2;
+constant MP$CONTROL_P				equals 3;
+constant MP$BREAK				equals 4;
+
+end_module $pal_def;
+
+
+module $cserve_def;
+
+constant CSERVE$SET_HWE				equals 8;
+constant CSERVE$CLEAR_HWE			equals 9;
+constant CSERVE$WRITE_BAD_CHECK_BITS		equals 10;
+constant CSERVE$CONFIGURE_MEMORY		equals 11;
+constant CSERVE$SIZE_SIMMS			equals 12;
+constant CSERVE$CONFIGURE_SIMMS			equals 13;
+constant CSERVE$LDLP				equals 16;
+constant CSERVE$STLP				equals 17;
+constant CSERVE$MEDU_HALT_ACTION		equals 50;
+constant CSERVE$MEDU_WDOG_INT_RD		equals 51;
+constant CSERVE$MEDU_INT_ENABLE			equals 52;
+constant CSERVE$MEDU_INT_DISABLE		equals 53;
+constant CSERVE$WRITE_BAD_ECC	        	equals 54;
+constant CSERVE$WRITE_BAD_TAG    		equals 55;
+constant CSERVE$GET_BASE			equals 63;
+constant CSERVE$HALT				equals 64;
+constant CSERVE$WHAMI				equals 65;
+constant CSERVE$START				equals 66;
+constant CSERVE$CALLBACK			equals 67;
+constant CSERVE$MTPR_EXC_ADDR			equals 68;
+constant CSERVE$JUMP_TO_ARC			equals 69;
+constant CSERVE$MP_WORK_REQUEST			equals 101;
+
+end_module $cserve_def;

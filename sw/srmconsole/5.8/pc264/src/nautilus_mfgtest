@@ -1,0 +1,124 @@
+if (0 > 1) then
+if (eval>nl d_passes 1 \>) then
+    set pcnt 5 2>nl
+else
+    set pcnt $d_passes 2>nl
+fi
+echo>$mout
+echo "Starting IIC exers.."
+ls -l iic* | find 5 | grep -v iic_mst | grep -v system | grep -v rcm | grep -v ocp >iil
+for i in `cat iil`; do
+    exer -a "r-Rc" -bs 100 $i -p 200 &
+done
+
+echo>$mout
+for pid in `ps | grep exer | element`; do
+  sa $pid f
+done
+
+if (eval>nl s_flag) then
+    until (eval>nl pcnt 0 !=); do
+	sleep 1
+	if (eval>nl `show d_status | grep on | wc -w`) then
+	    echo "Still testing IIC.." >$tout
+	else
+	    show_status | grep -v "set_fl" | grep -v "idle" >$tout
+	fi
+	sleep 1
+	set pcnt `eval pcnt 1 -`
+    done
+fi
+
+echo>$mout
+echo "Shutting down IIC exers.."
+echo>$mout
+
+until eval>nl `ps | grep exer | wc -l`; do
+    for i in `ps | grep exer_kid | elem`; do
+	kill $i
+    done
+    sleep 1
+done
+sleep 1
+until eval>nl `ps | grep exer | wc -l`; do
+    for i in `ps | grep exer_kid | elem`; do
+	kill $i
+    done
+    sleep 1
+done
+fi
+if (eval>nl d_passes 1 \>) then
+    set pcnt 5 2>nl
+else
+    set pcnt $d_passes 2>nl
+fi
+echo "Starting TOY exer.."
+exer -bc 1 -bs 1 -a "r-Rc" toy -sb e -eb 3f -p 0 &
+
+echo "Starting EEROM exer.."
+exer -a "r-Rc" eerom -p 0 &
+
+# If the -lb qualifier is used, try to run the external loopback tests on the
+# parallel and COM2 serial ports.
+
+if (eval>nl s_flag) then
+    if (eval>nl `show d_loopback | grep on | wc -l`) then
+	echo>$mout "Skipping COM2/PARA exers; -lb qualifier not specified"
+    else
+	set aa_tt_allow$$ $tt_allow_login 2>nl >nl
+	set tt_allow_login 0
+	if (exer tta1 -bs 1 -a 'wRc' -l 1 2>nl) then
+	    echo "Starting COM2 exer (external loopback).."
+	    exer tta1 -bs 1 -a 'wRc' -l 400 -p 0 &
+	else
+	    echo>$mout "No loopback installed"
+	    echo>$mout "COM 2 Serial Port Testing skipped"
+	fi
+	if (exer para -bs 1 -a 'wRc' -l 1 2>nl) then
+	    echo "Starting PARA exer (external loopback).."
+	    exer para -bs 1 -a 'wRc' -l 400 -p 0 &
+	else
+	    echo>$mout "No loopback installed"
+	    echo>$mout "Parallel Port Testing skipped"
+	fi
+    fi
+fi
+echo>$mout
+for pid in `ps | grep exer | element`; do
+  sa $pid f
+done
+
+if (eval>nl s_flag) then
+    until (eval>nl pcnt 0 !=); do
+	sleep 5
+	if (eval>nl `show d_status | grep on | wc -w`) then
+	    echo "Still testing junk I/O.." >$tout
+	else
+	    show_status | grep -v "set_fl" | grep -v "idle" >$tout
+	fi
+	sleep 5
+	set pcnt `eval pcnt 1 -`
+    done
+fi
+
+echo>$mout
+echo "Shutting down junk I/O exers.."
+
+until eval>nl `ps | grep exer | wc -l`; do
+    for i in `ps | grep exer_kid | elem`; do
+	kill $i
+    done
+    sleep 1
+done
+sleep 1
+until eval>nl `ps | grep exer | wc -l`; do
+    for i in `ps | grep exer_kid | elem`; do
+	kill $i
+    done
+    sleep 1
+done
+if (eval>nl `show d_loopback | grep on | wc -l`) then
+else
+    set tt_allow_login $aa_tt_allow$$
+    clear aa_tt_allow$$
+fi

@@ -1,0 +1,337 @@
+{****************************************************************************
+{*									    *
+{*  COPYRIGHT (c) 1986, 1987, 1988, 1989, 1991, 1992 BY			    *
+{*  DIGITAL EQUIPMENT CORPORATION, MAYNARD, MASSACHUSETTS.		    *
+{*  ALL RIGHTS RESERVED.						    *
+{* 									    *
+{*  THIS SOFTWARE IS FURNISHED UNDER A LICENSE AND MAY BE USED AND COPIED   *
+{*  ONLY IN  ACCORDANCE WITH  THE  TERMS  OF  SUCH  LICENSE  AND WITH THE   *
+{*  INCLUSION OF THE ABOVE COPYRIGHT NOTICE. THIS SOFTWARE OR  ANY  OTHER   *
+{*  COPIES THEREOF MAY NOT BE PROVIDED OR OTHERWISE MADE AVAILABLE TO ANY   *
+{*  OTHER PERSON.  NO TITLE TO AND OWNERSHIP OF  THE  SOFTWARE IS  HEREBY   *
+{*  TRANSFERRED.							    *
+{* 									    *
+{*  THE INFORMATION IN THIS SOFTWARE IS  SUBJECT TO CHANGE WITHOUT NOTICE   *
+{*  AND  SHOULD  NOT  BE  CONSTRUED AS  A COMMITMENT BY DIGITAL EQUIPMENT   *
+{*  CORPORATION.							    *
+{* 									    *
+{*  DIGITAL ASSUMES NO RESPONSIBILITY FOR THE USE  OR  RELIABILITY OF ITS   *
+{*  SOFTWARE ON EQUIPMENT WHICH IS NOT SUPPLIED BY DIGITAL.		    *
+{* 									    *
+{*									    *
+{****************************************************************************
+/*
+/*  Modifications:
+/*
+/*	by prw, 02-Sep-1992
+/*	Added in XBI+ support
+/*
+/*	by jds, 27-Apr-1992
+/*	Added XFA and XMP device IDs; reorganized.
+/* 
+/*	by jds, Fri Aug 16 16:17:49 1991
+/*	Added XNA device ID.
+/* 
+/*  4	by jds, Thu Jun  6 15:34:26 1991
+/*	Added LAMB device ID.
+/* 
+/*  3	by djm, Sun May  5 
+/*      Changed nodespace address to allow for larger IO addressing by
+/*	changing 21800000 to E1800000.   Also added definition of the
+/*      XCD and XCT.
+/*
+/*
+/*  2	by JDS, Fri May  3 14:58:31 1991
+/*  	Fixed nodespace address constants and added KDM70 device type
+/* constant.
+/*
+/*  1
+/*	Entered into Cobra/Laser console CMS library.
+/*
+/*  T1.0-18	Charles McKinley Norton	08-Mar-1989
+/*		Update dates; change bp_gate to a generic name.
+/*
+/*  X1.6-04	Charles McKinley Norton	13-Feb-1989
+/*		Define bit 15 in XGPR for console's use.
+/*
+/*  X1.6-02	Charles McKinley Norton	31-JAN-1989
+/*		Add some bit defs for failing command.
+/*
+/*  X1.5-18	Charles McKinley Norton	09-Dec-1988
+/*		Add definition for RCSR<2ERR>, which is bit 4.
+/*
+/*  V1.0-0	Charles McKinley Norton	09_may-1988
+/*		Updating per latest 9RR/IORR reg defs.
+/*
+/*  1-03	Gary L. Grebus, 24-Nov-1987 14:01:50
+/*		Added XCOMM register, new XMI device type codes, 
+/*		and new XDEV bit definitions.
+/*
+/*  1-02	Gary L. Grebus, 13-Apr-1987 15:55:27
+/*		Forgot XMI$ prefix on above symbol.
+/*
+/*  1-01	Gary L. Grebus, 13-Apr-1987 14:41:40
+/*		Added XMI$K_IO_ADAPTER_SIZE.
+/*  
+module $XMIDEF ident "V1-00";
+/*+
+/*  Rigel XMI ADDRESS SPACE LAYOUT and XMI REQUIRED REGISTERS
+/*-
+
+#Kb = 1@10;
+#Mb = 1@20;
+
+/*  The XMI ADDRESS SPACE 
+constant BASE equals %x20000000 prefix XMI$ tag A; 
+constant NODESPACE equals %x20000000 prefix XMI$ tag AB; 
+/* constant NODESPACE equals 512*1024 prefix XMI$ tag A;
+
+constant MEM_SPACE equals %x0  prefix XMI$ TAG A;	/* Base of memory space
+constant MEM_SPACE_SIZE equals 512*#Mb
+				prefix XMI$;		/* Size of memory space
+
+constant IO_SPACE equals %X20000000  
+				prefix XMI$ TAG A; 	/* Base of xmi node space
+
+constant PRIVATE_SPACE equals %x20000000 
+				prefix XMI$ TAG A;	/* Base of private space
+constant PRIVATE_SPACE_SIZE equals 24*#Mb
+				prefix XMI$;
+
+constant NNEX	equals 16	prefix XMI$;		/* # of XMI nodes
+
+constant NXMI	equals 8	prefix XMI$;		/* # of XMI's
+
+constant NODE_SPACE equals %xE1800000
+				prefix XMI$ TAG A;	/* Base of xmi space
+constant NODE_SPACE_SIZE equals 512*#Kb
+				prefix XMI$;		/* size per xmi node
+constant NODE_TOTAL_SIZE equals %x800000 prefix XMI$;   /* toal size of each XMI bus
+constant IO_ADAPTER_SPACE equals %X22000000
+				prefix XMI$ TAG A;	/* Base of IO Adapters (BI stuff)
+constant IO_ADAPTER_SIZE equals 32*#Mb
+				prefix XMI$;		/* Size per node  (BI stuff)
+#dot = XMI$A_IO_ADAPTER_SPACE;
+constant IO_ADAPTER_1 equals #dot prefix XMI$ TAG A;
+	#dot = #dot + (32*#Mb);
+constant IO_ADAPTER_2 equals #dot prefix XMI$ TAG A;
+	#dot = #dot + (32*#Mb);
+constant IO_ADAPTER_3 equals #dot prefix XMI$ TAG A;
+	#dot = #dot + (32*#Mb);
+constant IO_ADAPTER_4 equals #dot prefix XMI$ TAG A;
+	#dot = #dot + (32*#Mb);
+	#dot = #dot + (192*#Mb);		{ Reserved space
+
+constant IO_ADAPTER_5 equals #dot prefix XMI$ TAG A;
+	#dot = #dot + (32*#Mb);
+constant IO_ADAPTER_6 equals #dot prefix XMI$ TAG A;
+	#dot = #dot + (32*#Mb);
+constant IO_ADAPTER_7 equals #dot prefix XMI$ TAG A;
+	#dot = #dot + (32*#Mb);
+constant IO_ADAPTER_8 equals #dot prefix XMI$ TAG A;
+
+
+/* The XMI Required Registers..."**" means old Rigel reg and may not be implemented
+constant NODESP equals 	%X30000000 prefix XMI$ tag AL; /*  Base of nodespace
+constant XDEV	equals	%x30000000 prefix XMI$ tag AL; /*  Device Reg
+constant XBER	equals  %x30000004 prefix XMI$ tag AL; /*  Bus Error Reg
+constant XFADRA	equals	%x30000008 prefix XMI$ tag AL; /*  Failing Address Reg LW0
+constant XFADRB	equals	%x3000000C prefix XMI$ tag AL; /*  Failing Address Reg LW1
+constant RCSR	equals  %X30000010 prefix XMI$ tag AL; /** Node0 XCP 
+						       /** Control/Status 2
+constant XCOMM	equals  %X30000010 prefix XMI$ tag AL; /** Node 0 XCOMM Register
+constant XBCR   equals  %X30000018 prefix XMI$ tag AL; /** Bus Control Register
+
+aggregate XMIDEF structure prefix XMI$ fill;
+
+  XMIXDEV_OVERLAY union fill;			/* XMI Device Register
+    XDEV longword unsigned;
+    XMIXDEV_BITS structure fill;		
+	XDEV_DTYPE_FIELDS  union fill;  /* Device type
+	    XDEV_DTYPE word;			    /* as a word
+
+	    XDEV_DTYPE_BYTES structure fill;	    /* as a pair of bytes
+	        XDEV_ID byte;    			/* Device id
+	        XDEV_CLASS byte;		        /* Device class
+	    end XDEV_DTYPE_BYTES;
+	    
+	    XDEV_CLASS_BITS structure fill;
+	        XDEV_FILL1 bitfield length 10 fill;
+						    /* Fill / Undefined
+	        XDEV_XCOMM_PRESENT bitfield mask;   /* XCOMM Reg. is implemented
+	        XDEV_IO_DEV bitfield mask;	    /* I/O Device
+		XDEV_MEM_WINDOW bitfield mask;	    /* Bus Window (Memory)
+		XDEV_IO bitfield mask;		    /* Bus Window (I/O)
+						    /* Formerly, any I/O device
+		XDEV_MEM bitfield mask;		    /* Memory device
+		XDEV_CPU bitfield mask;		    /* CPU
+	    end XDEV_CLASS_BITS;
+        end XDEV_DTYPE_FIELDS;
+      
+	XDEV_DREV    word;			/* Device Revision
+	
+    end XMIXDEV_BITS;
+  end XMIXDEV_OVERLAY;
+
+  XMIXBER_OVERLAY union fill;
+    XBER longword unsigned;		/* XMI Bus Error Register
+    XMIXBER_BITS structure fill;		
+
+	XBER_FCMD	bitfield length 4;
+/*
+/* These constants can be used to mask out command in FCMD.
+/*
+    constant    (
+		FCMD_RES0,
+		FCMD_READ,
+		FCMD_INTER_READ,
+		FCMD_RES1,
+		FCMD_RES2,
+		FCMD_RES3,
+		FCMD_UNLK_WRT,
+		FCMD_WRI_MASK,
+		FCMD_INTERRUPT,
+		FCMD_IDENT,
+		FCMD_RES4,
+		FCMD_RES5,
+		FCMD_RES6,
+		FCMD_RES7,
+		FCMD_RES8,
+		FCMD_IMP_VEC_INT
+	    ) equals 0 increment 1;
+
+	XBER_FCID	bitfield length 6;	/* Failing commander ID
+	XBER_STF		bitfield mask;		/* Self Test Fail
+	XBER_ETF		bitfield mask;		/* Extended Test Fail
+	XBER_NSES	bitfield mask;		/* Node-Specific Error Summary
+	XBER_TTO		bitfield mask;		/* Transaction Timeout
+	XBER_TE		bitfield mask;		/* Transmit Error
+	XBER_CNAK	bitfield mask;		/* Command NoAck
+	XBER_RER		bitfield mask;		/* Read Error Response
+	XBER_RSE		bitfield mask;		/* Read Sequence Error
+	XBER_NRR		bitfield mask;		/* No Read Response
+	XBER_CRD		bitfield mask;		/* Corrected Read Data
+	XBER_WDNAK	bitfield mask;		/* Write Data NoAck
+	XBER_RIDNAK	bitfield mask;		/* Read/IDENT Data NoAck
+	XBER_WSE		bitfield mask;		/* Write Sequence Error
+	XBER_PE		bitfield mask;		/* Parity Error
+	XBER_IPE 	bitfield mask;		/* Inconsistent Parity Error
+	XBER_WEI 	bitfield mask;		/* Write Error Interrupt
+	XBER_XFAULT	bitfield mask;		/* XMI Fault
+	XBER_CC	 	bitfield mask;		/* Corrected Confirmation
+	XBER_XBAD 	bitfield mask;		/* XMI BAD
+	XBER_NHALT	bitfield mask;		/* Node Halt
+	XBER_NRST	bitfield mask;		/* Node Reset
+	XBER_ES		bitfield mask;		/* Error Summary
+    end XMIXBER_BITS;
+  end XMIXBER_OVERLAY;
+
+
+  XMIXFADR_OVERLAY union fill;
+    XFADR longword unsigned;			/* XMI Failing Address Register
+    XMIXFADR_BITS structure fill;
+	XFADR_ADR bitfield length 30;		/* Failing Address
+       	XFLN bitfield length 2;			/* Failing length
+    end XMIXFADR_BITS;
+  end XMIFADR_OVERLAY;
+
+  XMIXFADRA_OVERLAY union fill;
+    XFADRA longword unsigned;			/* XMI Failing Address Register LW0
+    XMIXFADRA_BITS structure fill;
+	XFADRA_ADR bitfield length 29;		/* Failing Address
+	XFADRA_ADR2 bitfield mask;	             	/*Failing Address [39]
+       	XFADRA_FLN bitfield length 2;			/* Failing length
+    end XMIXFADRA_BITS;
+  end XMIFADRA_OVERLAY;
+
+  XMIXFADRB_OVERLAY union fill;
+    XFADRB_ longword unsigned;			/* XMI Failing Address Register LW1
+    XMIXFADRB_BITS structure fill;
+	XFADRB_FMASK bitfield length 16;		/* Failing MASK
+	XFADRB_FADR  bitfield length 10;	        /* Failing Address
+       	XFADRB_ROZ bitfield length 2;			/* Read only zero
+       	XFADRB_FCMD bitfield length 4;		/* Failing CMD
+    end XMIXFADRB_BITS;
+  end XMIFADRB_OVERLAY;
+
+
+
+ XMI_BASEPLUS10 union fill;			/* Two possible registers here
+
+  XMIXCOMM_OVERLAY union fill;
+    XCOMM longword unsigned;			/* XMI Communications Register
+    XMIXCOMM_BITS structure fill;
+        XCOMM_CHAR1 byte unsigned;		/* Received character
+	XCOMM_NODE1 bitfield length 4 mask;	/* Node sending CHAR1
+	XCOMM_FILL1 bitfield length 2 fill;	/* Unused - MBZ
+	XCOMM_DISABLE_INT bitfield mask;	/* Disable interrupts
+	XCOMM_BUSY1 bitfield mask;		/* Valid char in CHAR1
+        XCOMM_CHAR2 byte unsigned;		/* Transmitted character
+	XCOMM_NODE2 bitfield length 4 mask;	/* Node sending CHAR2
+						/* (this node)
+	XCOMM_FILL2 bitfield length 3 fill;	/* Unused - MBZ
+	XCOMM_BUSY2 bitfield mask;		/* Valid char in CHAR2
+    end XMIXCOMM_BITS;
+  end XMIXCOMM_OVERLAY;
+
+  XMIRCSR_OVERLAY union fill;
+    RCSR longword unsigned;			/* XMI Command/Status Register 2
+    XMIRCSR_BITS structure fill;
+	RCSR_XCA_REV	bitfield length 4;	/* XCA REV
+/* SDL won't allow 2ERR, so put a char in front.
+	RCSR_X2ERR	bitfield mask;		/* Second Error Bit
+	SPARE_1		bitfield length 3;	/* Listed as spare
+	RCSR_WBD 	bitfield mask;		/* Write buffer disable
+	RCSR_ARD	bitfield mask;		/* Auto retry disable
+	RCSR_ESI	bitfield mask;		/* Enable Self Invalidates
+	RCSR_IPID 	bitfield mask;		/* IP Interrupt Disable
+	RCSR_TOS 	bitfield mask;		/* Timeout Select
+	RCSR_RAM_SPD	bitfield mask;		/* Ram Speed
+	RCSR_CRDID 	bitfield mask;		/* CRD Interrupt Disable
+	RCSR_CCID 	bitfield mask;		/* CC Interrupt Disable
+	RCSR_WS		bitfield mask;		/* WARM Start
+	RCSR_BPD 	bitfield mask;		/* Boot Processor Disable
+	RCSR_BP		bitfield mask;		/* Boot Processor
+	RCSR_CNAKR 	bitfield mask;		/* Commander NOACK Received
+	RCSR_UWP 	bitfield mask;		/* Unlock Write Pending
+	RCSR_LOCKOUT	bitfield length 2;	/* Lockout
+	RCSR_LTS	bitfield mask;		/* Lockout Time Select
+	RCSR_IPL	bitfield length 2 mask;	/* RSSC IPL
+	RCSR_WD		bitfield mask;		/* Write Disable
+	RCSR_CFE 	bitfield mask;		/* Cache Fill Error
+	RCSR_WDPE 	bitfield mask;		/* Write Data Parity Error
+	RCSR_XDP0E	bitfield mask;		/* XDP0 Parity Error
+	RCSR_XDP1E	bitfield mask;		/* XDP1 Parity Error
+	RCSR_XCAPE	bitfield mask;		/* XCA Parity Error
+    end XMIRCSR_BITS;
+  end XMIRCSR_OVERLAY;
+  end XMI_BASEPLUS10;	
+
+end XMIDEF;
+
+/* Known device type codes in XDEV_DTYPE
+constant DTYPE_XCP equals %x8001 prefix XMI$;
+constant DTYPE_XRP equals %x8082 prefix XMI$;
+constant DTYPE_XMP equals %x8080 prefix XMI$;
+constant DTYPE_XMA equals %x4001 prefix XMI$;
+constant DTYPE_XBI equals %x2001 prefix XMI$;
+constant DTYPE_XBIP equals %x2002 prefix XMI$;
+constant DTYPE_XJA equals %x1001 prefix XMI$;
+constant DTYPE_AXA equals %x1002 prefix XMI$;
+constant DTYPE_XCB equals %x0801 prefix XMI$;
+constant DTYPE_XCA equals %x0C01 prefix XMI$;
+constant DTYPE_XXA equals %x0C02 prefix XMI$;
+/* constant DTYPE_XON equals %x0C03 prefix XMI$;
+constant DTYPE_XNA equals %x0C03 prefix XMI$;			/* DEMNA
+constant DTYPE_XFA equals %x0823 prefix XMI$;			/* DEMFA
+constant DTYPE_XWA equals %x0C04 prefix XMI$;
+constant DTYPE_XCD equals %x0C05 prefix XMI$;			/* CIXCD
+constant DTYPE_KDM70 equals %x0C22 prefix XMI$;			/* KDM70
+constant DTYPE_CIMNA equals %x0C2F prefix XMI$;			/* CIMNA
+constant DTYPE_KZMSA equals %x0C36 prefix XMI$;			/* KZMSA
+constant DTYPE_KFMSA equals %x0810 prefix XMI$;			/* KFMSA
+constant DTYPE_KFMSB equals %x0c31 prefix XMI$;			/* KFMSB
+constant DTYPE_XCT equals %x0C69 prefix XMI$;
+constant DTYPE_LAMB equals %x102A prefix XMI$;			/* DWMLA
+                                
+end_module $XMIDEF;

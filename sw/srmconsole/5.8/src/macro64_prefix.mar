@@ -1,0 +1,120 @@
+.macro $macro64_defs
+;+
+;  PAL instruction definitions
+;
+;  hw_st and hw_ld
+;
+;	 3    2 2   2 2
+;	 1    6 5   1 0   6 5 4 3 2 1         0
+;	+------+-----+-----+-+-+-+-+-----------+
+;	|      |     |     |P|A|R|Q|           |
+;       |OPCODE| Ra  | Rb  |H|L|W|W|   DISP    |
+;	|      |     |     |Y|T|C| |           |
+;	+------+-----+-----+-+-+-+-+-----------+
+;-
+$OPDEF mnemonic=stq/p, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=0, 13:13=0, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=stq/pc, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=1, 13:13=0, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=stq/a, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=0, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=stq/aw, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=1, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=stq/w, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=0, 13:13=1, 12:12=1, 0:11=%op2.disp>
+
+$OPDEF mnemonic=stl/p, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=0, 13:13=0, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=stl/pc, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=1, 13:13=0, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=stl/a, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=0, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=stl/aw, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=1, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=stl/w, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1f, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=0, 13:13=1, 12:12=0, 0:11=%op2.disp>
+
+$OPDEF mnemonic=ldq/p, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=0, 13:13=0, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=ldq/pl, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=1, 13:13=0, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=ldq/a, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=0, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=ldq/aw, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=1, 12:12=1, 0:11=%op2.disp>
+$OPDEF mnemonic=ldq/w, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=0, 13:13=1, 12:12=1, 0:11=%op2.disp>
+
+$OPDEF mnemonic=ldl/p, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=0, 13:13=0, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=ldl/pl, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=1, 14:14=1, 13:13=0, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=ldl/a, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=0, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=ldl/aw, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=1, 13:13=1, 12:12=0, 0:11=%op2.disp>
+$OPDEF mnemonic=ldl/w, format=<custom=iregister, displacement>, -
+	encoding=<26:31=^x1b, 21:25=%op1, 16:20=%op2.reg, 15:15=0, 14:14=0, 13:13=1, 12:12=0, 0:11=%op2.disp>
+
+;+
+; mf, mt (hw_mfpr, hw_mtpr), implemented by macros...
+;-
+.macro mf gpr, ipr_num
+    	exp = <%ireg(gpr)@21> ! <%ireg(gpr)@16> ! ipr_num
+    	respal19 exp
+.endm
+
+
+.macro mt gpr, ipr_num
+    	exp = <%ireg(gpr)@21> ! <%ireg(gpr)@16> ! ipr_num
+    	respal1d exp
+.endm
+
+
+.macro	hw_rei					; hw_rei, normal
+	exp = <^X1F@21> ! <^X1F@16> ! <2@14>
+    	respal1e exp
+.endm
+
+
+.macro rcc gpr
+	rpcc gpr
+.endm
+
+;+
+; jmp and jsr are defined here to allow the hint argument
+;-
+$opdef jmp, 							-
+    format=<custom=iregister,indirect,branch_offset>,		-
+    encoding=<26:31=^x1A,21:25=%OP1,16:20=%OP2,14:15=^x0,0:13=%OP3>,-
+    defaults=<%OP3=.+4>
+
+$opdef jsr, 							-
+    format=<custom=iregister,indirect,branch_offset>,		-
+    encoding=<26:31=^x1A,21:25=%OP1,16:20=%OP2,14:15=^x1,0:13=%OP3>,-
+    defaults=<%OP3=.+4>
+
+$opdef ret,-
+     format=<custom=iregister,indirect>-
+     encoding=<26:31=^x1a,21:25=%OP1,16:20=%OP2,14:15=^x2,0:13=^x0>
+
+
+
+
+	.MACRO $MACRO64_EVX_DEFS,$GBL
+	$DEFINI MACRO64_EVX_DEF,$GBL
+
+$EQU	EVX$OPC_HW_LD	<^x1b>
+$EQU	EVX$OPC_SYNC	<^x18>
+
+	$DEFEND MACRO64_EVX_DEF,$GBL,DEF
+	.ENDM
+
+
+
+.macro	.cross			; make .cross be a nop
+.endm	.cross
+
+.macro	.nocross		; make .nocross be a nop
+.endm	.nocross
+.endm	$macro64_defs

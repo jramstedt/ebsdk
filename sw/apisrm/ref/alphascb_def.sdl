@@ -1,0 +1,182 @@
+/* file:	alpha_scb_def.sdl
+/*
+/* Copyright (C) 1987, 1988 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+ /*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Facility:	Alpha Console
+/*
+/* Abstract:	SCB definitions for Alpha
+/*
+/* Modifications:
+/*
+/*
+
+module	$scbdef;
+
+constant (  
+	"000"		,	/* 000	unused 		unused
+	"FLOAT_DISABLE"	,	/* 010	float_disable   Floating disabled
+	"020"		,	/* 020	unused 		unused
+	"030"		,	/* 030	unused 		unused
+	"040"		,	/* 040	unused 		unused
+	"050"		,	/* 050	unused 		unused
+	"060"		,	/* 060	unused 		unused
+	"070"		,	/* 070	unused 		unused
+	"ACCVIO"	,	/* 080	accvio		Access violation
+	"TNV"		,	/* 090	tnv		Translation not valid
+	"FAULT_ON_READ" ,	/* 0A0  fault_on_read   Fault on data stream read
+	"FAULT_ON_WRITE",	/* 0B0  fault_on_write  Fault on data stream write
+	"FAULT_ON_EXE"  ,	/* 0C0  fault_on_read   Fault on Istream access
+	"0D0"		,	/* 0D0	unused 		unused
+	"0E0"		,	/* 0E0	unused 		unused
+	"0F0"		,	/* 0F0	unused 		unused
+	"100"		,	/* 100	unused 		unused
+	"110"		,	/* 110	unused 		unused
+	"120"		,	/* 120	unused 		unused
+	"130"		,	/* 130	unused 		unused
+	"140"		,	/* 140	unused 		unused
+	"150"		,	/* 150	unused 		unused
+	"160"		,	/* 160	unused 		unused
+	"170"		,	/* 170	unused 		unused
+	"180"		,	/* 180	unused 		unused
+	"190"		,	/* 190	unused 		unused
+	"1A0"		,	/* 1A0	unused 		unused
+	"1B0"		,	/* 1B0	unused 		unused
+	"1C0"		,	/* 1C0	unused 		unused
+	"1D0"		,	/* 1D0	unused 		unused
+	"1E0"		,	/* 1E0	unused 		unused
+	"1F0"		,	/* 1F0	unused 		unused
+	"ARITHMETIC"	,	/* 200	arithmetic	Arithmetic           
+	"210"		,	/* 210	unused 		unused
+	"220"		,	/* 220	unused 		unused
+	"230"		,	/* 230	unused 		unused
+	"KERNEL_AST" 	,	/* 240	kernel_ast	Kernel mode AST
+	"EXEC_AST"	,	/* 250	exec_ast	Executive mode AST
+	"SUPER_AST"	,	/* 260	super_ast	Supervisor mode AST
+	"USER_AST"	,	/* 270	user_ast	User mode AST
+	"UNALIGNED"	,	/* 280	unaligned	Unaligned fault
+	"290"		,	/* 290	unused 		unused
+	"2A0"		,	/* 2A0	unused 		unused
+	"2B0"		,	/* 2B0	unused 		unused
+	"2C0"		,	/* 2C0	unused 		unused
+	"2D0"		,	/* 2D0	unused 		unused
+	"2E0"		,	/* 2E0	unused 		unused
+	"2F0"		,	/* 2F0	unused 		unused
+	"300"		,	/* 300	unused 		unused
+	"310"		,	/* 310	unused 		unused
+	"320"		,	/* 320	unused 		unused
+	"330"		,	/* 330	unused 		unused
+	"340"		,	/* 340	unused 		unused
+	"350"		,	/* 350	unused 		unused
+	"360"		,	/* 360	unused 		unused
+	"370"		,	/* 370	unused 		unused
+	"380"		,	/* 380	unused 		unused
+	"390"		,	/* 390	unused 		unused
+	"3A0"		,	/* 3A0	unused 		unused
+	"3B0"		,	/* 3B0	unused 		unused
+	"3C0"		,	/* 3C0	unused 		unused
+	"3D0"		,	/* 3D0	unused 		unused
+	"3E0"		,	/* 3E0	unused 		unused
+	"3F0"		,	/* 3F0	unused 		unused
+	"BREAKPOINT"	,	/* 400	breakpoint	Breakpoint           
+	"BUGCHECK"	,	/* 410	bugcheck	Bugcheck
+	"ILLEGAL_INSTR"	,	/* 420	Illegal_instr	Illegal instruction
+	"ILLEGAL_PAL_OP",	/* 430  Illegal_pal_op  Illegal PAL operand
+	"440"		,	/* 440	unused 		unused
+	"450"		,	/* 450	unused 		unused
+	"460"		,	/* 460	unused 		unused
+	"470"		,	/* 470	reserved        Reserved for performance monitor
+	"CHMK" 		,	/* 480	CHMK		CHMK
+	"CHME"		,	/* 490	CHME		CHME
+	"CHMS"		,	/* 4A0	CHMS		CHMS
+	"CHMU"		,	/* 4B0	CHMU		CHMU
+	"4C0"		,	/* 4C0	reserved	reserved for Digital
+	"4D0"		,	/* 4D0	reserved	reserved for Digital
+	"4E0"		,	/* 4E0	reserved	reserved for Digital
+	"4F0"		,	/* 4F0	reserved	reserved for Digital
+	"500"		,	/* 500	unused 		unused
+	"SL1" 		,	/* 510	SL1     	Software level 1     
+	"SL2"		,	/* 520	SL2		Software level 2
+	"SL3"		,	/* 530	SL3		Software level 3
+	"SL4"		,	/* 540	SL4		Software level 4
+	"SL5"		,	/* 550	SL5		Software level 5
+	"SL6"		,	/* 560	SL6		Software level 6
+	"SL7"		,	/* 570	SL7		Software level 7
+	"SL8"		,	/* 580	SL8		Software level 8
+	"SL9"		,	/* 590	SL9		Software level 9
+	"SLA"		,	/* 5A0	SLA		Software level A
+	"SLB"		,	/* 5B0	SLB		Software level B
+	"SLC"		,	/* 5C0	SLC		Software level C
+	"SLD"		,	/* 5D0	SLD		Software level D
+	"SLE"		,	/* 5E0	SLE		Software level E
+	"SLF"		,	/* 5F0	SLF		Software level F
+	"INTV"		,	/* 600	intv		Interval clock interrupt
+	"INTERPROCESSOR",	/* 610	interprocessor  Interprocessor interrupt
+	"SYS_CORR_ERR"	,	/* 620	sys_corr_err    System corrected error interrupt
+	"PR_CORR_ERR"	,	/* 630	pr_corr_err	Processor corrected error
+	"POWER_FAIL"	,	/* 640	power_fail	Power failure interrupt
+	"650"		,	/* 650	unused		Unused
+	"SYS_MCHK"	,	/* 660	sys_mchk	System machine check
+	"PR_MCHK"	,	/* 670	pr_mchk		Processor machine check 
+	"680"		,	/* 680	680		Reserved - processor specific
+	"690"		,	/* 690	690		Reserved - processor specific
+	"6A0"		,	/* 6A0	6A0		Reserved - processor specific
+	"6B0"		,	/* 6B0	6B0		Reserved - processor specific
+	"6C0"		,	/* 6C0  6C0		unused
+	"6D0"		,	/* 6D0  6D0		unused
+	"6E0"		,	/* 6E0  6E0		unused
+	"6F0"	 	,	/* 6F0	6F0		unused
+) equals 0 increment 1 prefix "SCB$Q" tag "";
+
+/*
+
+constant    	SCB_ENTRIES	equals 512;
+constant 	SCB_ENTRY_SIZE  equals 16;
+constant	MAX_EXC_VECTOR  equals 103;
+
+/*+
+/* ===============================================
+/* = SCBV - auxillary scb vector                 =
+/* ===============================================
+/*
+/* STRUCTURE OVERVIEW:
+/*
+/*	
+/*
+/*
+/* STRUCTURE MEMBERS:
+/*
+/*:
+/*       ----------------------------------------------------------------------
+/*       Structure Members    | Data Type  | Description
+/*       ----------------------------------------------------------------------
+/*                     routine|	address	   | address of routine to be called
+/*                            |	       	   | 
+/*                     p0     |	address    | parameter to be passed
+/*:      ----------------------------------------------------------------------
+/*
+/*-
+/*
+aggregate "SCBV" structure prefix "scbv$" tag "";
+	pd	longword;	/* PD for called routine
+	p0	longword;
+	p1	longword;
+end SCBV;
+
+end_module;

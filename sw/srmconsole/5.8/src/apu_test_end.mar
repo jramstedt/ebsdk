@@ -1,0 +1,55 @@
+; file:	apu_test_end.mar
+;
+; Copyright (C) 1991 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;
+
+;++
+;  FACILITY:
+;
+;      Alpha Console
+;
+;  MODULE DESCRIPTION:
+;
+;	Alpha Update Code
+;
+;  AUTHORS:
+;
+;      This is the end macro for update utility. This is 
+;      a placeholder so the symbol driver can find the 
+;      end of the console image and the beginning of the
+;      update utility. At least that is the theory. Since
+;      this is at the end of the console image (look at map)
+;      the apu_merge code will look for this pattern, and then
+;      pad the merging to the next 8192 page boundary, this
+;      is so that we can boot from physical memory.
+;
+;--
+
+.title	apu_test_end
+.PSECT	___ZZZ_UPDATE , quad, mix
+apu_check::
+    .long   0				    ; Additive Checksum
+apu_start::
+    .long   0				    ; Physical Start Update Code
+apu_length::
+    .long   0				    ; How big is this total image
+    .long   ^x4156414E                      ; 'AVAN'
+    .long   ^x54492020                      ; 'TI  '
+apu_end::
+.end

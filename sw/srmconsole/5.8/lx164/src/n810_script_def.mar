@@ -1,0 +1,154 @@
+; ********************************************************************************************************************************
+;  Created: 21-JUN-2000 10:26:29 by OpenVMS SDL EV1-33     
+;  Source:  14-APR-1993 08:38:33 AFW_USER$:[CONSOLE.V58.COMMON.SRC]N810_SCRIPT_D 
+; ********************************************************************************************************************************
+; 
+;  Copyright (C) 1993 by
+;  Digital Equipment Corporation, Maynard, Massachusetts.
+;  All rights reserved.
+; 
+;  This software is furnished under a license and may be used and copied
+;  only  in  accordance  of  the  terms  of  such  license  and with the
+;  inclusion of the above copyright notice. This software or  any  other
+;  copies thereof may not be provided or otherwise made available to any
+;  other person.  No title to and  ownership of the  software is  hereby
+;  transferred.
+; 
+;  The information in this software is  subject to change without notice
+;  and  should  not  be  construed  as a commitment by digital equipment
+;  corporation.
+; 
+;  Digital assumes no responsibility for the use  or  reliability of its
+;  software on equipment which is not supplied by digital.
+; 
+; 
+;  Abstract:	Definitions for NCR53C810 scripts
+; 
+;  Author:	Stephen F. Shirron
+; 
+;  Modifications:
+; 
+; 	sfs	14-Apr-1993	Initial entry.
+; 
+ 
+	.MACRO	$n810scriptdef,..EQU=<=>,..COL=<:>
+n810$k_dat_out'..equ'0
+n810$k_dat_in'..equ'1
+n810$k_cmd'..equ'2
+n810$k_sts'..equ'3
+n810$k_msg_out'..equ'6
+n810$k_msg_in'..equ'7
+n810$m_bm_byte_count'..equ'^XFFFFFF
+n810$m_bm_phase'..equ'^X7000000
+n810$k_move'..equ'0
+n810$k_wait_move'..equ'1
+n810$m_bm_opcode'..equ'^X8000000
+n810$m_bm_tab'..equ'^X10000000
+n810$m_bm_ind'..equ'^X20000000
+n810$k_bm'..equ'0
+n810$m_bm_type'..equ'^XC0000000
+n810$S_bm_byte_count'..equ'24
+n810$v_bm_byte_count'..equ'0
+n810$S_bm_phase'..equ'3
+n810$v_bm_phase'..equ'24
+n810$v_bm_opcode'..equ'27
+n810$v_bm_tab'..equ'28
+n810$v_bm_ind'..equ'29
+n810$S_bm_type'..equ'2
+n810$v_bm_type'..equ'30
+n810$l_bm_addr'..equ'4
+n810$m_io_atn'..equ'^X8
+n810$m_io_ack'..equ'^X40
+n810$m_io_tgt'..equ'^X200
+n810$m_io_id'..equ'^X70000
+n810$m_io_watn'..equ'^X1000000
+n810$m_io_tab'..equ'^X2000000
+n810$m_io_rel'..equ'^X4000000
+n810$k_resel'..equ'0
+n810$k_sel'..equ'0
+n810$k_disc'..equ'1
+n810$k_wait_disc'..equ'1
+n810$k_wait_sel'..equ'2
+n810$k_wait_resel'..equ'2
+n810$k_set'..equ'3
+n810$k_clear'..equ'4
+n810$m_io_opcode'..equ'^X38000000
+n810$k_io'..equ'1
+n810$m_io_type'..equ'^XC0000000
+n810$v_io_atn'..equ'3
+n810$v_io_ack'..equ'6
+n810$v_io_tgt'..equ'9
+n810$S_io_id'..equ'3
+n810$v_io_id'..equ'16
+n810$v_io_watn'..equ'24
+n810$v_io_tab'..equ'25
+n810$v_io_rel'..equ'26
+n810$S_io_opcode'..equ'3
+n810$v_io_opcode'..equ'27
+n810$S_io_type'..equ'2
+n810$v_io_type'..equ'30
+n810$l_io_addr'..equ'4
+n810$m_rw_data'..equ'^XFF00
+n810$m_rw_reg'..equ'^XFF0000
+n810$k_copy'..equ'0
+n810$k_or'..equ'2
+n810$k_and'..equ'4
+n810$k_add'..equ'6
+n810$m_rw_operation'..equ'^X7000000
+n810$k_write'..equ'5
+n810$k_read'..equ'6
+n810$k_modify'..equ'7
+n810$m_rw_opcode'..equ'^X38000000
+n810$k_rw'..equ'1
+n810$m_rw_type'..equ'^XC0000000
+n810$S_rw_data'..equ'8
+n810$v_rw_data'..equ'8
+n810$S_rw_reg'..equ'8
+n810$v_rw_reg'..equ'16
+n810$S_rw_operation'..equ'3
+n810$v_rw_operation'..equ'24
+n810$S_rw_opcode'..equ'3
+n810$v_rw_opcode'..equ'27
+n810$S_rw_type'..equ'2
+n810$v_rw_type'..equ'30
+n810$m_tc_data'..equ'^XFF
+n810$m_tc_mask'..equ'^XFF00
+n810$m_tc_wait'..equ'^X10000
+n810$m_tc_cmp_phase'..equ'^X20000
+n810$m_tc_cmp_data'..equ'^X40000
+n810$m_tc_jmp_true'..equ'^X80000
+n810$m_tc_phase'..equ'^X7000000
+n810$k_jmp'..equ'0
+n810$k_call'..equ'1
+n810$k_ret'..equ'2
+n810$k_int'..equ'3
+n810$m_tc_opcode'..equ'^X18000000
+n810$m_tc_rel'..equ'^X20000000
+n810$k_tc'..equ'2
+n810$m_tc_type'..equ'^XC0000000
+n810$S_tc_data'..equ'8
+n810$v_tc_data'..equ'0
+n810$S_tc_mask'..equ'8
+n810$v_tc_mask'..equ'8
+n810$v_tc_wait'..equ'16
+n810$v_tc_cmp_phase'..equ'17
+n810$v_tc_cmp_data'..equ'18
+n810$v_tc_jmp_true'..equ'19
+n810$S_tc_phase'..equ'3
+n810$v_tc_phase'..equ'24
+n810$S_tc_opcode'..equ'2
+n810$v_tc_opcode'..equ'27
+n810$v_tc_rel'..equ'29
+n810$S_tc_type'..equ'2
+n810$v_tc_type'..equ'30
+n810$l_tc_addr'..equ'4
+n810$m_mm_byte_count'..equ'^XFFFFFF
+n810$k_mm'..equ'3
+n810$m_mm_type'..equ'^XC0000000
+n810$S_mm_byte_count'..equ'24
+n810$v_mm_byte_count'..equ'0
+n810$S_mm_type'..equ'2
+n810$v_mm_type'..equ'30
+n810$l_mm_src'..equ'4
+n810$l_mm_dst'..equ'8
+	.ENDM

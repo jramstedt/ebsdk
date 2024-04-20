@@ -1,0 +1,4 @@
+# This is a script to add the DE200-LE (AKA DE205) to the isacfg table
+# The first instance of a DE205 is in io space at 300, memory space at d1000
+# and interrupts at IRQ5 (switch setting). 
+isacfg -slot 1 -dev 0 -mk -handle DE200-LE -irq0 5 -iobase0 300 -membase0 d0000 -memlen0 10000 -etyp 1 -enadev 1

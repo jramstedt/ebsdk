@@ -1,0 +1,31 @@
+# file: dpupdate_files.bld --  LFU utility build file for AlphaPC 264DP.
+
+include cp$src:pc264_files.bld
+configuration DPUPDATE
+option FWUPDATE
+
+#
+# start this last!!!!
+#
+driver	lfu_startup_driver.c	 5	group base
+#
+# These files are not needed
+#
+delete file cp$src:dp264_test
+delete file cp$src:dp264_mfgtest
+delete file cp$src:sys_exer_eb164
+delete file cp$src:memexer_dp264
+delete file cp$src:show_status
+delete file cp$src:kill_diags_eb164
+delete file cp$src:showit
+delete file nettest.c
+delete file memtest.c
+delete file memtest_gray_lw.c
+delete file memtest_alpha.mar
+delete file memtest_march.c
+delete file memtest_random.c
+delete file memtest_victim.c
+delete file isp1020_edit.c
+delete file exer.c
+delete file help.c
+delete file net.c

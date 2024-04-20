@@ -1,0 +1,270 @@
+{ Copyright (c) 1993 by
+{ Digital Equipment Corporation, Maynard, Massachusetts.
+{ All rights reserved.
+{
+{ This software is furnished under a license and may be used and copied
+{ only  in  accordance  of  the  terms  of  such  license  and with the
+{ inclusion of the above copyright notice.  This software or any  other
+{ copies thereof may not be provided or otherwise made available to any
+{ other person.  No title to and  ownership of the  software is  hereby
+{ transferred.
+{
+{ The information in this software is  subject to change without notice
+{ and  should  not  be  construed  as a commitment by Digital Equipment
+{ Corporation.
+{
+{ Digital assumes no responsibility for the use  or  reliability of its
+{ software on equipment which is not supplied by Digital.
+{
+MODULE CIA_ERRORDEF IDENT "V1.0";
+
+
+/*
+/* CIA Error Information 0 - 0x8740008000
+/*
+AGGREGATE cia_ei0 UNION 
+    PREFIX ei0_;
+
+    by_field STRUCTURE;
+	unused_0 BITFIELD LENGTH 4-^ MASK;
+	ev5_addr_h BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END cia_ei0;
+
+/*
+/* CIA Error Information 1 - 0x8740008040
+/*
+AGGREGATE cia_ei1 UNION 
+    PREFIX ei1_;
+
+    by_field STRUCTURE;
+	ev5_addr_h BITFIELD LENGTH 3-^ MASK;	    /* [2:0] ... bits 34:32
+	reserved BITFIELD LENGTH 7-^ MASK;	    /* [6:3]
+	ev5_addr_39 BITFIELD LENGTH 8-^ MASK;	    /* [7]   ... bit 39
+	ev5_cmd_h BITFIELD LENGTH 12-^ MASK;	    /* [11:8]
+	int4_valid_h BITFIELD LENGTH 16-^ MASK;	    /* [15:12]
+	reserved_0 BITFIELD LENGTH 21-^ MASK;	    /* [20:16]
+	ev5_addr_cmd_par BITFIELD LENGTH 22-^ MASK; /* [21]
+	reserved_1 BITFIELD LENGTH 30-^ MASK;	    /* [29:22]
+	ferr BITFIELD LENGTH  31-^ MASK;	    /* [30]
+	cpu_pe BITFIELD LENGTH 32-^ MASK;	    /* [31]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END cia_ei1;
+
+/*
+/* CIA Error register - 0x8740008200
+/*
+AGGREGATE CIA_ERR UNION 
+    PREFIX err_;
+
+    by_field STRUCTURE;
+	corr_ecc_err BITFIELD LENGTH 1-^ MASK;	    /* [0]
+	unc_ecc_err BITFIELD LENGTH 2-^ MASK;	    /* [1]
+	cpu_pe BITFIELD LENGTH 3-^ MASK;	    /* [2]
+	mem_nem BITFIELD LENGTH 4-^ MASK;	    /* [3]
+	pci_serr BITFIELD LENGTH  5-^ MASK;	    /* [4]
+	pci_perr BITFIELD LENGTH  6-^ MASK;	    /* [5]
+	pci_adr_pe BITFIELD LENGTH  7-^ MASK;	    /* [6]
+	m_abort BITFIELD LENGTH  8-^ MASK;	    /* [7]
+	t_abort BITFIELD LENGTH  9-^ MASK;	    /* [8]
+	pa_pte_inv BITFIELD LENGTH 10-^ MASK;	    /* [9]
+	from_wrt_err BITFIELD LENGTH 11-^ MASK;	    /* [10]
+	ioa_timeout BITFIELD LENGTH 12-^ MASK;	    /* [11]
+	reserved_0 BITFIELD LENGTH 16-^ MASK;	    /* [15:12]
+	lost_corr_ecc_err BITFIELD LENGTH 17-^ MASK;/* [16]
+	lost_unc_ecc_err BITFIELD LENGTH 18-^ MASK; /* [17]
+	lost_cpu_pe BITFIELD LENGTH 19-^ MASK;	    /* [18]
+	lost_mem_nem BITFIELD LENGTH 20-^ MASK;	    /* [19]
+	reserved_1 BITFIELD LENGTH  21-^ MASK;	    /* [20]
+	lost_pci_perr BITFIELD LENGTH  22-^ MASK;	    /* [21]
+	lost_pci_adr_pe BITFIELD LENGTH  23-^ MASK;	    /* [22]
+	lost_m_abort BITFIELD LENGTH  24-^ MASK;	    /* [23]
+	lost_t_abort BITFIELD LENGTH  25-^ MASK;	    /* [24]
+	lost_pa_pte_inv BITFIELD LENGTH 26-^ MASK;	    /* [25]
+	lost_from_wrt_err BITFIELD LENGTH 27-^ MASK;	    /* [26]
+	lost_ioa_timeout BITFIELD LENGTH 28-^ MASK;	    /* [27]
+	reserved_2 BITFIELD LENGTH 31-^ MASK;	    /* [30:28]
+	valid BITFIELD LENGTH 32-^ MASK;	    /* [31]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+END CIA_ERR;
+
+/*
+/* CIA Error status register - 0x8740008240
+/*
+CONSTANT (idle,
+    restart,
+    iow_64,
+    iow_32,
+    r_4,
+    none,
+    dma_rd,
+    dma_wr,
+    gru_wr,
+    gru_rd,
+    csr_rd,
+    pci_rd) EQUALS %X0 INCREMENT %X1000
+    PREFIX dm_;
+
+AGGREGATE cia_error_stat UNION 
+    PREFIX stat_;
+
+    by_field STRUCTURE;
+	pci_trgt BITFIELD LENGTH 1-^ MASK;	    /* [0]
+	pci_mstr BITFIELD LENGTH 2-^ MASK;          /* [1]
+	reserved_0 BITFIELD LENGTH 3-^ MASK;	    /* [2]
+	mem_source BITFIELD LENGTH 4-^ MASK;	    /* [3]
+	io_queue BITFIELD LENGTH 8-^ MASK;	    /* [7:4]
+	cpu_queue BITFIELD LENGTH 11-^ MASK;	    /* [10:8]
+	tlb_miss BITFIELD LENGTH 12-^ MASK;	    /* [11]
+	dm_stat BITFIELD LENGTH 16-^ MASK;	    /* [15:12]
+	pa_cpu_res BITFIELD LENGTH 18-^ MASK;       /* [17:16]
+	reserved_1 BITFIELD LENGTH 32-^ MASK;       /* [31:18]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+END cia_error_stat;
+
+/*
+/* CIA Error mask register - 0x8740008280
+/*
+AGGREGATE cia_error_mask UNION 
+    PREFIX msk_;
+
+    by_field STRUCTURE;
+	corr_ecc_err BITFIELD LENGTH 1-^ MASK;	    /* [0]
+	unc_ecc_err BITFIELD LENGTH 2-^ MASK;	    /* [1]
+	cpu_pe BITFIELD LENGTH 3-^ MASK;	    /* [2]
+	mem_nem BITFIELD LENGTH 4-^ MASK;	    /* [3]
+	pci_serr BITFIELD LENGTH  5-^ MASK;	    /* [4]
+	pci_perr BITFIELD LENGTH  6-^ MASK;	    /* [5]
+	pci_adr_pe BITFIELD LENGTH  7-^ MASK;	    /* [6]
+	m_abort BITFIELD LENGTH  8-^ MASK;	    /* [7]
+	t_abort BITFIELD LENGTH  9-^ MASK;	    /* [8]
+	pa_pte_inv BITFIELD LENGTH 10-^ MASK;	    /* [9]
+	from_wrt_err BITFIELD LENGTH 11-^ MASK;	    /* [10]
+	ioa_timeout BITFIELD LENGTH 12-^ MASK;	    /* [11]
+	reserved_1 BITFIELD LENGTH 32-^ MASK;	    /* [31:12]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+END cia_error_mask;
+
+/*
+/* CIA Error Syndrome register  - 0x8740008300
+/*
+
+AGGREGATE cia_syndrome UNION 
+    PREFIX synd_;
+
+    by_field STRUCTURE;
+	syndrome BITFIELD LENGTH 8-^ MASK;
+	unused_0 BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END cia_syndrome;
+
+
+/*
+/* CIA Memory Port status register 0 - 0x8740008400
+/*
+
+AGGREGATE cia_mpsr0 UNION 
+    PREFIX mpsr0_;
+
+    by_field STRUCTURE;
+	unused_0 BITFIELD LENGTH 4-^ MASK;
+	mem_addr_h BITFIELD LENGTH 32-^ MASK;
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END cia_mpsr0;
+
+/*
+/* CIA Memory Port status register 1 - 0x8740008440
+/*
+
+AGGREGATE cia_mpsr1 UNION 
+    PREFIX mpsr1_;
+
+    by_field STRUCTURE;
+	mem_addr_h BITFIELD LENGTH 2-^ MASK;	    /* [1:0]
+	reserved BITFIELD LENGTH 7-^ MASK;	    /* [6:3]
+	mem_addr_39 BITFIELD LENGTH 8-^ MASK;	    /* [7]
+	mem_cmd_h BITFIELD LENGTH 12-^ MASK;	    /* [11:8]
+	mem_int4_valid BITFIELD LENGTH 16-^ MASK;   /* [15:12]
+	mem_seq_st BITFIELD LENGTH 20-^ MASK;	    /* [19:16] 
+	mem_port_src BITFIELD LENGTH 21-^ MASK;	    /* [20]   
+	reserved_1 BITFIELD LENGTH 24-^ MASK;	    /* [23:21]
+	set_sel BITFIELD LENGTH 29-^ MASK;	    /* [28:24]
+	reserved_2 BITFIELD LENGTH 32-^ MASK;	    /* [31:29]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+
+END cia_mpsr1;
+
+
+/*
+/* PCI Error register 0 - 0x87400014c0
+/*
+
+AGGREGATE cia_pcie0 UNION 
+    PREFIX pcie0_;
+
+    by_field STRUCTURE;
+	cmd BITFIELD LENGTH 4-^ MASK;		    /* [3:0]
+	lock_state BITFIELD LENGTH 5-^ MASK;	    /* [4]
+	dac_cycle BITFIELD LENGTH 6-^ MASK;	    /* [5]
+	unused_0 BITFIELD LENGTH 8-^ MASK;	    /* [7:6]
+	window BITFIELD LENGTH 12-^ MASK;	    /* [11:8]
+	unused_1 BITFIELD LENGTH 16-^ MASK;	    /* [15:12]
+	mstr_state BITFIELD LENGTH 20-^ MASK;	    /* [19:16]
+	trgt_state BITFIELD LENGTH 23-^ MASK;	    /* [22:20]
+	unused_2 BITFIELD LENGTH 32-^ MASK;	    /* [31:23]
+    END by_field;
+    whole LONGWORD;
+    displacement BYTE DIMENSION 64;
+END cia_pcie0;
+
+/* Define constants to build the base address at 0x8740008000
+
+CONSTANT ciaerr_a_addr EQUALS %X8740008;
+CONSTANT ciaerr_v_addr EQUALS 12;
+CONSTANT ciaerr_k_offset EQUALS %x8000;
+
+
+/*
+/* CIA Error registers .....
+/*
+
+AGGREGATE cia_error_regs STRUCTURE ;
+    eir0 cia_ei0;			/* 8740008000
+    eir1 cia_ei1;			/* 8740008040
+    offset_0 byte DIMENSION %x200-: FILL;
+    cia_err CIA_ERR;			/* 8740008200
+    cia_err_stat cia_error_stat;	/* 8740008240
+    cia_err_mask cia_error_mask;	/* 8740008280 
+    offset_2 byte DIMENSION %x300-: FILL;
+    cia_syn cia_syndrome;		/* 8740008300 
+    offset_3 byte DIMENSION %x400-: FILL;
+    cia_mem0 cia_mpsr0;			/* 8740008400
+    cia_mem1 cia_mpsr1;			/* 8740008440
+    offset_5 byte DIMENSION %x800-: FILL;
+    pci_err0 cia_pcie0;			/* 8740008800 
+    pci_err1 LONGWORD;			/* 8740008840 
+    fill_1   BYTE DIMENSION 60;		/* filler
+    pci_err2 LONGWORD;			/* 8740008880
+END cia_error_regs;
+
+END_MODULE CIA_ERRORDEF;

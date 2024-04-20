@@ -1,0 +1,255 @@
+/*
+/* Copyright (C) 1992 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice 
+/* and  should  not  be  construed  as a commitment by Digital Equipment
+/* Corporation.                                                       
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by Digital. 
+/*
+/*
+/* Abstract:	IDE (Intelligent Drive Electronics) Definitions
+/*
+/* Author:	Judith Gold
+/*
+/* Modifications:
+/*
+/*	jeg	19-Nov-1992	Initial entry.
+/*
+ 
+module	$idedef;
+
+
+constant
+	IDE_REG_BASE equals %x3F0,
+	IDE_MAX_RESULT_BYTES equals 10,
+        IDE_MAX_COMMAND_BYTES equals 10,/* add one for null terminator
+	IDE_MAX_UNITS equals 4,
+	IDE_BUS_NODE_NUM equals 0,	/* bus node number - arbitrary value
+        MAX_RETRIES equals 3,		/* number of times to appempt read/write
+        UNIT_POSITION equals 3,		/* unit number offset in filename
+	IDE_INT_MASK equals %x40,	/* mask indicating interrupt received
+	HLT equals 2,			/* head load time
+	ND equals 0,			/* do allow DMAs
+	GPL equals %x1b,		/* assumes 512 sector size
+        SC equals 5,			/* number of sectors to be formatted	
+	FL_TO_MEM equals 0,		/* disk read to memory 
+	MEM_TO_FL equals 1,		/* memory write to disk
+	BYTES_PER_TRACK equals 18*512,	/* maximum number of bytes per track
+        BYTES_PER_SECTOR equals 512,    /* MS-DOS format
+	MAX_DMA_BYTES equals 64*1024,	/* maximum number of bytes to dma
+	N equals 2;			/* for N in read/write_data 512 assumed
+
+constant
+    	SK equals %x1,			/* set skip bit in read/write commands
+        MFM equals %x1,			/* set double density bit in "" ""
+	FM equals %x0,  		/* don't set the MFM bit
+	MT equals %x1;			/* multi-track operating mode 
+
+/* -----------------status, data and control register bit definitions-------
+
+/* SRA -- Status Register A -- 3F0
+
+aggregate SRA struct prefix "SRA$";
+	DIR bitfield length 1 mask;             
+	N_WP bitfield length 1 mask;
+	N_INDX bitfield length 1 mask;
+	HDSEL bitfield length 1 mask;
+	N_TRK0 bitfield length 1 mask;
+	STEP bitfield length 1 mask;
+	N_DRV2 bitfield length 1 mask;
+	INT_PENDING bitfield length 1 mask;
+end SRA;	 
+
+
+/* SRB -- Status Register B -- 3F1
+
+aggregate SRB struct prefix "SRB$";
+	MOT_EN0 bitfield length 1 mask;
+	MOT_EN1 bitfield length 1 mask;
+	WE bitfield length 1 mask;
+	RDDATA_TOGGLE bitfield length 1 mask;
+	WRDATA_TOGGLE bitfield length 1 mask;
+	DRIVER_SEL_0 bitfield length 1 mask;
+	filler bitfield length 2 mask;
+end SRB;
+
+
+/* DOR -- Digital Output Register -- 3F2
+
+
+aggregate DOR struct prefix "DOR$";
+	DRIVE_SEL0 bitfield length 1 mask;
+	DRIVE_SEL1 bitfield length 1 mask;
+	N_RESET bitfield length 1 mask;
+	N_DMA_GATE bitfield length 1 mask;
+	MOT_EN0 bitfield length 1 mask;         /* motor enables
+	MOT_EN1 bitfield length 1 mask;
+	MOT_EN2 bitfield length 1 mask;
+	MOT_EN3 bitfield length 1 mask;
+end DOR;
+
+
+/* TDR  -- Tape Drive Register -- 3F3
+
+aggregate TDR struct prefix "TDR$";
+	TAPE_SEL0 bitfield length 1 mask;
+	TAPE_SEL1 bitfield length 1 mask;
+	filler bitfield length 6 mask;
+end TDR;
+
+
+/* DSR -- Datarate Select Register -- 3F4 (write) 
+
+aggregate DSR struct prefix "DSR$";
+	DRATE_SEL0 bitfield length 1 mask;
+	DRATE_SEL1 bitfield length 1 mask;
+	PRECOMP0 bitfield length 1 mask;
+	PRECOMP1 bitfield length 1 mask;
+	PRECOMP2 bitfield length 1 mask;
+	filler bitfield length 1 mask;
+	POWERDOWN bitfield length 1 mask;
+	SW_RESET bitfield length 1 mask;
+end DSR;
+
+
+/* MSR_DSR -- Main Status Register -- 3F4 (read)
+
+aggregate MSR_DSR struct prefix "MSR_DSR$";
+	DRV0_BUSY bitfield length 1 mask;        /* drive in seek portion of cmd
+	DRV1_BUSY bitfield length 1 mask;
+	DRV2_BUSY bitfield length 1 mask;
+	DRV3_BUSY bitfield length 1 mask;
+	CMD_BUSY bitfield length 1 mask;         /* command in progress
+	NON_DMA bitfield length 1 mask;          
+	DIO bitfield length 1 mask;              /* direction of data xfer
+	RQM bitfield length 1 mask;              /* ready bit for CPU
+end MSR_DSR;
+
+
+/* DIR -- Digital Input Register -- 3F7 (read)
+
+aggregate DIR struct prefix "DIR$";
+	N_HIGH_DENS bitfield length 1 mask;
+	DRATE_SEL0 bitfield length 1 mask;
+	DRATE_SEL1 bitfield length 1 mask;
+	filler bitfield length 4 mask;
+	DSK_CHG bitfield length 1 mask;
+end DIR;
+
+
+/* CCR -- Configuration Control Register -- 3F7 (write)
+
+aggregate CCR struct prefix "CCR$";
+	DRATE_SEL0 bitfield length 1 mask;
+	DRATE_SEL1 bitfield length 1 mask;
+	filler bitfield length 6 mask;
+end CCR;
+
+
+/* -----------------least significant byte of command definitions-------
+
+constant
+IDE_READ_DATA equals 6,
+IDE_READ_DLTD_DATA equals %xC,
+IDE_WRITE_DATA equals 5,
+IDE_WRITE_DLTD_DATA equals 9,
+IDE_READ_TRACK equals 2,
+IDE_VERIFY equals 6,
+IDE_FORMAT_TRACK equals %xD,
+IDE_RECALIBRATE equals 7,
+IDE_SENSE_INT_STATUS equals 8,
+IDE_SPECIFY equals 3,
+IDE_SENSE_DRIVE_STATUS equals 4,
+IDE_SEEK equals %xF,
+IDE_CONFIGURE equals %x13,
+IDE_RELATIVE_SEEK equals %xF,
+IDE_DUMPREG equals %xE,
+IDE_READID equals %xA,
+IDE_PERPENDICULAR_MODE equals %x12,
+IDE_LOCK equals 4;
+
+
+
+/* -----------------status registers 0 - 3, read as command result only-------
+
+
+
+aggregate SR0 struct prefix "SR0$";
+	DS0 bitfield length 1 mask;		/* drive select
+	DS1 bitfield length 1 mask;             /* 
+	H bitfield length 1 mask;               /* head address
+	filler bitfield length 1 mask;          /* 
+	EC bitfield length 1 mask;              /* equipment check
+	SE bitfield length 1 mask;              /* seek end
+	IC bitfield length 2 mask;              /* interrupt code
+end SR0;
+
+
+aggregate SR1 struct prefix "SR1$";
+	MA bitfield length 1 mask;              /* missing address mark
+	NW bitfield length 1 mask;              /* not writable
+	ND bitfield length 1 mask;              /* no data
+	filler1 bitfield length 1 mask;         /* 
+	OR bitfield length 1 mask;              /* overrun/underrun
+	DE bitfield length 1 mask;              /* data error
+	filler2 bitfield length 1 mask;         /*
+	EN bitfield length 1 mask;              /* end of cylinder
+end SR1;
+
+
+aggregate SR2 struct prefix "SR2$";
+	MD bitfield length 1 mask;		/* missing data address mark
+	BC bitfield length 1 mask;              /* bad cylinder
+	filler bitfield length 2 mask;          /* 
+	WC bitfield length 1 mask;              /* wrong cylinder
+	DD bitfield length 1 mask;              /* data error in data field
+	CM bitfield length 1 mask;              /* control mark
+	filler2 bitfield length 1 mask;         /*
+end SR2;
+
+
+aggregate SR3 struct prefix "SR3$";              
+	DS0 bitfield length 1 mask;             /* drive select
+	DS1 bitfield length 1 mask;             /*
+	HD bitfield length 1 mask;              /* head address
+	filler1 bitfield length 1 mask;         /*
+	T0 bitfield length 1 mask;              /* TRACK0 pin
+	filler2 bitfield length 1 mask;         /*
+	WP bitfield length 1 mask;              /* write protect pin
+	filler3 bitfield length 1 mask;         /*
+end SR3;                                               
+
+/* media descriptors   F == floppy, H = hard disk
+
+constant 
+	FMEGA equals %xf0,			/* 1.44 or 2.88 MB 3.5" or
+						/* 1.2 MB 5.25" floppy
+	HDISK equals %xf8,			/* hard disk, any size
+	F720_3 equals %xf9,			/* 720 K, 3.5" or
+						/* 1.2 MB 5.25" floppy
+	F640_5 equals %xfa,			/* 640 K, 5.25" floppy
+	F640_3 equals %xfb,			/* 640 K, 3.5" floppy
+	F180_5 equals %xfc,			/* 180 K, 4.25" floppy
+	F360_5 equals %xfd,			/* 360 K, 5.25" floppy
+	F160_5 equals %xfe,			/* 160 K, 5.25" floppy
+	F320_5 equals %xff;			/* 320 K, 5.25" floppy
+	
+	
+constant
+	_2_88_MEG equals %x2e147a;		/* 2.88 Mb
+				
+
+end_module;
+
+

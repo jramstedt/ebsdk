@@ -1,0 +1,582 @@
+/* file:	ev6_pc264_impure_def.sdl
+/*                           
+/* Abstract:	PAL impure scratch area and logout area data structure 
+/* 		definitions for Alpha firmware.
+/*                               
+/*                           
+{*	To convert to macro: 
+{*      SDL/LANGUAGE=MACRO/COPYRIGHT/LIST EV6_PC264_IMPURE_DEF.SDL
+{*       
+                                        
+module	$pal_impure;      
+                                  
+IFLANGUAGE CC             
+LITERAL;               
+#ifndef IMPURE_DEF_H
+#define IMPURE_DEF_H
+END_LITERAL;
+END_IFLANGUAGE;
+
+constant REVISION equals 1 prefix IMPURE$;  /* Revision number of this file
+                                              
+aggregate TMCES union; 
+  fields structure;
+    mchk bitfield length 1;                            
+    sce  bitfield length 1;                            
+    pce  bitfield length 1;                            
+    dpc  bitfield length 1;                            
+    dsc  bitfield length 1;
+  end fields;
+  whole byte;
+end TMCES;	                                     
+     
+aggregate TPAL_P_MISC_REG structure ;  
+	sw bitfield length 2;                         
+	ip bitfield length 1;  
+	cm bitfield length 2;              
+	rsvd1 bitfield length 2;           
+	vmm bitfield length 1;             
+	ipl bitfield length 5;             
+ 	rsvd2 bitfield length 3;           
+        mces TMCES;                        
+	scbv bitfield length 16;
+        mchkCode bitfield length 16;
+	switch1 bitfield length 1;
+ 	phys bitfield length 1;
+end TPAL_P_MISC_REG;           
+             
+aggregate TPAL_PCTX_REG structure ;
+	rsvd1 bitfield length 1;                         
+	ppce bitfield length 1;                                         
+	fpe bitfield length 1;              
+	rsvd2 bitfield length 2;           
+	aster bitfield length 4;             
+	astrr bitfield length 4;             
+ 	rsvd3a bitfield length 19;           
+ 	rsvd3b bitfield length 7;           
+        asn bitfield length 8;
+	rsvd4 bitfield length 17;
+end TPAL_PCTX_REG;
+                  
+/*
+/* Structure of the processor-specific impure area
+/*
+aggregate impure struct prefix "" tag "";
+	cns$flag	quadword;
+	cns$hlt		quadword;
+constant (
+	cns$r0,cns$r1,cns$r2,cns$r3,cns$r4,cns$r5,cns$r6,cns$r7,
+	cns$r8,cns$r9,cns$r10,cns$r11,cns$r12,cns$r13,cns$r14,cns$r15,
+	cns$r16,cns$r17,cns$r18,cns$r19,cns$r20,cns$r21,cns$r22,cns$r23,
+	cns$r24,cns$r25,cns$r26,cns$r27,cns$r28,cns$r29,cns$r30,cns$r31
+	) equals . increment 8 prefix "" tag "";
+	cns$gpr	quadword dimension 32;
+constant (
+	cns$f0,cns$f1,cns$f2,cns$f3,cns$f4,cns$f5,cns$f6,cns$f7,
+	cns$f8,cns$f9,cns$f10,cns$f11,cns$f12,cns$f13,cns$f14,cns$f15,
+	cns$f16,cns$f17,cns$f18,cns$f19,cns$f20,cns$f21,cns$f22,cns$f23,
+	cns$f24,cns$f25,cns$f26,cns$f27,cns$f28,cns$f29,cns$f30,cns$f31
+	) equals . increment 8 prefix "" tag "";                     
+	cns$fpr	quadword dimension 32;                               
+	#t=.;                                                        
+	cns$mchkflag quadword;                                       
+	constant cns$pt_offset equals .;                             
+        constant PT$_IMPURE equals (.-cns$pt_offset)/4;
+	cns$pt	   	quadword dimension 1;                        
+        constant PT$_WHAMI equals (.-cns$pt_offset)/4;
+	cns$whami  	quadword;                                    
+        constant PT$_SCC equals (.-cns$pt_offset)/4;
+	cns$scc	   	quadword;                                    
+        constant PT$_PRBR equals (.-cns$pt_offset)/4;
+	cns$prbr   	quadword;                                    
+        constant PT$_PTBR equals (.-cns$pt_offset)/4;
+	cns$ptbr   	quadword;                                    
+	cns$trap   	quadword;                                    
+	cns$halt_code	quadword;                                    
+	cns$ksp	   	quadword;                                    
+	cns$scbb       	quadword;                                    
+        constant PT$_PCBB equals (.-cns$pt_offset)/4;
+	cns$pcbb       	quadword;                                        
+	cns$vptb       	quadword;
+	cns$pt_pad  	quadword dimension 13;
+	cns$shadow4	quadword;
+	cns$shadow5	quadword;
+	cns$shadow6	quadword;
+	cns$shadow7	quadword;
+	cns$shadow20	quadword;
+	cns$p_temp    	quadword;
+        constant PT$_PS equals (.-cns$pt_offset)/4;
+	cns$p_misc	TPAL_P_MISC_REG;
+	cns$shadow23	quadword;
+	cns$fpcr	quadword;
+	cns$va		quadword;
+	cns$va_ctl	quadword;
+	cns$exc_addr	quadword;
+	cns$ier_cm	quadword;
+	cns$sirr	quadword;
+	cns$isum	quadword;
+	cns$exc_sum	quadword;
+	cns$pal_base	quadword;
+	cns$i_ctl	quadword;
+	cns$pctr_ctl	quadword;
+	cns$process_context	TPAL_PCTX_REG;
+	cns$i_stat	quadword;
+	cns$dtb_alt_mode	quadword;
+	cns$mm_stat	quadword;                                        
+	cns$m_ctl	quadword;
+	cns$dc_ctl	quadword;
+	cns$dc_stat	quadword;
+	cns$write_many	quadword;
+	cns$virbnd	quadword;
+	cns$sysptbr	quadword;
+	cns$report_lam	quadword;
+
+IFSYMBOL ev6_p1;
+	cns$fpe_state	quadword;	/* For emulator
+	cns$fp_pc	quadword;	/* For emulator
+
+	cns$r0_emul	quadword;	/* Integer registers for emulator
+	cns$r1_emul	quadword;
+	cns$r2_emul	quadword;
+	cns$r3_emul	quadword;
+	cns$r4_emul	quadword;
+	cns$r5_emul	quadword;
+	cns$r6_emul	quadword;
+	cns$r7_emul	quadword;
+	cns$r8_emul	quadword;
+	cns$r9_emul	quadword;
+	cns$r10_emul	quadword;
+	cns$r11_emul	quadword;
+	cns$r12_emul	quadword;
+	cns$r13_emul	quadword;
+	cns$r14_emul	quadword;
+	cns$r15_emul	quadword;
+	cns$r16_emul	quadword;
+	cns$r17_emul	quadword;
+	cns$r18_emul	quadword;
+	cns$r19_emul	quadword;
+	cns$r20_emul	quadword;
+	cns$r21_emul	quadword;
+	cns$r22_emul	quadword;
+	cns$r23_emul	quadword;
+	cns$r24_emul	quadword;
+	cns$r25_emul	quadword;
+	cns$r26_emul	quadword;
+	cns$r27_emul	quadword;
+	cns$r28_emul	quadword;
+	cns$r29_emul	quadword;
+	cns$r30_emul	quadword;
+	cns$r31_emul	quadword;
+
+	cns$f0_emul	quadword;	/* Floating point registers
+	cns$f1_emul	quadword;
+	cns$f2_emul	quadword;
+	cns$f3_emul	quadword;
+	cns$f4_emul	quadword;
+	cns$f5_emul	quadword;
+	cns$f6_emul	quadword;
+	cns$f7_emul	quadword;
+	cns$f8_emul	quadword;
+	cns$f9_emul	quadword;
+	cns$f10_emul	quadword;
+	cns$f11_emul	quadword;
+	cns$f12_emul	quadword;
+	cns$f13_emul	quadword;
+	cns$f14_emul	quadword;
+	cns$f15_emul	quadword;
+	cns$f16_emul	quadword;
+	cns$f17_emul	quadword;
+	cns$f18_emul	quadword;
+	cns$f19_emul	quadword;
+	cns$f20_emul	quadword;
+	cns$f21_emul	quadword;
+	cns$f22_emul	quadword;
+	cns$f23_emul	quadword;
+	cns$f24_emul	quadword;
+	cns$f25_emul	quadword;
+	cns$f26_emul	quadword;
+	cns$f27_emul	quadword;
+	cns$f28_emul	quadword;
+	cns$f29_emul	quadword;
+	cns$f30_emul	quadword;
+	cns$f31_emul	quadword;
+END_IFSYMBOL;
+
+	cns$exit_console	quadword;
+	cns$work_request	quadword;
+	cns$cchip_dirx		quadword;
+	cns$cchip_misc		quadword;
+	cns$pchip0_err		quadword;
+	cns$pchip1_err		quadword;
+
+	cns$srom_srom_rev	quadword;   /* Parameters passed up from srom
+	cns$srom_proc_id	quadword;
+	cns$srom_mem_size	quadword;      
+	cns$srom_cycle_cnt	quadword;
+	cns$srom_signature	quadword;
+	cns$srom_proc_mask	quadword;
+	cns$srom_sysctx		quadword;
+
+	constant cns$size equals .;
+	constant pal$impure_size equals (.+7) & %xfff8;
+	constant cns$mchksize equals (.+7-#t) & %xfff8;
+end impure;
+
+aggregate __impure struct prefix "" tag "";
+	cns__flag	quadword;
+	cns__halt		quadword;
+constant (
+	cns__r0,cns__r1,cns__r2,cns__r3,cns__r4,cns__r5,cns__r6,cns__r7,
+	cns__r8,cns__r9,cns__r10,cns__r11,cns__r12,cns__r13,cns__r14,cns__r15,
+	cns__r16,cns__r17,cns__r18,cns__r19,cns__r20,cns__r21,cns__r22,cns__r23,
+	cns__r24,cns__r25,cns__r26,cns__r27,cns__r28,cns__r29,cns__r30,cns__r31
+	) equals . increment 8 prefix "" tag "";
+	cns__gpr	quadword dimension 32;
+constant (
+	cns__f0,cns__f1,cns__f2,cns__f3,cns__f4,cns__f5,cns__f6,cns__f7,
+	cns__f8,cns__f9,cns__f10,cns__f11,cns__f12,cns__f13,cns__f14,cns__f15,
+	cns__f16,cns__f17,cns__f18,cns__f19,cns__f20,cns__f21,cns__f22,cns__f23,
+	cns__f24,cns__f25,cns__f26,cns__f27,cns__f28,cns__f29,cns__f30,cns__f31
+	) equals . increment 8 prefix "" tag "";
+	cns__fpr	quadword dimension 32;
+	#t=.;
+	cns__mchkflag quadword;
+	constant cns__pt_offset equals .;
+constant (
+	cns__impure,cns__whami,cns__scc,cns__prbr,cns__ptbr,cns__trap,cns__halt_code,
+	cns__ksp,cns__scbb,cns__pcbb,cns__vptb,cns__pt11,cns__pt12,cns__pt13,
+	cns__pt14,cns__pt15,cns__pt16,cns__pt17,cns__pt18,cns__pt19,cns__pt20,
+	cns__pt21,cns__pt22,cns__pt23
+	) equals . increment 8 prefix "" tag "";
+	cns__pt		quadword dimension 24;
+	cns__p4		quadword;
+	cns__p5		quadword;                             
+	cns__p6		quadword;         
+	cns__p7		quadword;
+	cns__p20	quadword;
+	cns__p_temp	quadword;
+	cns__p_misc	quadword;
+	cns__p23	quadword;
+	constant cns__ipr_offset equals .;
+	cns__fpcr	quadword;
+	cns__va		quadword;
+	cns__va_ctl	quadword;
+	cns__exc_addr	quadword;
+	cns__ier_cm	quadword;
+	cns__sirr	quadword;
+	cns__isum	quadword;
+	cns__exc_sum	quadword;
+	cns__pal_base	quadword;
+	cns__i_ctl	quadword;
+	cns__pctr_ctl	quadword;
+	cns__process_context	quadword;
+	cns__i_stat	quadword;
+	cns__dtb_alt_mode	quadword;
+	cns__mm_stat	quadword;         
+	cns__m_ctl	quadword;         
+	cns__dc_ctl	quadword;         
+	cns__dc_stat	quadword;         
+	cns__write_many	quadword;
+	cns__virbnd	quadword;
+	cns__sysptbr	quadword;
+	cns__report_lam	quadword;
+
+IFSYMBOL ev6_p1;
+	cns__fpe_state	quadword;
+	cns__fp_pc	quadword;
+
+	cns__r0_emul	quadword;
+	cns__r1_emul	quadword;
+	cns__r2_emul	quadword;
+	cns__r3_emul	quadword;
+	cns__r4_emul	quadword;
+	cns__r5_emul	quadword;
+	cns__r6_emul	quadword;
+	cns__r7_emul	quadword;
+	cns__r8_emul	quadword;
+	cns__r9_emul	quadword;
+	cns__r10_emul	quadword;
+	cns__r11_emul	quadword;
+	cns__r12_emul	quadword;
+	cns__r13_emul	quadword;
+	cns__r14_emul	quadword;
+	cns__r15_emul	quadword;
+	cns__r16_emul	quadword;
+	cns__r17_emul	quadword;
+	cns__r18_emul	quadword;
+	cns__r19_emul	quadword;
+	cns__r20_emul	quadword;
+	cns__r21_emul	quadword;
+	cns__r22_emul	quadword;
+	cns__r23_emul	quadword;
+	cns__r24_emul	quadword;
+	cns__r25_emul	quadword;
+	cns__r26_emul	quadword;
+	cns__r27_emul	quadword;
+	cns__r28_emul	quadword;
+	cns__r29_emul	quadword;
+	cns__r30_emul	quadword;
+	cns__r31_emul	quadword;
+
+	cns__f0_emul	quadword;
+	cns__f1_emul	quadword;
+	cns__f2_emul	quadword;
+	cns__f3_emul	quadword;
+	cns__f4_emul	quadword;
+	cns__f5_emul	quadword;
+	cns__f6_emul	quadword;
+	cns__f7_emul	quadword;
+	cns__f8_emul	quadword;
+	cns__f9_emul	quadword;
+	cns__f10_emul	quadword;
+	cns__f11_emul	quadword;
+	cns__f12_emul	quadword;
+	cns__f13_emul	quadword;
+	cns__f14_emul	quadword;
+	cns__f15_emul	quadword;
+	cns__f16_emul	quadword;
+	cns__f17_emul	quadword;
+	cns__f18_emul	quadword;
+	cns__f19_emul	quadword;
+	cns__f20_emul	quadword;
+	cns__f21_emul	quadword;
+	cns__f22_emul	quadword;
+	cns__f23_emul	quadword;
+	cns__f24_emul	quadword;
+	cns__f25_emul	quadword;
+	cns__f26_emul	quadword;
+	cns__f27_emul	quadword;
+	cns__f28_emul	quadword;
+	cns__f29_emul	quadword;
+	cns__f30_emul	quadword;
+	cns__f31_emul	quadword;
+END_IFSYMBOL;
+
+	cns__exit_console	quadword;
+	cns__work_request	quadword;
+	cns__cchip_dirx		quadword;
+	cns__cchip_misc		quadword;
+	cns__pchip0_err		quadword;
+	cns__pchip1_err		quadword;
+
+	cns__srom_rev		quadword;   /* Parameters passed up from srom
+	cns__proc_id		quadword;
+	cns__mem_size		quadword;      
+	cns__cycle_cnt		quadword;
+	cns__signature		quadword;
+	cns__proc_mask		quadword;
+	cns__sysctx		quadword;
+
+	constant cns__size equals .;
+end __impure;               
+                            
+/* PALVERSION is used in hwrpb.c
+aggregate PALVERSION struct prefix "" tag "";
+      	minor	byte unsigned;		/* ev_driver.c
+      	major	byte unsigned;
+      	is_v	word unsigned;
+      	xxx	word unsigned;
+	max_cpu word unsigned;
+end PALVERSION;
+
+end_module $pal_impure;
+
+module	$pal_logout;
+
+/*
+/* Start definition of Corrected Error Frame
+/*
+constant MCHK_CRD__REV equals 1;
+
+aggregate crd_logout struct prefix "" tag "";
+	mchk$crd_flag		quadword;
+	mchk$crd_offsets	quadword;
+	
+	/* Pal-specific information	
+	mchk$crd_mchk_code	longword;
+	mchk$crd_frame_rev	longword;
+
+	/* CPU-specific information
+	constant mchk$crd_cpu_base equals . ;
+	mchk$crd_i_stat		quadword;
+	mchk$crd_dc_stat	quadword;
+	mchk$crd_c_addr		quadword;
+	mchk$crd_dc1_syndrome	quadword;
+	mchk$crd_dc0_syndrome	quadword;
+	mchk$crd_c_stat		quadword;
+	mchk$crd_c_sts		quadword;
+	mchk$crd_mm_stat	quadword;
+
+        /* system specific information 
+	constant mchk_crd_system_base equals . ;
+	mchk$crd_os_flags	quadword;
+	mchk$crd_cchip_dir	quadword;
+	mchk$crd_cchip_misc	quadword;
+	mchk$crd_pchip0_err	quadword;
+	mchk$crd_pchip1_err	quadword;
+
+	constant mchk$crd_size equals (.+7) & %xfff8;
+
+end crd_logout;
+
+aggregate crd__logout struct prefix "" tag "";
+	mchk_crd__flag_frame	quadword;
+	mchk_crd__offsets	quadword;
+	
+	/* pal-specific information	
+	mchk_crd__mchk_code	quadword;
+
+	/* cpu-specific information
+	constant mchk_crd__cpu_base equals . ;
+	mchk_crd__i_stat	quadword;
+	mchk_crd__dc_stat	quadword;
+	mchk_crd__c_addr	quadword;
+	mchk_crd__dc1_syndrome	quadword;
+	mchk_crd__dc0_syndrome	quadword;
+	mchk_crd__c_stat	quadword;
+	mchk_crd__c_sts		quadword;
+	mchk_crd__mm_stat	quadword;
+	
+	/* system-specific information
+	constant mchk_crd__system_base equals . ;
+	mchk_crd__os_flags	quadword;
+	mchk_crd__cchip_dir	quadword;
+	mchk_crd__cchip_misc	quadword;
+	mchk_crd__pchip0_err	quadword;
+	mchk_crd__pchip1_err	quadword;
+
+	constant mchk_crd__size equals (.+7) & %xfff8;
+
+end crd__logout;
+
+constant MCHK__REV equals 1;
+
+aggregate logout struct prefix "" tag "";
+	mchk$flag		quadword;
+	mchk$offsets		quadword;
+
+        /* Pal-specific information
+	mchk$mchk_code		quadword;
+
+        /* CPU-specific information
+	constant mchk$cpu_base equals . ;
+	mchk$i_stat		quadword;
+	mchk$dc_stat		quadword;
+	mchk$c_addr		quadword;
+	mchk$dc1_syndrome	quadword;
+	mchk$dc0_syndrome	quadword;
+	mchk$c_stat		quadword;
+	mchk$c_sts		quadword;
+        mchk$mm_stat	        quadword;
+	mchk$exc_addr		quadword;
+	mchk$ier_cm		quadword;
+	mchk$isum		quadword;
+	mchk$reserved_0		quadword;
+	mchk$pal_base		quadword;
+	mchk$i_ctl		quadword;
+	mchk$process_context	quadword;
+	mchk$reserved_1		quadword;
+	mchk$reserved_2		quadword;
+
+        /* System-specific information
+	constant mchk$sys_base equals . ;
+	mchk$os_flags		quadword;
+	mchk$cchip_dir		quadword;
+	mchk$cchip_misc 	quadword;
+	mchk$pchip0_err		quadword;
+	mchk$pchip1_err		quadword;
+
+	constant mchk$size equals (.+7) & %xfff8;
+
+	constant mchk$crd_base	equals 0 ;
+	constant mchk$mchk_base	equals mchk$crd_size ;
+	constant pal$logout_area equals %x6000;
+	constant pal$logout_base equals %x6000;
+	constant PAL__LOGOUT_BASE equals pal$logout_base;
+
+	constant pal$logout_specific_size equals %x400;
+	constant PAL__LOGOUT_SPECIFIC_SIZE equals pal$logout_specific_size;
+
+end logout;
+
+aggregate __logout struct prefix "" tag "";
+	mchk__flag_frame	quadword;
+	mchk__offsets		quadword;
+
+        /* pal-specific information
+	mchk__mchk_code		quadword;
+
+        /* cpu-specific information
+	constant mchk__cpu_base equals . ;
+	mchk__i_stat		quadword;
+	mchk__dc_stat		quadword;
+	mchk__c_addr		quadword;
+	mchk__dc1_syndrome	quadword;
+	mchk__dc0_syndrome	quadword;
+	mchk__c_stat		quadword;
+	mchk__c_sts		quadword;
+	mchk__mm_stat		quadword;
+	mchk__exc_addr		quadword;
+	mchk__ier_cm		quadword;
+	mchk__isum		quadword;
+	mchk__reserved_0	quadword;
+	mchk__pal_base		quadword;
+	mchk__i_ctl		quadword;
+	mchk__process_context	quadword;
+	mchk__reserved_1	quadword;
+	mchk__reserved_2	quadword;
+
+        /* system-specific information
+	constant mchk__system_base equals . ;
+	mchk__os_flags		quadword;
+	mchk__cchip_dir		quadword;
+	mchk__cchip_misc 	quadword;
+	mchk__pchip0_err        quadword;
+	mchk__pchip1_err	quadword;
+
+	constant mchk__size equals (.+7) & %xfff8;
+	constant mchk_crd__base	equals 0 ;
+	constant mchk__base	equals mchk$crd_size ;
+
+end __logout;
+
+constant SYS_EVENT__REV equals 1;
+
+aggregate sys_event__logout struct prefix "" tag "";
+        sys_event__flag_frame   quadword;
+        sys_event__offsets      quadword;
+
+        /* pal-specific information
+        sys_event__mchk_code    quadword;
+
+        /* cpu-specific information
+        constant sys_event__cpu_base equals . ;
+
+        /* System-specific information
+        constant sys_event__system_base equals . ;
+	sys_event__os_flags	quadword;
+        sys_event__dir		quadword;
+	sys_event__system_0	quadword;
+	sys_event__system_1	quadword;
+	sys_event__reserved_0	quadword;
+	sys_event__reserved_1	quadword;
+	sys_event__reserved_2	quadword;
+	sys_event__reserved_3	quadword;
+	sys_event__reserved_4	quadword;
+	sys_event__reserved_5	quadword;
+	sys_event__reserved_6	quadword;
+
+        /* system-specific information
+
+        constant sys_event__size equals (.+7) & %xfff8;
+        constant sys_event__base equals mchk_crd__size + mchk__size;
+
+end sys_event__logout;
+
+IFLANGUAGE CC               
+LITERAL;
+#endif
+END_LITERAL;
+END_IFLANGUAGE;
+
+end_module $pal_logout;

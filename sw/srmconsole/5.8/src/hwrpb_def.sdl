@@ -1,0 +1,428 @@
+/* file:	hwrpb_def.sdl
+/*
+/* Copyright (C) 1990, 1991 by
+/* Digital Equipment Corporation, Maynard, Massachusetts.
+/* All rights reserved.
+/*
+/* This software is furnished under a license and may be used and copied
+/* only  in  accordance  of  the  terms  of  such  license  and with the
+/* inclusion of the above copyright notice. This software or  any  other
+/* copies thereof may not be provided or otherwise made available to any
+/* other person.  No title to and  ownership of the  software is  hereby
+/* transferred.
+/*
+/* The information in this software is  subject to change without notice
+/* and  should  not  be  construed  as a commitment by digital equipment
+/* corporation.
+/*
+/* Digital assumes no responsibility for the use  or  reliability of its
+/* software on equipment which is not supplied by digital.
+/*
+/*
+/* Abstract:	Hardware Restart Paramater Block (HWRPB) data structure 
+/*		definitions for Alpha firmware.
+/*
+/* Author:	David Mayo
+/*
+/* Modifications:
+/*
+/*	ajb	26-nov-1991	Create some constants that are needed in 
+/*				constructing the physical layout of the
+/*				bootstrap addres space.
+/*
+/*	jds	24-Oct-1991	Replaced TERM_IO CRB entry with separate entries for each GBUS UART.
+/* 
+/*	jds	 2-Oct-1991	Updated to conform to Alpha Console Architecture Rev 3.2.
+/* 
+/*	kl	27-Jun-1991	Update Reason_for_halt constants, add halt_requested
+/*				constants for console SRM ECO 3.1.
+/*
+/*	kl	17-Jun-1991	Replace quadword filler with RXRDY bitfield mask, 
+/*				add/modify SLOT STATE bits, replace ASTEN,ASTSR 
+/*				halt fields with ARGLIST and RETURN. Modify
+/*				Reason_for_Halt constants. This is a subset of the 
+/*				Console SRM ECO 3.1
+/*
+/*	jds	29-May-1991	Added some CRB/CTB defs; added prefix for
+/*				CTB defs.
+/* 
+/*	jds	23-May-1991	Added some CRB defs; added prefix for CRB
+/*				defs.
+/*
+/*	dtm	 5-Dec-1990	CRB and MEMDSC updates
+/*
+/*	dtm	 9-Nov-1990	Updated for SRM Rev. 2.1
+/*
+/*	dtm	24-Aug-1990	Initial entry.
+/*
+module	$hwrpbdef;
+
+/* CTB bus types
+constant  TURBO_CHANNEL_BUS equals 0;
+constant  ISA_BUS equals 1;
+constant EISA_BUS equals 2;
+constant  PCI_BUS equals 3;
+
+constant HWRPB$_REVISION equals 13;	/* revision of this hwrpb definition
+
+/*
+/* Structure of HWRPB
+/*
+aggregate HWRPB structure prefix "" tag "" fill;
+	BASE	  quadword unsigned;	/* Physical address of base of HWRPB
+	IDENT	  quadword unsigned;	/* Identifying string 'HWRPB'
+	REVISION  quadword unsigned;	/* HWRPB version number
+	HWRPB_SIZE quadword unsigned;	/* HWPRB size
+	PRIMARY	  quadword unsigned;	/* ID of primary processor
+	PAGESIZE  quadword unsigned;	/* System page size in bytes
+	PA_SIZE	  quadword unsigned;	/* Physical address size in bits
+	ASN_MAX	  quadword unsigned;	/* Maximum ASN value 
+	SERIALNUM quadword unsigned dimension 2;	/* System serial number
+	SYSTYPE	  quadword unsigned;	/* Alpha system type (Laser)
+	SYSVAR	  quadword unsigned;	/* Laser system subtype
+	SYSREV	  quadword unsigned;	/* System revision
+	ICLK_FREQ quadword unsigned;	/* Interval clock interrupt frequency
+	CC_FREQ	  quadword unsigned;	/* Cycle Counter frequency
+	VPTBR	  quadword unsigned;    /* Virtual page table base register
+	RSVD_ARCH quadword unsigned;    /* Reserved for architecture use, SBZ
+	THB_OFFSET  quadword unsigned;	/* Offset to Translation Buffer Hint Block
+	NPROC	  quadword unsigned;	/* Number of processor supported
+	SLOT_SIZE quadword unsigned;	/* Size of Per-CPU Slots in bytes
+	SLOT_OFFSET quadword unsigned;	/* Offset to Per-CPU Slots
+	NUM_CTBS    quadword unsigned;	/* Number of CTBs in CTB table
+	CTB_SIZE    quadword unsigned;	/* Size of largest CTB in CTB table
+	CTB_OFFSET quadword unsigned;	/* Offset to Console Terminal Block
+	CRB_OFFSET quadword unsigned;	/* Offset to Console Routine Block
+	MEM_OFFSET  quadword unsigned;	/* Offset to Memory Data Descriptors
+	CONFIG_OFFSET quadword unsigned;    /* Offset to Configuration Data Table
+	FRU_OFFSET quadword unsigned;	/* Offset to FRU Table
+	SAVE_TERM	quadword unsigned;  /* Starting VA of SAVE_TERM routine
+	SAVE_TERM_VALUE	quadword unsigned;  /* Procedure Value of SAVE_TERM routine
+	RESTORE_TERM	quadword unsigned;  /* Starting VA of RESTORE_TERM routine
+	RESTORE_TERM_VALUE  quadword unsigned;	/* Procedure Value of RESTORE_TERM routine
+	RESTART	  quadword unsigned;	/* VA of restart routine
+	RESTART_VALUE  quadword unsigned;	/* Restart procedure value
+	RSVD_SW	  quadword unsigned;	/* Reserved to System Software
+	RSVD_HW   quadword unsigned;	/* Reserved to Hardware
+	CHKSUM	  quadword unsigned;	/* Checksum of HWRPB
+	RXRDY	  quadword unsigned;	/* RX Ready bitmask 
+	TXRDY	  quadword unsigned;    /* TX Ready bitmask     
+	DSRDB_OFFSET quadword unsigned;	/* Offset to Dynamic System Recognition Data Block
+end HWRPB;
+end_module $hwrpbdef;
+
+
+module $dsrdbdef;
+/*
+/* Structure of Dynamic System Recognition Data Block
+/*
+aggregate DSRDB structure prefix "" tag "" fill;
+	SMM	quadword unsigned;	/* SMM value
+	LURT_OFFSET quadword unsigned;	/* Offset to LURT
+	NAME_OFFSET quadword unsigned;	/* Offset to NAME
+end DSRDB;
+end_module $dsrdbdef;
+
+module $tbhintdef;
+/*
+/* Structure of Translation Buffer Granularity Hint Block
+/*
+aggregate TB_HINT structure prefix "" tag "" fill;
+	itb	word dimension (16);	/* instruction cache xlation buf hints
+	dtb	word dimension (16);	/* data cache translation buf hints
+end TB_HINT;
+end_module $tbhintdef;
+
+module $slotdef;
+/*
+/* Structure of Per-CPU Slots
+/*
+constant (
+	DEFAULT,
+	SV_RST_TERM,
+	COLD_BOOT,
+	WARM_BOOT,
+	REMAIN_HALTED,
+	POWER_OFF_SYSTEM,
+	RESERVED,
+	MIGRATE) equals 0 increment 1 prefix HALT_REQUEST$;
+
+aggregate SLOT_STATE structure prefix "SLOT$" tag "" fill;
+	BIP bitfield mask;	/* Boot in progress
+	RC bitfield mask;	/* Restart capable
+	PA bitfield mask;	/* Processor available
+	PP bitfield mask;	/* Processor present
+	OH bitfield mask;	/* Operator halted
+	CV bitfield mask;	/* Context valid
+	PV bitfield mask;	/* Palcode valid
+	PMV bitfield mask;	/* Palcode memory valid
+	PL bitfield mask;	/* Palcode loaded
+	RSVD_MBZ0 bitfield mask length 7; /* Reserved MBZ
+	HALT_REQUESTED bitfield mask length 8; /* Halt requested
+	RSVD_MBZ1 bitfield mask length 8; /* Reserved MBZ
+	RSVD_MBZ2 longword unsigned; /* Reserved MBZ
+end SLOT_STATE;
+
+aggregate SLOT structure prefix "" tag "" fill;
+	HWPCB union fill;
+		VMS_HWPCB structure fill;
+			KSP quadword unsigned;
+			ESP quadword unsigned;
+			SSP quadword unsigned;
+			USP quadword unsigned;
+			PTBR quadword unsigned;
+			ASN quadword unsigned;
+			ASTEN_SR quadword unsigned;
+			FEN quadword unsigned;
+			CC quadword unsigned;
+			UNQ quadword unsigned;
+			SCRATCH quadword unsigned dimension 6;
+		end VMS_HWPCB;
+		OSF_HWPCB structure fill;
+			KSP quadword unsigned;
+			USP quadword unsigned;
+			PTBR quadword unsigned;
+			CC longword unsigned;
+			ASN longword unsigned;
+			UNQ quadword unsigned;
+			FEN quadword unsigned;
+			SCRATCH quadword unsigned dimension 10;
+		end OSF_HWPCB;
+	end HWPCB;
+
+	STATE SLOT_STATE;
+
+	PAL_MEM_LEN quadword unsigned;
+	PAL_SCR_LEN quadword unsigned;
+	PAL_MEM_ADR quadword unsigned;
+	PAL_SCR_ADR quadword unsigned;
+	PAL_REV quadword unsigned;
+	CPU_TYPE quadword unsigned;
+	CPU_VAR quadword unsigned;
+	CPU_REV quadword unsigned;
+	SERIAL_NUM quadword unsigned dimension 2;
+	PAL_LOGOUT quadword unsigned;
+	PAL_LOGOUT_LEN quadword unsigned;
+	HALT_PCBB quadword unsigned;
+	HALT_PC quadword unsigned;
+	HALT_PS quadword unsigned;
+	HALT_ARGLIST quadword unsigned;
+	HALT_RETURN quadword unsigned;
+	HALT_VALUE quadword unsigned;
+	HALTCODE quadword unsigned;
+	RSVD_SW quadword unsigned;
+	RXLEN longword unsigned;
+	TXLEN longword unsigned;
+	RX byte dimension 80;
+	TX byte dimension 80;
+	PAL_REV_AVAIL quadword unsigned dimension 16;
+	CPU_COMP quadword unsigned;
+	CONSOLE_DATA_LOG quadword unsigned;
+	CONSOLE_DATA_LOG_LEN quadword unsigned;
+	BCACHE_INFO quadword unsigned;
+	CC_FREQ	quadword unsigned;
+	RSVD_ARCH byte dimension %x280-.;
+end SLOT;
+
+constant (
+	POWERUP,
+	OPERATOR_REQUEST_CRASH,
+	KSTACK_NOTVALID,
+	SCBB_NOTVALID,
+	PTBR_NOTVALID, 
+	CALL_PAL_HALT,
+	DOUBLE_ERROR) equals 0 increment 1 prefix HALT$;
+
+end_module $slotdef;
+
+module $memdscdef;
+/*
+/* Memory Descriptor definitions
+/*
+aggregate CLUSTER structure prefix "" tag "" fill;
+	START_PFN quadword unsigned;
+	PFN_COUNT quadword unsigned;
+	TEST_COUNT quadword unsigned;
+	BITMAP_VA quadword unsigned;
+	BITMAP_PA quadword unsigned;
+	BITMAP_CHKSUM quadword unsigned;
+	USAGE quadword unsigned;
+end CLUSTER;
+
+aggregate MEMDSC structure prefix "" tag "" fill;
+	CHECKSUM quadword unsigned;
+	IMP_DATA_PA quadword unsigned;
+	CLUSTER_COUNT quadword unsigned;
+	CLUSTER structure fill dimension 1;
+		START_PFN quadword unsigned;
+		PFN_COUNT quadword unsigned;
+		TEST_COUNT quadword unsigned;
+		BITMAP_VA quadword unsigned;
+		BITMAP_PA quadword unsigned;
+		BITMAP_CHKSUM quadword unsigned;
+		USAGE quadword unsigned;
+	end CLUSTER;
+end MEMDSC;
+
+IFLANGUAGE CC
+LITERAL;
+#define MEMDSC_SIZE (sizeof(struct MEMDSC) + (sizeof(struct CLUSTER) * (MEMORY_CLUSTER_COUNT - 1)))
+END_LITERAL;
+END_IFLANGUAGE;
+
+end_module $memdscdef;
+
+
+module $ctbdef;
+/*
+/* Console Terminal Block definitions
+/*
+constant (
+	NONE,
+	PROCESSOR,
+	DZ_VT,
+	DZ_GRAPHICS,
+	DZ_WS) equals 0 increment 1 prefix CTB$;
+
+aggregate CTB_VT_table struct prefix "" tag "";
+	CSR	longword;		/* Base CSR address
+	TX_IPL	longword;		/* TX interrupt IPL
+	TX_SCB	longword;		/* TX interrupt SCB vector
+	RX_IPL	longword;		/* RX interrupt IPL
+	RX_SCB	longword;		/* RX interrupt SCB vector
+end CTB_VT_table;
+
+aggregate CTB_WS_table struct prefix "" tag "";
+	TERM_OUT_LOC longword unsigned;	/* location/type of output terminal
+	TERM_IN_LOC  longword unsigned;	/* location/type of input  terminal
+	DEV_IPL	 longword;		/* Device IPL
+	TX_SCB	 longword;		/* TX interrupt SCB vector
+	RX_SCB	 longword;		/* RX interrupt SCB vector
+	TYPE	 longword;		/* Terminal type
+end CTB_WS_table;
+
+constant CTB$VT_LEN equals %x60;	/* DL/DZ VT device dependent field
+constant CTB$WS_LEN equals %x160;	/* Workstation device dependent field
+
+aggregate CTB_VT structure prefix "CTB_VT$" tag "" fill;
+	TYPE quadword unsigned;
+	ID quadword unsigned;
+	RSVD quadword unsigned;
+	DEV_DEP_LEN quadword unsigned;
+	CSR quadword unsigned;
+	TX_SCB_OFFSET_L longword unsigned;
+	TX_INT structure prefix "TX$";
+	    SCB_OFFSET_H bitfield mask length 31;
+	    IE bitfield mask;
+	end TX_INT;
+	RX_SCB_OFFSET_L longword unsigned;
+	RX_INT structure prefix "RX$";
+	    SCB_OFFSET_H bitfield mask length 31;
+	    IE bitfield mask;
+	end RX_INT;
+	BAUD quadword unsigned;
+	PUTS_STATUS quadword unsigned;
+	GETC_STATUS quadword unsigned;
+	CON_RSVD byte unsigned dimension %x40;
+end CTB_VT;
+
+aggregate CTB_WS structure prefix "CTB_WS$" tag "" fill;
+	TYPE quadword unsigned;
+	ID quadword unsigned;
+	RSVD quadword unsigned;
+	DEV_DEP_LEN quadword unsigned;
+	DEV_IPL quadword unsigned;
+	TX_SCB_OFFSET_L longword unsigned;
+	TX_INT structure prefix "TX$";
+	    SCB_OFFSET_H bitfield mask length 31;
+	    IE bitfield mask;
+	end TX_INT;
+	RX_SCB_OFFSET_L longword unsigned;
+	RX_INT structure prefix "RX$";
+	    SCB_OFFSET_H bitfield mask length 31;
+	    IE bitfield mask;
+	end RX_INT;
+	TERM_TYPE quadword unsigned;
+	KB_TYPE quadword unsigned;
+	KB_TRN_TBL quadword unsigned;
+	KB_MAP_TBL quadword unsigned;
+	KB_STATE quadword unsigned;
+	LAST_KEY quadword unsigned;
+	US_FONT quadword unsigned;
+	MCS_FONT quadword unsigned;
+	FONT_WIDTH quadword unsigned;
+	FONT_HEIGHT quadword unsigned;
+	MONITOR_WIDTH quadword unsigned;
+	MONITOR_HEIGHT quadword unsigned;
+	MONITOR_DENSITY quadword unsigned;
+	NUM_PLANES quadword unsigned;
+	CURSOR_WIDTH quadword unsigned;
+	CURSOR_HEIGHT quadword unsigned;
+	NUM_HEADS quadword unsigned;
+	OPWIN quadword unsigned;
+	HEAD_OFFSET quadword unsigned;
+	PUTCHAR_ROUTINE quadword unsigned;
+	IO_STATE quadword unsigned;
+	LISTENER_STATE quadword unsigned;
+	EXT_INFO quadword unsigned;
+	TERM_OUT_LOC quadword unsigned;
+	SERVER_OFFSET quadword unsigned;
+	LINE_PARAM quadword unsigned;
+	TERM_IN_LOC quadword unsigned;
+	CON_RSVD byte unsigned dimension %x50;
+end CTB_WS;
+
+end_module $ctbdef;
+
+module $crbdef;
+/*
+/* Structure of Console Routine Block (CRB)
+/*
+constant (
+    CODE,				/* CRB entry for code.
+    HEAP,				/* CRB entry for heap.
+    ENTRIES)
+    equals 0 increment 1 prefix "CRB$" counter #crb_entries;
+
+aggregate CRB_ENTRY structure prefix "CRB_ENTRY$" tag "" fill;
+		V_ADDRESS quadword unsigned;
+		P_ADDRESS quadword unsigned;
+		PAGE_COUNT quadword unsigned;
+		#crb_entry_size = .;
+end CRB_ENTRY;
+
+constant SIZE equals #crb_entry_size prefix "CRB_ENTRY$";
+
+aggregate CRB structure prefix "CRB$" tag "" fill;
+	VDISPATCH quadword unsigned;
+	PDISPATCH quadword unsigned;
+	VFIXUP quadword unsigned;
+	PFIXUP quadword unsigned;
+	ENTRIES quadword unsigned;
+	PAGES quadword unsigned;
+	"ENTRY" CRB_ENTRY dimension #crb_entries;
+	#crb_size = .;
+end CRB;
+
+constant SIZE equals #crb_size prefix "CRB$";
+
+end_module $crbdef;
+
+/*
+/* Definitions for the physical layout of the bootstrap space
+/*
+module $bootdef;
+constant	BOOT_BSSPAGES	equals 32;
+constant	BOOT_STACKPAGES	equals 2;
+constant	BOOT_GUARDPAGES equals 1;
+constant	BOOT_L0PAGES	equals 1;			/* for alpha
+constant	BOOT_L1PAGES	equals 1;			/* for alpha
+constant	BOOT_L2PAGES	equals 1;			/* for alpha
+constant	BOOT_L30PAGES	equals 2;			/* for alpha
+constant	BOOT_L31PAGES	equals 4;			/* for alpha
+constant	BOOT_PTEPAGES	equals BOOT_L0PAGES
+					+ BOOT_L1PAGES
+					+ BOOT_L2PAGES
+					+ BOOT_L30PAGES
+					+ BOOT_L31PAGES;
+end_module $bootdef;

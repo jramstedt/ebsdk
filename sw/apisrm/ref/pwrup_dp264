@@ -1,0 +1,77 @@
+# The environment variable full_powerup_diags controls whether we test
+# the Disks and Network.  If it is set to ON all disks and the EWA0
+# network are tested.  If set to OFF then the testing is skipped.
+# The default value is ON. 
+if (show full_powerup_diags | grep ON >nl) then
+    echo "Testing the System"
+# test the memory
+    echo "Testing the Memory"
+    testmem
+# test the disks
+    echo "" > disk_list
+    for j in k r u; do
+	for i in a b c d e f g; do
+	    echo `show device d | grep d$j$i | grep -v " RRD"` | cat -l 40 | find 0 >>disk_list
+	done
+    done
+    if (grep d disk_list >nl) then
+	echo "Testing the Disks (read only)"
+	exer -a "?r-Rc" -l 40 `cat disk_list`
+    fi
+    rm disk_list
+# test the network
+
+    if (ls ewa0 > nl) then
+	echo "Testing the Network"
+    fi  
+
+    for i in a b c d e f g; do
+	if (ls ew"$i"0 > nl) then
+	    set netdev
+	    set netdev `show dev | grep -i ew"$i"0|cat -l 4`
+	    net -cm in "$netdev" 2>nl
+	    net -sa "$netdev" >ndbr/lp_nodes_"$netdev" 2>nl 
+	    set "$netdev"_loop_count  1
+	    set "$netdev"_loop_size   100
+	    set "$netdev"_lp_msg_node 1
+	    set d_softerr halt
+	    if (nettest "$netdev" -mode nc -f lp_nodes_"$netdev" -p 1 2>nl) then
+		set "$netdev"_loop_count  2
+		set "$netdev"_loop_inc    1
+		set "$netdev"_loop_patt   ffffffff
+		set "$netdev"_loop_size   0e
+		set "$netdev"_lp_msg_node 1
+		nettest "$netdev" -mode nc -f lp_nodes_"$netdev" -p 1 -w 1
+		set "$netdev"_loop_count  2
+		set "$netdev"_loop_inc    d0
+		set "$netdev"_loop_patt   ffffffff
+		set "$netdev"_loop_size   100
+		set "$netdev"_lp_msg_node 8
+		nettest "$netdev" -mode nc -f lp_nodes_"$netdev" -p 1 -w 1 
+	    else
+		echo "Internal network loopback Failed"
+	    fi
+            net -cm nm "$netdev" 2>nl
+	    clear netdev
+	fi
+    done
+fi
+#
+# Display the system temperature if RCM device is present
+#
+if (eval > nl `ls iic_rcm_temp | wc -w` 1 !=) then
+    deposit iic_rcm_temp ac -b
+    deposit iic_rcm_temp 02
+    deposit iic_rcm_temp ee
+    deposit iic_rcm_temp aa
+    eval -ix `examine iic_rcm_temp | find 2` > bar
+    echo "System Temperature is" `cat bar` "degrees C"
+fi
+#set the user defined ocp text string
+if (eval `show ocp_text | wc -w` 1 != >nl) then
+    echo "$ocp_text" -n >sable_ocp
+fi
+#
+# Execute the nvram script
+#
+nvram

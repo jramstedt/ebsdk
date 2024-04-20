@@ -1,0 +1,2038 @@
+; file:	kernel_alpha.mar
+;
+; Copyright (C) 1990 by
+; Digital Equipment Corporation, Maynard, Massachusetts.
+; All rights reserved.
+;
+; This software is furnished under a license and may be used and copied
+; only  in  accordance  of  the  terms  of  such  license  and with the
+; inclusion of the above copyright notice. This software or  any  other
+; copies thereof may not be provided or otherwise made available to any
+; other person.  No title to and  ownership of the  software is  hereby
+; transferred.
+;
+; The information in this software is  subject to change without notice
+; and  should  not  be  construed  as a commitment by digital equipment
+; corporation.
+;
+; Digital assumes no responsibility for the use  or  reliability of its
+; software on equipment which is not supplied by digital.
+;
+
+;++
+;  FACILITY:
+;
+;      Alpha Console, VAX version
+;
+;  MODULE DESCRIPTION:
+;
+;	Kernel functions for EVAX/Alpha firmware.
+;
+;  AUTHORS:
+;
+;	Stephen Shirron
+;
+;  CREATION DATE:
+;  
+;	21-Mar-1990
+;
+;  MODIFICATION HISTORY:
+;
+;
+;       ska	12-nov-1998	Conditionalize for YukonA
+;
+;	jje	26-Feb-1994	Inherit Medulla changes for Cortex
+;	ju	07-13-94	Medulla watchdog diag support
+;	ju	02-24-94	Medulla interrupt support
+;
+;	jmp	11-29-93	Add avanti support
+;
+;	dtr	10-Oct-1993	Removed the mustang conditional in the putc
+;				code.  There was a problem in it in that the
+;				address for the io was wrong.  The code was
+;				using 180000000 instead of 300000000.
+;
+;	dwr	27-Sep-1993	Turbo logout and impure areas are stored by
+;				TURBO virtual IDs. Add TURBO-only code after
+;				WHAMI reads to make the LSB node id = TURBO VID.
+;
+;	dwr	23-Sep-1993	Make sure upper LW of emulated address is F's
+;
+;	dwr	21-Sep-1993	Duplicate ldqp_u/stqp_u for Turbo emulation and
+;				go through read/write_csr_32 for CSR accesses.
+;			
+;	jrk	13-Sep-1993	Jensen DLB addition
+;
+;	dwr	10-Sep-1993	Add check for MPSTART halt code (68d) to 
+;				krn$_init
+;
+;	kl	 9-Sep-1993	Skip halt code check if Turbo on ISP	
+;
+;	jrk	 3-Sep-1993	Overlay integration
+;
+;	kl	19-Aug-1993	Ruby merge
+;
+;	sfs	02-Aug-1993	Fix up SPINLOCK and SPINUNLOCK to make bugs
+;				easier to find.  SPINLOCK will now SYSFAULT
+;				if an attempt is made to acquire a spinlock
+;				which is already owned by the requesting CPU.
+;				Similarly, SPINUNLOCK will SYSFAULT if an
+;				attempt is made to release a spinlock which
+;				is not owned by the requesting CPU.  Further,
+;				SPINLOCK now treats req_ipl as the minimum
+;				IPL desired -- if IPL is already above req_ipl,
+;				then IPL is left unchanged.  This fixes the
+;				problem seen with spinlocks which had a req_ipl
+;				of IPL_RUN, yet needed to be acquired from an
+;				ISR.
+;
+;	ajb	03-Jun-1992	Add callers_pc
+;
+;	jad	26-Mar-1992	Add scrub mem.
+;
+;	jad	10-Feb-1992	Fix exdep handler.
+;
+;	jad	02-Jan-1992	Add an addq_v_u increment routine.
+;
+;	ajb	02-Dec-1991	Move heap size calculation out of this module.
+;
+;	jad	10-Sep-1991	Changed heap size for cb_proto
+;
+;	pel	30-Aug-1991	remove last change; allow replace_node path
+;				if ADU
+;
+;	pel	27-Aug-1991	don't take replace_node path if ADU
+;
+;	jad	05-Aug-1991	Added support for cb_proto. 
+;
+;	jrk	07-Aug-1991	fix cb_proto. 
+;
+;	jad	05-Aug-1991	Added support for cb_proto. 
+;
+;	cfc	24-Jul-1991	Added $impuredef incl for exdep exception 
+;				handling.
+;
+;	jds	23-Jul-1991	Added exdep_longjmp for ex/dep exception
+;				handling.
+;
+;	cto	01-Jul-1991	Add ADAWI for MP
+;
+;	kl	09-May-1991	Carve out idle pcb/stack from memory
+;
+;	kl	19-Mar-1991	bbssi,bbcci
+;
+;	dtm	14-Mar-1991	Restore PRBR and SP properly on HALT entry
+;
+;	jds	14-Mar-1991	Added MxPR64 routines
+;
+;	dtm	 5-Mar-1991	Look at PAL hlt code on entry
+;
+; 	kl	25-Feb-1991	Additional idle pcb and kstack for multiprocessor
+;
+;	dtm	19-Feb-1991	Callback$code split off into callback_alpha.mar
+;
+;	dtm	15-Feb-1991	Environment Variable console callbacks added
+;
+;	jds	 5-Feb-1991	Add ldqp_u/stqp_u routines.
+;
+;	dtm	25-Jan-1991	Add standalone routines to implement ADU 
+;				console terminal callbacks.
+;
+;	sfs	25-Jan-1991	Fairly massive work on the scheduling
+;				primitives.  There is now a lightweight
+;				context switch, as well as the heavyweight
+;				context switch from before.  The lightweight
+;				context switch can be used whenever process
+;				rescheduling is voluntary; when such switching
+;				is done far fewer registers are saved and
+;				restored.  The presence of a heavyweight
+;				context is signalled by PCB$A_ACP; if nonzero
+;				this field points to a heavyweight context.
+;				In order to support nesting of exceptions and
+;				interrupts, a pointer to any previous heavy-
+;				weight context is stored in any newly built
+;				heavyweight context, and is restored as those
+;				contexts are unwound.  Restoration of context
+;				releases the kernel spinlock in an unusual
+;				way -- the spinlock value is cleared part way
+;				through, and then later IPL is dropped.  This
+;				is deliberate; the spinlock is released at the
+;				earliest opportunity, yet IPL cannot be dropped
+;				until the entire context is restored.  R0, R1,
+;				and R16 are now stored in a heavyweight context
+;				in an unusual order; this is done so that those
+;				registers can be freed for use so that IPL can
+;				be raised to IPL_SYNC.  We do this because we
+;				don't want to nest interrupts if it can be
+;				avoided (or else each process would have to
+;				allocate stack accordingly).
+;
+;	sfs	21-Jan-1991	Conditionalize floating point code for EV3.
+;
+;	jds	11-Jan-1991	Add setjmp/longjmp routines.  Changed ldq's to
+;				ldl's for loading PCB field acp.
+;
+;	sfs	20-Dec-1990	Add exception R2 through R7 to ALPHA_CTX.
+;
+;	kl	14-Dec-1990	Connect process specific exception handling.
+;
+;	dtm	11-Dec-1990	Make vardef symbol global.
+;				Add dispatch/fixup stubs.
+;
+;	sfs	29-Nov-1990	Remove page table stuff.
+;
+;	sfs	21-Nov-1990	Remove SWPCTX_NEWPC patch (PAL will be fixed
+;				to add this directly).
+;
+;	ajb	20-Nov-1990	Add access to scb
+;
+;	ajb	16-Nov-1990	Add RCC, MB instructions.  Comment out 
+;				PAL patch for now.
+;
+;	sfs	01-Nov-1990	Adapted from vax version
+;
+;--
+
+	.title	kernel_alpha
+
+	$kerneldef
+	$scbdef
+	$aprdef
+	$pal_impure
+	$halt_codes
+	$mxr
+	$pal_func
+	$pal_def
+	$cserve_def
+	$hwrpbdef
+	$slotdef
+
+	.psect	kernel$data, 4, noexe
+
+linkage:
+
+pd	krn$_start
+pd	krn$_init
+pd	exit_console
+pd	getpcb
+pd	sysfault
+pd	sysfault_nohalt
+pd	callers_pc
+pd	get_sp
+pd	countdown
+pd	do_bpt
+pd	swap_context
+pd	spinlock
+pd	spinunlock
+pd	scrub_mem
+pd	_bbssi
+pd	_bbcci
+pd	mbpr_stqc
+pd	mfpr64
+pd	mtpr64
+pd	mfpr_ipl
+pd	mtpr_ipl
+pd	mfpr_mces
+pd	mtpr_mces
+pd	mfpr_scbb
+pd	mtpr_scbb
+pd	mfpr_whami
+pd	mtpr_ipir
+pd	mtpr_exc_addr
+pd	mtpr_datfx
+pd	ldb
+pd	ldw
+pd	ldl
+pd	ldq
+pd	ldo
+pd	ldh
+pd	stb
+pd	stw
+pd	stl
+pd	stq
+pd      sto
+pd      sth
+pd	ldqp
+pd	stqp
+pd	ldqp_u
+pd	stqp_u
+pd	addq_v_u
+pd	rscc
+pd	cserve
+pd	cflush
+pd	mb
+pd	imb
+pd	wh64
+.if ne MEDULLA ! CORTEX ! YUKONA
+pd	int_enable
+pd	int_disable
+pd	wdog_int_read
+.endc
+pd	quadset
+pd	log2, math$log2_g, decc$glog2
+pd	common_isr
+pd	setjmp
+pd	longjmp, decc$longjmp
+.if ne MODULAR
+pd	krn$_load_flash
+.endc
+.if ne TURBO ! TL6
+pd	read_32
+pd	write_32
+pd	write_all
+.endc
+
+ref	krn$_init
+ref	krn$_idle
+ref	idle_pcbs
+ref	console_relocated
+ref	spl_kernel
+ref	reschedule
+ref	walk_stack
+ref	sysfault_walk_stack
+ref	establish_setjmp
+ref	find_setjmp
+ref	console_restart
+
+.if df macro64$
+	.psect	$$$first, 4, exe, mix
+.iff
+	.psect	$$$first, 4, exe
+.endc
+
+.if	ndf	AVANTI_DEBUG
+AVANTI_DEBUG = 0
+.endc
+
+.if	ndf	K2_DEBUG
+K2_DEBUG = 0
+.endc
+
+.macro	delay	register,?l1
+	rpcc	register
+	srl	register,#2,register
+	extbl	register,#0,register
+	sll	register,#4,register
+	addq	register,#15,register
+l1:	subq	register,#1,register
+	bne	register,l1
+.endm
+
+.macro	lock	register,register2,location,?l1,?l2
+	mb
+l1:	mb
+	ldl	register,location
+	bne	register,l1
+
+l2:	ldl_l	register,location
+
+	bis	register,#1,register2
+
+	stl_c	register2,location
+	beq	register2,l1
+	bne	register,l1
+	mb
+	mb
+.endm
+
+.if ne AVANTI_DEBUG ! K2_DEBUG
+;;;	put a char to com1 for first poweron.
+;;;	remove this code after that.
+
+io_base = ^x30
+com1 = ^x3f8
+thr = 0
+lsr =  5
+lsr$v_thre == 5 + 8
+
+.macro	combott_putc 	ascchar,rcom,rs,?lab1,?lab2
+	lda	'rcom',io_base(r31)	; io and EISA bus address 	
+	sll	'rcom',#28,'rcom'
+	lda	'rs',com1+lsr(r31)	; line status register
+	sll	'rs',#5,'rs'		; shifted com1 address
+	bis	'rs','rcom','rcom'	; tt port address in rcom	
+lab1:        		      	
+	ldl	'rs',('rcom')
+	mb
+	srl	'rs',#lsr$v_thre,'rs'	; extract thre bit  
+	blbc    'rs',lab1               ; if not ready to txmit, spin.
+	lda	'rcom',io_base(r31)	; io and EISA bus address 	
+	sll	'rcom',#28,'rcom'
+	lda	'rs',com1+thr(r31)		; transmit holding register
+	sll	'rs',#5,'rs'		; shifted com1 address
+	bis	'rs','rcom','rcom'	; tt port address in rcom	
+	and	'ascchar',#^xff,'rs'
+	stl	'rs',('rcom')	; xmit the character
+	mb				; wait for the write
+.endm  combott_putc
+
+
+_krn$_start_::
+	;+
+	; If we're not living where we've been linked to, then copy ourselves to
+	; that location.  Assume non overlapped copies.  Patch the entry address
+	; so that it jumps over this copy fragment.  Where we are linked to is
+	; defined in platform_<platform>.mms
+	;-
+	bsr	r0,1$
+0$:	.long	_krn$_start_
+1$:	lda	r16, 65(r31)
+	combott_putc r16, r4, r5
+	ldl	r4,(r0)
+
+.iff
+
+_krn$_start_::
+	;+
+	; If we're not living where we've been linked to, then copy ourselves to
+	; that location.  Assume non overlapped copies.  Patch the entry address
+	; so that it jumps over this copy fragment.  Where we are linked to is
+	; defined in platform_<platform>.mms
+	;-
+	bsr	r0,_krn$_start2
+_krn$_start0:
+	.long	_krn$_start_
+.if ne MODULAR
+	.long	symbol_data_count
+	.long	symbol_entry_count
+.endc	; end if ne MODULAR
+console_relocated::
+	.long 0
+_krn$_start2:
+	ldl	r4,(r0)
+.endc
+.if ne TURBO ! TL6
+	br	r31,4$
+.endc
+.if eq TURBO
+	subq	r0,#_krn$_start0-_krn$_start_,r5
+	subq	r4,r5,r0
+	zap	r0,#^xf0,r0
+	beq	r0,4$		; don't copy if we are where we should be
+
+.if ne RAWHIDE
+; code to load in the boot'd image's decompression code and
+; get the boot'd VMS pal loaded in 
+
+	bsr	r21, grom_boot_code
+.endc
+
+	ldah	r2,2(r31)	; 20000 quads
+.if ne 	RAWHIDE
+	ldah	r2,4(r31)	; 40000 quads
+.endc
+	bis	r5,r31,r1	; where we are now
+	bis	r4,r31,r0	; where we are going to
+2$:	subq	r2,#1,r2
+	ldq	r3,(r1)
+	stq	r3,(r0)
+	lda	r0,8(r0)
+	lda	r1,8(r1)
+	bne	r2,2$
+
+	;
+	; backpatch the entry address (which is hard coded in pal's enter
+	; console routine) with instructions to jump to the new
+	; location.
+	;
+	addq	r4,#4$-_krn$_start_,r2
+	addq	r4,#5$-_krn$_start_,r1
+	bis	r5,r31,r0
+	ldl	r3,0(r1)
+	extwl	r2,#0,r4
+	bis	r3,r4,r3
+	stl	r3,0(r0)
+	ldl	r3,4(r1)
+	extwl	r2,#2,r4
+	bis	r3,r4,r3
+	stl	r3,4(r0)
+	ldl	r3,8(r1)
+	stl	r3,8(r0)
+
+	; 
+	; Set a flag saying that we have been here relocated
+	;
+	bsr	r0,.+8
+	.long	console_relocated
+	ldl	r0,(r0)
+	lda	r1,1(r31)
+	stl	r1,(r0)
+
+.if ne RAWHIDE
+; instead of jumping to console, we now want to jump to new PAL
+20$:	bsr	r0,21$
+	.long	grom_boot_start
+21$:	ldl	r0,(r0)
+	jmp	r31,(r0)
+	halt
+.endc
+	;
+	; and then jump to the linked version
+	;
+	imb
+	jmp	r31,(r2)
+
+	;
+	; a template for the patch instructions -- exactly three instructions
+	;
+5$:	lda	r0,(r31)
+	ldah	r0,(r0)
+	jmp	r31,(r0)
+.endc
+
+4$:	bsr	r0,10$
+	.long	linkage
+10$:	ldl	r3,(r0)
+	lda	r25,0(r31)
+	ldq	r27,_krn$_init(r3)
+	ldq	r26,8(r27)
+	jsr	r26,(r26)
+	halt
+
+.if eq MODULAR
+.if df macro64$
+	.psect	$$$second, 4, exe, mix
+.iff
+	.psect	$$$second, 4, exe
+.endc
+
+initial_heap::
+	.blkb	min_heap_size
+.endc
+
+.if df macro64$
+	.psect	___last, 4, exe, mix
+.iff
+	.psect	___last, 4, exe
+.endc
+
+idle_pcbs::
+	.blkb	max_processor_id*<pcb$s_pcb+krn$k_minstack>
+___verylast::
+
+.if df macro64$
+	.psect	kernel$code, 4, exe, mix
+.iff
+	.psect	kernel$code, 4, exe
+.endc
+
+_krn$_init_:
+	lda	r3,linkage-krn$_init(r27)
+.if ne TURBO
+	lda	r16,ipl_sync(r31)
+	mtpr_ipl
+.endc
+	lda	r16,1(r31)
+	mtpr_fen
+	lda	r16,1(r31)
+	mtpr_datfx
+	mfpr_whami
+	bis	r0,r31,r8
+	lda	r1,pal$impure_specific_size(r31)
+	mulq	r8,r1,r1
+	lda	r2,pal$impure_common_size(r31)
+	addq	r1,r2,r1
+	get_addr r2,pal$impure_base,r31
+	addq	r1,r2,r1
+	ldq	r1,8(r1)
+.if eq wildfire
+	cmpeq	r1,#hlt$c_reset,r0		; If RESET
+	bne	r0,10$				;   perform console entry
+.endc
+	sll	r8,#3,r1
+	addq	r1,r2,r1
+	ldq	r9,impure$pcb_offset(r1)
+	beq	r9,10$
+	stq	r31,impure$pcb_offset(r1)
+	bis	r9,r31,r16
+	mtpr_prbr
+	br	r31,_enter_console_
+
+10$:	ldq	r1,_idle_pcbs(r3)
+	lda	r2,krn$k_minstack(r31)
+	lda	r6,pcb$s_pcb(r31)
+	addq	r2,r6,r4
+	mulq	r4,#max_processor_id,r5
+	addq	r1,r5,r5			
+	mulq	r8,r4,r4			
+	addq	r1,r4,r9
+	bis	r9,r31,r16
+	mtpr_prbr
+	addq	r2,r9,r4
+	addq	r4,r6,r4
+	bis	r31,r4,sp
+	bis	r9,r31,r22
+20$:	stq	r31,(r9)
+	addq	r9,#8,r9
+	cmpult	r9,sp,r7	
+	bne	r7,20$
+	stl	r2,pcb$l_stacksize(r22)
+	lda	r29,(r31)
+	bis 	r31,r5,r16
+	lda	r25,1(r31)
+	ldq	r27,_krn$_idle(r3)
+	ldq	r26,8(r27)
+	jsr	r26,(r26)
+	halt
+
+_getpcb_:
+	mfpr_prbr
+	ret	r31,(r26)
+
+_sysfault_:
+	bis	r26,r31,r0
+	bis	r27,r31,r1
+.if ne TL6
+	ldah	r27,^x8e00(r31)
+	lda	r27,^x1680(r27)		; scope trigger
+	mb
+	stl	r31,(r27)
+	mb
+	mb
+.endc
+	lda	r27,sysfault_nohalt-sysfault(r27)
+	bsr	r26,_sysfault_nohalt_
+
+	bsr	r0,5$
+	.long	linkage
+5$:	ldl	r3,(r0)
+	lda	r25,0(r31)
+	ldq	r27,_console_restart(r3)
+	ldq	r26,8(r27)
+	jsr	r26,(r26)
+10$:	halt
+	br	r31,10$
+
+_sysfault_nohalt_:
+	lda	sp,-acx$s_alpha_ctx(sp)
+	stq	r31,acx$q_exc_r2(sp)
+	stq	r31,acx$q_exc_r3(sp)
+	stq	r31,acx$q_exc_r4(sp)
+	stq	r31,acx$q_exc_r5(sp)
+	stq	r31,acx$q_exc_r6(sp)
+	stq	r31,acx$q_exc_r7(sp)
+	stq	r31,acx$q_ps(sp)
+	stq	r31,acx$q_pc(sp)
+	stq	r0,acx$q_r0(sp)
+	stq	r1,acx$q_r1(sp)
+	stq	r2,acx$q_r2(sp)
+	stq	r3,acx$q_r3(sp)
+	stq	r4,acx$q_r4(sp)
+	stq	r5,acx$q_r5(sp)
+	stq	r6,acx$q_r6(sp)
+	stq	r7,acx$q_r7(sp)
+	stq	r8,acx$q_r8(sp)
+	stq	r9,acx$q_r9(sp)
+	stq	r10,acx$q_r10(sp)
+	stq	r11,acx$q_r11(sp)
+	stq	r12,acx$q_r12(sp)
+	stq	r13,acx$q_r13(sp)
+	stq	r14,acx$q_r14(sp)
+	stq	r15,acx$q_r15(sp)
+	stq	r16,acx$q_r16(sp)
+	stq	r17,acx$q_r17(sp)
+	stq	r18,acx$q_r18(sp)
+	stq	r19,acx$q_r19(sp)
+	stq	r20,acx$q_r20(sp)
+	stq	r21,acx$q_r21(sp)
+	stq	r22,acx$q_r22(sp)
+	stq	r23,acx$q_r23(sp)
+	stq	r24,acx$q_r24(sp)
+	stq	r25,acx$q_r25(sp)
+	stq	r26,acx$q_r26(sp)
+	stq	r27,acx$q_r27(sp)
+	stq	r28,acx$q_r28(sp)
+	stq	r29,acx$q_r29(sp)
+	lda	r0,acx$s_alpha_ctx(sp)
+	stq	r0,acx$q_r30(sp)
+	mfpr_prbr
+	ldl	r1,pcb$a_acp(r0)
+	stq	r1,acx$q_acp(sp)
+	stl	sp,pcb$a_acp(r0)
+        lda     r3,linkage-sysfault_nohalt(r27)
+        lda     r16,(r29)
+        lda     r17,(r30)
+        lda     r18,(r26)
+        lda     r19,(sp)
+        lda     r20,1(r31)
+        lda     r25,5(r31)
+        ldq     r27,_sysfault_walk_stack(r3)
+        ldq     r26,8(r27)
+        jsr     r26,(r26)
+	mfpr_prbr
+	ldq	r1,acx$q_acp(sp)
+	stl	r1,pcb$a_acp(r0)
+	ldq	r0,acx$q_r0(sp)
+	ldq	r1,acx$q_r1(sp)
+	ldq	r3,acx$q_r3(sp)
+	ldq	r26,acx$q_r26(sp)
+	lda	sp,+acx$s_alpha_ctx(sp)
+	ret	r31,(r26)
+
+_do_bpt_:
+	bpt
+	ret	r31,(r26)
+
+_spinlock_:
+	bis	r16,r31,r22
+	;
+	; Raise IPL.
+	;
+	mfpr_ipl
+	bis	r0,r31,r23
+	ldl	r16,req_ipl(r22)
+	cmple	r0,r16,r0
+	beq	r0,10$
+	mtpr_ipl
+	;
+	; Lock the spinlock structure itself.
+	;
+10$:	lock	r0,r16,value(r22)
+	;
+	; We now own the spinlock structure (but not the spinlock).
+	;
+	; See if we own the spinlock; if so, crash.
+	;
+	mfpr_whami
+	addl	r0,#max_processor_id,r0
+	ldl	r1,owner(r22)
+	cmpeq	r0,r1,r0
+	bne	r0,50$
+.if gt <max_processor_id-1>
+	;
+	; We don't already own the spinlock.  Say that we're interested in
+	; owning it.
+	;
+	ldl	r24,next_number(r22)
+	addl	r24,#1,r0
+	stl	r0,next_number(r22)
+	mb
+	mb
+	;
+	; See if we can now own the spinlock.  We can if the owner is 0, and
+	; if it's our turn (our chosen number == now_serving).
+	;
+20$:	ldl	r0,owner(r22)
+	bne	r0,30$
+	ldl	r0,now_serving(r22)
+	cmpeq	r0,r24,r0
+	beq	r0,30$
+.endc
+	;
+	; We own the spinlock.  Update the owner and saved IPL, release the
+	; spinlock structure, and return.
+	;
+	mfpr_whami
+	addl	r0,#max_processor_id,r0
+	stl	r0,owner(r22)
+	stl	r23,sav_ipl(r22)
+	mb
+	stl	r31,value(r22)
+	mb
+	mb
+	ret	r31,(r26)
+
+.if gt <max_processor_id-1>
+	;
+	; The spinlock is already owned.  Release the spinlock structure.
+	;
+30$:	stl	r31,value(r22)
+	mb
+	mb
+	;
+	; Wait for the spinlock to be unowned.
+	;
+;40$:	delay	r0
+40$:	ldl	r0,owner(r22)
+	bne	r0,40$
+	ldl	r0,now_serving(r22)
+	cmpeq	r0,r24,r0
+	beq	r0,40$
+	;
+	; The spinlock appears to be unowned.  Lock the spinlock structure
+	; itself, and try again.
+	;
+	lock	r0,r16,value(r22)
+	br	r31,20$
+.endc
+
+	;
+	; We have detected an attempt to acquire a spinlock that this CPU
+	; already owns.  Complain about it.
+	;
+50$:	bis	r26,r31,r0
+	bis	r27,r31,r1
+	ldl	r16,owner(r22)
+	ldl	r17,now_serving(r22)
+	ldl	r18,next_number(r22)
+	ldl	r19,sav_ipl(r22)
+	mb
+	stl	r31,value(r22)
+	mb
+	mb
+	lda	r27,sysfault_nohalt-spinlock(r27)
+	bsr	r26,_sysfault_nohalt_
+	ret	r31,(r0)
+
+_spinunlock_:
+	bis	r16,r31,r22
+	;
+	; Lock the spinlock structure itself.
+	;
+	lock	r0,r16,value(r22)
+	;
+	; Make sure it's owned by us.
+	;
+	mfpr_whami
+	addl	r0,#max_processor_id,r0
+	ldl	r1,owner(r22)
+	cmpeq	r0,r1,r0
+	beq	r0,10$
+	;
+	; We own the spinlock.  Say there's no owner, bump up now_serving,
+	; release the spinlock structure, and return.
+	;
+.if gt <max_processor_id-1>
+	mb
+	ldl	r0,now_serving(r22)
+	addl	r0,#1,r0
+	stl	r0,now_serving(r22)
+	mb
+.endc
+	stl	r31,owner(r22)
+	ldl	r16,sav_ipl(r22)
+	mb
+	stl	r31,value(r22)
+	mb
+	mtpr_ipl
+	mb
+	ret	r31,(r26)
+
+	;
+	; We have detected an attempt to release a spinlock that this CPU
+	; doesn't own.  Complain about it.
+	;
+10$:	bis	r26,r31,r0
+	bis	r27,r31,r1
+	ldl	r16,owner(r22)
+	ldl	r17,now_serving(r22)
+	ldl	r18,next_number(r22)
+	ldl	r19,sav_ipl(r22)
+	mb
+	stl	r31,value(r22)
+	mb
+	lda	r27,sysfault_nohalt-spinunlock(r27)
+	bsr	r26,_sysfault_nohalt_
+	ret	r31,(r0)
+
+_rscc_:
+	bis	r16,r31,r22
+	rscc
+	stq	r0,(r22)
+	ret	r31,(r26)
+
+_cserve_:
+	cserve
+	ret	r31,(r26)
+
+_cflush_:
+	cflush
+	ret	r31,(r26)
+
+_mb_:
+	mb
+	ret	r31,(r26)
+
+_imb_:
+	imb
+	ret	r31,(r26)
+
+_wh64_:
+	.long	^x63f0f800 	; wh64 (r16)
+	ret	r31,(r26)
+
+.if ne MEDULLA ! CORTEX ! YUKONA
+
+_int_enable_:
+	bis	r16, r31, r17	;copy mask to cserve a1
+	lda	r16, CSERVE$MEDU_INT_ENABLE(r31) ;load function code
+	cserve
+	ret	r31,(r26)
+
+_int_disable_:
+	bis	r16, r31, r17	;copy mask to cserve a1
+	lda	r16, CSERVE$MEDU_INT_DISABLE(r31) ;load function code
+	cserve
+	ret	r31,(r26)
+
+_wdog_int_read_:
+	; reads and clears interrupt count
+	lda	r16, CSERVE$MEDU_WDOG_INT_RD(r31) ;load function code
+	cserve
+	ret	r31,(r26)
+.endc
+
+_quadset_:
+	beq	r18, 20$
+10$:	stq	r17, (r16)
+	lda	r16, 8(r16)
+	subq	r18, #1, r18
+	bgt	r18, 10$
+20$:	ret	r31, (r26)
+
+;
+;	log2 (0) == 0
+;	log2 (1) == 0
+;	log2 (2) == 1
+;	log2 (15) == 3
+;	log2 (16) == 4
+;
+
+_log2_:
+	bis	r31, r31, r0
+10$:	srl	r16, #1, r16
+	beq	r16, 20$
+	addq	r0, #1, r0
+	br	r31, 10$
+20$:	ret	r31, (r26)
+
+_mbpr_stqc_:
+	stq_c	r16, (r17)
+	bis	r16, r31, r0
+	ret	r31, (r26)	
+
+__bbssi_:
+	lda	r22, 1(r31)
+	sll	r22, r16, r22
+	mb
+10$:	ldl_l	r0, (r17)
+	and	r0, r22, r1
+	bne	r1, 30$
+	bis 	r0, r22, r1
+	stl_c	r1, (r17)
+	bne	r1, 30$
+	lda	r0, 1000(r31)
+20$:	subq	r0, #1, r0
+	bne	r0, 20$
+	br	r31, 10$
+30$:	mb
+	srl	r0, r16, r0
+	and	r0, #1, r0
+	ret	r31, (r26)
+
+_scrub_mem_:
+	ldq_l	r0, (r16)	; Perform LL
+	stq_c	r0, (r16)	; Perform STQL
+	ret	r31, (r26)
+
+__bbcci_:
+	lda	r22, 1(r31)
+	sll	r22, r16, r22
+	mb
+10$:	ldl_l	r0, (r17)
+	and	r0, r22, r1
+	beq	r1, 30$
+	bic 	r0, r22, r1
+	stl_c	r1, (r17)
+	bne	r1, 30$
+	lda	r0, 1000(r31)
+20$:	subq	r0, #1, r0
+	bne	r0, 20$
+	br	r31, 10$
+30$:	mb          
+	srl	r0, r16, r0
+	and	r0, #1, r0
+	xor	r0, #1, r0
+	ret	r31, (r26)
+
+_swap_context_:
+	bis	r16,r31,r22
+	mfpr_prbr
+	lda	r1,pcb$r_alpha_hw_pcb(r0)
+	stq	r2,alpha_hw_pcb$q_r2(r1)
+	stq	r3,alpha_hw_pcb$q_r3(r1)
+	stq	r4,alpha_hw_pcb$q_r4(r1)
+	stq	r5,alpha_hw_pcb$q_r5(r1)
+	stq	r6,alpha_hw_pcb$q_r6(r1)
+	stq	r7,alpha_hw_pcb$q_r7(r1)
+	stq	r8,alpha_hw_pcb$q_r8(r1)
+	stq	r9,alpha_hw_pcb$q_r9(r1)
+	stq	r10,alpha_hw_pcb$q_r10(r1)
+	stq	r11,alpha_hw_pcb$q_r11(r1)
+	stq	r12,alpha_hw_pcb$q_r12(r1)
+	stq	r13,alpha_hw_pcb$q_r13(r1)
+	stq	r14,alpha_hw_pcb$q_r14(r1)
+	stq	r15,alpha_hw_pcb$q_r15(r1)
+	stq	r26,alpha_hw_pcb$q_r26(r1)
+	stq	r27,alpha_hw_pcb$q_r27(r1)
+	stq	r29,alpha_hw_pcb$q_r29(r1)
+	stq	r30,alpha_hw_pcb$q_r30(r1)
+	lda	r3,linkage-swap_context(r27)
+	ldq	r4,_spl_kernel(r3)
+	ldl	r5,sav_ipl(r4)
+	bis	r22,r31,r16
+	mtpr_prbr
+	bis	r22,r31,r0
+	ldl	r1,pcb$a_acp(r0)
+	bne	r1,restore_large_context
+restore_small_context:
+	bis	r4,r31,r22
+	bis	r5,r31,r16
+	lda	r1,pcb$r_alpha_hw_pcb(r0)
+	ldq	r2,alpha_hw_pcb$q_r2(r1)
+	ldq	r3,alpha_hw_pcb$q_r3(r1)
+	ldq	r4,alpha_hw_pcb$q_r4(r1)
+	ldq	r5,alpha_hw_pcb$q_r5(r1)
+	ldq	r6,alpha_hw_pcb$q_r6(r1)
+	ldq	r7,alpha_hw_pcb$q_r7(r1)
+	ldq	r8,alpha_hw_pcb$q_r8(r1)
+	ldq	r9,alpha_hw_pcb$q_r9(r1)
+	ldq	r10,alpha_hw_pcb$q_r10(r1)
+	ldq	r11,alpha_hw_pcb$q_r11(r1)
+	ldq	r12,alpha_hw_pcb$q_r12(r1)
+	ldq	r13,alpha_hw_pcb$q_r13(r1)
+	ldq	r14,alpha_hw_pcb$q_r14(r1)
+	ldq	r15,alpha_hw_pcb$q_r15(r1)
+	ldq	r26,alpha_hw_pcb$q_r26(r1)
+	ldq	r27,alpha_hw_pcb$q_r27(r1)
+	ldq	r29,alpha_hw_pcb$q_r29(r1)
+	ldq	r30,alpha_hw_pcb$q_r30(r1)
+	lock	r0,r1,value(r22)
+.if gt <max_processor_id-1>
+	ldl	r0,now_serving(r22)
+	addl	r0,#1,r0
+	stl	r0,now_serving(r22)
+.endc
+	stl	r31,owner(r22)
+	mb
+	stl	r31,value(r22)
+	mb			
+	imb
+	mtpr_ipl
+	ret	r31,(r26)
+
+;
+; mtpr64 - callable mtpr routine which provides the capability to write a
+; 64-bit data quantity.
+;
+;	r16 - naturally-aligned address of quadword data to write to IPR.
+;	r17 - IPR identifier code.
+;
+_mtpr64_:
+	bis	r16, r31, r22		;Save R16.
+	ldq	r16, (r16)		;Get quadword operand.
+10$:	cmpeq	r17, APR$K_ASTEN, r0	;ASTEN?
+	beq	r0, 20$			;No: skip over.
+	mtpr_asten			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+20$:	cmpeq	r17, APR$K_ASTSR, r0	;ASTSR?
+	beq	r0, 30$			;No: skip over.
+	mtpr_astsr			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+30$:	cmpeq	r17, APR$K_FEN, r0	;FEN?
+	beq	r0, 50$			;No: skip over.
+	mtpr_fen			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+50$:	cmpeq	r17, APR$K_IPIR, r0	;IPIR?
+	beq	r0, 60$			;No: skip over.
+	mtpr_ipir			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+60$:	cmpeq	r17, APR$K_IPL, r0	;IPL?
+	beq	r0, 70$			;No: skip over.
+	mtpr_ipl			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+70$:	cmpeq	r17, APR$K_MCES, r0	;MCES?
+	beq	r0, 80$			;No: skip over.
+	mtpr_mces			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+80$:	cmpeq	r17, APR$K_PRBR, r0	;PRBR?
+	beq	r0, 100$		;No: skip over.
+	mtpr_prbr			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+100$:	cmpeq	r17, APR$K_SCBB, r0	;SCBB?
+	beq	r0, 120$		;No: skip over.
+	mtpr_scbb			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+120$:	cmpeq	r17, APR$K_SIRR, r0	;SIRR?
+	beq	r0, 130$		;No: skip over.
+	mtpr_sirr			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+130$:	cmpeq	r17, APR$K_TBIA, r0	;TBIA?
+	beq	r0, 160$		;No: skip over.
+	mtpr_tbia			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+160$:	cmpeq	r17, APR$K_TBIAP, r0	;TBIAP?
+	beq	r0, 170$		;No: skip over.
+	mtpr_tbiap			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+170$:	cmpeq	r17, APR$K_TBIS, r0	;TBIS?
+	beq	r0, 180$		;No: skip over.
+	mtpr_tbis			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+180$:	cmpeq	r17, APR$K_ESP, r0	;ESP?
+	beq	r0, 190$		;No: skip over.
+	mtpr_esp			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+190$:	cmpeq	r17, APR$K_SSP, r0	;SSP?
+	beq	r0, 200$		;No: skip over.
+	mtpr_ssp			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+200$:	cmpeq	r17, APR$K_USP, r0	;USP?
+	beq	r0, 210$		;No: skip over.
+	mtpr_usp			;Yes: mtpr.
+	br	r31, 1000$		;Skip to end.
+210$:	lda	r0, (r31)		;Return 0: failure.
+	ret	r31, (r26)
+1000$:	stq	r0, (r22)		;Store return value.
+	lda	r0, 1(r31)		;Return 1: success.
+	ret	r31, (r26)
+;
+; mfpr64 - callable mfpr routine which provides the capability to read a 64-bit
+; value.
+;
+;	r16 - naturally-aligned destination address for quadword IPR data.
+;	r17 - IPR identifier code.
+;
+_mfpr64_:
+	bis	r16, r31, r22		;Save R16.
+	cmpeq	r17, APR$K_ASN, r0	;ASN?
+	beq	r0, 10$			;No: skip over.
+	mfpr_asn			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+10$:	cmpeq	r17, APR$K_FEN, r0	;FEN?
+	beq	r0, 50$			;No: skip over.
+	mfpr_fen			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+50$:	cmpeq	r17, APR$K_IPL, r0	;IPL?
+	beq	r0, 70$			;No: skip over.
+	mfpr_ipl			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+70$:	cmpeq	r17, APR$K_MCES, r0	;MCES?
+	beq	r0, 80$			;No: skip over.
+	mfpr_mces			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+80$:	cmpeq	r17, APR$K_PCBB, r0	;PCBB?
+	beq	r0, 90$			;No: skip over.
+	mfpr_pcbb			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+90$:	cmpeq	r17, APR$K_PRBR, r0	;PRBR?
+	beq	r0, 100$		;No: skip over.
+	mfpr_prbr			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+100$:	cmpeq	r17, APR$K_PTBR, r0	;PTBR?
+	beq	r0, 110$		;No: skip over.
+	mfpr_ptbr			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+110$:	cmpeq	r17, APR$K_SCBB, r0	;SCBB?
+	beq	r0, 120$		;No: skip over.
+	mfpr_scbb			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+120$:	cmpeq	r17, APR$K_SISR, r0	;SISR?
+	beq	r0, 140$		;No: skip over.
+	mfpr_sisr			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+140$:	cmpeq	r17, APR$K_TBCHK, r0	;TBCHK?
+	beq	r0, 150$		;No: skip over.
+	mfpr_tbchk			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+150$:	cmpeq	r17, APR$K_ESP, r0	;ESP?
+	beq	r0, 190$		;No: skip over.
+	mfpr_esp			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+190$:	cmpeq	r17, APR$K_SSP, r0	;SSP?
+	beq	r0, 200$		;No: skip over.
+	mfpr_ssp			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+200$:	cmpeq	r17, APR$K_USP, r0	;USP?
+	beq	r0, 210$		;No: skip over.
+	mfpr_usp			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+210$:	cmpeq	r17, APR$K_WHAMI, r0	;WHAMI?
+	beq	r0, 220$		;No: skip over.
+	mfpr_whami			;Yes: mfpr.
+	br	r31, 1000$		;Skip to end.
+220$:	lda	r0, (r31)		;Return 0: failure.
+	ret	r31, (r26)
+1000$:	stq	r0, (r22)		;Store data.
+	lda	r0, 1(r31)		;Return 1: success.
+	ret	r31, (r26)
+
+_mfpr_ipl_:
+	mfpr_ipl
+	ret	r31,(r26)
+
+_mtpr_ipl_:
+	mtpr_ipl
+	ret	r31,(r26)
+
+_mfpr_mces_:
+	mfpr_mces
+	ret	r31,(r26)
+
+_mtpr_mces_:
+	mtpr_mces
+	ret	r31,(r26)
+
+_mfpr_scbb_:
+	mfpr_scbb
+	sll	r0,#13,r0
+	ret	r31,(r26)
+
+_mtpr_scbb_:
+	srl	r16,#13,r16
+	mtpr_scbb
+	ret	r31,(r26)
+
+_mfpr_whami_:
+	mfpr_whami
+	ret	r31,(r26)
+
+_mtpr_ipir_:
+	mtpr_ipir
+	ret	r31,(r26)
+
+_mtpr_exc_addr_:
+	mtpr_exc_addr
+	ret	r31,(r26)
+
+_mtpr_datfx_:
+	mtpr_datfx
+	ret	r31,(r26)
+
+_ldb_:
+;;;	ldbu	r0,(r16)
+	.long	<10@26> ! <0@21> ! <16@16> ! ^x0000
+	mb
+	ret	r31,(r26)
+
+_ldw_:
+;;;	ldwu	r0,(r16)
+	.long	<12@26> ! <0@21> ! <16@16> ! ^x0000
+	mb
+	ret	r31,(r26)
+
+_ldl_:
+	bis	r16,r31,r22		; setup address
+	lda	r16,ipl_sync(r31)	; raise ipl
+	mtpr_ipl			; "
+	br	r31,10$
+	.align	4
+10$:	mb				; flush writes
+	ldl	r23,(r22)		; fetch requested data
+	mb
+	mb
+	bis	r23,r31,r22		; use data before lowering ipl
+	bis	r0,r31,r16		; put ipl in r16
+	mtpr_ipl			; put back original ipl
+	bis	r22,r31,r0		; return data
+	ret	r31,(r26)
+
+_ldq_:
+	ldq	r0,(r16)
+	mb
+	ret	r31,(r26)
+
+_ldo_:
+	ldq	r18,8*0(r16)
+	ldq	r19,8*1(r16)
+	stq     r18,8*0(r17)
+	stq     r19,8*1(r17)
+	mb
+	ret	r31,(r26)
+
+_ldh_:
+	ldq	r18,8*0(r16)
+	ldq	r19,8*1(r16)
+	ldq	r20,8*2(r16)
+	ldq	r21,8*3(r16)
+	stq     r18,8*0(r17)
+	stq     r19,8*1(r17)
+	stq     r20,8*2(r17)
+	stq     r21,8*3(r17)
+	mb
+	ret	r31,(r26)
+
+_stb_:
+;;;	stb	r17,(r16)
+	.long	<14@26> ! <17@21> ! <16@16> ! ^x0000
+	mb
+	ret	r31,(r26)
+
+_stw_:
+;;;	stw	r17,(r16)
+	.long	<13@26> ! <17@21> ! <16@16> ! ^x0000
+	mb
+	ret	r31,(r26)
+
+_stl_:
+	bis	r16,r31,r22
+	bis	r17,r31,r23
+	lda	r16,ipl_sync(r31)
+	mtpr_ipl
+	br	r31,10$
+	.align	4
+10$:	mb
+	stl	r23,(r22)
+	mb
+	mb
+	bis	r0,r31,r16
+	mtpr_ipl
+	ret	r31,(r26)
+
+_stq_:
+	stq	r17,(r16)
+	mb
+	ret	r31,(r26)
+
+_sto_:
+	ldq	r18,8*0(r17)
+	ldq	r19,8*1(r17)
+	bis	r18,r19,r31	; Use data from previous loads
+	stq     r18,8*0(r16)	; One write more likely to go out now
+	stq     r19,8*1(r16)
+	mb
+	ret	r31,(r26)
+
+_sth_:
+	ldq	r18,8*0(r17)	; do these loads so WB gets filled with stores
+	ldq	r19,8*1(r17)
+	ldq	r20,8*2(r17)
+	ldq	r21,8*3(r17)	
+	bis	r18,r19,r31	; Use data from previous loads
+	bis	r20,r21,r31
+	stq     r18,8*0(r16)	; one write more likely to go out now
+	stq     r19,8*1(r16)
+	stq     r20,8*2(r16)
+	stq     r21,8*3(r16)
+	mb
+	ret	r31,(r26)
+
+_ldqp_:
+	ldq	r16,(r16)
+	bis	r17,r31,r22
+	ldqp
+	stq	r0,(r22)
+	ret	r31,(r26)
+
+_stqp_:
+	ldq	r16,(r16)
+	ldq	r17,(r17)
+	stqp
+	ret	r31,(r26)
+
+.PAGE
+.SBTTL	"_ldqp_u_ - Load unaligned quadword from physical memory."
+;++
+; FUNCTIONAL DESCRIPTION:
+; 
+;   _ldqp_u_
+;	Loads a quadword from a physical memory location which may or may not be
+; naturally-aligned.  Peforms all necessary byte-packing and writes the
+; desired quadword to the naturally-aligned virtual destination quadword.
+;
+; Although the code for ldqp_u is generic, it contains comments which refer to
+; a specific example, shown here:
+;
+;	+---+---+---+---+---+---+---+---+
+;	| c | b | a | X | X | X | X | X | :LQ
+;	+---+---+---+---+---+---+---+---+
+;	| Y | Y | Y | h | g | f | e | d | :HQ = LQ + 8
+;	+---+---+---+---+---+---+---+---+
+;
+; The desired data is at LQ+5.  LQ and HQ are naturally-aligned quadword
+; addresses.
+;
+; FORMAL PARAMETERS:
+; 
+;	r16	unaligned physical address of source quadword.
+;	r17	naturally-aligned virtual address of destination quadword.
+; 
+; REGISTER USAGE:
+;
+;	r0	Used to construct the desired quadword.
+;	r1	Low-order aligned quadword.
+;	r2	High-order aligned quadword.
+;	r3	Copy of unaligned physical source address, as passed by r16.
+;	r4	Copy of aligned virtual destination address, as passed by r17.
+;
+;--
+_ldqp_u_:
+	lda	sp, -24(sp)		;Reserve space for regs.
+	stq	r2, (sp)		;Save r2.
+	stq	r3, 8(sp)		;Save r3.
+	stq	r4, 16(sp)		;Save r4.
+
+	lda	r3, (r16)		;Copy source address to r3.
+	lda	r4, (r17)		;Copy destination address to r4.
+	bic	r3, #^b111, r16		;Align low-order quadword address.
+	ldqp				;Get low-order quadword.
+	mb
+	mb
+	lda	r1, (r0)		;Copy to r1.
+	addq	r3, #7, r16		;Calculate address of high byte of
+					; unaligned quadword.
+	bic	r16, #^b111, r16	;Align high-order quadword address.
+	ldqp				;Get high-order quadword.
+	mb
+	mb
+	lda	r2, (r0)		;Copy to r2.
+	extql	r1, r3, r1		;r1 = 00000cba
+	extqh	r2, r3, r2		;r2 = hgfed000
+	or	r2, r1, r0		;r0 = hgfedcba
+	stq	r0, (r4)		;Write desired quadword to destination.
+
+	ldq	r2, (sp)		;Restore saved r2.
+	ldq	r3, 8(sp)		;Restore saved r3.
+	ldq	r4, 16(sp)		;Restore saved r4.
+	lda	sp, 24(sp)		;Restore sp.
+	ret	r31, (r26)		;Return to caller.
+
+.PAGE
+.SBTTL	"_stqp_u_ - Store a quadword to an unaligned physical memory location."
+;++
+; FUNCTIONAL DESCRIPTION:
+; 
+;   _stqp_u_
+;	Stores the given quadword to the given unaligned physical memory
+; location.  This is accomplished using a read-modify-write sequence on the
+; corresponding aligned quadwords.  The quadword to store must be
+; naturally-aligned, and is passed by reference using its virtual address.
+; 
+; Although the code for stqp_u is generic, it contains comments which refer to
+; a specific example, shown here:
+;
+; memory before write:
+;	+---+---+---+---+---+---+---+---+
+;	| Z | Z | Z | X | X | X | X | X | :LQ
+;	+---+---+---+---+---+---+---+---+
+;	| Y | Y | Y | Z | Z | Z | Z | Z | :HQ = LQ + 8
+;	+---+---+---+---+---+---+---+---+
+;
+; The data is to be written to LQ+5.  LQ and HQ are naturally-aligned quadword
+; addresses.
+;
+; desired data to write:
+;	hgfedcba	(quadword case)
+;
+; FORMAL PARAMETERS:
+; 
+;	r16	unaligned physical address to write to.
+;	r17	naturally-aligned virtual address of quadword data to write.
+; 
+; REGISTER USAGE:
+;
+;	r0	Return value from ldqp (to read existing data).
+;	r1	Low-order aligned quadword.
+;	r2	High-order aligned quadword.
+;	r3	Holds write data bytes which appear in the low-order aligned
+;		quadword.
+;	r4	Holds write data bytes which appear in the high-order aligned
+;		quadword.
+;	r5	Copy of write data, as referenced by r17.
+;	r6	Copy of unaligned physical address, as passed by r16.
+;	r7	Unaligned physical address of last byte in the quadword.
+;
+;--
+_stqp_u_:
+	lda	sp, -48(sp)		;Reserve space for regs.
+	stq	r2, (sp)		;Save r2.
+	stq	r3, 8(sp)		;Save r3.
+	stq	r4, 16(sp)		;Save r4.
+	stq	r5, 24(sp)		;Save r5.
+	stq	r6, 32(sp)		;Save r6.
+	stq	r7, 40(sp)		;Save r7.
+
+	lda	r6, (r16)		;Copy unaligned physical address to r6.
+	ldq	r5, (r17)		;Copy quadword data to r5.
+	addq	r6, #7, r7		;Calculate address of high byte of
+					; unaligned quadword.
+	bic	r7, #^b111, r16		;Align high-order quadword physical addr.
+	ldqp				;Get high-order aligned quadword.
+	mb
+	mb
+	lda	r2, (r0)		;Copy high-order aligned quadword to r2.
+	bic	r6, #^b111, r16		;Align low-order quadword physical addr.
+	ldqp				;Get low-order aligned quadword.
+	mb
+	mb
+	lda	r1, (r0)		;Copy low-order aligned quadword to r1.
+	insqh	r5, r6, r4		;r4 = 000hgfed
+	insql	r5, r6, r3		;r3 = cba00000
+	mskqh	r2, r6, r2		;r2 = yyy00000
+	mskql	r1, r6, r1		;r1 = 000xxxxx
+	or	r2, r4, r2		;r2 = yyyhgfed
+	or	r1, r3, r1		;r1 = cbaxxxxx
+	lda	r17, (r2)		;Load high-order data for stqp.
+	bic	r7, #^b111, r16		;Align high-order quadword address.
+	stqp				;Store high-order quadword.
+	lda	r17, (r1)		;Load low-order data for stqp.
+	bic	r6, #^b111, r16		;Align low-order quadword address.
+	stqp				;Store low-order quadword.
+
+	ldq	r2, (sp)		;Restore saved r2.
+	ldq	r3, 8(sp)		;Restore saved r3.
+	ldq	r4, 16(sp)		;Restore saved r4.
+	ldq	r5, 24(sp)		;Restore saved r5.
+	ldq	r6, 32(sp)		;Restore saved r6.
+	ldq	r7, 40(sp)		;Restore saved r7.
+	lda	sp, 48(sp)		;Restore sp.
+	ret	r31, (r26)		;Return to caller.
+
+.PAGE
+.SBTTL	"Increment quadword routine "
+;+
+; ============================================================================
+; = addq_v_u - Routine that adds a value to a quadword			     =
+; ============================================================================
+;
+; OVERVIEW:
+;
+; This routine will add a value a quadword. The address of the aligned quadword
+; should be passed, along with the value.
+;
+; FORM OF CALL:
+;  
+;	addq_v_u(qaddr);       C code form
+;  
+; RETURNS:
+;
+;	msg_success - success
+;       
+;       
+; ARGUMENTS:                                  
+;
+;	r16	address of the quadword.
+;	r17	value to be added.
+;
+; REGISTER USAGE:
+;
+;	r0 - scratch
+;-                           
+
+_addq_v_u_:                                                
+	ldq	r0,(r16)
+	addq	r0,r17,r0
+	stq	r0,(r16)
+	ret	r31,(r26)
+
+.PAGE
+.SBTTL	"_setjmp_ - save execution environment for longjmp"
+;++
+; FUNCTIONAL DESCRIPTION:
+; 
+;   _setjmp_
+;	_setjmp_ saves state information for use by longjmp.  The return is zero
+; from a direct call to setjmp, and non-zero from a subsequent call of longjmp.
+; setjmp calls establish_setjmp to add a copy of its saved environment data to
+; the setjmp queue of the process. This environment data may then be used by
+; longjmp to restore the execution environment on an Alpha.
+; 
+; FORMAL PARAMETERS:
+; 
+;   r16		- An environment identifier (integer) to be associated with the
+;		saved setjmp environment.
+; 
+; IMPLICIT INPUTS:
+; 
+;   NONE.
+; 
+; IMPLICIT OUTPUTS:
+; 
+;   NONE.
+; 
+; ROUTINE VALUE:
+; 
+;   Returns zero from a direct call; non-zero on return from longjmp.
+; 
+; SIDE EFFECTS:
+; 
+;   NONE.
+;--
+_setjmp_:
+	lda	sp, -ASJD$S_ASJD(sp)	;Allocate space for saved context.
+	stq	sp, ASJD$Q_SP(sp)	;Store current stack location.
+	stq	r1, ASJD$Q_R1(sp)	;Store r1.
+	stq	r2, ASJD$Q_R2(sp)	;Store r2.
+	stq	r3, ASJD$Q_R3(sp)	;Store r3.
+	stq	r4, ASJD$Q_R4(sp)	;Store r4.
+	stq	r5, ASJD$Q_R5(sp)	;Store r5.
+	stq	r6, ASJD$Q_R6(sp)	;Store r6.
+	stq	r7, ASJD$Q_R7(sp)	;Store r7.
+	stq	r8, ASJD$Q_R8(sp)	;Store r8.
+	stq	r9, ASJD$Q_R9(sp)	;Store r9.
+	stq	r10, ASJD$Q_R10(sp)	;Store r10.
+	stq	r11, ASJD$Q_R11(sp)	;Store r11.
+	stq	r12, ASJD$Q_R12(sp)	;Store r12.
+	stq	r13, ASJD$Q_R13(sp)	;Store r13.
+	stq	r14, ASJD$Q_R14(sp)	;Store r14.
+	stq	r15, ASJD$Q_R15(sp)	;Store r15.
+	stq	r26, ASJD$Q_R26(sp)	;Store r26 (return address).
+	stq	r27, ASJD$Q_R27(sp)	;Store r27 (procedure value).
+	stq	r29, ASJD$Q_R29(sp)	;Store r29 (frame pointer).
+	lda	r17, 0(sp)		;Load pointer to setjmp data block.
+	lda	r25, 2(r31)		;Load Argument Information.
+	ldq	r27, establish_setjmp_-setjmp(r27) ;Load Procedure Value.
+	ldq	r26, 8(r27)		;Load Procedure Entry Address.
+	jsr	r26, (r26)		;Establish setjmp for this process.
+
+	ldq	r26, ASJD$Q_R26(sp)	;Restore return address.
+	lda	sp, ASJD$S_ASJD(sp)	;Pop space from stack.
+	lda	r0, 0(r31)		;Return 0 from initial setjmp call.
+	ret	r31, (r26)		;Return to caller.
+
+.PAGE
+.SBTTL	"_longjmp_ - restore previously saved execution environment"
+;++
+; FUNCTIONAL DESCRIPTION:
+; 
+;   _longjmp_
+;	_longjmp_ restores the state saved by the most recent call to setjmp
+; which used the same environment identifer, and execution resumes as if the
+; setjmp function had just executed and returned the specified non-zero return
+; value. The function containing the setjmp must not have terminated.
+; 
+; FORMAL PARAMETERS:
+; 
+;   r16		- Environment identifier to be used in looking up the saved
+;		  setjmp environment data.
+;   r17		- Non-zero return value for associated setjmp call.
+; 
+; IMPLICIT INPUTS:
+; 
+;   NONE.
+; 
+; IMPLICIT OUTPUTS:
+; 
+;   NONE.
+; 
+; ROUTINE VALUE:
+; 
+;   Returns the value passed to longjmp as the second argument, r17.  Does
+; not return to the caller of longjmp, but to the caller of the associated
+; setjmp.
+; 
+; SIDE EFFECTS:
+; 
+;   NONE.
+;--
+_longjmp_:
+	lda	r2, 0(r17)		;Save copy of return value in r2.
+	lda	r25, 1(r31)		;Load Argument Information.
+	ldq	r27, find_setjmp_-longjmp(r27) ;Load Procedure Value.
+	ldq	r26, 8(r27)		;Load Procedure Entry Address.
+	jsr	r26, (r26)		;Find the setjmp for this process.
+	bne	r0, 20$			;Found it?
+	halt				;No: fatal error!
+20$:	lda	r28, 0(r0)		;Copy r0 to r28.
+	lda	r0, 0(r2)		;Load return value.
+	ldq	sp, ASJD$Q_SP(r28)	;Restore saved stack location.
+	ldq	r1, ASJD$Q_R1(r28)	;Restore r1.
+	ldq	r2, ASJD$Q_R2(r28)	;Restore r2.
+	ldq	r3, ASJD$Q_R3(r28)	;Restore r3.
+	ldq	r4, ASJD$Q_R4(r28)	;Restore r4.
+	ldq	r5, ASJD$Q_R5(r28)	;Restore r5.
+	ldq	r6, ASJD$Q_R6(r28)	;Restore r6.
+	ldq	r7, ASJD$Q_R7(r28)	;Restore r7.
+	ldq	r8, ASJD$Q_R8(r28)	;Restore r8.
+	ldq	r9, ASJD$Q_R9(r28)	;Restore r9.
+	ldq	r10, ASJD$Q_R10(r28)	;Restore r10.
+	ldq	r11, ASJD$Q_R11(r28)	;Restore r11.
+	ldq	r12, ASJD$Q_R12(r28)	;Restore r12.
+	ldq	r13, ASJD$Q_R13(r28)	;Restore r13.
+	ldq	r14, ASJD$Q_R14(r28)	;Restore r14.
+	ldq	r15, ASJD$Q_R15(r28)	;Restore r15.
+	ldq	r26, ASJD$Q_R26(r28)	;Restore r26 (return address).
+	ldq	r27, ASJD$Q_R27(r28)	;Restore r27 (procedure value).
+	ldq	r29, ASJD$Q_R29(r28)	;Restore r29 (frame pointer).
+	lda	sp, ASJD$S_ASJD(sp)	;Deallocate used stack space.
+	ret	r31, (r26)		;Return to caller of original setjmp.
+
+.PAGE
+.SBTTL	"Common interrupt/exception handler"
+;+
+; ============================================================================
+; = common_isr - common interrupt/exception dispatcher			=
+; ============================================================================
+;
+; OVERVIEW:
+;
+;	All interrupts, exceptions and context switching for the firmware
+;	vector through this routine so that the save and restore context
+;	code is in one place.
+;
+;
+; FORM OF CALL:
+;  
+;	by PAL as a result of an interrupt/exception, including swapping
+;	context.
+;  
+; RETURNS:
+;
+;	None
+;       
+; ARGUMENTS:
+;
+;	r2	scb vector (always the address of this routine)
+;	r3	scb parameter, an index into auxillary vector table
+;
+;
+; SIDE EFFECTS:
+;
+;
+;-
+_common_isr_:
+	;+
+	; Raise IPL so that this thread can't be interrupted.  We don't want
+	; to nest interrupts (not enough stack is available).
+	;-
+	lda	sp,-<4*8>(sp)
+	stq	r0,0(sp)
+	stq	r1,8(sp)
+	stq	r16,16(sp)
+	stq	r17,24(sp)
+	lda	r16,ipl_sync(r31)
+	mtpr_ipl
+
+	;+
+	; So that we can have some maneuvering room, save all the remaining
+	; GPRs on the stack, thus creating a somewhat unorthodox saved context.
+	;-
+	lda	sp,-<acx$s_alpha_ctx-<12*8>>(sp)
+	stq	r2,acx$q_exc_r2(sp)
+	stq	r3,acx$q_exc_r3(sp)
+	stq	r4,acx$q_exc_r4(sp)
+	stq	r5,acx$q_exc_r5(sp)
+	stq	r6,acx$q_exc_r6(sp)
+	stq	r7,acx$q_exc_r7(sp)
+	stq	r8,acx$q_r8(sp)
+	stq	r9,acx$q_r9(sp)
+	stq	r10,acx$q_r10(sp)
+	stq	r11,acx$q_r11(sp)
+	stq	r12,acx$q_r12(sp)
+	stq	r13,acx$q_r13(sp)
+	stq	r14,acx$q_r14(sp)
+	stq	r15,acx$q_r15(sp)
+	stq	r18,acx$q_r18(sp)
+	stq	r19,acx$q_r19(sp)
+	stq	r20,acx$q_r20(sp)
+	stq	r21,acx$q_r21(sp)
+	stq	r22,acx$q_r22(sp)
+	stq	r23,acx$q_r23(sp)
+	stq	r24,acx$q_r24(sp)
+	stq	r25,acx$q_r25(sp)
+	stq	r26,acx$q_r26(sp)
+	stq	r27,acx$q_r27(sp)
+	stq	r28,acx$q_r28(sp)
+	stq	r29,acx$q_r29(sp)
+	lda	r0,acx$s_alpha_ctx(sp)
+	ldq	r1,acx$q_ps(sp)
+	extbl	r1,#1,r5
+	extbl	r1,#7,r1
+	addq	r0,r1,r0
+	stq	r0,acx$q_r30(sp)
+	mfpr_prbr
+	ldl	r1,pcb$a_acp(r0)
+	stq	r1,acx$q_acp(sp)
+	stl	sp,pcb$a_acp(r0)
+
+	;+
+	; Call the routine associated with this vector.  The vector's
+	; parameter is an address of an auxillary structure that gives the
+	; routine to be called and its parameter.
+	;-
+	ldl	r16,scbv$l_p0(r3)
+	zap	r16,#^xf0,r16
+	ldl	r17,scbv$l_p1(r3)
+	zap	r17,#^xf0,r17
+	lda	r25,2(r31)
+	ldl	r27,scbv$l_pd(r3)	; routine's procedure descriptor
+	zap	r27,#^xf0,r27
+	ldq	r26,8(r27)
+	jsr	r26,(r26)
+
+	;+
+	; Reschedule, save the PCB of the new process, and drop the spinlock
+	; (but keep high IPL).
+	;-
+	bsr	r0,10$
+	.long	linkage
+10$:	ldl	r3,(r0)
+	ldq	r4,_spl_kernel(r3)
+	lda	r16,0(r31)
+	lda	r25,1(r31)
+	ldq	r27,_reschedule(r3)
+	ldq	r26,8(r27)
+	jsr	r26,(r26)
+	bis	r0,r31,r2
+	bis	r2,r31,r16
+	mtpr_prbr
+	bis	r2,r31,r0
+	ldl	r1,pcb$a_acp(r0)
+	beq	r1,restore_small_context
+restore_large_context:
+	bis	r1,r31,sp
+	ldq	r1,acx$q_acp(sp)
+	stl	r1,pcb$a_acp(r0)
+	ldq	r8,acx$q_r8(sp)
+	ldq	r9,acx$q_r9(sp)
+	ldq	r10,acx$q_r10(sp)
+	ldq	r11,acx$q_r11(sp)
+	ldq	r12,acx$q_r12(sp)
+	ldq	r13,acx$q_r13(sp)
+	ldq	r14,acx$q_r14(sp)
+	ldq	r15,acx$q_r15(sp)
+	ldq	r18,acx$q_r18(sp)
+	ldq	r19,acx$q_r19(sp)
+	ldq	r20,acx$q_r20(sp)
+	ldq	r21,acx$q_r21(sp)
+	ldq	r22,acx$q_r22(sp)
+	ldq	r23,acx$q_r23(sp)
+	ldq	r24,acx$q_r24(sp)
+	ldq	r25,acx$q_r25(sp)
+	ldq	r26,acx$q_r26(sp)
+	ldq	r27,acx$q_r27(sp)
+	ldq	r28,acx$q_r28(sp)
+	ldq	r29,acx$q_r29(sp)
+	ldq	r0,acx$q_r0(sp)
+	ldq	r1,acx$q_r1(sp)
+	ldq	r16,acx$q_r16(sp)
+	ldq	r17,acx$q_r17(sp)
+	lda	sp,+<acx$s_alpha_ctx-<8*8>>(sp)
+	lock	r2,r3,value(r4)
+.if gt <max_processor_id-1>
+	ldl	r2,now_serving(r4)
+	addl	r2,#1,r2
+	stl	r2,now_serving(r4)
+.endc
+	stl	r31,owner(r4)
+	mb
+	stl	r31,value(r4)
+	mb			
+	imb
+	rei
+
+.PAGE
+.SBTTL	"Callers_pc"
+;+
+; ============================================================================
+; = callers_pc - return the pc of the caller's caller                        =
+; ============================================================================
+;
+; OVERVIEW:
+;
+;
+;
+; FORM OF CALL:
+;  
+;  
+; RETURNS:
+;
+;	Return address of caller's caller.
+;       
+; ARGUMENTS:
+;
+;
+; SIDE EFFECTS:
+;
+;
+;-
+_callers_pc_:
+	ldq	r0,(r29)
+	ldq	r0,(r0)
+	extwl	r0,#2,r0
+	addq	r0,r29,r0
+	ldq	r0,(r0)
+	ret	r31,(r26)
+
+	.subtitle get_sp
+;+
+; ============================================================================
+; = get_sp - return the current sp                                           =
+; ============================================================================
+;
+; OVERVIEW:
+;-
+_get_sp_:
+	bis	r31,r30,r0
+	ret	r31,(r26)
+
+
+.PAGE
+.SBTTL	"Countdown"
+;+
+; ============================================================================
+; = countdown -  simple countdown routine                                    =
+; ============================================================================
+;
+; OVERVIEW:
+;	This routine counts down from a value and returns when the value is
+;	is 0.  It is used to generate consistent software timing loops (doing
+;	this in C leaves you vulnerable to compiler optimizations).
+;
+;
+; FORM OF CALL:
+;  	countdown (n)
+;  
+; RETURNS:
+;
+;	Return address of caller's caller.
+;       
+; ARGUMENTS:
+;
+;
+; SIDE EFFECTS:
+;
+;
+;-
+_countdown_:
+	subq	r16, 1, r16
+	bne	r16, _countdown_
+	ret	r31,(r26)
+
+	.subtitle console_exit
+_exit_console_:
+	;
+	; Save all non-volatile registers to the small context area
+	; of the PCB.
+	;
+	mfpr_prbr
+	lda	r1,pcb$r_alpha_hw_pcb(r0)
+	stq	r2,alpha_hw_pcb$q_r2(r1)
+	stq	r3,alpha_hw_pcb$q_r3(r1)
+	stq	r4,alpha_hw_pcb$q_r4(r1)
+	stq	r5,alpha_hw_pcb$q_r5(r1)
+	stq	r6,alpha_hw_pcb$q_r6(r1)
+	stq	r7,alpha_hw_pcb$q_r7(r1)
+	stq	r8,alpha_hw_pcb$q_r8(r1)
+	stq	r9,alpha_hw_pcb$q_r9(r1)
+	stq	r10,alpha_hw_pcb$q_r10(r1)
+	stq	r11,alpha_hw_pcb$q_r11(r1)
+	stq	r12,alpha_hw_pcb$q_r12(r1)
+	stq	r13,alpha_hw_pcb$q_r13(r1)
+	stq	r14,alpha_hw_pcb$q_r14(r1)
+	stq	r15,alpha_hw_pcb$q_r15(r1)
+	stq	r26,alpha_hw_pcb$q_r26(r1)
+	stq	r27,alpha_hw_pcb$q_r27(r1)
+	stq	r29,alpha_hw_pcb$q_r29(r1)
+	stq	r30,alpha_hw_pcb$q_r30(r1)
+	bis	r0,r31,r2
+	mfpr_whami
+	sll	r0,#3,r0
+	get_addr r1,pal$impure_base,r31
+	addq	r1,r0,r1
+	stq	r2,impure$pcb_offset(r1)
+	imb
+	cserve
+_enter_console_:
+	;
+	; Restore all non-volatile registers from the small context area
+	; of the PCB.
+	;
+	mfpr_prbr
+	lda	r1,pcb$r_alpha_hw_pcb(r0)
+	ldq	r2,alpha_hw_pcb$q_r2(r1)
+	ldq	r3,alpha_hw_pcb$q_r3(r1)
+	ldq	r4,alpha_hw_pcb$q_r4(r1)
+	ldq	r5,alpha_hw_pcb$q_r5(r1)
+	ldq	r6,alpha_hw_pcb$q_r6(r1)
+	ldq	r7,alpha_hw_pcb$q_r7(r1)
+	ldq	r8,alpha_hw_pcb$q_r8(r1)
+	ldq	r9,alpha_hw_pcb$q_r9(r1)
+	ldq	r10,alpha_hw_pcb$q_r10(r1)
+	ldq	r11,alpha_hw_pcb$q_r11(r1)
+	ldq	r12,alpha_hw_pcb$q_r12(r1)
+	ldq	r13,alpha_hw_pcb$q_r13(r1)
+	ldq	r14,alpha_hw_pcb$q_r14(r1)
+	ldq	r15,alpha_hw_pcb$q_r15(r1)
+	ldq	r26,alpha_hw_pcb$q_r26(r1)
+	ldq	r27,alpha_hw_pcb$q_r27(r1)
+	ldq	r29,alpha_hw_pcb$q_r29(r1)
+	ldq	r30,alpha_hw_pcb$q_r30(r1)
+	ret	r31,(r26)
+
+.if ne MODULAR
+.PAGE
+.SBTTL	"krn$_load_flash - load data from flash rom routine"
+;+
+; ============================================================================
+; = krn$_load_flash - Routine that loads from the flash rom                  =
+; ============================================================================
+;
+; OVERVIEW:
+;
+; This routine will will call the decompression program and decompress a
+; flash rom image into its specified load address.
+;
+; FORM OF CALL:
+;  
+;	krn$_load_flash(offset, buf_adr, actual_address, reloc_address);
+;  
+; RETURNS:
+;
+;	status
+;       
+; ARGUMENTS:                                  
+;
+;	r16	offset to the flash rom image header
+;	r17	decompression buffer address
+;	r18	Where to load
+;	r19	byte fetch routine address
+;
+; REGISTER USAGE:
+;
+;	r0 - scratch
+;-                           
+
+_krn$_load_flash_::
+	bsr	r0,hf_xfer_
+	.long	hf_load_flash_val
+hf_xfer_:
+	ldl	r0,(r0)		; get procedure address
+	ldl	r0,(r0)
+	ldl	r27,(r0)
+	ldl	r0,8(r27)	; get routine start address
+	jmp	r31,(r0)	; transfer to console routine
+
+.endc	; end if ne MODULAR
+
+.if ne TURBO ! TL6
+_read_32_:
+	mb				; flush writes
+	mb
+	ldl	r0,(r16)		; fetch requested data
+	mb
+	ret	r31,(r26)
+
+_write_32_:
+	mb
+	mb
+	stl	r17,(r16)
+	mb
+	mb
+	mb
+	mb
+	ret	r31,(r26)
+
+_write_all_:
+	lda	r0,^xffc0(r31)		;puts ffc0 in low word, sign extends
+	zap	r0,#^xf0,r0		;now have ffffffc0 in r0 (4GB address)
+10$:
+	ldl_l	r1,(r0)			;Read LW from block
+	stl_c	r1,(r0)			;restore data
+	subq	r0,#^x40,r0		;decrement address
+	bge	r0,10$			;stop after address 0 is accessed
+	ret	r31,(r26)		;Done	
+
+.if ne	GALAXY
+migrate_cpu::
+	lda	r16, cserve$galaxy_migrate(r31) ; set PAL_BASE to target node
+	.long	pal_func_cserve
+	halt					; halt to target image PALcode
+.endc
+.if eq	GALAXY
+migrate_cpu::
+	halt					; not implemneted halt
+.endc
+.endc
+
+	.end

@@ -1,0 +1,35 @@
+;+
+; target_osf.mar - predicate rules for building OSF PALcode
+;-
+
+;+
+; Last Edit:	26-Oct-98
+;-
+	osfpal = 1
+	beh_model = 0			; behavioural model?
+	focus = 0
+	srom = 1
+	srm_console = 0
+	kseg_hack = 0
+	force_path2 = 1			; EV6 bug fixup
+	va_48 = 0
+
+
+	srom_serial_io = 0		; palcode debug
+	srom_serial_irq = 0		;
+	serial_irq_debug_mchk = 0	;
+	pci_debug_io = 0		; data dumped to addresses in PCI-IO
+	srom_debug_io = 0		; strings and numbers on SROM UART
+
+
+; STIG - additional predicates for debugging
+	debug_init = 0
+	debug_dmiss = 0		; setting this makes an unbootable config
+	debug_imiss = 0		; setting this makes an unbootable config
+	debug_ints = 0		; setting this makes an unbootable config
+	debug_mchk = 0
+	debug_ipl = 0		; setting this makes an unbootable config
+	debug_err = 0
+	debug_swap = 0
+	debug_ipi = 0
+

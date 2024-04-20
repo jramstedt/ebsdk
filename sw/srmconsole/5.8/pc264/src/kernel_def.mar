@@ -1,0 +1,1609 @@
+; ********************************************************************************************************************************
+;  Created: 21-AUG-2000 16:04:43 by OpenVMS SDL EV1-31     
+;  Source:   9-MAR-2000 18:12:46 NIGHTRIDER:[CONSOLE.V58.COMMON.SRC]KERNEL_DEF.S 
+; ********************************************************************************************************************************
+;  file:	kernel_def.sdl    
+; 
+;  Copyright (C) 1990, 1995 by    
+;  Digital Equipment Corporation, Maynard, Massachusetts.
+;  All rights reserved.
+; 
+;  This software is furnished under a license and may be used and copied
+;  only  in  accordance  of  the  terms  of  such  license  and with the
+;  inclusion of the above copyright notice. This software or  any  other
+;  copies thereof may not be provided or otherwise made available to any
+;  other person.  No title to and  ownership of the  software is  hereby
+;  transferred.
+; 
+;  The information in this software is  subject to change without noticec
+;  and  should  not  be  construed  as a commitment by digital equipment
+;  corporation.
+; 
+;  Digital assumes no responsibility for the use  or  reliability of its
+;  software on equipment which is not supplied by digital.
+; 
+; 
+;  Abstract:	Kernel data structure definitions for
+; 		EVAX/Cobra firmware.
+;                                                    
+;  Author:	AJ Beaverson
+; 
+;  Modifications:
+; 
+; 	dwn	15-Sep-1995	Added DDB$K_TOKEN
+; 
+; 	cto	14-Jan-1994	Diag_common addition/subtractions to PCB
+; 
+; 	kl	19-Aug-1993	Ruby merge
+; 
+; 	pel	15-Jan-1993	Conditionalize for morgan
+; 
+; 	phk	22-Jun-1992	Add FB driver
+; 
+; 	ajb	28-May-1992	Create FLASH, which is an unstructured
+; 				uniform byte stream for flash roms.
+; 
+; 	ajb	30-Apr-1992	Trim semaphore names to 16 characters for a
+; 				savings of 6500 bytes.  Semaphore names are
+; 				exist only for human readability, and are not
+; 				used by programs or scripts.
+; 
+; 	ajb	30-Apr-1992	Remove rlock, wlock from inodes.  The pipe
+; 				driver is the only driver that uses them, so
+; 				let it create a private structure that hangs
+; 				of the misc field.
+; 
+; 	ajb	06-feb-1992	Use ifsymbol constructs
+; 				to encode max_processor
+; 
+; 	pel	05-Feb-1992	put IOB w/in FILE quadword aligned.
+; 				Pad FILE struct to be multiple of quadwords.
+; 
+; 	hcb	27-Jan-1992	include platform.defs
+; 
+; 	pel	22-Jan-1992	expand IOB bytes_written,read, io_count to qwd
+; 
+; 	pel	09-Jan-1992	Add len field to RAB struct
+; 
+; 	pel	19-Dec-1991	Add SWAP DDB entry
+; 
+; 	phk	15-Nov-1991	Add code_entry to FILE structure
+; 
+; 	phk	08-Oct-1991	Add EL & TEE  DDB entries
+; 
+; 	hcb	03-Oct-1991	Add Cobra Primary IO space driver DDB entry 
+; 
+; 	pel	30-Sep-1991	make lbus, fbus csr driver DDB entries instead
+; 				of separate csr drivers for each device.
+;  
+; 	pel	11-Sep-1991	gen MAX_DRIVERS automatically; add SCRAM, NCR
+; 				csr drivers.
+;  
+; 	jds	16-Aug-1991	Added EX (XNA) DDB entry.
+;  
+; 	phk	31-Jul-1991	Add MODE_M_SILENT
+; 
+; 	ajb	29-May-1991	Add stack size to INODE
+; 
+; 	hcb	22-May-1991	Add memtest setjmp id
+; 
+; 	ajb	22-May-1991	Export a pointer to the shell's parse structure
+; 				into the PCB so that EXIT, BREAK, certain SET
+; 				commands and CONTROL X can touch the current
+; 				shell.
+; 
+; 	pel	20-May-1991	Add pcb pointer to IOB
+; 
+; 	ajb	17-May-1991	Remember parent's pid when starting a process.
+; 
+; 	dtm	15-May-1991	Add GBUS driver to DDB
+; 
+; 	twp	14-May-1991	Removed error fields in PCB that have been
+; 				moved into the IOB.  Added two new EV's
+; 				to diag_ev structure (completion and startup)
+; 
+; 	ajb	09-May-1991	Add control-c flink/blink to PCB
+; 
+;       djm	25-Apr-1991	Added XCT to driver database.
+; 
+; 	phk	24-Apr-1991	Add CSR to driver database.
+; 
+; 	ajb	24-Apr-1991	statically allocate standard filenames in
+; 				the PCB.
+; 
+; 	ajb	23-Apr-1991	Add MAX_PATHNAME, which is the largest size
+; 				a protocol string can be.
+; 
+; 	dwb	16-Apr-1991	Increase MAX_DRIVERS to 64.
+; 
+; 	kl	16-Apr-1991	Entry constants, saved_pcb field for VAX 
+; 				entry context.	
+; 
+; 	jad	04-Apr-1991	Add PBQ.
+; 
+; 	kl	02-Apr-1991	Add MBX to DDB
+; 
+; 	pel	29-Mar-1991	add iobq to PCB
+; 
+; 	hcb	29-Mar-1991	Add DDB$K_MOPLP to driver database.
+; 
+; 	jds	28-Mar-1991	Added FPR, PT driver defs.
+; 
+; 	pel	27-Mar-1991	add IOB structure to FILE structure; delete
+; 				fatal_errors from pcb
+; 
+; 	ajb	21-mar-1991	Insure at least one character of pushback for
+; 				all file types.
+; 
+; 	jad	13-Mar-1991	Add ff to driver database.
+; 
+; 	pel	12-Mar-1991	collapse inode wrt_ref, rd_ref into just ref.
+; 
+; 	db	11-Mar-1991	Add DDB$K_IIC
+; 
+; 	phk	08-Mar-1991	Add DDB$K_DMA
+; 
+; 	kl	01-Mar-1991	Change HWRPB communications driver to a TT
+; 				port driver.
+; 
+; 	twp	25-Feb-1991	Removed expected, received, failing_vec, and
+; 				failing_addr fields from PCB - will only be
+; 				used for extended error reports if so desired.
+; 				Removed cleanup routine from PCB -- diagnostic
+; 				will now load cleanup routine as direct
+; 				pcb rundown routine.  Removed req_section and
+; 				req_passes not needed in the PCB -- can be 
+; 				referenced directly from QSTRUCT array.  Also
+; 				renamed the 'sections' variable in the dispatch
+; 				table to now be 'groups'.
+; 
+; 	ajb	25-Feb-1991	Add pointer to qualifiers in PCB.
+; 
+; 	jad	21-Feb-1991	Add DDB$K_NDBR
+; 
+; 	sfs	19-Feb-1991	Add ALLOW_COLON and ALLOW_SLASH to DDB; remove
+; 				REF from INODE.
+; 
+; 	ajb	14-Feb-1991	Pass values through semaphores.  The value
+; 				is OR'd in so that it can be treated as a 
+; 				cluster of event flags.
+; 
+; 	mrc	05-Feb-1991	Added contents of STATUS_BLOCK structure
+; 				directly into PCB.  Eliminated DIAG_FLAGS.
+; 				Defined a process kill setjmp id
+; 				(PROC_KILL_SJ_ID) used to allow killpending to
+; 				jump directly to krn$_process if killpending is
+; 				set.  Added to DIAG_EVS structure.
+; 
+; 	kl	25-Jan-1991	Add VAX exception context to PCB
+; 
+; 	sfs	25-Jan-1991	Rearrange PCB; add lightweight saved Alpha
+; 				context.
+; 
+; 	pel	24-Jan-1991	add ptr to opened semaphore to PCB.
+;  
+; 	jds	16-Jan-1991	Added Alpha setjmp structure.
+;  
+; 	mrc	14-Jan-1991	Add STATUS_BLOCK structure and diag constants.
+; 				Also add DIAG_DIS_TABLE structure, DIAG_FLAGS
+; 				structure and DIAG_EVS structure. Update PCB
+; 				to have a pointer to the status block.
+; 
+; 	kl	03-Jan-1991	Add hwrpb_comm driver entry
+; 
+; 	sfs	20-Dec-1990	Add exception R2 through R7 to ALPHA_CTX.
+; 
+; 	ajb	19-Dec-1990	Add drivers types for ssc tt port and tty class
+; 				driver.
+; 
+; 	ajb	12-Dec-1990	Add a Poll Queue Element. These live on a
+; 				polling queue, visited by the timer process
+; 				every tick, and are used to trigger drivers
+; 				when we are running polled.
+; 
+; 	ajb	11-Dec-1990	Add adutt driver entry
+; 
+; 	jds	07-Dec-1990	Added setjmp/longjmp defs.
+; 
+; 	ajb	06-Dec-1990	Add a structure that describes the stack as
+; 				delivered by PAL code, with some enhancements
+; 				to allow saving of context.
+; 
+; 	pel	05-Dec-1990	use ! to define DEF_PERMISSION
+; 
+; 	pel	29-Nov-1990	add a_stdin/out/err to PCB. increase max_fopen.
+; 				In PCB keep pointers to stdin/out/err filenames
+; 				instead of the names themselves.
+;                                                                          
+; 	jds	16-Nov-1990	Restructured entry context.
+; 
+; 	ajb	15-Nov-1990	Add timestamp in PCB so that we keep better
+; 				track of time.
+; 
+; 	kl	15-Nov-1990	add handler queue to PCB
+; 
+; 	dtm	15-Nov-1990	add entry context fields for callback parameters
+; 
+; 	ajb	14-nov-1990	remove control t fields
+; 
+; 	pel	14-Nov-1990	Chgd MODE_M_ values; added create, rewrite 
+; 				Add DVX_WILDCARD, SEARCH_START
+;                                                                          
+; 	jds	12-Nov-1990	Add ids for examine/deposit drivers.
+; 
+; 	sfs	08-Nov-1990	Add protocol drivers.
+; 
+; 	ajb	08-Nov-1990	Add access modes for stdin, stdout and stderr
+; 
+; 	jad	07-Nov-1990	Add DDB$K_EA
+; 
+; 	pel	05-Nov-1990	Add MODE_M_FIXED to prevent a file from moving
+; 
+; 	ajb	02-Nov-1990	Remove ownership queues for semaphores and
+; 				timers, save FPRs on Alpha
+; 
+; 	sfs	31-Oct-1990	Define Alpha hardware context.
+; 
+; 	pel	29-Oct-1990	Add local_offset field to FILE file descriptor.
+; 
+; 	kl	25-Oct-1990	Modify entry_context
+; 
+; 	sfs	24-Oct-1990	Modify LOCK structure.
+; 
+; 	ajb	16-Oct-1990	Add PCB_ALIGNMENT
+; 
+; 	dtm	15-Oct-1990	break out environment variable definitions
+; 
+; 	jad	11-Oct-1990	Add MOPDL to driver database.
+; 
+; 	sfs	09-Oct-1990	Add "status" and "count" fields to FILE.
+; 
+; 	kl	05-Oct-1990	add entry_ctx
+; 
+; 	kl	05-Oct-1990	add last_processor field to PCB	
+; 
+; 	dtm	05-Oct-1990	add environment variable action routines
+; 
+; 	pel	02-Oct-1990	delete inode fl,bl. reduce MAX_INODES to 200.
+; 
+; 	ajb	01-Oct-1990	make pcb size a multiple of 4
+; 
+; 	ajb	28-Sep-1990	Add validation entry point to drivers
+; 
+; 	dtm	25-Sep-1990	Change EV$NOSYSTEM to EV$USER.
+; 
+; 	jad	24-Sep-1990	Add to NI_GBL environment variable pointer.
+; 
+; 	dtm	19-Sep-1990	Add environment variable definitions
+; 
+; 	jad	07-Sep-1990	Add Misc field to control T Queue.
+; 
+; 	ajb	04-Sep-1990	Add user defined startup routine.
+; 
+; 	jad	30-aug-1990	Add alternate to TIMERQ.
+; 
+; 	pel	17-Aug-1990	Add access mode field to FILE, file descriptor.
+;                               Add binary permission inode attribute.
+; 
+; 	pel	14-Aug-1990	Add fields to inode per file_sys design spec.
+; 
+; 	jad	13-Aug-1990	Add some ni definitions
+; 
+; 	ajb	08-Aug-1990	Bump up idle stack size
+; 
+; 	ajb	01-Aug-1990	Add process quantums
+; 
+; 	ajb	30-Jul-1990	Create a spinlock data structure
+; 
+; 	ajb	26-Jul-1990	Add a field in the PCB that indicates what
+; 				state the process is in.
+; 
+; 	ajb	25-Jul-1990	Add ownership queue for timer queue elements.
+; 
+; 	ajb	24-Jul-1990	Add process ids to PCB
+; 
+; 	jad	24-Jul-1990	Add MOP to driver database.
+; 
+; 	kl	20-Jul-1990     Additional documentation.
+; 
+; 	kl,dm	17-Jul-1990	Multiprocessor upgrade (first pass)
+; 
+; 	ajb	4-Jul-1990	Add nokill bit to PCB so processes can protect
+; 				themselves when necessary.
+; 
+; 	ajb	3-Jul-1990	Add backpointer to semaphore in PCB for when
+; 				the PCB is on a semaphore queue.
+; 
+; 	jad	20-Jun-1990	Add EZ to driver database.
+; 
+; 	ajb	13-Jun-1990	Bump up minimum stack size
+; 
+; 	sfs	30-May-1990	Add SCSI and DSSI definitions.
+; 
+; 	ajb	14-May-1990	Add a small buffer in the file descriptor
+; 				to support pushing back at least one character
+; 				into the input strream.
+; 
+; 	ajb	11-May-1990	Add address of completion semaphore to PCB.
+; 
+; 	ajb	20-Apr-1990	Added file system definitions.
+; 
+; 	ajb	07-Mar-1990	Initial entry.
+; 
+ 
+	.MACRO	$kerneldef,..EQU=<=>,..COL=<:>
+KRN$K_MINSTACK'..equ'4096               ;  minimum stack size
+MAX_PRI'..equ'8                         ;  number of priorities
+MAX_NAME'..equ'32                       ;  max size of an identifier
+MAX_IPL'..equ'31
+MAX_WHOAMI'..equ'1                      ;  maximum value that whoami can return.
+MAX_CPU'..equ'2                         ;  max number of cpus allowed
+IPL_SYNC'..equ'31                       ;  kernel synchronization IPL
+IPL_ERR'..equ'30                        ;  high IPL which still allows errors to be delivered
+IPL_RUN'..equ'0                         ;  normally running IPL
+MAX_ARGS'..equ'64                       ;  max # procedure arguments 
+DEF_ALLOC'..equ'2048                    ;  default allocation size for newly created files
+DEF_EXPAND'..equ'512                    ;  default expansion size for files
+DEF_QUANTUM'..equ'10                    ;  default process quantum, in ticks
+PCB_ALIGNMENT'..equ'128                 ;  required HW pcb alignment for evax
+ERROR_ENTRY'..equ'1                     ;  error entry
+SYSTEM_RESET_ENTRY'..equ'2              ;  system_reset_entry
+CALLBACK_ENTRY'..equ'4                  ;  callback entry
+EXTERNAL_ENTRY'..equ'8                  ;  external entry
+NODE_RESET_ENTRY'..equ'16               ;  node reset entry
+; +
+;  ===============================================
+;  = QUEUE - queue structure                     =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+; 	A standard console queue is a double linked list.	
+; 
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      flink  |	address	   | forward link 
+;                             |	       	   | 
+;                      blink  |	address    | backward link
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_QUEUE'..equ'8
+QUEUE'..equ'0
+flink'..equ'0
+blink'..equ'4
+; +
+;  ===============================================
+;  = SEMAPHORE - semaphore structure 		 =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  Semaphore queues are FIFO, and not prioritized. (In most cases, there will 
+;  be only one task on the queue).
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      flink  |	byte 	   | forward link 
+;                             |	       	   | 
+;                      blink  |	address    | backward link
+;                             |	       	   | 
+; 		       gsq    | queue      | global semaphore queue
+;                             |	       	   | 
+;                      count  | longword   | count
+;                             |	       	   | 
+; 		       value  | longword   | value that krn$_wait will return
+;                             |	       	   | 
+; 		       owner  | address    | auxiliary structure for owner
+;                             |	       	   | 
+;                      name   | string     | name
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_SEMAPHORE_OWNER'..equ'20
+SEMAPHORE_OWNER'..equ'0
+owner_pcb'..equ'0
+new_affinity'..equ'4
+new_priority'..equ'8
+old_affinity'..equ'12
+old_priority'..equ'16
+S_SEMAPHORE'..equ'44
+SEMAPHORE'..equ'0
+flink'..equ'0
+blink'..equ'4
+gsq'..equ'8
+count'..equ'16
+value'..equ'20
+owner'..equ'24
+S_name'..equ'16
+name'..equ'28
+; 
+;  Structure of a file entry
+; 
+; +
+;  ===============================================
+;  = NI_GBL - NI Global data definitions	 =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  This structure is to be pointed to by the misc feild in the inode.
+;  It simply contains pointers to the NI data structures to be used by the
+;  drivers.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      pbp    |	address    | Pointer to the port block info
+;                             |	       	   | 
+;                      dlp    |	address    | Pointer to the datalink info
+;                             |	       	   | 
+;                      mbp    |	address    | Pointer to the MOP block info
+;                             |	       	   | 
+;                      mcp    |	address    | Pointer to the MOP counters
+;                             |	       	   | 
+;                      enp    |	address    | Pointer to environment variables
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_NI_GBL'..equ'24
+NI_GBL'..equ'0
+pbp'..equ'0                             ; Pointer to the port block info
+dlp'..equ'4                             ; Pointer to the datalink info
+mbp'..equ'8                             ; Pointer to the MOP block info
+mcp'..equ'12                            ; Pointer to the MOP counters
+lpp'..equ'16                            ; Pointer to device loopback info
+enp'..equ'20                            ; Pointer to environment variables
+S_DDB'..equ'45
+DDB'..equ'0
+name'..equ'0                            ;  how this device wants to be called
+read'..equ'4                            ;  read routine
+write'..equ'8                           ;  write routine
+open'..equ'12                           ;  open routine
+close'..equ'16                          ;  close routine
+expand'..equ'20                         ;  expand routine
+delete'..equ'24                         ;  delete routine
+create'..equ'28                         ;  address of create routine
+setmode'..equ'32                        ;  sets interrupt/polled mode
+validation'..equ'36                     ;  validation routine
+misc'..equ'40                           ;  class specific use
+allow_info'..equ'352
+allow_next'..equ'353
+flash'..equ'354                         ;  is a flash update driver
+block'..equ'355                         ;  is a block device
+sequential'..equ'356                    ;  can't be fseek'd
+S_net_device'..equ'2
+net_device'..equ'357                    ;  is a network device
+filesystem'..equ'359                    ;  is a filesystem
+DDB$K_INTERRUPT'..equ'0                 ;  set to interrupt mode
+DDB$K_POLLED'..equ'1                    ;  set to polled mode
+DDB$K_STOP'..equ'2                      ;  set to stopped
+DDB$K_START'..equ'3                     ;  set to start
+DDB$K_ASSIGN'..equ'4                    ;  assign controller letters
+DDB$K_LOOPBACK_INTERNAL'..equ'5         ;  device internal loopback
+DDB$K_LOOPBACK_EXTERNAL'..equ'6         ;  device external loopback
+DDB$K_NOLOOPBACK'..equ'7                ;  no loopback
+DDB$K_OPEN'..equ'8                      ;  file open
+DDB$K_CLOSE'..equ'9                     ;  file close
+DDB$K_READY'..equ'10                    ;  get ready to boot
+DDB$K_MULTICAST'..equ'11                ;  enable multicast
+DDB$K_ETHERNET'..equ'1                  ;  Ethernet device 
+DDB$K_FDDI'..equ'2                      ;  FDDI device
+DDB$K_TOKEN'..equ'3                     ;  TOKEN RING 
+; +
+;  ===============================================
+;  = INODE - file entry structure 		 =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  Inodes are allocated from the ilist array.
+;  Each inode points to a file. This file may be a read only file, such as a
+;  script, a write only file such as a log, an executable, such as a
+;  routine which executes a command, etc. The inode also points into the 
+;  driver database to a set of routines, associated with a specific driver,
+;  that may perform actions on the file.
+; 
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;    -------------------------------------------------------------------------
+;    Structure Members | Data Type  | Description
+;    -------------------------------------------------------------------------
+;    dvx           | longword   | index into the driver database
+;                  |            | 
+;    dev           | longword   | address of device structure
+;                  |            | 
+;    inuse         | longword   | set if node is in use
+;                  |	        | 
+;    name          | string     | name of file
+;                  |	        | 
+;    attr          | longword   | file attributes (read,write,execute)
+;                  |	        | 
+;    loc           | address    | address of file
+;                  |	        | 
+;    len           | quadword   | size of file in bytes
+;                  |	        | 
+;    alloc         | quadword   | size allocated
+;                  |	        | 
+;    ref           | longword   | open reference count  (for drivers)
+;                  |	        | 
+;    append_offset | quadword   | + loc = addr to append next block of data to
+;                  |	        | 
+;    misc          | address    | miscellaneous pointer
+;                  |	        | 
+; :  -------------------------------------------------------------------------
+; 
+; -
+; 
+S_INODE'..equ'92
+INODE'..equ'0
+flink'..equ'0                           ;  singly linked list of inodes
+dva'..equ'4                             ;  pointer to driver dispatch table
+dev'..equ'8                             ;  pointer to device descriptor
+inuse'..equ'12                          ;  set if node is in use
+attr'..equ'16                           ;  attribute mask              
+loc'..equ'20                            ;  first byte of file
+S_len'..equ'8
+len'..equ'24                            ;  actual size in bytes.
+S_alloc'..equ'8
+alloc'..equ'32                          ;  size allocated
+S_append_offset'..equ'8
+append_offset'..equ'40                  ;  + inode.loc = addr to append next data to
+ref'..equ'48                            ;  open reference count (for drivers)
+misc'..equ'52                           ;  miscellaneous pointer
+S_name'..equ'32
+name'..equ'56
+bs'..equ'88                             ;  natural block size of the device, normally 0
+ATTR$M_READ'..equ'1                     ;  for compatability
+ATTR$M_WRITE'..equ'2                    ;  writes (and deletes) allowed
+ATTR$M_EXECUTE'..equ'4                  ;  executable file
+ATTR$M_BINARY'..equ'8                   ;  binary file
+ATTR$M_EXPAND'..equ'16                  ;  shell expands wildcards
+ATTR$M_SECURE'..equ'32                  ;  access allowed in secure mode 
+ATTR$M_NOFREE'..equ'64                  ;  don't free file space 
+ATTR$M_DEVICE'..equ'128                 ;  device
+ATTR$M_ADAPTER'..equ'256                ;  adapter
+ATTR$M_BUS'..equ'512                    ;  bus
+ATTR$M_FILE'..equ'1024                  ;  file
+DEF_PERMISSION'..equ'3
+DEF_PUSHBACK'..equ'8                    ;  max amount of pushback
+DEF_RBUF'..equ'2048                     ;  max size of read ahead
+; +                                                                             
+;  ===============================================                              
+;  = RAB - Read Ahead Buffer                     =                              
+;  ===============================================                              
+;                                                                               
+;  STRUCTURE OVERVIEW:                                                          
+;                                                                               
+;  Drivers that do not supports FSEEKs require buffers, so that                 
+;  functions such as ungetc can work in a transparent manner.  Define a         
+;  generic read ahead buffer, and allow for a predetermined amount of           
+;  pushback.  The buffer is implemented as a circular queue.  Because           
+;  these buffers are process specific, no synchronization is required.          
+;                                                                               
+;                                                                               
+;  STRUCTURE MEMBERS:                                                           
+; 
+; :                                                                             
+;        ---------------------------------------------------------------------- 
+;        Structure Members    | Data Type  | Description                        
+;        ---------------------------------------------------------------------- 
+;                      alloc  | longword   | number of bytes that are allocated 
+;                             |            | 
+;                      len    | longword   | number of bytes in the buffer      
+;                             |            | 
+;                      buf    | address    | pointer to buffer                  
+;                             |            | 
+;                      inx    | longword   | input index                        
+;                             |            | 
+;                      outx   | longword   | output index                       
+; :      ---------------------------------------------------------------------- 
+;                                                                               
+; -                                                                            
+;                                                                               
+S_RAB'..equ'20
+RAB'..equ'0
+len'..equ'0                             ;                                     
+alloc'..equ'4                           ;                                     
+buf'..equ'8                             ;                                     
+inx'..equ'12                            ;                                     
+outx'..equ'16                           ;                                     
+; +                                                                             
+;  ===============================================                              
+;  = IOB  - IO block structure                   =                              
+;  ===============================================                              
+;                                                                               
+;  STRUCTURE OVERVIEW:                                                          
+;  
+;  Contains IO count data.  Every file descriptor and driver port block
+;  has an IOB.  All IOBs live on a linked list, iobq, synchronized by the
+;  spinlock, spl_iobq.  IOBs are created by fopen and driver init routines 
+;  and they may be created by diagnostics or any other code.
+;  IOBs are deleted by fclose and drivers or other code.
+;   
+; 
+;  STRUCTURE MEMBERS:                                                           
+; 
+; :                                                                             
+;   ----------------------------------------------------------------------- 
+;     Members    | Data Type  | Description                        
+;   ----------------------------------------------------------------------- 
+; 		       sysq   |	queue	   | system wide IOB queue
+;                             |            | 
+; 		       pcbq   |	queue      | PCB wide q; all IOBs for 1 PCB
+;                             |            | 
+; 		      name    | string     | name string for this IO block 
+;                             |            | 
+;         	      pcb     | address    | address of pcb
+;                	      |            | 
+; 		hard_errors   | longword   | number of hard errors reported
+;                             |            | 
+; 		soft_errors   | longword   | number of soft errors reported
+;                             |            | 
+; 		bytes_read    | quadword   | number of bytes read
+;                             |            | 
+; 		bytes_written | quadword   | number of bytes written
+;                             |            | 
+; 		io_count      | quadword   | number of I/O operations done
+;                             |            | 
+; 		retry_count   | longword   | number of retries performed
+; : ----------------------------------------------------------------------- 
+;                                                                               
+; -                                                                            
+;                                                                               
+S_IOB'..equ'88
+IOB'..equ'0
+sysq'..equ'0                            ;  system wide IOB q
+pcbq'..equ'8                            ;  pcb q; all IOBs for 1 pcb
+S_bytes_read'..equ'8
+bytes_read'..equ'16
+S_bytes_written'..equ'8
+bytes_written'..equ'24
+S_io_count'..equ'8
+io_count'..equ'32
+S_name'..equ'32
+name'..equ'40
+pcb'..equ'72                            ;  addr of pcb
+hard_errors'..equ'76
+soft_errors'..equ'80
+retry_count'..equ'84
+; +                                                                             
+;  ===============================================                              
+;  = File - File descriptor structure            =                              
+;  ===============================================                              
+;                                                                               
+;  STRUCTURE OVERVIEW:                                                          
+;                                                              
+;  When accessing files, a small integer is passed to the routines.  This       
+;  integer is an index into an array of pointers to file descriptors.  Each     
+;  PCB has a prebuilt array of file descriptors.                                
+;   
+; 
+;  STRUCTURE MEMBERS:                                                           
+; 
+; :                                                                             
+;   ----------------------------------------------------------------------- 
+;     Members    | Data Type  | Description                        
+;   ----------------------------------------------------------------------- 
+;   	  ip     | address    | address of inode
+;                |            | 
+;   local_offset | quadword   | current location in file
+;                |            | 
+;         offset | address    | pointer to current location in file
+;                |            | 
+;         mode   | longword   | access mode
+;                |            | 
+;         rap    | longword   | address of read ahead buffer, 0 if not used
+;                |            | 
+;         status | longword   | status of last operation
+;                |            | 
+;         count  | longword   | count of last operation
+;                |            | 
+;    code_entry  | longword   | code entry point in file
+;                |            |
+;         iob    | IOB        | IOB; contains IO counts 
+; : ----------------------------------------------------------------------- 
+;                                                                               
+; -                                                                            
+;                                                                               
+S_FILE'..equ'152
+FILE'..equ'0
+flink'..equ'0                           ;  forward link
+blink'..equ'4                           ;  backward link
+S_local_offset'..equ'8
+local_offset'..equ'8                    ;  current location in file
+iob'..equ'16                            ;  IOB; contains IO counts;keep on qwd
+ip'..equ'104                            ;  address of inode
+offset'..equ'108                        ;  pointer to current location in file
+mode'..equ'112                          ;  access mode
+rap'..equ'116                           ;  addr of read ahead buf, 0 if not used
+status'..equ'120                        ;  status of last operation
+count'..equ'124                         ;  count of last operation
+code_entry'..equ'128                    ;  code entry point in file
+misc'..equ'132                          ;  miscellaneous field
+pushback'..equ'136                      ;  pushback value
+pushed'..equ'140                        ;  is value valid
+;  access modes; more description in ANSI C standard, fopen
+;                                                                          
+;  Access mode attributes are combined (ORed) to create a file descr mode. 
+;  Rewrite access mode attribute means to discard previous file contents if
+;  the file existed before the fopen.					   
+;                                                                          
+;  access mode     access mode attributes                                  
+;      "r"         read                                                    
+;      "w"         write, rewrite, create                                  
+;      "a"         write, append, create                                    
+;      "r+"        read, write                                             
+;      "w+"        read, write, rewrite, create                            
+;      "a+"        read, write, append, create                              
+;      "f"         fixed, file's memory address will not be moved          
+;      "z"         use memzone if append to above access modes
+; 
+;  access mode attributes:                                                 
+MODE_M_READ'..equ'1                     ;  read, same as inode read attrib 
+MODE_M_WRITE'..equ'2                    ;  write,same as inode write attrib
+MODE_M_APPEND'..equ'16                  ;  append                          
+MODE_M_REWRITE'..equ'32                 ;  rewrite, discard old file       
+MODE_M_CREATE'..equ'64                  ;  creation allowed                
+MODE_M_SILENT'..equ'128                 ;  error message disabled
+MODE_M_PERM'..equ'256                   ;  file is permanent (fp is malloc'd)
+MODE_M_SECURE'..equ'512                 ;  access allowed in secure mode 
+MODE_M_IMMEDIATE'..equ'1024             ;  complete immediately, don't block
+MODE_M_MZONE'..equ'2048                 ;  use memzone
+; +
+;  ===============================================
+;  = TIMERQ - Queue of sleeping processes        =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  The timer queue holds those processes that have put themselves
+;  to sleep. Each time a timer interrupt is posted on the primary processor,
+;  the timer task walks down the timer queue awakening those 
+;  processes that have finished sleeping. 
+; 
+;                                 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      flink  |	address    | forward link 
+;                             |            | 
+;                      blink  |	address    | backward link
+;                             |            | 
+;                      msec   |	longword   | time to sleep
+;                             |            | 
+;                      sem    |	semaphore  | semaphore the sleeper waits on
+;                             |            | 
+;                      active |	longword   | active flag (TRUE = active)
+;                             |            | 
+;                      perm   |	longword   | permanent flag (TRUE = permanent)
+;                             |            | 
+;                      alt    |	longword   | alternate flag (TRUE = alternate)
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_TIMERQ'..equ'68
+TIMERQ'..equ'0
+flink'..equ'0
+blink'..equ'4
+msec'..equ'8
+sem'..equ'12
+active'..equ'56
+perm'..equ'60
+alt'..equ'64
+; +
+;  =======================================================
+;  = DELAYYQ - Queue of processes awaiting creation      =
+;  =======================================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  This queue contains processes whose creation has been delayed.
+;  After a delay interval is complete, each process will be created.
+; 
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      flink  |	address    | forward link 
+;                             |            | 
+;                      blink  |	address    | backward link
+;                             |            | 
+;                      msec   |	longword   | number of milliseconds to delay
+;                             |            | 
+;                use_tt_not_nl|	longword   | flag to use "tt", not "nl"
+;                             |            | 
+;                      code   |	address    | code to run
+;                             |            | 
+;                      startup|	address    | process startup routine
+;                             |            | 
+;                      sem    |	SEMAPHORE  | pointer to completion semaphore
+;                             |            | 
+;                      pri    |	longword   | process priority
+;                             |            | 
+;                     affinity|	longword   | process affinity
+;                             |            | 
+;                      stack  |	longword   | size of process stack
+;                             |            | 
+;                      name   |	array      | process name
+;                             |            | 
+;                      a0     |	longword   | first argument
+;                             |            | 
+;                      a1     |	longword   | second argument
+;                             |            | 
+;                      a2     |	longword   | third argument
+;                             |            | 
+;                      a3     |	longword   | fourth argument
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_DELAYQ'..equ'88
+DELAYQ'..equ'0
+flink'..equ'0
+blink'..equ'4
+msec'..equ'8
+use_tt_not_nl'..equ'12
+code'..equ'16
+startup'..equ'20
+sem'..equ'24
+pri'..equ'28
+affinity'..equ'32
+stack'..equ'36
+S_name'..equ'32
+name'..equ'40
+a0'..equ'72
+a1'..equ'76
+a2'..equ'80
+a3'..equ'84
+; +
+;  ===============================================
+;  = POLLQ - Queue of poll routines              =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  This queue contains all the active poll routines.  On every timer tick,
+;  the timer process walks down this queue calling the routines.  Drivers
+;  register/deregister their poll routines in this queue as a result of a
+;  call to xx_setmode.
+; 
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      flink  |	address    | forward link 
+;                             |            | 
+;                      blink  |	address    | backward link
+;                             |            | 
+;                      routine|	address    | poll routine to call
+;                             |            | 
+;                      param  |	longword   | parameter to pass to routine
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_POLLQ'..equ'16
+POLLQ'..equ'0
+flink'..equ'0
+blink'..equ'4
+routine'..equ'8
+param'..equ'12
+; +
+;  ===============================================
+;  = PBQ - Queue of port blocks                  =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  This queue contains generic pointers to a list of port blocks.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      flink  |	address    | forward link 
+;                             |            | 
+;                      blink  |	address    | backward link
+;                             |            | 
+;                      pb     |	address    | Address of a port block.
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_PBQ'..equ'12
+PBQ'..equ'0
+flink'..equ'0
+blink'..equ'4
+pb'..equ'8
+; +
+;  ==============================================================
+;  = DIAG_DIS_TABLE - diagnostic dispatch table                 =
+;  ==============================================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  The diagnostic dispatch table contains the information necessary to
+;  dispatch to tests.  A diagnostic program should define and initialize
+;  an array of DIAG_DIS_TABLE to create the dispatch table.  Each entry in
+;  the array will describe a single test.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;    --------------------------------------------------------------------
+;    Structure Member   | Data Type     | Description
+;    --------------------------------------------------------------------
+;    routine            | address       | address of test routine
+;                       |               |
+;    groups             | longword      | name of groups to which this test
+;                       |               | belongs
+; :  --------------------------------------------------------------------
+; -
+; 
+S_DIAG_DIS_TABLE'..equ'8
+DIAG_DIS_TABLE'..equ'0
+routine'..equ'0
+groups'..equ'4
+; +
+;  ==============================================================
+;  = DIAG_EVS - diagnostic environment variable states          =
+;  ==============================================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  The diagnostic evs structure consists of bits used to represent the
+;  current state of the global diagnostic environment variables.  These
+;  bits should not be modified by the diagnostic program, but can be read
+;  to determine the current state of the environment variables.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;    --------------------------------------------------------------------
+;    Structure Member   | Data Type     | Description
+;    --------------------------------------------------------------------
+;    bell               | bitfield      | set if D_BELL is ON
+;                       |               |
+;    clean              | bitfield      | set if D_CLEANUP is ON
+;                       |               |
+;    comp               | bitfield      | set if D_COMPLETE is ON
+;                       |               |
+;    eop                | bitfield      | set if D_EOP is ON
+;                       |               |
+;    head               | bitfield      | set if D_STARTUP is ON
+;                       |               |
+;    log                | bitfield      | set if D_LOGERR is ON
+;                       |               |
+;    oper               | bitfield      | set if D_OPER is ON
+;                       |               |
+;    quick              | bitfield      | set if D_QUICK is ON
+;                       |               |
+;    status             | bitfield      | set if D_STATUS is ON
+;                       |               |
+;    tt                 | bitfield      | set if D_TRACE is ON
+;                       |               |
+;    halt_hard          | bitfield      | set if D_HARDERR is HALT
+;                       |               |
+;    loop_hard          | bitfield      | set if D_HARDERR is LOOP
+;                       |               |
+;    halt_soft          | bitfield      | set if D_SOFTERR is HALT
+;                       |               |
+;    loop_soft          | bitfield      | set if D_SOFTERR is LOOP
+;                       |               |
+;    rpt_summ           | bitfield      | set if D_REPORT is SUMMARY
+;                       |               |
+;    rpt_full           | bitfield      | set if D_REPORT is FULL
+;                       |               |
+;    rpt_off            | bitfield      | set if D_REPORT is OFF
+; :  --------------------------------------------------------------------
+; -
+; 
+m_bell'..equ'^X1
+m_clean'..equ'^X2
+m_comp'..equ'^X4
+m_eop'..equ'^X8
+m_start'..equ'^X10
+m_logs'..equ'^X20
+m_logh'..equ'^X40
+m_oper'..equ'^X80
+m_quick'..equ'^X100
+m_status'..equ'^X200
+m_tt'..equ'^X400
+m_halt_hard'..equ'^X800
+m_loop_hard'..equ'^X1000
+m_halt_soft'..equ'^X2000
+m_loop_soft'..equ'^X4000
+m_rpt_summ'..equ'^X8000
+m_rpt_full'..equ'^X10000
+m_rpt_off'..equ'^X20000
+S_DIAG_EVS'..equ'3
+DIAG_EVS'..equ'0
+bell'..equ'0                            ;  D_BELL state
+clean'..equ'1                           ;  D_CLEANUP state
+comp'..equ'2                            ;  D_COMPLETE state
+eop'..equ'3                             ;  D_EOP state
+start'..equ'4                           ;  D_STARTUP state
+logs'..equ'5                            ;  D_LOGSERR state
+logh'..equ'6                            ;  D_LOGHERR state
+oper'..equ'7                            ;  D_OPER state
+quick'..equ'8                           ;  D_QUICK state
+status'..equ'9                          ;  D_STATUS state
+tt'..equ'10                             ;  D_TRACE state
+halt_hard'..equ'11                      ;  D_HARDERR state
+loop_hard'..equ'12                      ;  D_HARDERR state
+halt_soft'..equ'13                      ;  D_SOFTERR state
+loop_soft'..equ'14                      ;  D_SOFTERR state
+rpt_summ'..equ'15                       ;  D_REPORT state
+rpt_full'..equ'16                       ;  D_REPORT state
+rpt_off'..equ'17                        ;  D_REPORT state
+alpha_hw_pcb$S_ALPHA_HW_PCB'..equ'144
+ALPHA_HW_PCB'..equ'0
+alpha_hw_pcb$S_r2'..equ'8
+alpha_hw_pcb$q_r2'..equ'0
+alpha_hw_pcb$S_r3'..equ'8
+alpha_hw_pcb$q_r3'..equ'8
+alpha_hw_pcb$S_r4'..equ'8
+alpha_hw_pcb$q_r4'..equ'16
+alpha_hw_pcb$S_r5'..equ'8
+alpha_hw_pcb$q_r5'..equ'24
+alpha_hw_pcb$S_r6'..equ'8
+alpha_hw_pcb$q_r6'..equ'32
+alpha_hw_pcb$S_r7'..equ'8
+alpha_hw_pcb$q_r7'..equ'40
+alpha_hw_pcb$S_r8'..equ'8
+alpha_hw_pcb$q_r8'..equ'48
+alpha_hw_pcb$S_r9'..equ'8
+alpha_hw_pcb$q_r9'..equ'56
+alpha_hw_pcb$S_r10'..equ'8
+alpha_hw_pcb$q_r10'..equ'64
+alpha_hw_pcb$S_r11'..equ'8
+alpha_hw_pcb$q_r11'..equ'72
+alpha_hw_pcb$S_r12'..equ'8
+alpha_hw_pcb$q_r12'..equ'80
+alpha_hw_pcb$S_r13'..equ'8
+alpha_hw_pcb$q_r13'..equ'88
+alpha_hw_pcb$S_r14'..equ'8
+alpha_hw_pcb$q_r14'..equ'96
+alpha_hw_pcb$S_r15'..equ'8
+alpha_hw_pcb$q_r15'..equ'104
+alpha_hw_pcb$S_r26'..equ'8
+alpha_hw_pcb$q_r26'..equ'112
+alpha_hw_pcb$S_r27'..equ'8
+alpha_hw_pcb$q_r27'..equ'120
+alpha_hw_pcb$S_r29'..equ'8
+alpha_hw_pcb$q_r29'..equ'128
+alpha_hw_pcb$S_r30'..equ'8
+alpha_hw_pcb$q_r30'..equ'136
+acx$S_ALPHA_CTX'..equ'320
+ALPHA_CTX'..equ'0
+acx$S_acp'..equ'8
+acx$q_acp'..equ'0
+acx$S_exc_r2'..equ'8
+acx$q_exc_r2'..equ'8
+acx$S_exc_r3'..equ'8
+acx$q_exc_r3'..equ'16
+acx$S_exc_r4'..equ'8
+acx$q_exc_r4'..equ'24
+acx$S_exc_r5'..equ'8
+acx$q_exc_r5'..equ'32
+acx$S_exc_r6'..equ'8
+acx$q_exc_r6'..equ'40
+acx$S_exc_r7'..equ'8
+acx$q_exc_r7'..equ'48
+acx$S_r8'..equ'8
+acx$q_r8'..equ'56
+acx$S_r9'..equ'8
+acx$q_r9'..equ'64
+acx$S_r10'..equ'8
+acx$q_r10'..equ'72
+acx$S_r11'..equ'8
+acx$q_r11'..equ'80
+acx$S_r12'..equ'8
+acx$q_r12'..equ'88
+acx$S_r13'..equ'8
+acx$q_r13'..equ'96
+acx$S_r14'..equ'8
+acx$q_r14'..equ'104
+acx$S_r15'..equ'8
+acx$q_r15'..equ'112
+acx$S_r18'..equ'8
+acx$q_r18'..equ'120
+acx$S_r19'..equ'8
+acx$q_r19'..equ'128
+acx$S_r20'..equ'8
+acx$q_r20'..equ'136
+acx$S_r21'..equ'8
+acx$q_r21'..equ'144
+acx$S_r22'..equ'8
+acx$q_r22'..equ'152
+acx$S_r23'..equ'8
+acx$q_r23'..equ'160
+acx$S_r24'..equ'8
+acx$q_r24'..equ'168
+acx$S_r25'..equ'8
+acx$q_r25'..equ'176
+acx$S_r26'..equ'8
+acx$q_r26'..equ'184
+acx$S_r27'..equ'8
+acx$q_r27'..equ'192
+acx$S_r28'..equ'8
+acx$q_r28'..equ'200
+acx$S_r29'..equ'8
+acx$q_r29'..equ'208
+acx$S_r30'..equ'8
+acx$q_r30'..equ'216
+acx$S_r0'..equ'8
+acx$q_r0'..equ'224
+acx$S_r1'..equ'8
+acx$q_r1'..equ'232
+acx$S_r16'..equ'8
+acx$q_r16'..equ'240
+acx$S_r17'..equ'8
+acx$q_r17'..equ'248
+acx$S_r2'..equ'8
+acx$q_r2'..equ'256                      ;  this part is delivered by PAL
+acx$S_r3'..equ'8
+acx$q_r3'..equ'264
+acx$S_r4'..equ'8
+acx$q_r4'..equ'272
+acx$S_r5'..equ'8
+acx$q_r5'..equ'280
+acx$S_r6'..equ'8
+acx$q_r6'..equ'288
+acx$S_r7'..equ'8
+acx$q_r7'..equ'296
+acx$S_pc'..equ'8
+acx$q_pc'..equ'304
+acx$S_ps'..equ'8
+acx$q_ps'..equ'312
+; +
+;  ===============================================
+;  = PCB - Process Context Block                 =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  Process context.
+; 
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+; 		flink 	      | address    | forward link
+;                             |            | 
+; 	        blink 	      | address    | backward link
+;                             |            | 
+; 	        alpha_hw_pcb  | ALPHA_HW_PCB | Alpha hardware context
+;                             |            | 
+; 	        semp          | address    | semaphore the process may be waiting on
+;                             |            | 
+; 		ctrlcq        |	queue	   | control C queue
+;                             |            | 
+; 		pq            |	queue	   | PCB queue
+;                             |            | 
+; 		dq            |	queue      | dynamic memory ownership queue
+;                             |            | 
+; 		hq            |	queue      | handler queue
+;                             |            | 
+; 		sjq           |	queue      | setjmp queue
+;                             |            | 
+; 		iobq          |	queue      | IO block queue for this PCB
+;                             |            | 
+;               pstate        | longword   | process state
+;                             |            | 
+; 		shellp	      | longword   | address of shell's context if this
+;                             |            | process is a shell.
+;                             |            | 
+; 		killpending   | longword   | bit requesting that process exit
+;                             |            | 
+; 		cmd_mode      | longword   | command mode
+;                             |            | 
+; 		cmd_switch    | longword   | command mode switch
+;                             |            | 
+; 		stdin_name    | address    | filename addr for standard input
+;                             |            | 
+; 		stdout_name   | address    | filename addr for standard output
+;                             |            | 
+; 		stderr_name   | address    | filename addr for standard error
+;                             |            | 
+; 		stdin	      | address    | address of stdin  file descriptor
+;                             |            |                   
+; 		stdout	      | address    | address of stdout file descriptor
+;                             |            | 
+; 		stderr	      | address    | address of stderr file descriptor
+;                             |            | 
+;               qexpire       | longword   | number of ticks to go before the
+;                             |            | quantum expires
+;                             |            | 
+;               qexpire_dec   | longword   | value by which qexpire is
+;                             |            | decremented on every timer tick.
+;                             |            | 
+;               quantum       | longword   | number of timer ticks that this
+;                             |            | process gets to run before being
+;                             |            | bumped
+;                             |            | 
+;               timestamp     | quadword   | value of timer when this process
+;                             |            | was swapped in.
+;                             |            | 
+; 		cputime	      | quadword   | number of nsec process was running
+;                             |            | 
+;               exit_status   |	longword   | final exit status for the process
+;                             |            | 
+;               affinity      |	longword   | cpu affinity mask
+;                             |            | 
+;             created_affinity|	longword   | cpu affinity mask at creation
+;                             |            | 
+;               parentpid     | longword   | process id of parent
+;                             |            | 
+;               pid           | longword   | process id
+;                             |            | 
+;               last_processor| longword   | last processor this process ran on
+;                             |            | 
+; 		name	      | array      | process name
+;                             |            | 
+; 		startup	      | address    | user defined startup routine
+;                             |            | 
+; 		task	      | address    | task address
+;                             |            | 
+; 		rundown	      |	address    | rundown routine
+;                             |            | 
+; 	        completion    |	address    | posted by rundown routine
+;                             |            | 
+; 	        opened        |	SEMAPHORE  | posted by krn$_process
+;                             |            | 
+; 	        pri	      | longword   | 0 <= pri <= MAX_PRI
+;                             |            | 
+; 	        acp           | ALPHA_CTX  | ptr to Alpha hardware context
+;                             |            | (on the stack)
+;                             |            | 
+; 		qualp	      | address    | address of qualifier list
+; 			      |            |
+; 		dev_name      | byte array | name of target device
+;                             |            | 
+; 		test_mask     | address    | array of test numbers 
+;                             |            | 
+; 		dispatch      | address    | address of diag dispatch table
+;                             |            | 
+; 		sup_dev       | address    | names of supported devices
+;                             |            | 
+; 		globals       | address    | generic pointer
+;                             |            | 
+; 		diag_common   | address    | address of common diagnostic
+; 			      |            | structure variables
+;                             |            | 
+; 		evs           | longword   | current state of global diag evs
+;                             |            | 
+; 		stacksize     |	longword   | size of stack in bytes
+;                             |            | 
+; 		argc	      | longword   | argument count
+;                             |            | 
+; 	   	argv          | array      | argument list
+;                             |            | 
+; 		stack	      |	array      | process stack
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+SIGNAL_KILL'..equ'1                     ;  bit assignments for
+SIGNAL_CONTROLC'..equ'2                 ;  killpending field
+pcb$S_PCB'..equ'496
+PCB'..equ'0
+pcb$a_flink'..equ'0                     ;  forward link
+pcb$a_blink'..equ'4                     ;  backward link
+pcb$r_alpha_hw_pcb'..equ'8              ;  Alpha hardware context
+pcb$a_semp'..equ'152                    ;  back pointer to semaphore
+pcb$r_ctrlcq'..equ'156                  ;  Control C queue
+pcb$r_pq'..equ'164                      ;  PCB queue
+pcb$r_dq'..equ'172                      ;  dynamic memory ownership q
+pcb$r_hq'..equ'180                      ;  handler queue
+pcb$r_sjq'..equ'188                     ;  setjmp queue
+pcb$r_iobq'..equ'196                    ;  IO block queue for this pcb
+pcb$l_pstate'..equ'204                  ;  process state
+pcb$l_shellp'..equ'208                  ;  address of shell's context
+pcb$l_killpending'..equ'212             ;  please exit...
+pcb$l_cmd_mode'..equ'216                ;  command mode
+pcb$l_cmd_switch'..equ'220              ;  command mode switch
+pcb$r_fq'..equ'224                      ;  file queue
+pcb$a_stdin_name'..equ'232
+pcb$a_stdout_name'..equ'236
+pcb$a_stderr_name'..equ'240
+pcb$S_stdin_mode'..equ'8
+pcb$b_stdin_mode'..equ'244              ;  access modes for 
+pcb$S_stdout_mode'..equ'8
+pcb$b_stdout_mode'..equ'252             ;  standard channels
+pcb$S_stderr_mode'..equ'8
+pcb$b_stderr_mode'..equ'260
+pcb$a_stdin'..equ'268                   ;  addr of stdin file descr
+pcb$a_stdout'..equ'272                  ;  addr of stdout file descr
+pcb$a_stderr'..equ'276                  ;  addr of stderr file descr
+pcb$S_timestamp'..equ'8
+pcb$q_timestamp'..equ'288
+pcb$S_cputime'..equ'8
+pcb$q_cputime'..equ'296                 ;  number of nsec process was running
+pcb$l_qexpire'..equ'304
+pcb$l_qexpire_dec'..equ'308
+pcb$l_quantum'..equ'312
+pcb$l_exit_status'..equ'316             ;  final status code
+pcb$l_affinity'..equ'320
+pcb$l_created_affinity'..equ'324
+pcb$l_parentpid'..equ'328               ;  parent's pid
+pcb$l_pid'..equ'332
+pcb$l_last_processor'..equ'336
+pcb$S_name'..equ'32
+pcb$b_name'..equ'340
+pcb$a_startup'..equ'372                 ;  user defined startup
+pcb$a_task'..equ'376                    ;  task address
+pcb$a_rundown'..equ'380                 ;  rundown routine
+pcb$a_completion'..equ'384              ;  posted by rundown routine
+pcb$a_opened'..equ'388                  ;  posted by krn$_process
+pcb$l_pri'..equ'392                     ;  0 <= pri <= MAX_PRI
+pcb$a_acp'..equ'396                     ;  context is on stack
+pcb$a_qualp'..equ'400
+pcb$S_dev_name'..equ'32
+pcb$b_dev_name'..equ'404
+pcb$a_test_mask'..equ'436
+pcb$a_dis_table'..equ'440
+pcb$a_sup_dev'..equ'444
+pcb$a_globals'..equ'448
+pcb$a_diag_common'..equ'452
+pcb$l_stacksize'..equ'456               ;  # bytes in stack
+pcb$l_argc'..equ'460
+pcb$S_argv'..equ'16
+pcb$l_argv'..equ'464                    ;  keep this first 
+pcb$S_stack'..equ'8
+pcb$b_stack'..equ'488                   ;  this must be last
+; 
+;  Process states
+; 
+KRN$K_NULL'..equ'1
+KRN$K_WAIT'..equ'2
+KRN$K_READY'..equ'3
+KRN$K_RUNNING'..equ'4
+; 
+;  Error Types
+; 
+DIAG$K_HARD'..equ'1
+DIAG$K_SOFT'..equ'2
+DIAG$K_FATAL'..equ'3
+; +
+;  ============================================================================
+;  = LOCK - spinlock data structures                                          =
+;  ============================================================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;       This data structure defines a spinlock.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                       lock  |  longword  | contents of the actual lock
+;                             |            |
+;                    req_ipl  |  longword  | IPL that spinlock must run at
+;                             |            |
+;                    sav_ipl  |  longword  | IPl previous to spinlock, and the
+;                             |            | IPL that will be restored.
+;                             |            |
+;                   attempts  |  longword  | number of times this spinlock has been
+;                             |            | taken
+;                             |            |
+;                    retries  |  longword  | number of times the lock has failed
+;                             |            |
+;                      owner  |  longword  | the PID of the current owner
+;                             |            |
+;                      count  |  longword  | number of concurrent locks
+; :      ----------------------------------------------------------------------
+; 
+; -
+S_LOCK'..equ'64
+LOCK'..equ'0
+value'..equ'0
+req_ipl'..equ'4
+sav_ipl'..equ'8
+attempts'..equ'12
+retries'..equ'16
+owner'..equ'20
+count'..equ'24
+next_number'..equ'28
+now_serving'..equ'32
+S_pad'..equ'28
+pad'..equ'36                            ;  Ensure 64byte alignment
+; +
+;  ===============================================
+;  = HQE - Handler queue entry			 =
+;  ===============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  Handler queue entry
+; 
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        ----------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        ----------------------------------------------------------------------
+;                      flink  |	address    | forward link 
+;                             |            | 
+;                      blink  |	address    | backward link
+;                             |            | 
+;                      vector |	longword   | SCB index
+;                             |            | 
+;                      handler|	address    | address of handler
+;                             |            | 
+;                      param  |	longword   | SCB parameter
+; :      ----------------------------------------------------------------------
+; 
+; -
+; 
+S_HQE'..equ'20
+HQE'..equ'0
+flink'..equ'0
+blink'..equ'4
+vector'..equ'8
+handler'..equ'12
+param'..equ'16
+; +
+;  ==============================================
+;  = ASJD - Alpha SetJmp Data			=
+;  ==============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  The Alpha SetJmp Data structure holds sufficient information to implement setjmp/longjmp on an Alpha machine,
+;  given an execution environment which complies with the Alpha standard calling conventions.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        -------------------------------------------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        -------------------------------------------------------------------------------------------------------
+;                      sp     | quadword   | SP after space is reserved for ASJD structure on the stack in setjmp.
+;                             |            |
+;                      rn     | quadword   | Rn at time of setjmp call (n=1:15, 26, 27, 29).
+;                             |            |
+;                      fn     | quadword   | Fn at time of setjmp call (n=2:9).
+; :      -------------------------------------------------------------------------------------------------------
+; 
+; -
+; 
+ASJD$S_ASJD'..equ'152
+ASJD'..equ'0
+ASJD$S_sp'..equ'8
+ASJD$q_sp'..equ'0
+ASJD$S_r1'..equ'8
+ASJD$q_r1'..equ'8
+ASJD$S_r2'..equ'8
+ASJD$q_r2'..equ'16
+ASJD$S_r3'..equ'8
+ASJD$q_r3'..equ'24
+ASJD$S_r4'..equ'8
+ASJD$q_r4'..equ'32
+ASJD$S_r5'..equ'8
+ASJD$q_r5'..equ'40
+ASJD$S_r6'..equ'8
+ASJD$q_r6'..equ'48
+ASJD$S_r7'..equ'8
+ASJD$q_r7'..equ'56
+ASJD$S_r8'..equ'8
+ASJD$q_r8'..equ'64
+ASJD$S_r9'..equ'8
+ASJD$q_r9'..equ'72
+ASJD$S_r10'..equ'8
+ASJD$q_r10'..equ'80
+ASJD$S_r11'..equ'8
+ASJD$q_r11'..equ'88
+ASJD$S_r12'..equ'8
+ASJD$q_r12'..equ'96
+ASJD$S_r13'..equ'8
+ASJD$q_r13'..equ'104
+ASJD$S_r14'..equ'8
+ASJD$q_r14'..equ'112
+ASJD$S_r15'..equ'8
+ASJD$q_r15'..equ'120
+ASJD$S_r26'..equ'8
+ASJD$q_r26'..equ'128
+ASJD$S_r27'..equ'8
+ASJD$q_r27'..equ'136
+ASJD$S_r29'..equ'8
+ASJD$q_r29'..equ'144
+; +
+;  ==============================================
+;  = SJD_UNION - SetJmp Data Union		=
+;  ==============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  The SetJmp Data union is used to handle Alpha setjmp context data.  It is encapsulted in the SJQ
+;  structure.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        -------------------------------------------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        -------------------------------------------------------------------------------------------------------
+;                      alpha  | ASJD       | Alpha setjmp data block.
+; :      -------------------------------------------------------------------------------------------------------
+; 
+; -
+; 
+S_sjd_union'..equ'152
+sjd_union'..equ'0
+asjd'..equ'0
+; +
+;  ==============================================
+;  = SJQ - SetJmp Queue				=
+;  ==============================================
+; 
+;  STRUCTURE OVERVIEW:
+; 
+;  The SetJmp Queue is a per-process queue which holds the environment data required by setjmp/longjmp for the
+;  process.
+; 
+;  STRUCTURE MEMBERS:
+; 
+; :
+;        -------------------------------------------------------------------------------------------------------
+;        Structure Members    | Data Type  | Description
+;        -------------------------------------------------------------------------------------------------------
+;                      flink  |	address    | forward link 
+;                             |            | 
+;                      blink  |	address    | backward link
+;                             |            | 
+;                      envid  | longword   | environment identifier
+;                             |            | 
+; 		       sjd    | SJD        | setjmp environment data
+; :      -------------------------------------------------------------------------------------------------------
+; 
+; -
+; 
+S_SJQ'..equ'164
+SJQ'..equ'0
+flink'..equ'0                           ;  Forward link
+blink'..equ'4                           ;  Backward link
+sjd'..equ'8                             ;  setjmp environment data
+envid'..equ'160                         ;  environment ID
+jmp_buf'..equ'0                         ;  Define jmp_buf type as longint.
+PROC_KILL_SJ_ID'..equ'0                 ;  Process kill setjmp id.
+EXDEP_SJ_ID'..equ'1                     ;  Examine/deposit setjmp id.
+MEMTEST_SJ_ID'..equ'2                   ;  Memtest setjmp id.
+	.ENDM
