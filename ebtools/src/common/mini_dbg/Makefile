@@ -83,7 +83,7 @@ $(PROGRAM).sp : mini_dbg.s mini_rcs.h mini_dbg.h serialio.s ascitab.h sromio.s .
 	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) $(CPP_EXTRA) $< > $@
 
 $(PROGRAM).o : $(PROGRAM).sp
-	$(AS) $(ASFLAGS) -m$(call LC,$(CPU)) -o $@ $^
+	$(AS) $(ASFLAGS) -R -m$(call LC,$(CPU)) -o $@ $^
 	
 $(PROGRAM).pvc :
 	echo set code_file $(PROGRAM).exe > $@
@@ -94,7 +94,7 @@ $(PROGRAM).pvc :
 	echo quit >> $@
 
 $(PROGRAM).exe : $(PROGRAM).o
-	$(OBJCOPY) --dump-section .text=$@ $<
+	$(OBJCOPY) -O binary $< $@
 #	$(ASTRIP) $(ASTRIP_FLAGS) $(PROGRAM).o $(PROGRAM).exe
 #	$(PVC) < $(PROGRAM).pvc
 

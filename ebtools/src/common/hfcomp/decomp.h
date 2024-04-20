@@ -54,7 +54,8 @@ int inflate (void);
 #ifdef ROM
 
 #define slide area->Slide
-typedef int size_t;
+/* typedef int size_t; */
+typedef unsigned long size_t;
 
 /* #define NULL (char *)0 */
 

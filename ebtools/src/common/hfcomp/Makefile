@@ -79,8 +79,8 @@ inf_s$(TYPE).o : inflate.c
 dbmmn$(TYPE).o : dbmmain.c
 	$(CC) $(CCFLAGS) -o $@ -c $^
 
-decmp$(TYPE).out : cstartup.o decmp$(TYPE).o inf_s$(TYPE).o dbmmn$(TYPE).o
-	$(LD) -N -Ttext=$(DECOMP_BASE) -s -z noexecstack -e __start -o $@ $^
+decmp$(TYPE).elf : cstartup.o decmp$(TYPE).o inf_s$(TYPE).o dbmmn$(TYPE).o
+	$(LD) -nostdlib -N -Ttext=$(DECOMP_BASE) -s -z noexecstack -e __start -o $@ $^
 #	$(LD) -N -segment_page 16 -T $(DECOMP_BASE) -non_shared -o $@ $^
 # https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
 
@@ -113,7 +113,7 @@ upal$(TYPE).map : upal$(TYPE).o
 
 ### decmp
 
-decmp$(TYPE).nh : decmp$(TYPE).out
+decmp$(TYPE).nh : decmp$(TYPE).elf
 	$(OBJCOPY) -O binary $< $@
 
 decmp$(TYPE).img : upal$(TYPE).nh decmp$(TYPE).nh pvc$(TYPE).pvc
@@ -140,7 +140,7 @@ lint :
 
 clean :
 	rm -f *.o *~ \#*\# *.bak *.a core \
-	*.nh decmp*.out *.lis *.dis \
+	*.nh decmp*.elf *.lis *.dis \
 	*.map *.pvc *.ent *.sp \
 	decmp*.img \
 	hfcomp
