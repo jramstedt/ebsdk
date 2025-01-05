@@ -35,7 +35,7 @@
 
 #undef BEGIN
 #define BEGIN(s) { yy_start = 1 + 2 * (s); last_begin_state = s; }
-static int last_begin_state = INITIAL;
+static int last_begin_state;
 
 /*
  * Tells flex to use get_input() instead of its default.
@@ -86,8 +86,6 @@ static int needed_prep = 0;
 int listing_line_size;
 char* listing_line;  
 char* listing_line_ptr;
-
-int yy_flex_debug = 0;
 
 /*
  * Functions which are prototyped here because they shouldn't be called
@@ -1354,6 +1352,8 @@ SYMBOL	([a-zA-Z$_.][a-zA-Z0-9$_./]*|[0-9]+[a-zA-Z$_.][a-zA-Z0-9$_./]+|[0-9]+[a-z
                                 }
 
 %%
+
+static int last_begin_state = INITIAL;
 
 #ifndef _tolower
 #define _tolower(s) tolower(s)

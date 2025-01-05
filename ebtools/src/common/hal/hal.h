@@ -51,15 +51,6 @@
 /*#define BLOCK_TOKEN_ALLOC*/
 #endif
 
-#ifndef VMS
-#ifdef linux
-extern const char *const sys_errlist[];
-#else
-extern char *sys_errlist[];
-#endif
-#define strerror(n)	sys_errlist[n]
-#endif
-
 #ifdef __STDC__
 #define PROTO(text)	text
 #else

@@ -419,7 +419,7 @@ directive:
                                                push_bodies($4); 
                                                (void)next_file(); 
                                            } else
-                                               free_tok_s($4)
+                                               free_tok_s($4);
                                         }
     |	REPEAT opt_absexpr EOL
             BODYTEXT ENDR EOL		{ do_list(L_DEFINITIONS, start_line); push_repeat_body($4, $2);}

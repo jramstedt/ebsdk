@@ -291,35 +291,48 @@ int next_file()
       errout(E_INFO | E_NO_LNUM, "hal", "opening %s for input.\n", ifile->name);
   }
 
-  if (ifile->buff == NULL)
+  if (ifile->buff == NULL) {
     switch(ifile->type) {
-    case F_STRING:
-    case F_MACRO_PREP:
-      if (!macro_prep_buff_free_list)
-        ifile->buff = yy_create_buffer((ifile->type == F_FILE) ? ifile->f : NULL, PREP_BUF_SIZE);
-      else {
-        BUFFER_LIST *temp = macro_prep_buff_free_list;
-        macro_prep_buff_free_list = temp->next;
-        ifile->buff = temp->buff;
-        yy_init_buffer(ifile->buff, NULL);
-        FREE(temp);
-      }
-      break;
-    case F_MACRO:
-      if (!macro_buff_free_list)
-        ifile->buff = yy_create_buffer((ifile->type == F_FILE) ? ifile->f : NULL, MACRO_BUF_SIZE);
-      else {
-        BUFFER_LIST *temp = macro_buff_free_list;
-        macro_buff_free_list = temp->next;
-        ifile->buff = temp->buff;
-        yy_init_buffer(ifile->buff, NULL);
-        FREE(temp);
-      }
-      break;
-    default:
-    ifile->buff = yy_create_buffer((ifile->type == F_FILE) ? ifile->f : NULL, YY_BUF_SIZE);
+      case F_STRING:
+      case F_MACRO_PREP:
+        if (!macro_prep_buff_free_list) {
+          ifile->buff = yy_create_buffer(NULL, PREP_BUF_SIZE);
+          yy_switch_to_buffer(ifile->buff);
+        } else {
+          BUFFER_LIST *temp = macro_prep_buff_free_list;
+          macro_prep_buff_free_list = temp->next;
+          ifile->buff = temp->buff;
+
+          yy_switch_to_buffer(ifile->buff);
+          yyrestart(NULL);
+
+          FREE(temp);
+        }
+        
+        break;
+      case F_MACRO:
+        if (!macro_buff_free_list) {
+          ifile->buff = yy_create_buffer(NULL, MACRO_BUF_SIZE);
+          yy_switch_to_buffer(ifile->buff);
+        } else {
+          BUFFER_LIST *temp = macro_buff_free_list;
+          macro_buff_free_list = temp->next;
+          ifile->buff = temp->buff;
+
+          yy_switch_to_buffer(ifile->buff);
+          yyrestart(NULL);
+
+          FREE(temp);
+        }
+        break;
+      default:
+        ifile->buff = yy_create_buffer((ifile->type == F_FILE) ? ifile->f : NULL, YY_BUF_SIZE);
+        yy_switch_to_buffer(ifile->buff);
     }
-  yy_switch_to_buffer(ifile->buff);
+  } else {
+    yy_switch_to_buffer(ifile->buff);
+  }
+
   yychar = ifile->yychar;
   yylval = ifile->yylval;
   

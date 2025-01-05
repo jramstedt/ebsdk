@@ -20,9 +20,6 @@
 */
 #include <stdio.h>
 
-/* from bison output */
-#define YYEMPTY		-2
-
 #ifndef NO_LEXYY
 /* from flex output */
 #define YY_NULL 0
