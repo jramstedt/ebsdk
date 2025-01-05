@@ -7,6 +7,7 @@ sdkshell.conf
 
 # Built binaries
 ebtools/src/common/bit/bit
+ebtools/src/common/hal/hal
 ebtools/src/common/hex32/hex32
 ebtools/src/common/hexpad/hexpad
 ebtools/src/common/ic4mat/ic4mat
