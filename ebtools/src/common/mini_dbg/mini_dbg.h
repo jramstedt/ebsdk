@@ -204,7 +204,7 @@
 
 #ifndef LDLI
 #define LDLI(reg,val) \
-lda reg, (val&0xffff)(r31)		; /* Mask off upper word	*/ \
+lda reg, SEXT(val&0xffff)(r31)		; /* Mask off upper word	*/ \
 ldah reg, SEXT((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
 					  /* remove its sign-extension	*/
 #endif
@@ -212,8 +212,8 @@ ldah reg, SEXT((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
 #define LDLQ(reg, val_h, val_l) \
 LDLI(reg, val_h); \
 sll  reg, 32, reg; \
-lda  reg, (val_l&0xffff)(reg); \
-ldah reg, ((val_l+0x8000)>>16)(reg);
+lda  reg, SEXT(val_l&0xffff)(reg); \
+ldah reg, SEXT((val_l+0x8000)>>16)(reg);
 
 
 /*--------------------------------------------------------------------------

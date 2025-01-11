@@ -2262,12 +2262,12 @@ InitCPU:
 					/* and exc_mask 		*/
 	mfpr	r31, va			/* unlock faulting va, mmstat 	*/
 
-#define icp_stat_init (ICPERR_M_DPE | ICPERR_M_TPE  | ICPERR_M_TMR)
-	lda	r2, icp_stat_init(r31)	/* Clear Icache data and tag 	*/
+#define icp$stat_init (ICPERR_M_DPE | ICPERR_M_TPE  | ICPERR_M_TMR)
+	lda	r2, icp$stat_init(r31)	/* Clear Icache data and tag 	*/
 	mtpr	r2, icPerr		/* parity error, & timeout error*/
 
-#define dcp_stat_init (DCPERR_M_LOCK | DCPERR_M_SEO)
-	lda	r2, dcp_stat_init(r31)	/* Clear Dcache parity error 	*/
+#define dcp$stat_init (DCPERR_M_LOCK | DCPERR_M_SEO)
+	lda	r2, dcp$stat_init(r31)	/* Clear Dcache parity error 	*/
 	mtpr	r2, dcPerr		/* status		 	*/
 
 /* ======================================================================

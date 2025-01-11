@@ -27,6 +27,7 @@ INCLUDES	= -I. -I../include
 
 LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
 ASFLAGS		= # -acdlnm="$@.lst"
+CPPFLAGS	= -fdollars-in-identifiers
 
 CPU_064		= 21064
 CPU_064A	= 21064A
