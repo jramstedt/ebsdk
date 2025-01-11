@@ -1,30 +1,51 @@
-OBJFILES=lexer.lex.o parser.tab.o avl_mod.o dll.o main.o hal.o sym.o utl.o \
-    dir.o memmgt.o operator.o osf.o lib.o NN_Div.o NN_Util.o NN_DigitDiv.o \
-    NN_SubDigitMult.o NN_Sub.o NN_DigitMult.o yywrap.o
+CONFIG_DIR=../../../..
+include $(CONFIG_DIR)/sdkmake.conf
 
-CFLAGS=-I. -DHALSRC -D__int64=long
+CC				= cc
+CFLAGS		= -g -I.
+FLEX			= flex
+FLEXFLAGS	= -iIL
+BISON			= bison
+BISONFLAGS= -dtvl
 
-hal: $(OBJFILES)
-	$(CC) -o hal $(OBJFILES)
+SRCS = lexer.lex.c parser.tab.c avl_mod.c dir.c dll.c hal.c lib.c main.c \
+		memmgt.c NN_DigitDiv.c NN_DigitMult.c NN_Div.c NN_Sub.c NN_SubDigitMult.c \
+		NN_Util.c operator.c osf.c sym.c utl.c yywrap.c
 
-FLEX=flex
-FLEXFLAGS=-iIL
+hal : $(SRCS:.c=.o)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
-BISON=bison
-BISONFLAGS=-dtvl
-
-install: hal
-	cp hal ../../../unix
-
-lexer.lex.c:	lexer.l parser.tab.c
-	$(FLEX) $(FLEXFLAGS) lexer.l
-	mv lex.yy.c lexer.lex.c
+lexer.lex.c : lexer.l parser.tab.c
+	$(FLEX) $(FLEXFLAGS) $<
+	mv lex.yy.c $@
 
 parser.tab.c: parser.y
-	$(BISON) $(BISONFLAGS) parser.y
+	$(BISON) $(BISONFLAGS) $<
 
-clean:
-	rm -f $(OBJFILES) hal
+install : hal
+		cp -fp $^ $(EB_TOOLBOX)/.
+		chmod 775 $(addprefix $(EB_TOOLBOX)/, $^)
+
+clean :
+		rm -f *.o *~ \#*\# *.bak *.a core \
+		hal
 
 realclean:	clean
 	rm -f parser.tab.c parser.tab.h lexer.lex.c lex.yy.c
+
+# Dependencies
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+
+COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+
+%.o : %.c
+%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.c) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+$(DEPFILES):
+
+include $(wildcard $(DEPFILES))
