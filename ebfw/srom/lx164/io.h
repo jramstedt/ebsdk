@@ -3,7 +3,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1993							    *
+**  Copyright ï¿½ 1993							    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -160,6 +160,9 @@
 #define ROMINC 0x20	/* Adder used to address next byte in ROM */
 #endif
 
+#define SEXT(val) ((val ^ 0x8000) - 0x8000)
+#define SEXT10b(val) ((val ^ 0x200) - 0x200)
+
 /*
  * The LDLI macro is used to load a 32 bit sign extended
  * literal into the specified register.
@@ -173,15 +176,15 @@
  * sign-extension.
  */
 #define LDLI(reg,val) \
-lda reg, (val&0xffff)(r31)		; /* Mask off upper word	*/ \
-ldah reg, ((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
+lda reg, SEXT(val&0xffff)(r31)		; /* Mask off upper word	*/ \
+ldah reg, SEXT((val+0x8000)>>16)(reg)	; /* Mask off lower word and	*/
 					  /* remove its sign-extension	*/
 
 #define LDLQ(reg, val_h, val_l) \
 LDLI(reg, val_h); \
 sll  reg, 32, reg; \
-lda  reg, (val_l&0xffff)(reg); \
-ldah reg, ((val_l+0x8000)>>16)(reg);
+lda  reg, SEXT(val_l&0xffff)(reg); \
+ldah reg, SEXT((val_l+0x8000)>>16)(reg);
 
 /* 
  * NOTE: The following routines will clobber R0, R27-R29 and ALL PALtemps.  

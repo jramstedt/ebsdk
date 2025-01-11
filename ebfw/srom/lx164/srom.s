@@ -388,7 +388,7 @@ initIPRs:
  *	R14 - Pointer to PYXIS base register = 87.4000.0000
  */
 initGlobals:
-	ldah	r0, 0xfff0(r31)		/* r13 <- CBOX base pointer 	*/
+	ldah	r0, SEXT(0xfff0)(r31)		/* r13 <- CBOX base pointer 	*/
 	zap	r0, 0xE0, r13
 	load_csr_base(r14)		/* Base for config registers.	*/
 	bsr	r28, ClearCPUErrors	/* Clear errors before starting	*/
@@ -2697,25 +2697,27 @@ BCacheOnOff:
 #define MCR_BCSTATE_K_MASK  (MC_MCR_M_BCACHE_ENABLE | MC_MCR_M_OVERLAP_DISABLE)
 
 	ldah	r1, 0x1000(r14)		/* MCR ponter */
-	ldl_p	r0, MC_MCR(r1)		/* read MCR */
+	ldl_p	r0, SEXT10b(MC_MCR)(r1)		/* read MCR */
 	LDLI	(r2,  MCR_BCSTATE_K_MASK)
 	bic		r0, r2, r0
 	blbc	r19, mcr_bc_off		/* branch if bcache is to be turned off */
 	bis		r0, r2, r0
 mcr_bc_off:
 	ldah	r1, 0x1000(r14)		/* MCR ponter */
-	stl_p	r0, MC_MCR(r1)
+	stl_p	r0, SEXT10b(MC_MCR)(r1)
 	mb
-	ldl_p	r0, MC_MCR(r1)		/* read MCR */
+	ldl_p	r0, SEXT10b(MC_MCR)(r1)		/* read MCR */
 
-	ldl_p	r0, MC_GTR(r1)		/* read GTR */
-	bic		r0, MC_GTR_M_IDLE_BC_WIDTH, r0
+	ldl_p	r0, SEXT10b(MC_GTR)(r1)		/* read GTR */
+	LDLI	(r2,  MC_GTR_M_IDLE_BC_WIDTH)
+	bic		r0, r2, r0
 	blbc	r19, gtr_bc_off
-	bis		r0, (3<<MC_GTR_V_IDLE_BC_WIDTH), r0
+	LDLI	(r2,  (3<<MC_GTR_V_IDLE_BC_WIDTH))
+	bis		r0, r2, r0
 gtr_bc_off:
-	stl_p	r0, MC_GTR(r1)		/* write GTR */
+	stl_p	r0, SEXT10b(MC_GTR)(r1)		/* write GTR */
 	mb
-	ldl_p	r0, MC_GTR(r1)		/* read GTR */
+	ldl_p	r0, SEXT10b(MC_GTR)(r1)		/* read GTR */
 
 	mb
 	stq_p	r19, bcCtl(r13)		/* write the BC_CONTROL register */
@@ -3475,9 +3477,11 @@ ClearCPUErrors:
 /*
  * Clear the Serial Line, Performance Counter,and CRD interrupt requests
  */
-#define HWINT_CLR_ALL (( HWINT_M_PC0C | HWINT_M_PC1C | HWINT_M_PC2C | \
-			 HWINT_M_CRDC | HWINT_M_SLC) >> 16 )
-	ldah	r2, HWINT_CLR_ALL(r31)
+#define HWINT_CLR_ALL (( HWINT_M_PC0C | HWINT_M_PC1C | HWINT_M_PC2C | HWINT_M_CRDC | HWINT_M_SLC) >> 16 )
+	ldah	r2, (HWINT_CLR_ALL >> 16)(r31)
+	sll		r2, 16, r2
+	ldah	r2,	(HWINT_CLR_ALL & 0xffff)(r2)
+
 	mtpr	r2, hwIntClr
 
 	ldq_p	r31, scStat(r13)	/* Clear SCache errors.		*/
@@ -4690,7 +4694,7 @@ read_flash:
 
 	bsr	r29, WriteFBank		/* Switch banks. r2 is 0 or 1	*/
 
-	ldah	r0, (FROM_BASE>>16)(r31) /* base address of Flash memory*/
+	ldah	r0, SEXT(FROM_BASE>>16)(r31) /* base address of Flash memory*/
 	zap	r0, 0xF0, r0		/* blow off the high longword	*/
 	addq	r4, r0, r4		/* Add offset to base address.	*/
 
