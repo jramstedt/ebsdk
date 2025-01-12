@@ -5,7 +5,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1993, 1994						    *
+**  Copyright ï¿½ 1993, 1994						    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -4019,7 +4019,7 @@ set_icsr:
 	mtpr	t0, iVptBr
 	mtpr	zero, ptPtbr
 
-	ldah	v0, 0xFFF0(zero)	// v0 <- 0.FFF0.0000
+	ldah	v0, SEXT(0xFFF0)(zero)	// v0 <- 0.FFF0.0000
 	zap	v0, 0xE0, v0		// Get base address of CBOX IPRs
 
 	ldq_p	zero, scStat(v0)	// Clear Scache status and error addr
@@ -4612,7 +4612,7 @@ IntCrdHandler:
 	mtpr	v0, pt0			// Save v0.
 	mtpr	t0, pt1			// Save t0.
 
-	ldah	p6, 0xFFF0(zero)
+	ldah	p6, SEXT(0xFFF0)(zero)
 	zap	p6, 0xE0, p6		// Form CBOX IPR base address.
 
 	ldq_p	v0, eiAddr(p6)		// Get Bcache/System error address.
@@ -4890,7 +4890,7 @@ MchkOSBugCheck:
 	bis	p7, MCES_M_MIP, p7	// Set Machine-Check-In-Progress flag
 
 	mtpr	p7, ptMces		// Save combined SCB and MCHK bits
-	ldah	p6, 0xFFF0(zero)	// p6 <- 00.FFF0.0000
+	ldah	p6, SEXT(0xFFF0)(zero)	// p6 <- 00.FFF0.0000
 
 	mtpr	t0, pt1			// Save t0
 	zap	p6, 0xE0, p6		// p6 <- FF.FFF0.0000 Cbox IPR base
@@ -5002,7 +5002,7 @@ MchkContinue:
 	mtpr	t3, pt4			// Save t3
 	or	p6, v0, p6		// Merge in the MCHK code
 	mtpr	p6, ptMisc		// Store updated MCES, MCHK, SCB bits
-	ldah	p6, 0xFFF0(zero)	// r14 <- 0.FFF0.0000
+	ldah	p6, SEXT(0xFFF0)(zero)	// r14 <- 0.FFF0.0000
 	mtpr	t0, pt1			// Save t0 - 30 instructions
 	zap	p6, 0xE0, p6		// Form Cbox IPR base address
 	mtpr	p4, pt10		// Stash the exception address
@@ -5199,7 +5199,7 @@ MchkLogOut:
 	STORE_IPR(excMask,LAF_Q_EXC_MASK,p6)
 	STORE_IPR(excSum,LAF_Q_EXC_SUM,p6)
 
-	ldah	p5, 0xFFF0(zero)	// p5 <- FF...FFF0.0000
+	ldah	p5, SEXT(0xFFF0)(zero)	// p5 <- FF...FFF0.0000
 	zap	p5, 0xE0, p5		// Form Cbox IPR base address
 
 	ldq_p	p5, ldLock(p5)		// Get the LD_LOCK IPR
@@ -5547,7 +5547,7 @@ pvc$osf35$379:				    // loads. HW_ST ok here, so ignore
 	SAVE_IPR(excMask,CNS_Q_EXC_MASK,t0)
 	SAVE_IPR(intId,CNS_Q_INT_ID,t0)
 
-	ldah	p6, 0xFFF0(zero)
+	ldah	p6, SEXT(0xFFF0)(zero)
 	zap	p6, 0xE0, p6		// Get base address of CBOX IPRs
 	NOP				// Pad mfpr dcPerr out of shadow of
 	NOP				// last store

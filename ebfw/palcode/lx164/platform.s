@@ -5,7 +5,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1993, 1994						    *
+**  Copyright ï¿½ 1993, 1994						    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -295,7 +295,7 @@ Sys_Reset:
 	bic	a0, BC_M_ALLOC_CYC, a0	// Make sure alloc_cycle is clear
 	SAVE_SHADOW(a0,CNS_Q_BC_CTL,t1)	// Save shadow of bcCtl.
 
-	ldah	v0, 0xFFF0(zero)	// v0 <- FFFF.FFFF.FFF0.0000
+	ldah	v0, SEXT(0xFFF0)(zero)	// v0 <- FFFF.FFFF.FFF0.0000
 	zap	v0, 0xE0, v0		// Get base address of FF.FFF0.0000
 
 	RESTORE_SHADOW(a1,CNS_Q_BC_CFG,t1)	// Load up current BC_CONFIG
@@ -764,7 +764,7 @@ Sys_IntMchkHandlerMerge:
 
 	mtpr	p6, ptMces		// Save combined SCB and MCHK bits
 
-	ldah	p6, 0xFFF0(zero)	// p6 <- FF...FFF0.0000
+	ldah	p6, SEXT(0xFFF0)(zero)	// p6 <- FF...FFF0.0000
 	mtpr	t0, pt1			// Save t0
 
 	zap	p6, 0xE0, p6		// p6 <- FF.FFF0.0000 Cbox IPR base 
@@ -1396,7 +1396,7 @@ Sys_Cserve_Rd_BcCfgOff:
 	ALIGN_BRANCH_TARGET
 
 Sys_Cserve_Wr_Bcache:
-	ldah	v0, 0xFFF0(zero)	// v0 <- FFFF.FFFF.FFF0.0000
+	ldah	v0, SEXT(0xFFF0)(zero)	// v0 <- FFFF.FFFF.FFF0.0000
 	zap	v0, 0xE0, v0		// Get base address of FF.FFF0.0000
 	bic	a0, BC_M_ALLOC_CYC, a0	// Make sure alloc_cycle is clear
 

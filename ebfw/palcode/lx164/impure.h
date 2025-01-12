@@ -6,7 +6,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1994							    *
+**  Copyright ï¿½ 1994							    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -212,30 +212,30 @@
 */
 
 #define SAVE_GPR(reg,offset,base) \
- 	stq_p	reg, ((offset-0x200)&0x3FF)(base)
+ 	stq_p	reg, SEXT10b((offset-0x200)&0x3FF)(base)
 
 #define RESTORE_GPR(reg,offset,base) \
-	ldq_p	reg, ((offset-0x200)&0x3FF)(base)
+	ldq_p	reg, SEXT10b((offset-0x200)&0x3FF)(base)
 
 #define SAVE_FPR(reg,offset,base) \
-	stt	reg, ((offset-0x200)&0x3FF)(base)
+	stt	reg, SEXT10b((offset-0x200)&0x3FF)(base)
 
 #define RESTORE_FPR(reg,offset,base) \
-	ldt	reg, ((offset-0x200)&0x3FF)(base)
+	ldt	reg, SEXT10b((offset-0x200)&0x3FF)(base)
 
 #define SAVE_IPR(reg,offset,base) \
 	mfpr	v0, reg;	  \
-  	stq_p	v0, ((offset-CNS_Q_IPR)&0x3FF)(base)
+  	stq_p	v0, SEXT10b((offset-CNS_Q_IPR)&0x3FF)(base)
 
 #define RESTORE_IPR(reg,offset,base) \
-  	ldq_p	v0, ((offset-CNS_Q_IPR)&0x3FF)(base); \
+  	ldq_p	v0, SEXT10b((offset-CNS_Q_IPR)&0x3FF)(base); \
 	mtpr	v0, reg
 
 #define SAVE_SHADOW(reg,offset,base) \
-  	stq_p	reg, ((offset-CNS_Q_IPR)&0x3FF)(base)
+  	stq_p	reg, SEXT10b((offset-CNS_Q_IPR)&0x3FF)(base)
 
 #define	RESTORE_SHADOW(reg,offset,base)\
-	ldq_p	reg, ((offset-CNS_Q_IPR)&0x3FF)(base)
+	ldq_p	reg, SEXT10b((offset-CNS_Q_IPR)&0x3FF)(base)
 
 /*
  *  STORE_IPR doesn't compensate for weird
@@ -243,7 +243,7 @@
  */
 #define STORE_IPR(reg,offset,base) \
 	mfpr	v0, reg;	  \
-  	stq_p	v0, ((offset)&0x3FF)(base)
+  	stq_p	v0, SEXT10b((offset)&0x3FF)(base)
 
 /*
 ** Macro to save the internal state of the general purpose

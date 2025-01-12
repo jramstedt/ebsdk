@@ -6,7 +6,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1993, 1994						    *
+**  Copyright ï¿½ 1993, 1994						    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -132,10 +132,13 @@
 #define CALL_PAL_UNPRIV(vector) \
     . = (PAL_CALL_PAL_UNPRIV_ENTRY+((vector&0x3F)<<6))
 
+#define SEXT(val) ((val ^ 0x8000) - 0x8000)
+#define SEXT10b(val) ((val ^ 0x200) - 0x200)
+
 /* 
 ** Implements a load "immediate" longword function 
 */
 #define LDLI(reg,val) \
-	ldah	reg, ((val+0x8000) >> 16)(zero); \
-	lda	reg, (val&0xffff)(reg)
+	ldah	reg, SEXT((val+0x8000) >> 16)(zero); \
+	lda	reg, SEXT(val&0xffff)(reg)
 
