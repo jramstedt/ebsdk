@@ -1,0 +1,129 @@
+CONFIG_DIR=../../..
+include $(CONFIG_DIR)/sdkmake.conf
+include ../../rules.gnu
+
+#
+# Set environment variables to point to various things:
+#
+#	EB_TOOLBOX	- Where your toolset is located
+#
+
+# CPP	  =	/usr/bin/cpp
+# AS	  =	$(EB_TOOLBOX)/gas
+# LD	  =	$(EB_TOOLBOX)/gld
+# DIS	  =	$(EB_TOOLBOX)/alist
+# STRIP	  =	$(EB_TOOLBOX)/astrip
+# PVC	  =	$(EB_TOOLBOX)/pvc
+# MAKEDEP	  =	$(CPP) -MM
+
+#
+# Define NPHALT if you want a non-privileged HALT function
+# (useful for debugging), otherwise, only the privileged
+# HALT function is available.
+#
+# Define KDEBUG if you want a special unprivileged CALL_PAL
+# breakpoint trap handler for remote kernel debugging.
+#
+
+DEFINES   =	-DNPHALT -DKDEBUG \
+		-DCONSOLE_ENTRY=0x$(DBMENTRY) \
+		$(OPTION_FLAGS_GLOBAL) $(SROM_INCLUDES) \
+		-DDISABLE_MACHINE_CHECKS -DSROM_SERIAL_PORT
+
+LDFLAGS	  =	-Tstrip 0 -Thdr -N
+
+GASFLAGS   =        $(GASFLAGS_GLOBAL)
+
+.SUFFIXES:
+.SUFFIXES: .s .i .$(OBJ)
+
+OSFPALOBJS =	$(OBJDIR)osfpal.$(OBJ)	\
+		$(OBJDIR)srom_dbm.$(OBJ)	\
+		$(OBJDIR)sromcsrv.$(OBJ)	\
+		$(OBJDIR)platform.$(OBJ)
+
+OSFPALCPP =	$(OBJDIR)osfpal.i	\
+		$(OBJDIR)srom_dbm.i	\
+		$(OBJDIR)sromcsrv.i	\
+		$(OBJDIR)platform.i
+
+all: $(OBJDIR)osfpal $(OBJDIR)osfpal.lis
+
+$(OBJDIR)osfpal.i: osfpal.s
+	$(DELETE) $(OBJDIR)osfpal.i
+	$(CPP) $(CPPFLAGS) $(DEFINES) osfpal.s $(CPPOUT) $(OBJDIR)osfpal.i
+
+$(OBJDIR)platform.i: platform.s
+	$(DELETE) $(OBJDIR)platform.i
+	$(CPP) $(CPPFLAGS) $(DEFINES) platform.s $(CPPOUT) $(OBJDIR)platform.i
+
+$(OBJDIR)srom_dbm.i: ../srom_dbm.s ../mini_dbg.h
+	$(DELETE) $(OBJDIR)srom_dbm.i
+	$(CPP) $(CPPFLAGS) $(DEFINES) ../srom_dbm.s $(CPPOUT) $(OBJDIR)srom_dbm.i
+
+$(OBJDIR)sromcsrv.i: ../sromcsrv.s ../mini_dbg.h
+	$(DELETE) $(OBJDIR)sromcsrv.i
+	$(CPP) $(CPPFLAGS) $(DEFINES) ../sromcsrv.s $(CPPOUT) $(OBJDIR)sromcsrv.i
+
+$(OBJDIR)osfpal.nh: osfpal
+	$(STRIP) -a osfpal $(OBJDIR)osfpal.nh
+
+ifeq "$(EB_BUILD_SYSTEM)" "WINNT"
+$(OBJDIR)osfpal:	$(OSFPALCPP)
+	$(GAS) $(GASFLAGS) -o $(OBJDIR)osfpal $(OSFPALCPP)
+
+else
+$(OBJDIR)osfpal: $(OSFPALOBJS)
+	$(GLD) $(LDFLAGS) -o $(OBJDIR)osfpal $(OSFPALOBJS)
+
+$(OBJDIR)osfpal.$(OBJ): $(OBJDIR)osfpal.i
+	$(GAS) $(GASFLAGS) -o $(OBJDIR)osfpal.$(OBJ) $(OBJDIR)osfpal.i
+
+$(OBJDIR)platform.$(OBJ): $(OBJDIR)platform.i
+	$(GAS) $(GASFLAGS) -o $(OBJDIR)platform.$(OBJ) $(OBJDIR)platform.i
+
+$(OBJDIR)srom_dbm.$(OBJ): $(OBJDIR)srom_dbm.i
+	$(GAS) $(GASFLAGS) -o $(OBJDIR)srom_dbm.$(OBJ) $(OBJDIR)srom_dbm.i
+
+$(OBJDIR)sromcsrv.$(OBJ): $(OBJDIR)sromcsrv.i
+	$(GAS) $(GASFLAGS) -o $(OBJDIR)sromcsrv.$(OBJ) $(OBJDIR)sromcsrv.i
+
+endif
+
+pvc: $(OBJDIR)osfpal.lis $(OBJDIR)osfpal.nh $(OBJDIR)osfpal.ent $(OBJDIR)osfpal.map
+	(export PVC_PAL PVC_ENTRY PVC_MAP;	\
+	 PVC_PAL=$(OBJDIR)osfpal.nh;		\
+	 PVC_ENTRY=$(OBJDIR)osfpal.ent;		\
+	 PVC_MAP=$(OBJDIR)osfpal.map;		\
+	 $(PVC);)
+
+$(OBJDIR)osfpal.lis: $(OBJDIR)osfpal
+	$(ALIST) $(OBJDIR)osfpal > $(OBJDIR)osfpal.lis
+
+$(OBJDIR)osfpal.map: $(OBJDIR)osfpal
+	$(ALIST) -m $(OBJDIR)osfpal > $(OBJDIR)osfpal.map
+
+depend:
+
+clean:
+	$(DELETE) *~ \#*\# core ${MAKEFILE}.bak \
+		$(OBJDIR)osfpal		\
+		$(OBJDIR)osfpal.lis	\
+		$(OBJDIR)osfpal.map	\
+		$(OBJDIR)osfpal.i	\
+		$(OBJDIR)osfpal.$(OBJ)	\
+		$(OBJDIR)osfpal.nh	\
+		$(OBJDIR)platform.lis	\
+		$(OBJDIR)platform.map	\
+		$(OBJDIR)platform.i	\
+		$(OBJDIR)platform.$(OBJ)	\
+		$(OBJDIR)sromcsrv.lis	\
+		$(OBJDIR)sromcsrv.map	\
+		$(OBJDIR)sromcsrv.i	\
+		$(OBJDIR)sromcsrv.$(OBJ)	\
+		$(OBJDIR)srom_dbm.lis	\
+		$(OBJDIR)srom_dbm.map	\
+		$(OBJDIR)srom_dbm.i	\
+		$(OBJDIR)srom_dbm.$(OBJ)
+
+	$(CLEAN)

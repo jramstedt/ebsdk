@@ -1,21 +1,20 @@
 CONFIG_DIR=../../..
 include $(CONFIG_DIR)/sdkmake.conf
-include ../../rules.gnu
 
-#
-# Set environment variables to point to various things:
-#
-#	EB_TOOLBOX	- Where your toolset is located
-#
+include $(EB_BASE)/rules.gnu
 
-# CPP	  =	/usr/bin/cpp
-# AS	  =	$(EB_TOOLBOX)/gas
-# LD	  =	$(EB_TOOLBOX)/gld
-# DIS	  =	$(EB_TOOLBOX)/alist
-# STRIP	  =	$(EB_TOOLBOX)/astrip
-# PVC	  =	$(EB_TOOLBOX)/pvc
-# MAKEDEP	  =	$(CPP) -MM
+AS				= as
+LD				= ld
+CPP				= cpp
+OBJCOPY		= objcopy
+OBJDUMP		= objdump
+DELETE		= rm -f
+PVC				=	$(EB_TOOLBOX)/pvc
 
+INCLUDES	= $(SROM_INCLUDES)
+
+LDFLAGS	  = -nostdlib -N -Ttext=0 -z noexecstack -e 0
+ASFLAGS		=
 #
 # Define NPHALT if you want a non-privileged HALT function
 # (useful for debugging), otherwise, only the privileged
@@ -24,106 +23,91 @@ include ../../rules.gnu
 # Define KDEBUG if you want a special unprivileged CALL_PAL
 # breakpoint trap handler for remote kernel debugging.
 #
+CPPFLAGS	= $(OPTION_FLAGS_GLOBAL) -fdollars-in-identifiers \
+						-DNPHALT \
+						-DKDEBUG \
+						-DCONSOLE_ENTRY=0x$(DBMENTRY) \
+						-DDISABLE_MACHINE_CHECKS \
+						-DSROM_SERIAL_PORT
 
-DEFINES   =	-DNPHALT -DKDEBUG \
-		-DCONSOLE_ENTRY=0x$(DBMENTRY) \
-		$(OPTION_FLAGS_GLOBAL) $(SROM_INCLUDES) \
-		-DDISABLE_MACHINE_CHECKS -DSROM_SERIAL_PORT
+SRCS = osfpal.s ../srom_dbm.s ../sromcsrv.s platform.s
 
-LDFLAGS	  =	-Tstrip 0 -Thdr -N
+.PHONY = all clean pvc
 
-GASFLAGS   =        $(GASFLAGS_GLOBAL)
+all : $(OBJDIR)osfpal $(OBJDIR)osfpal.lis
 
-.SUFFIXES:
-.SUFFIXES: .s .i .$(OBJ)
+# osfpal
+$(OBJDIR)osfpal.sp : osfpal.s
+	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
-OSFPALOBJS =	$(OBJDIR)osfpal.$(OBJ)	\
-		$(OBJDIR)srom_dbm.$(OBJ)	\
-		$(OBJDIR)sromcsrv.$(OBJ)	\
-		$(OBJDIR)platform.$(OBJ)
+$(OBJDIR)srom_dbm.sp : ../srom_dbm.s
+	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
-OSFPALCPP =	$(OBJDIR)osfpal.i	\
-		$(OBJDIR)srom_dbm.i	\
-		$(OBJDIR)sromcsrv.i	\
-		$(OBJDIR)platform.i
+$(OBJDIR)sromcsrv.sp : ../sromcsrv.s
+	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
+	
+$(OBJDIR)platform.sp : platform.s
+	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
-all: $(OBJDIR)osfpal $(OBJDIR)osfpal.lis
+$(OBJDIR)%.o : $(OBJDIR)%.sp
+	$(AS) $(ASFLAGS) -R -m$(CPUTYPE) -o $@ $^
 
-$(OBJDIR)osfpal.i: osfpal.s
-	$(DELETE) $(OBJDIR)osfpal.i
-	$(CPP) $(CPPFLAGS) $(DEFINES) osfpal.s $(CPPOUT) $(OBJDIR)osfpal.i
+$(OBJDIR)osfpal : $(addprefix $(OBJDIR), $(notdir $(SRCS:.s=.o)))
+	$(LD) $(LDFLAGS) -o $@ $^
 
-$(OBJDIR)platform.i: platform.s
-	$(DELETE) $(OBJDIR)platform.i
-	$(CPP) $(CPPFLAGS) $(DEFINES) platform.s $(CPPOUT) $(OBJDIR)platform.i
+# osfpal listing
+$(OBJDIR)osfpal.lis : $(OBJDIR)osfpal
+	$(OBJDUMP) -x -D $< > $@
 
-$(OBJDIR)srom_dbm.i: ../srom_dbm.s ../mini_dbg.h
-	$(DELETE) $(OBJDIR)srom_dbm.i
-	$(CPP) $(CPPFLAGS) $(DEFINES) ../srom_dbm.s $(CPPOUT) $(OBJDIR)srom_dbm.i
+# pvc
+$(OBJDIR)osfpal.pvc : $(OBJDIR)osfpal.nh $(OBJDIR)osfpal.ent $(OBJDIR)osfpal.map
+	echo set code_file $(OBJDIR)osfpal.nh > $@
+	echo set entry_file $(OBJDIR)osfpal.ent >> $@
+	echo set map_file $(OBJDIR)osfpal.map >> $@
+	echo set cpu $(CPUTYPE) >> $@
+	echo go >> $@
+	echo quit >> $@
 
-$(OBJDIR)sromcsrv.i: ../sromcsrv.s ../mini_dbg.h
-	$(DELETE) $(OBJDIR)sromcsrv.i
-	$(CPP) $(CPPFLAGS) $(DEFINES) ../sromcsrv.s $(CPPOUT) $(OBJDIR)sromcsrv.i
+$(OBJDIR)osfpal.nh : $(OBJDIR)osfpal
+	$(OBJCOPY) -O binary $< $@
 
-$(OBJDIR)osfpal.nh: osfpal
-	$(STRIP) -a osfpal $(OBJDIR)osfpal.nh
+$(OBJDIR)osfpal.map : $(OBJDIR)osfpal
+	$(OBJDUMP) -tw $< | grep -i "pvc\\$$" > $@
 
-ifeq "$(EB_BUILD_SYSTEM)" "WINNT"
-$(OBJDIR)osfpal:	$(OSFPALCPP)
-	$(GAS) $(GASFLAGS) -o $(OBJDIR)osfpal $(OSFPALCPP)
+$(OBJDIR)osfpal.ent : $(OBJDIR)osfpal
+	$(OBJDUMP) -tw $< | grep -i "pvc\\$$" > $@
 
-else
-$(OBJDIR)osfpal: $(OSFPALOBJS)
-	$(GLD) $(LDFLAGS) -o $(OBJDIR)osfpal $(OSFPALOBJS)
+pvc : $(OBJDIR)osfpal.pvc
+	$(PVC) < $(OBJDIR)osfpal.pvc
 
-$(OBJDIR)osfpal.$(OBJ): $(OBJDIR)osfpal.i
-	$(GAS) $(GASFLAGS) -o $(OBJDIR)osfpal.$(OBJ) $(OBJDIR)osfpal.i
-
-$(OBJDIR)platform.$(OBJ): $(OBJDIR)platform.i
-	$(GAS) $(GASFLAGS) -o $(OBJDIR)platform.$(OBJ) $(OBJDIR)platform.i
-
-$(OBJDIR)srom_dbm.$(OBJ): $(OBJDIR)srom_dbm.i
-	$(GAS) $(GASFLAGS) -o $(OBJDIR)srom_dbm.$(OBJ) $(OBJDIR)srom_dbm.i
-
-$(OBJDIR)sromcsrv.$(OBJ): $(OBJDIR)sromcsrv.i
-	$(GAS) $(GASFLAGS) -o $(OBJDIR)sromcsrv.$(OBJ) $(OBJDIR)sromcsrv.i
-
-endif
-
-pvc: $(OBJDIR)osfpal.lis $(OBJDIR)osfpal.nh $(OBJDIR)osfpal.ent $(OBJDIR)osfpal.map
-	(export PVC_PAL PVC_ENTRY PVC_MAP;	\
-	 PVC_PAL=$(OBJDIR)osfpal.nh;		\
-	 PVC_ENTRY=$(OBJDIR)osfpal.ent;		\
-	 PVC_MAP=$(OBJDIR)osfpal.map;		\
-	 $(PVC);)
-
-$(OBJDIR)osfpal.lis: $(OBJDIR)osfpal
-	$(ALIST) $(OBJDIR)osfpal > $(OBJDIR)osfpal.lis
-
-$(OBJDIR)osfpal.map: $(OBJDIR)osfpal
-	$(ALIST) -m $(OBJDIR)osfpal > $(OBJDIR)osfpal.map
-
-depend:
-
-clean:
-	$(DELETE) *~ \#*\# core ${MAKEFILE}.bak \
+clean :
+	$(DELETE) *.o *~ \#*\# *.bak *.a core \
 		$(OBJDIR)osfpal		\
 		$(OBJDIR)osfpal.lis	\
 		$(OBJDIR)osfpal.map	\
-		$(OBJDIR)osfpal.i	\
-		$(OBJDIR)osfpal.$(OBJ)	\
+		$(OBJDIR)osfpal.sp	\
+		$(OBJDIR)osfpal.o	\
 		$(OBJDIR)osfpal.nh	\
-		$(OBJDIR)platform.lis	\
-		$(OBJDIR)platform.map	\
-		$(OBJDIR)platform.i	\
-		$(OBJDIR)platform.$(OBJ)	\
-		$(OBJDIR)sromcsrv.lis	\
-		$(OBJDIR)sromcsrv.map	\
-		$(OBJDIR)sromcsrv.i	\
-		$(OBJDIR)sromcsrv.$(OBJ)	\
-		$(OBJDIR)srom_dbm.lis	\
-		$(OBJDIR)srom_dbm.map	\
-		$(OBJDIR)srom_dbm.i	\
-		$(OBJDIR)srom_dbm.$(OBJ)
+		$(OBJDIR)osfpal.pvc		\
+		$(OBJDIR)platform.sp	\
+		$(OBJDIR)platform.o	\
+		$(OBJDIR)sromcsrv.sp	\
+		$(OBJDIR)sromcsrv.o	\
+		$(OBJDIR)srom_dbm.sp	\
+		$(OBJDIR)srom_dbm.o
 
-	$(CLEAN)
+# Dependencies
+DEPDIR := .deps
+DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+
+COMPILE.s = $(CPP) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+
+%.sp : %.s
+%.sp : %.s $(DEPDIR)/%.d | $(DEPDIR)
+		$(COMPILE.s) $(OUTPUT_OPTION) $<
+
+$(DEPDIR): ; @mkdir -p $@
+
+DEPFILES := $(addprefix $(DEPDIR)/, $(notdir $(SRCS:.s=.d)))
+$(DEPFILES):
+include $(wildcard $(DEPFILES))
