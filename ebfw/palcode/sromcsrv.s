@@ -1,7 +1,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright © 1994							    *
+**  Copyright ï¿½ 1994							    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
@@ -101,8 +101,9 @@
 
 Sys_Cserve_Srom_Init:
 	bsr	r21, autobaud_sync	/* do the autobaud thing	*/
-	bis	r23, mc_m_echo, r23	/* Enable echo 	*/
-	bis	r23, r31, r0		/* Return Line Status	*/
+	lda	r0, mc_m_echo(r31)	/* Get mc_m_echo */
+	bis	r23, r0, r23				/* Enable echo 	*/
+	bis	r23, r31, r0				/* Return Line Status	*/
 	hw_rei
 
 
