@@ -5,6 +5,7 @@ include $(EB_BASE)/rules.gnu
 
 ALPHA_TOOLS 	= \
 	AS=alpha-linux-gnu-as \
+	AR=alpha-linux-gnu-ar \
 	LD=alpha-linux-gnu-ld \
 	CC=alpha-linux-gnu-gcc \
 	CPP=alpha-linux-gnu-cpp \
