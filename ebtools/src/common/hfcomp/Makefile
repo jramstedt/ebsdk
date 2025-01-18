@@ -4,6 +4,7 @@ include $(CONFIG_DIR)/sdkmake.conf
 include $(EB_BASE)/rules.gnu
 
 AS		= as
+LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
 LD		= ld
 CC		= gcc
 CPP		= cpp
@@ -24,7 +25,7 @@ INCLUDES	= -I. -I../include
 
 CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -mtune=$(CPU) -Os -Wall -Wno-builtin-declaration-mismatch
 CFLAGS		= -g $(INCLUDES)
-ASFLAGS		=
+ASFLAGS		= -m$(call LC,$(CPU))
 LINT		= /usr/bin/lint
 LINTFLAGS	=  -1 -wp -av -n $(INCLUDES)
 
@@ -69,7 +70,7 @@ cstartup.sp : cstartup.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) -DNO_INITDATA -DNO_EXITDATA $^ > $@
 
 cstartup.o : cstartup.sp
-	$(AS) $(ASFLAGS) -m$(CPU) -o $@ $^
+	$(AS) $(ASFLAGS) -o $@ $^
 
 decmp$(TYPE).o : decomp.c
 	$(CC) $(CCFLAGS) -DROM -o $@ -c $^
@@ -92,8 +93,7 @@ upal$(TYPE).sp : micropal.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) -DPVCCHECK -DASSEMBLY_CODE $(HEADER_DEFS) $^ > $@
 
 upal$(TYPE).o : upal$(TYPE).sp
-	$(AS) $(ASFLAGS) -R -m$(CPU) -o $@ $^
-#	$(AS) $(ASFLAGS) -$(CPU) -o $@ $^
+	$(AS) $(ASFLAGS) -R -o $@ $^
 
 # Strip all header sections (text and data)
 upal$(TYPE).nh : upal$(TYPE).o

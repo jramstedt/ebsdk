@@ -4,6 +4,7 @@ include $(CONFIG_DIR)/sdkmake.conf
 include $(EB_BASE)/rules.gnu
 
 AS				= as
+LC				= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
 LD				= ld
 CPP				= cpp
 OBJCOPY		= objcopy
@@ -14,7 +15,7 @@ PVC				=	$(EB_TOOLBOX)/pvc
 INCLUDES	= $(SROM_INCLUDES)
 
 LDFLAGS	  = -nostdlib -N -Ttext=0 -z noexecstack -e 0
-ASFLAGS		=
+ASFLAGS		= -R -m$(call LC,$(CPUTYPE))
 #
 # Define NPHALT if you want a non-privileged HALT function
 # (useful for debugging), otherwise, only the privileged
@@ -50,7 +51,7 @@ $(OBJDIR)platform.sp : platform.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
 $(OBJDIR)%.o : $(OBJDIR)%.sp
-	$(AS) $(ASFLAGS) -R -m$(CPUTYPE) -o $@ $^
+	$(AS) $(ASFLAGS) -o $@ $^
 
 $(OBJDIR)osfpal : $(addprefix $(OBJDIR), $(notdir $(SRCS:.s=.o)))
 	$(LD) $(LDFLAGS) -o $@ $^

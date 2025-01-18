@@ -4,6 +4,7 @@ include $(CONFIG_DIR)/sdkmake.conf
 include $(EB_BASE)/rules.gnu
 
 AS		= as
+LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
 LD		= ld
 CC		= gcc
 CPP		= cpp
@@ -26,8 +27,7 @@ ALPHA_TOOLS 	= \
 
 INCLUDES	= -I. -I../include
 
-LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
-ASFLAGS		= # -acdlnm="$@.lst"
+ASFLAGS		= -m$(call LC,$(CPU)) # -acdlnm="$@.lst"
 CPPFLAGS	= -fdollars-in-identifiers
 
 CPU_064		= 21064
@@ -85,7 +85,7 @@ $(PROGRAM).sp : mini_dbg.s mini_rcs.h mini_dbg.h serialio.s ascitab.h sromio.s .
 	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) $(CPP_EXTRA) $< > $@
 
 $(PROGRAM).o : $(PROGRAM).sp
-	$(AS) $(ASFLAGS) -R -m$(call LC,$(CPU)) -o $@ $^
+	$(AS) $(ASFLAGS) -R -o $@ $^
 	
 $(PROGRAM).pvc :
 	echo set code_file $(PROGRAM).exe > $@
