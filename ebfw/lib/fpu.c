@@ -59,7 +59,7 @@ static char *rcsid = "$Id: fpu.c,v 1.1.1.1 1998/12/29 21:36:11 paradis Exp $";
 void ieee_set_fp_control(const long fp_control)
 {
 #if __GNUC__
-  __asm__ (
+  __asm__ __volatile__ (
     "mt_fpcr  %0;"
     : 
     : "f" (*(double *)&fp_control)
@@ -74,7 +74,7 @@ long ieee_get_fp_control(void)
   double t;
 
 #if __GNUC__
-  __asm__ (
+  __asm__ __volatile__ (
     "mf_fpcr  %0;"
     : "=f" (t)
   );
