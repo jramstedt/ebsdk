@@ -20,7 +20,7 @@ MAKEROM		= $(TOOLBOX)/makerom
 
 INCLUDES	= $(SROM_INCLUDES) -I$(OBJDIR) 
 
-CPPFLAGS	= $(OPTION_FLAGS_GLOBAL) -fdollars-in-identifiers
+CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
 ASFLAGS		= -R -m$(call LC,$(CPUTYPE))
 SROMFLAGS	= $(SROM_FLAGS_GLOBAL)
 

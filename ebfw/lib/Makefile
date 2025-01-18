@@ -7,6 +7,7 @@ AS		= as
 AR		= ar
 LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
 CC		= gcc
+CPP				= cpp
 DELETE		= rm -f
 
 ALPHA_TOOLS 	= \
@@ -19,7 +20,8 @@ ALPHA_TOOLS 	= \
 	OBJDUMP=alpha-linux-gnu-objdump
 
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
-CCFLAGS		= $(CCFLAGS_GLOBAL) -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
+CPPFLAGS	= $(CCFLAGS_GLOBAL)
+CCFLAGS		= -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
 
 TARGET_SRCS	= $(TARGET)_io.c $(TARGET)mem.c
 
@@ -50,7 +52,7 @@ vars:
 	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
 $(OBJDIR)%.o : %.sp
-	$(AS) $(ASFLAGS) $(INCLUDES) -o $@ $^
+	$(AS) $(ASFLAGS) -o $@ $^
 
 $(OBJDIR)%.o : %.c
 	$(CC) $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^

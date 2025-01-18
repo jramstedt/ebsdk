@@ -28,7 +28,6 @@ ALPHA_TOOLS 	= \
 INCLUDES	= -I. -I../include
 
 ASFLAGS		= -m$(call LC,$(CPU)) # -acdlnm="$@.lst"
-CPPFLAGS	= -fdollars-in-identifiers
 
 CPU_064		= 21064
 CPU_064A	= 21064A
@@ -49,6 +48,7 @@ CPP_EXTRA_d	= -DDEBUG
 CPP_EXTRA	= $(CPP_$(TYPE)) $(CPP_EXTRA_$(VERSION))
 
 SROMFLAGS	= -v
+CPPFLAGS	= -DDC$(CPU) $(CPP_EXTRA) -fdollars-in-identifiers
 
 ### Mini debugger
 MAKEFILE	= Makefile
@@ -82,7 +82,7 @@ mini_rcs.h : mini_dbg.s
 	$(TOOLBOX)/rcsv -v $< $@
 
 $(PROGRAM).sp : mini_dbg.s mini_rcs.h mini_dbg.h serialio.s ascitab.h sromio.s ../include/dc21064.h ../include/dc21164.h ../include/dc21264.h wm.h
-	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) $(CPP_EXTRA) $< > $@
+	$(CPP) $(CPPFLAGS) $(INCLUDES) $< > $@
 
 $(PROGRAM).o : $(PROGRAM).sp
 	$(AS) $(ASFLAGS) -R -o $@ $^

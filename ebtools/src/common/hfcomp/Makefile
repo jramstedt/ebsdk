@@ -23,6 +23,7 @@ ALPHA_TOOLS 	= \
 
 INCLUDES	= -I. -I../include
 
+CPPFLAGS	= -DPVCCHECK
 CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -mtune=$(CPU) -Os -Wall -Wno-builtin-declaration-mismatch
 CFLAGS		= -g $(INCLUDES)
 ASFLAGS		= -m$(call LC,$(CPU))
@@ -90,7 +91,7 @@ decmp$(TYPE).elf : cstartup.o decmp$(TYPE).o inf_s$(TYPE).o dbmmn$(TYPE).o
 
 # Preprocesses micropal.s to upal$(TYPE).sp
 upal$(TYPE).sp : micropal.s
-	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) -DPVCCHECK -DASSEMBLY_CODE $(HEADER_DEFS) $^ > $@
+	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) -DASSEMBLY_CODE $(HEADER_DEFS) $^ > $@
 
 upal$(TYPE).o : upal$(TYPE).sp
 	$(AS) $(ASFLAGS) -R -o $@ $^

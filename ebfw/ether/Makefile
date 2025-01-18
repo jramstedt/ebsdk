@@ -16,7 +16,8 @@ ALPHA_TOOLS 	= \
 	OBJCOPY=alpha-linux-gnu-objcopy \
 	OBJDUMP=alpha-linux-gnu-objdump
 
-CCFLAGS		= $(CCFLAGS_GLOBAL) -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
+CPPFLAGS	= $(CCFLAGS_GLOBAL)
+CCFLAGS		= -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
 
 C_SRCS	= am79c960.c  arp.c  bootp.c  DEC21040.c  eaddr.c  edevice.c  ethernet.c  ip.c  netboot.c  net_buff.c  netman.c  tftp.c  udp.c
 
