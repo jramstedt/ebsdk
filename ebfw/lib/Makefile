@@ -5,6 +5,7 @@ include $(EB_BASE)/rules.gnu
 
 AS		= as
 AR		= ar
+LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
 CC		= gcc
 DELETE		= rm -f
 
@@ -17,8 +18,8 @@ ALPHA_TOOLS 	= \
 	OBJCOPY=alpha-linux-gnu-objcopy \
 	OBJDUMP=alpha-linux-gnu-objdump
 
-ASFLAGS		=
-CCFLAGS		= $(CCFLAGS_GLOBAL)
+ASFLAGS		= -m$(call LC,$(CPUTYPE))
+CCFLAGS		= $(CCFLAGS_GLOBAL) -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
 
 TARGET_SRCS	= $(TARGET)_io.c $(TARGET)mem.c
 
@@ -74,3 +75,4 @@ clean :
 		$(addprefix $(OBJDIR), $(S_SRCS:.s=.o) $(TARGET_SRCS:.c=.o) $(C_SRCS:.c=.o)) \
 		$(OBJDIR)cstartup.o \
 		$(OBJDIR)lib.a \
+		$(addprefix $(OBJDIR), $(C_SRCS:.c=.i) $(C_SRCS:.c=.s) $(C_SRCS:.c=.cpp) $(TARGET_SRCS:.c=.i) $(TARGET_SRCS:.c=.s) $(TARGET_SRCS:.c=.cpp))

@@ -46,6 +46,11 @@ your own risk.
 #define INLINE __inline
 #define ASM __asm
 
+#elif __GNUC__
+
+#define INLINE static
+#define ASM __asm__ 
+
 #else /* unix */
 
 #define INLINE static
@@ -57,15 +62,40 @@ your own risk.
 #ifndef _WIN32
 #pragma inline (atomic_inc)
 #endif
-INLINE int atomic_inc(int source,volatile int *dest)
+INLINE int atomic_inc(int source, volatile int *dest)
 {
-   unsigned int temp=0,ret;
+    unsigned int temp = 0, ret;
     ASM ("mb;");
-    while (temp==0)
+    while (temp == 0)
     {
+#if __GNUC__
+/*  Might be more correct, but doesn't match the original...
+        __asm__ (
+            "ldl_l   %0, %2;"   // <- | (dest) => "ret", 1 => lock_flag
+            "addl    %0, %3, %1;"  // -> | "ret" + 1 => "temp"
+            "stl_c   %1, %2;"   // -> | "temp" => (dest), lock_flag => temp
+            : "+r" (ret), "=r" (temp), "=m" (dest)
+            : "r" (source)
+        );
+*/
+        __asm__ (
+            "ldl_l   %0, %2;"   // <- | (dest) => "ret", 1 => lock_flag
+            "addl    %0, 1, %1;"  // -> | "ret" + 1 => "temp"
+            "stl_c   %1, %2;"   // -> | "temp" => (dest), lock_flag => temp
+            : "+&r" (ret), "+r" (temp), "+m" (*dest)
+        );
+#else
+        /*
+            http://odl.sysworks.biz/disk$axpdocsep992/progtool/deccv60/5492p024.htm#index_x_856
+            
+            a0-a5 argument registers: R16-R21
+            v0 return value: R0 or F0, depending on type
+        */
+
        ret= ASM("ldl_l   %v0,(%a0);",dest);
        temp= ASM("addl   %a0,1,%v0;\
                   stl_c   %v0,(%a1) ;",ret,dest);
+#endif
     }
     ASM ("mb;");
     return ret;
@@ -76,16 +106,34 @@ INLINE int atomic_inc(int source,volatile int *dest)
 #endif
 static int test_set_low(volatile long *dest)
 {
-   long temp=0,ret= -1;
+    long temp = 0, ret = -1;
     ASM ("mb;");
 //    printf("test_set_low start %d %p %lx\n",gh_task.pid,dest,*dest);
     while (temp==0)
     {
+#if __GNUC__
+        __asm__ (
+            "ldq_l  %0, %1;"
+            : "=&r" (ret)
+            : "m" (*dest)
+        );
+
+        if (ret & 1) return 1;
+
+        __asm__ (
+            "bis    %2, 1, %0;"
+            "stq_c  %0, %1;"
+            : "+r" (temp), "=m" (*dest)
+            : "r" (ret)
+        );
+#else
        ret= ASM("ldq_l   %v0,(%a0) ;",dest);
        if (ret&1) return 1;
        temp= ASM("bis   %a0,1,%v0;\
                   stq_c   %v0,(%a1) ;",ret,dest);
+#endif
     }
+
     ASM ("mb;");
 //    printf("test_set_low %d %p %lx %lx\n",gh_task.pid,dest,*dest,ret);
     return 0;
