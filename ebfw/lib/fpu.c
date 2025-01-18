@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -50,20 +50,38 @@ static char *rcsid = "$Id: fpu.c,v 1.1.1.1 1998/12/29 21:36:11 paradis Exp $";
  *
  */
 
+#ifndef __GNUC__
 #include <machine/fpu.h>
 #include <c_asm.h>
+#endif
 
 #ifndef __NO_FLOATING_POINT
-void ieee_set_fp_control(long fp_control)
+void ieee_set_fp_control(const long fp_control)
 {
+#if __GNUC__
+  __asm__ (
+    "mt_fpcr  %0;"
+    : 
+    : "f" (*(double *)&fp_control)
+  );
+#else
   dasm("mt_fpcr %0;",*(double *)&fp_control);
+#endif
 }
 
 long ieee_get_fp_control(void)
 {
   double t;
 
+#if __GNUC__
+  __asm__ (
+    "mf_fpcr  %0;"
+    : "=f" (t)
+  );
+#else
   t= dasm("mf_fpcr %f0;");
+#endif
+
   return *(long *)&t;
 }
 #endif /* __NO_FLOATING_POINT */
