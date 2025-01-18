@@ -25,15 +25,12 @@ TARGET_SRCS	= $(TARGET)_io.c $(TARGET)mem.c
 
 S_SRCS	= asmstuff.s cstartup.s setjmp.s ulcd.s
 
-C_SRCS 	= 28f008sa.c  29f040.c  acersio.c  am29v800.c  amdflash.c  assert.c  atof.c \
+C_SRCS	= 28f008sa.c  29f040.c  acersio.c  am29v800.c  amdflash.c  assert.c  atof.c \
 					beep.c  c8514.c  callback.c  calloc.c  ctype.c  exit.c  fatdrv.c  fileio.c  flash.c  floppy.c \
 					fpu.c  fsboot.c  ftype.c  halp.c  ident.c  initdata.c  int.c  iobusini.c  isa_dma.c  kbd.c \
 					mcheck.c  memt.c  memtest.c  mflash.c  p8514.c  pci.c  pflash.c  pr.c  printf.c  prtrace.c \
 					puts.c  rand.c  rom.c  romhead.c  scanf.c  search.c  smc.c  smcc669.c  string.c  strtod.c  strtoul.c \
 					sum.c  tga.c  time.c  vga.c  vgafont.c  xlate.c
-
-# ???
-#C_SRCS	+= fpu.c
 
 .PHONY : all lib vars
 
@@ -47,7 +44,6 @@ vars:
 	@echo TARGETDIR is $(TARGETDIR)
 	@echo OBJDIR is $(OBJDIR)
 	@echo SRCDIR is $(SRCDIR)
-	@echo OBJFILES is $(OBJFILES)
 
 
 %.sp : %.s

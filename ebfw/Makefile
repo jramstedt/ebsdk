@@ -4,8 +4,8 @@ CONFIG_DIR=..
 include $(CONFIG_DIR)/sdkmake.conf
 include rules.gnu
 
-
-EB_SUBDIRS=h srom palcode lib stubs ieee ether ladebug dbm demo dhry
+# Removed ieee
+EB_SUBDIRS=h srom palcode lib stubs ether ladebug dbm demo dhry
 
 all:	$(CHECK_CONFIG)
 	@echo EB_BASE is ${EB_BASE}
