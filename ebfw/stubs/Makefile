@@ -1,114 +1,40 @@
-# $Id: Makefile,v 1.1.1.1 1998/12/29 21:36:15 paradis Exp $
-# $Log: Makefile,v $
-# Revision 1.1.1.1  1998/12/29 21:36:15  paradis
-# Initial CVS checkin
-#
-# Revision 1.8  1997/12/15  19:03:58  pbell
-# Added sflash.
-#
-# Revision 1.7  1997/06/02  17:42:19  fdh
-# Updated include file dependencies.
-#
-# Revision 1.6  1997/05/19  15:25:53  fdh
-# Updated include file dependencies.
-#
-# Revision 1.5  1997/04/23  18:17:06  fdh
-# Updated include file dependencies.
-#
-# Revision 1.4  1997/04/10  17:07:12  fdh
-# Modified the rule for making library archive.
-#
-# Revision 1.3  1997/03/17  10:33:42  fdh
-# Create library (stub.a) containing stubs.
-#
-
 CONFIG_DIR=../..
 include $(CONFIG_DIR)/sdkmake.conf
-include ../rules.gnu
 
-# -------------------------------------------------
-# Append local cc flags here for only this Makefile
-# -------------------------------------------------
-CCFLAGS = $(CCFLAGS_GLOBAL)
+include $(EB_BASE)/rules.gnu
 
-TARGET_SRCS = 
+AR		= ar
+CC		= gcc
+DELETE		= rm -f
 
-ALL_TARGET_SRCS =
+ALPHA_TOOLS 	= \
+	AS=alpha-linux-gnu-as \
+	AR=alpha-linux-gnu-ar \
+	LD=alpha-linux-gnu-ld \
+	CC=alpha-linux-gnu-gcc \
+	CPP=alpha-linux-gnu-cpp \
+	OBJCOPY=alpha-linux-gnu-objcopy \
+	OBJDUMP=alpha-linux-gnu-objdump
 
-AS_SRCS	 = 
+CCFLAGS		= $(CCFLAGS_GLOBAL) -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
 
-C_SRCS	 = \
-	$(SRCDIR)bios_dbg.c \
-	$(SRCDIR)biosem.c \
-	$(SRCDIR)cxx.c \
-	$(SRCDIR)dpml.c \
-	$(SRCDIR)fflush.c \
-	$(SRCDIR)stdlib.c \
-	$(SRCDIR)sflash.c \
-	$(SRCDIR)stub_pci.c
+C_SRCS	= bios_dbg.c  biosem.c  cxx.c  dpml.c  fflush.c  sflash.c  stdlib.c  stub_pci.c
 
-OBJFILES = $(AS_SRCS:%.s=$(OBJDIR)%.$(OBJ)) $(TARGET_SRCS:%.c=$(OBJDIR)%.$(OBJ)) $(C_SRCS:%.c=$(OBJDIR)%.$(OBJ))
+.PHONY : all stubs
 
-all:  $(OBJDIR)stubs.$(LIBEXT)
+all :
+	$(MAKE) -f Makefile $(ALPHA_TOOLS) stubs
 
-vars:
-	@echo OBJFILES is $(OBJFILES)
+stubs : $(OBJDIR)stubs.a
 
-#----------------------------------------------------------------------------
-$(OBJDIR)stdlib.$(OBJ):		stdlib.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
+$(OBJDIR)%.o : %.c
+	$(CC) $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
-$(OBJDIR)sflash.$(OBJ):		sflash.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
+$(OBJDIR)stubs.a : $(addprefix $(OBJDIR), $(C_SRCS:.c=.o))
+	$(DELETE) $@
+	$(AR) rcs $@ $^
 
-$(OBJDIR)dpml.$(OBJ):		dpml.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
-
-$(OBJDIR)biosem.$(OBJ):		biosem.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
-
-$(OBJDIR)bios_dbg.$(OBJ):		bios_dbg.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
-
-$(OBJDIR)cxx.$(OBJ):			cxx.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
-
-$(OBJDIR)fflush.$(OBJ):		fflush.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
-
-$(OBJDIR)stub_pci.$(OBJ):		stub_pci.c
-	$(CC) $(CCFLAGS) -o $@ -c $(INCLUDES) $<
-
-
-#----------------
-
-ifeq "$(EB_BUILD_SYSTEM)" "WINNT"
-$(OBJDIR)stubs.$(LIBEXT): $(OBJFILES)
-	$(DELETE) $(OBJDIR)stubs.$(LIBEXT)
-	$(LIBRARY) -VERBOSE -OUT:$(OBJDIR)stubs.$(LIBEXT) $(OBJFILES)
-else
-$(OBJDIR)stubs.$(LIBEXT): $(OBJFILES)
-	$(DELETE) $(OBJDIR)stubs.$(LIBEXT)
-	$(AR) rcs $(OBJDIR)stubs.$(LIBEXT) $(OBJFILES)
-endif
-
-#----------------------------------------------------------------------------
-
-depend: $(SRCS)
-	$(MAKEDEPEND) -p'$$(OBJDIR)' -- $(DEPENDFLAGS) -- \
-	$(AS_SRCS) $(C_SRCS) $(ALL_TARGET_SRCS)
-
-clean:
-	$(DELETE) *~ \#*\# core ${MAKEFILE}.bak \
-		$(OBJFILES) \
-		$(OBJDIR)cstartup.$(OBJ) \
-		$(OBJDIR)llib-lstubs.ln \
-		$(OBJDIR)stubs.$(LIBEXT)
-	$(CLEAN)
-
-distclean: clean
-	$(MAKEDEPEND) -f $(MAKEFILE)
-	$(DELETE) Makefile.bak
-
-#----------------------------------------------------------------------------
-# DO NOT DELETE THIS LINE -- make depend depends on it.
+clean :
+	$(DELETE) *.o *~ \#*\# *.bak *.a core \
+		$(addprefix $(OBJDIR), $(C_SRCS:.c=.o)) \
+		$(OBJDIR)stubs.a
