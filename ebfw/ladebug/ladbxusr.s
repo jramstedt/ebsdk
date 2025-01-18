@@ -1,7 +1,7 @@
 
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -78,7 +78,9 @@ your own risk.
 #include "fregs.h"
 
 	.ugen	
+#if __osf__
 	.verstamp	3 11
+#endif
 	.data	
 	.align	3
 	.align	0
