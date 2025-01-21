@@ -16,10 +16,10 @@ ALPHA_TOOLS 	= \
 	OBJCOPY=alpha-linux-gnu-objcopy \
 	OBJDUMP=alpha-linux-gnu-objdump
 
-CPPFLAGS	= $(CCFLAGS_GLOBAL)
-CCFLAGS		= -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
+CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
+CCFLAGS		= -c -Os -Wall -Wextra
 
-C_SRCS	= am79c960.c  arp.c  bootp.c  DEC21040.c  eaddr.c  edevice.c  ethernet.c  ip.c  netboot.c  net_buff.c  netman.c  tftp.c  udp.c
+C_SRCS	= DEC21040.c  am79c960.c  arp.c  bootp.c  eaddr.c  edevice.c  ethernet.c  ip.c  net_buff.c  netboot.c  netman.c  tftp.c  udp.c
 
 .PHONY : all ether
 

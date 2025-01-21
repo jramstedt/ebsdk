@@ -16,9 +16,10 @@ ALPHA_TOOLS 	= \
 	OBJCOPY=alpha-linux-gnu-objcopy \
 	OBJDUMP=alpha-linux-gnu-objdump
 
-CCFLAGS		= $(CCFLAGS_GLOBAL) -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
+CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
+CCFLAGS		= -c -Os -Wall -Wextra
 
-C_SRCS	= bios_dbg.c  biosem.c  cxx.c  dpml.c  fflush.c  sflash.c  stdlib.c  stub_pci.c
+C_SRCS	= bios_dbg.c  biosem.c  cxx.c  dpml.c  fflush.c  stdlib.c  sflash.c  stub_pci.c
 
 .PHONY : all stubs
 

@@ -20,19 +20,20 @@ ALPHA_TOOLS 	= \
 	OBJDUMP=alpha-linux-gnu-objdump
 
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
-CPPFLAGS	= $(CCFLAGS_GLOBAL)
-CCFLAGS		= -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
+CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
+CCFLAGS		= -c -Os -Wall -Wextra
 
 TARGET_SRCS	= $(TARGET)_io.c $(TARGET)mem.c
 
-S_SRCS	= asmstuff.s cstartup.s setjmp.s ulcd.s
+S_SRCS	= asmstuff.s ulcd.s setjmp.s
 
-C_SRCS	= 28f008sa.c  29f040.c  acersio.c  am29v800.c  amdflash.c  assert.c  atof.c \
-					beep.c  c8514.c  callback.c  calloc.c  ctype.c  exit.c  fatdrv.c  fileio.c  flash.c  floppy.c \
-					fpu.c  fsboot.c  ftype.c  halp.c  ident.c  initdata.c  int.c  iobusini.c  isa_dma.c  kbd.c \
-					mcheck.c  memt.c  memtest.c  mflash.c  p8514.c  pci.c  pflash.c  pr.c  printf.c  prtrace.c \
-					puts.c  rand.c  rom.c  romhead.c  scanf.c  search.c  smc.c  smcc669.c  string.c  strtod.c  strtoul.c \
-					sum.c  tga.c  time.c  vga.c  vgafont.c  xlate.c
+C_SRCS	= iobusini.c  beep.c  c8514.c  time.c  acersio.c  initdata.c  fsboot.c  floppy.c \
+					fileio.c  fatdrv.c  ident.c  int.c  kbd.c  memtest.c  p8514.c  pr.c  printf.c \
+					scanf.c  puts.c  strtoul.c  strtod.c  atof.c  rom.c  romhead.c  search.c  vga.c \
+					vgafont.c  xlate.c  pci.c  halp.c  flash.c  mflash.c  pflash.c  28f008sa.c  29f040.c \
+					tga.c  string.c  prtrace.c  ctype.c  calloc.c  exit.c  ftype.c  rand.c  assert.c \
+					smc.c  sum.c  mcheck.c  isa_dma.c  smcc669.c  am29v800.c  amdflash.c  memt.c  callback.c \
+					fpu.c
 
 .PHONY : all lib vars
 

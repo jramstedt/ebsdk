@@ -24,7 +24,7 @@ ALPHA_TOOLS 	= \
 INCLUDES	= -I. -I../include
 
 CPPFLAGS	= -DPVCCHECK
-CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -mtune=$(CPU) -Os -Wall -Wno-builtin-declaration-mismatch
+CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -Os -Wall -Wno-builtin-declaration-mismatch
 CFLAGS		= -g $(INCLUDES)
 ASFLAGS		= -m$(call LC,$(CPU))
 LINT		= /usr/bin/lint

@@ -20,8 +20,8 @@ ALPHA_TOOLS 	= \
 	OBJDUMP=alpha-linux-gnu-objdump
 
 ASFLAGS		=  -m$(call LC,$(CPUTYPE))
-CPPFLAGS	= $(CCFLAGS_GLOBAL)
-CCFLAGS		= -mcpu=$(CPUTYPE) -mtune=$(CPUTYPE) -Os -Wall
+CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
+CCFLAGS		= -c -Os -Wall -Wextra
 
 S_SRCS	= kutil.s  ladbxusr.s
 

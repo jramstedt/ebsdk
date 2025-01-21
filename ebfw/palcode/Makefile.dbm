@@ -24,7 +24,7 @@ ASFLAGS		= -R -m$(call LC,$(CPUTYPE))
 # Define KDEBUG if you want a special unprivileged CALL_PAL
 # breakpoint trap handler for remote kernel debugging.
 #
-CPPFLAGS	= $(OPTION_FLAGS_GLOBAL) -fdollars-in-identifiers \
+CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers \
 						-DNPHALT \
 						-DKDEBUG \
 						-DCONSOLE_ENTRY=0x$(DBMENTRY) \

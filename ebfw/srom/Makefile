@@ -31,7 +31,7 @@ else
 SROMMAKEFILE = $(default_SROMMAKEFILE)
 endif
 
-.PHONY = all tardef tardefrom tar0 tar1 tar2 tar3 clean distclean depend
+.PHONY = all tardef tardefrom tar0 tar1 tar2 tar3 clean distclean
 
 all : $(STYLE_TARGETS)
 
