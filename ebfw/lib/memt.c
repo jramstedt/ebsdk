@@ -158,7 +158,11 @@ static	long	clock_period = -1;	/* CPU clock period (picosecs). Negative indicate
 static	unsigned long	cpu_start;	/* pcc reading at CPU time zero					*/
 static	unsigned long	wall_start;	/* pcc reading at wall clock time zero				*/
 
+#ifdef __GNUC__
+#define __RPCC __builtin_alpha_rpcc
+#else
 unsigned long __RPCC();
+#endif
 
 long	cpu_time_()
 {

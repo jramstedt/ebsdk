@@ -437,6 +437,24 @@ void Waitforever(ul *PalImpureBase)
 #ifndef _WIN32
 void SRM_hack_WakeUp()
 {
+#ifdef __GNUC__
+  __asm__ (
+    "mb;\n\t"
+    "ldah $1, 0x400f($31);\n\t"
+    "lda  $1, 0xe000($1);\n\t"
+    "sll  $1, 13, $1;\n\t"
+    "subq $31, 1, $2;\n\t"
+    "sll  $2, 47, $2;\n\t"
+    "bis  $2, $1, $1;\n\t"
+    "lda  $2, 0x5a($31);\n\t"
+    "stb  $2, 0x80($1);\n\t"
+    "bis	$31, $16, $30;\n\t"
+    "bis	$31, $17, $27;"
+    :
+    :
+    : "$1", "$2", "$16", "$17", "$27"
+  );
+#else
   asm("	mb;\
 	ldah    %t0, 0x400f(%zero);\
 	lda     %t0, 0xe000(%t0);\
@@ -458,6 +476,7 @@ void SRM_hack_WakeUp()
     {
 	;
     }   
+#endif
 }
 
 void SRM_hack_Waitforever(ul *PalImpureBase)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -402,11 +402,11 @@ wait_a_long_time:
 	stb	r17, 0(r16)
 #endif /* DP264 || CLUBS*/
 
-        ldl	t2, (t0)
+        ldl	t2, 0(t0)
         bne     t2, Not_primary
 	addq	t0, 8, t0
 	bic 	t0, 0x07, t0		# Clear bottom 3 bits to avoid 
-	ldq	sp, (t0)
+	ldq	sp, 0(t0)
 	bis	zero, v0, a0
 	lda	pv, Waitforever
 	jsr	ra, (pv)

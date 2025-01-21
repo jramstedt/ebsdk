@@ -2,7 +2,7 @@
 #define __ARCCODES_H_LOADED
 /*****************************************************************************
 
-Copyright © 1995, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright ï¿½ 1995, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 
@@ -40,6 +40,14 @@ your own risk.
  * Initial revision
  *
  */
+
+/* Avoid conflicts with errno.h */
+#undef ESUCCESS
+#undef EINVAL
+#undef EIO
+#undef ENODEV
+#undef ENOMEM
+#undef EMAXIMUM
 
 typedef enum _ARC_CODES {
     ESUCCESS,

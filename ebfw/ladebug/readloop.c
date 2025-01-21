@@ -1,7 +1,7 @@
 
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -125,7 +125,6 @@ static char *rcsid = "$Id: readloop.c,v 1.1.1.1 1998/12/29 21:36:14 paradis Exp 
 #include "mon.h"
 #include "palosf.h"		/* For exception definitions. */
 
-volatile int dbug_remotely;
 static ip_addr remote_ip_address;
 static ip_addr clientIPAddress;
 static int is_connected;

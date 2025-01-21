@@ -749,7 +749,7 @@ static char *rcsid = "$Id: cmd.c,v 1.3 1999/04/15 21:30:39 paradis Exp $";
 #include "mcheck.h"
 #include "fsboot.h"
 #include "interlock.h"
-#ifndef _WIN32
+#ifdef __osf__
 #include <c_asm.h>
 #endif
 
@@ -1013,6 +1013,15 @@ static void cmd_dirty_deposit(void) {
     case Quad:
 #ifdef _WIN32
       deposit_quad(hexarg[1],(ul)hexarg[2]);
+#elif __GNUC__
+      // CALL_PAL INSQHIL Insert into longword queue at head, interlocked
+      register sl __r0 __asm__("$0");
+      register ul __r16 __asm__("$16") = hexarg[1];
+      register ul __r17 __asm__("$17") = hexarg[2];
+      __asm__ __volatile__ (
+        "call_pal 0x87;"
+        : "+r"(__r16), "+r"(__r17), "=r"(__r0)
+      );
 #else
       asm("call_pal 0x87",hexarg[1],(ul)hexarg[2]);
 #endif
