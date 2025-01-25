@@ -84,7 +84,7 @@ char *rcsidkeyarray[] = {
   0
 };
 
-ident( ul first, ul last)
+int ident( ul first, ul last)
 {
   ul i;
   ul k;

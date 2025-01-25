@@ -699,7 +699,15 @@ extern int kbd_getc(void );
 /*::::::::::::::
 memtest.c
 ::::::::::::::*/
+extern int mt( int argc, char *argv[] );
+
+
+/*::::::::::::::
+memtest.c
+::::::::::::::*/
 extern void memtest( ul min, ul max, int inc, int iterations, State_t McheckState, int drivers);
+
+
 
 /*::::::::::::::
 p8514.c
@@ -848,7 +856,8 @@ extern size_t strlen(char * s);
 extern void bzero(char * s , int count);
 extern int memcmp(const void * pcs , const void * pct , size_t n);
 extern void * memset(void * ps , int c , size_t n);
-//extern void * memcpy(void * ps , const void * pct , size_t n);
+extern void * memcpy(void * ps , const void * pct , size_t n);
+extern void * memchr(const void* ptr, int ch, size_t count);
 
  
 /*::::::::::::::
@@ -880,5 +889,10 @@ extern void vgasetup(void);
 #ifdef NOT_IN_USE
 extern void setupDac(void);
 #endif
+
+/*::::::::::::::
+fflush.c
+::::::::::::::*/
+extern int fflush(FILE *);
 
 #endif /* __LIB_H_LOADED */

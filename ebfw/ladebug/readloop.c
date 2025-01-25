@@ -123,6 +123,7 @@ static char *rcsid = "$Id: readloop.c,v 1.1.1.1 1998/12/29 21:36:14 paradis Exp 
 #include "ladebug.h"
 #include "ether.h"
 #include "mon.h"
+#include "mcheck.h"
 #include "palosf.h"		/* For exception definitions. */
 
 static ip_addr remote_ip_address;

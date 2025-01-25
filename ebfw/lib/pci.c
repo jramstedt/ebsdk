@@ -231,8 +231,8 @@ static PCIDevice_t freedevices[(PCI_T0_LAST_IDSEL-PCI_T0_FIRST_IDSEL+1)
 static PCIBus_t  freebuses[PCI_MAX_BRIDGES];
 static PCIDevice_t *allocatedevices;
 static PCIBus_t *allocatebuses;
-static PCIIOBase;
-static PCIMemBase;
+static ui PCIIOBase;
+static ui PCIMemBase;
 
 static int VgaDeviceDetected;
 int DigitalTGADetected;

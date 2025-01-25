@@ -132,7 +132,7 @@ static char *rcsid = "$Id: search.c,v 1.1.1.1 1998/12/29 21:36:11 paradis Exp $"
  *               the value string, while a false value indicates a request
  *		 to find matching values
  */
-search( ul first, ul last, int size, char *valstr, int inverse )
+int search( ul first, ul last, int size, char *valstr, int inverse )
 {
    char *fmt[] = {"%02x\n", "%04x\n", "%08x\n", "%016lx\n"};
    ul i, addr;

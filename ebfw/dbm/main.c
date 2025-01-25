@@ -202,7 +202,8 @@ ul mem_size = 0;
 
 ul bootadr;
 ul **second_stack;
-volatile ul secondary_cpu_function= 0;
+//volatile ul secondary_cpu_function= 0;
+void (*secondary_cpu_function)(void);
 extern char __start;
 extern int storage_initialized;
 extern ul storage_pool_start;

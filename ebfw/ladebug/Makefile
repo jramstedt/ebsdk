@@ -21,7 +21,7 @@ ALPHA_TOOLS 	= \
 
 ASFLAGS		=  -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
-CCFLAGS		= -c -Os -Wall -Wextra
+CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin
 
 S_SRCS	= kutil.s  ladbxusr.s
 

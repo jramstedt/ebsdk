@@ -59,9 +59,9 @@ static char *rcsid = "$Id: cxx.c,v 1.1.1.1 1998/12/29 21:36:15 paradis Exp $";
 
 #include "lib.h"
 
-_purecall() {return 0;}		/* Visual C++ */
+int _purecall() {return 0;}		/* Visual C++ */
 
-__cxx_dispatch() {puts("__cxx_dispatch() called"); return 0;}
-__cxx_gem_dispatch() {puts("__cxx_gem_dispatch() called"); return 0;}
+int __cxx_dispatch() {puts("__cxx_dispatch() called"); return 0;}
+int __cxx_gem_dispatch() {puts("__cxx_gem_dispatch() called"); return 0;}
 
-__pure_virtual() {puts("__pure_virtual() called"); return 0;} /* GNU C++ */
+int __pure_virtual() {puts("__pure_virtual() called"); return 0;} /* GNU C++ */

@@ -161,4 +161,6 @@ extern ARC_STATUS WriteFlashByte(IN ULONG Offset, IN UCHAR Value);
 extern VOID WriteFlashUCHAR(IN ULONG Offset, IN UCHAR Value);
 extern UCHAR ReadFlashUCHAR(IN ULONG Offset);
 
+extern VOID FlashWriteEnable(int enable);
+
 #endif /* __FWUP_H_LOADED */

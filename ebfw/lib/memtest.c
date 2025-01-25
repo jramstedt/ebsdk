@@ -164,6 +164,7 @@ static char *rcsid = "$Id: memtest.c,v 1.4 1999/01/25 22:16:01 gries Exp $";
  */
 
 #include "system.h"
+#include "mon.h"
 #include "lib.h"
 #include "ether.h"
 #include "console.h"

@@ -88,7 +88,7 @@ static char *rcsid = "$Id: string.c,v 1.1.1.1 1998/12/29 21:36:11 paradis Exp $"
 #include <stddef.h>
 #include "lib.h"
 
-#if 0
+#if 1
 	// In the new libc.a memcopy, memmove, _OtsMove, etc
 	// all reside in the same ots_move_alpha.o module.
 	// We have to use memcpy from libca to avoid linker
@@ -137,6 +137,23 @@ void *memset(void *ps, int c, size_t n)
     while (n--) *s++ = (char)c;
 
     return saved;
+}
+
+/**************************************************************************
+ * memchr()                                                               *
+ **************************************************************************/
+void* memchr(const void* ptr, int ch, size_t count)
+{
+	register const char *s = (const char *)ptr;
+	while (count) {
+		if (*s == (char)ch) {
+			return (void *)s;
+		}
+		++s;
+		--count;
+	}
+
+	return NULL;
 }
 
 size_t strlen(char *s)

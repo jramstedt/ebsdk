@@ -100,6 +100,7 @@ AmdFlashSetLastError(
     );
 
 static
+ARC_STATUS
 AmdFlash_CheckStatus(
     IN PUCHAR FlashOffset,
     IN FLASH_OPERATIONS Operation,
@@ -704,6 +705,7 @@ Return Value:
 }
 
 static
+ARC_STATUS
 AmdFlash_CheckStatus(
     IN PUCHAR FlashOffset,
     IN FLASH_OPERATIONS Operation,

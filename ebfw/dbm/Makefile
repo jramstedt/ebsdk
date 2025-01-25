@@ -16,7 +16,7 @@ SYSGEN	= $(TOOLBOX)/sysgen
 
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
-CCFLAGS		= -c -Os -Wall -Wextra
+CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin
 ifdef EB_DISABLE_GRAPHICS
 CCFLAGS		+= -DDISABLE_GRAPHICS
 endif

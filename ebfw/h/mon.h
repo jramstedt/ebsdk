@@ -270,6 +270,7 @@ extern int  CharAv(void );
 extern int  RawGetChar(void );
 extern void FlushChar(void);
 extern DBM_STATUS console_port_init(void );
+extern DBM_STATUS console_video_init(void);
 extern void PortsFlushChar(void);
 extern int  PortsGetChar(void);
 extern void PortsPutChar(char c);

@@ -410,7 +410,7 @@ arg_to_int(char *arg)
     return rslt;
 }
 
-start_timing ()
+void start_timing ()
 {
     cpu_time_();
 }

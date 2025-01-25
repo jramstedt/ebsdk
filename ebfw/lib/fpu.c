@@ -50,6 +50,8 @@ static char *rcsid = "$Id: fpu.c,v 1.1.1.1 1998/12/29 21:36:11 paradis Exp $";
  *
  */
 
+#include "lib.h"
+
 #ifndef __GNUC__
 #include <machine/fpu.h>
 #include <c_asm.h>
