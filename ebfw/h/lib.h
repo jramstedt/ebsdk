@@ -697,7 +697,7 @@ extern int kbd_getc(void );
 
 
 /*::::::::::::::
-memtest.c
+memt.c
 ::::::::::::::*/
 extern int mt( int argc, char *argv[] );
 
