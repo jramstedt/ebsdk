@@ -130,7 +130,7 @@ static char *RCSid = "$Id: uload.c,v 1.2 1999/03/21 23:35:32 paradis Exp $";
 
 #ifdef __linux__
 #include <stdio.h>
-#include <strings.h>
+#include <string.h>
 #include <termios.h>
 #include <sys/file.h>
 #include <sys/stat.h>

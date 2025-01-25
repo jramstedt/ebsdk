@@ -44,6 +44,7 @@ struct yy_buffer_state
 typedef struct yy_buffer_state *YY_BUFFER_STATE;
 YY_BUFFER_STATE yy_create_buffer PROTO((FILE *, int));
 void yy_switch_to_buffer PROTO((YY_BUFFER_STATE));
+void yyrestart PROTO((FILE *));
 #endif
 
 #endif

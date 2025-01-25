@@ -112,7 +112,7 @@ char seen[SEEN_SIZE];                   /* upper and lower case */
 /*
  *  Forward routine descriptions.
  */
-main(int argc, char **argv);
+int main(int argc, char **argv);
 void usage();
 void write_file(FILE *in, char *filename);
 unsigned int write_text_section(FILE *in, FILE *out);
@@ -124,7 +124,7 @@ static char *Revision = "$Revision: 1.2 $";
 static char *DateStamp = __DATE__;
 static char *TimeStamp = __TIME__;
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *in_file_name = NULL;
     char *out_file_name = NULL;

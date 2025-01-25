@@ -80,6 +80,7 @@ char *s;
 /*****************************************************************************/
 /* look if the symbol is in, (YES) update the ref, (NO) create  */
 /*****************************************************************************/
+void
 symuse(s,type)
 char *s;    
 int  type;
@@ -614,7 +615,7 @@ SENTRY *e;
         fprintf(listing_file, "\n");
 }
 /*****************************************************************************/
-symcreate(pe)
+void symcreate(pe)
 SENTRY **pe;
 {
     if((*pe = ALLOC(SENTRY)) == 0) {

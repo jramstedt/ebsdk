@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdbool.h>
 
 typedef enum _CONVERT_MODE {
     normal = 0,
@@ -27,7 +28,7 @@ ConvertMapFile(
   int retval = 0;
 
   /*
-   * do {} while(FALSE); is used as an exception loop
+   * do {} while(false); is used as an exception loop
    * Its body is executed exactly once, but if a problem
    * occurs, we can break out and hit common cleanup code
    */
@@ -95,7 +96,7 @@ ConvertMapFile(
       }
     }
     fprintf(stderr, "done\n");
-  } while(FALSE);
+  } while(false);
 
   /*
    * Clean up

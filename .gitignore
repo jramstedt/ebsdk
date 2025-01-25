@@ -14,6 +14,7 @@ ebtools/src/common/ic4mat/ic4mat
 ebtools/src/common/list/alist
 ebtools/src/common/list/clist
 ebtools/src/common/makerom/makerom
+ebtools/src/common/mapcvt/mapcvt
 ebtools/src/common/objtest/ccheck
 ebtools/src/common/objtest/newstrip
 ebtools/src/common/pvc/pvc

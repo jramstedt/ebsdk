@@ -93,7 +93,7 @@ char seen[SEEN_SIZE];			/* upper and lower case */
 /*
  *  Forward routine descriptions.
  */
-main(int argc, char **argv);
+int main(int argc, char **argv);
 void usage();
 void read_file(char *filename);
 void write_file(char *filename);
@@ -101,7 +101,7 @@ void write_file(char *filename);
  *  External routines.
  */
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *ifname = NULL;	/* default .o file */
     char *ofname = "a.out.strip";

@@ -21,9 +21,13 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
+#ifdef _POSIX_C_SOURCE
+#include <sys/stat.h>
+#endif
 
 #include "hal.h"
 #include "operator.h"
@@ -660,7 +664,7 @@ int type;
     
     if (psect_stk == NULL) {
         errout(E_ERR, "do_rest_psect", "no psects defined on psect stack.\n");
-        return;
+	exit(EXIT_FAILURE);
     }
 
     /*

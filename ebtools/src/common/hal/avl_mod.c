@@ -91,7 +91,7 @@ int (*compar)();
 }
 
 
-
+int
 avl_lookup(tree, key, value_p)
 avl_tree *tree;
 register char *key;
@@ -113,6 +113,7 @@ char **value_p;
     return 0;
 }
 
+int
 avl_first(tree, key_p, value_p)
 avl_tree *tree;
 char **key_p;
@@ -132,7 +133,7 @@ char **value_p;
     }
 }
 
-
+int
 avl_last(tree, key_p, value_p)
 avl_tree *tree;
 char **key_p;
@@ -152,6 +153,7 @@ char **value_p;
     }
 }
 
+int
 avl_insert(tree, key, value)
 avl_tree *tree;
 char *key;
@@ -183,7 +185,7 @@ char *value;
 }
 
 
-
+int
 avl_find_or_add(tree, key, slot_p)
 avl_tree *tree;
 char *key;
@@ -217,6 +219,7 @@ char ***slot_p;
     return 0;			/* not already in tree */
 }
 
+int
 avl_delete(tree, key_p, value_p)
 avl_tree *tree;
 char **key_p;
@@ -312,7 +315,7 @@ int dir;
     return gen;
 }
 
-
+int
 avl_gen(gen, key_p, value_p)
 avl_generator *gen;
 char **key_p;
@@ -387,7 +390,7 @@ register int stack_n;
     }
 }
 
-static 
+static int
 rotate_left(node_p)
 register avl_node **node_p;
 {
@@ -411,7 +414,7 @@ register avl_node **node_p;
 }
 
 
-static 
+static int
 rotate_right(node_p)
 avl_node **node_p;
 {

@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <stdlib.h>
 #include "hal.h"
 
 #ifdef _WIN32
@@ -114,7 +115,7 @@ static void handle_memdir_expr PROTO((TOKEN_LIST* expr, int type));
 static void push_bodies PROTO((TOKEN_LIST* bodyseq));
 static void push_repeat_body PROTO((TOKEN_LIST* body, TOKEN_LIST* absexpr));
 static void push_while_body PROTO((TOKEN_LIST* body, TOKEN_LIST* expr));
-static dbug();
+static void dbug();
 static char* create_temporary_label PROTO((unsigned int hi, unsigned int lo));
 %}
 
@@ -165,7 +166,7 @@ action:
     |	instruction EOL		{ do_list(L_BINARY | L_MISC, start_line); }
     |   assignment		{ do_list(L_ASSIGN | L_MISC, start_line); saved_absexpr = 0; }
     |	directive		{ /* do_list handled inside directive */ saved_absexpr = 0; }
-    |   ENDP EOL		{ do_list(L_MISC, start_line); return; }
+    |   ENDP EOL		{ do_list(L_MISC, start_line); YYACCEPT; /* return; */ }
     |   error EOL		/* do_list handled by errout ??? */
     ;
 
@@ -726,9 +727,9 @@ macro_call_arg:
 %%
 
 #ifdef __STDC__
-yyerror(char *s)
+void yyerror(char *s)
 #else
-yyerror(s)
+void yyerror(s)
 char *s;
 #endif
 {
@@ -737,7 +738,7 @@ char *s;
   return;
 }
 
-static dbug()
+static void dbug()
 {
     dbgout("opcode=%08X\n", opcode); 
 }

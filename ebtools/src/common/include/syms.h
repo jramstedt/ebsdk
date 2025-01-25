@@ -206,7 +206,7 @@
 #define otInline	4	/* inline procedure */
 #define otEnd		5	/* whatever you started */
 #define otMax		6	/* KEEP UP TO DATE */
-#endif (MFG == MIPS)
+#endif /* (MFG == MIPS) */
 
 
 #ifdef LANGUAGE_C
@@ -633,5 +633,5 @@ stConstant	scInfo	iss		--- (complex, e.g. string)
  *
  */
 
-#endif LANGUAGE_C
+#endif /* LANGUAGE_C */
 

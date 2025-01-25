@@ -52,7 +52,7 @@ for dir in $unix_subdirs ; do
 	echo "***** No Makefile in unix/$dir"
     else
 	echo "##### Building unix/$dir #####"
-        (cd unix/$dir ; $EB_TOOLBOX/gnumake -f Makefile ; $EB_TOOLBOX/gnumake -f Makefile install)
+        (cd unix/$dir ; make -f Makefile ; make -f Makefile install)
     fi
 done
 
@@ -61,7 +61,7 @@ for dir in $gnumake_subdirs ; do
 	echo "***** No Makefile in common/$dir"
     else
 	echo "##### Building common/$dir #####"
-        (cd common/$dir ; $EB_TOOLBOX/gnumake -f Makefile ; $EB_TOOLBOX/gnumake -f Makefile install)
+        (cd common/$dir ; make -f Makefile ; make -f Makefile install)
     fi
 done
 

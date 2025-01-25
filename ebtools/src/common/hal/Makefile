@@ -8,9 +8,9 @@ FLEXFLAGS	= -iIL
 BISON			= bison
 BISONFLAGS= -dtvl
 
-SRCS = lexer.lex.c parser.tab.c avl_mod.c dir.c dll.c hal.c lib.c main.c \
-		memmgt.c NN_DigitDiv.c NN_DigitMult.c NN_Div.c NN_Sub.c NN_SubDigitMult.c \
-		NN_Util.c operator.c osf.c sym.c utl.c yywrap.c
+SRCS =	lexer.lex.c parser.tab.c avl_mod.c dll.c main.c hal.c sym.c utl.c \
+	dir.c memmgt.c operator.c osf.c lib.c NN_Div.c NN_Util.c NN_DigitDiv.c \
+	NN_SubDigitMult.c NN_Sub.c NN_DigitMult.c yywrap.c
 
 hal : $(SRCS:.c=.o)
 	$(CC) $(CFLAGS) $(CPPFLAGS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^

@@ -56,7 +56,9 @@ static char *rcsid = "$Id: ccheck.c,v 1.1.1.1 1998/12/29 21:36:23 paradis Exp $"
 typedef long vm_offset_t;
 */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #ifdef _WIN32
 #include <windef.h>
@@ -145,7 +147,7 @@ void usage();
 void read_file(char *filename);
 void analyse_coff_file();
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *in_file_name = "a.out";	/* default .o file */
     char *arg, option;

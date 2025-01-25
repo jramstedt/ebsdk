@@ -96,7 +96,7 @@ char seen[SEEN_SIZE];			/* upper and lower case */
 /*
  *  Forward routine descriptions.
  */
-main(int argc, char **argv);
+int main(int argc, char **argv);
 void usage();
 void read_file(char *filename);
 void analyse_aout_file();
@@ -118,7 +118,7 @@ void print_64bit_value(char *start, integer_t value, int hex, char *end);
  */
 void print_instruction(int instruction, FILE *stream);
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *in_file_name = "a.out";	/* default .o file */
     char *arg, option;

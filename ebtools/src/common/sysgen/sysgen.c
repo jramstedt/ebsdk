@@ -190,7 +190,7 @@ FILE *output_fp;
 /*
  *  Forward routine descriptions.
  */
-main(int argc, char **argv);
+int main(int argc, char **argv);
 void usage();
 void print_filetype(int type);
 FILE *parse_filehead(int m_index);
@@ -202,7 +202,7 @@ int64 fsize(FILE *fp);
  *  External routines.
  */
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *arg, option;
     int i, findex = 0, flash_image= 0;

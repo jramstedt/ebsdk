@@ -493,8 +493,9 @@ int code;
 }
 
 #ifdef __STDC__
-main(int argc, char *argv[])
+int main(int argc, char *argv[])
 #else
+int
 main(argc, argv)
 int argc;
 char *argv[];

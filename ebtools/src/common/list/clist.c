@@ -137,7 +137,7 @@ char buffer2[255];
 /*
  *  Forward routine descriptions.
  */
-main(int argc, char **argv);
+int main(int argc, char **argv);
 void usage();
 void analyse_coff_file(FILE *in);
 void dump_symbol_table(FILE *in, pHDRR hdrr);
@@ -160,7 +160,7 @@ unsigned int is_pvc_label(char *label);
 extern void print_instruction(int instruction, FILE *stream);
 
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *in_file_name = "a.out";	/* default .o file */
     FILE *in;

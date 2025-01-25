@@ -54,7 +54,9 @@ static char *rcsid = "$Id: newstrip.c,v 1.1.1.1 1998/12/29 21:36:23 paradis Exp 
 typedef long vm_offset_t;
 */
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 #include <limits.h>
 #ifdef _WIN32
@@ -143,7 +145,7 @@ void read_file(char *filename);
 void analyse_coff_file(char ** loadstart, unsigned long int * loadsize);
 void write_stripped_file(char * filename, char * loadstart, unsigned long int loadsize);
 
-main(int argc, char **argv)
+int main(int argc, char **argv)
 {
     char *ifname = NULL;
     char *ofname = "a_out.sti";

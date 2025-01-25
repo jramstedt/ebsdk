@@ -230,7 +230,7 @@ OPID find_operator(char* opname_in, int return_name)
     return ID_NULL;
 }
     
-
+void
 load_default_operators()
 {
     int i,max;
@@ -410,7 +410,7 @@ OPID oid;
   return (operator[oid].type == MACRO_CALL);
 }
 
-free_operators()
+void free_operators()
 {
     free(operator_hash);
     free(ev4_operator_hash);
