@@ -368,7 +368,7 @@ static int edit_cmdline(void)
     */
     case '.':			/* Repeat */
       if (cmdEol == 0) return (c);
-
+      /* fallthrough */
     default:
       if (prefix != 0) {	/* Ignore unrecognized sequences */
 	prefix = 0;

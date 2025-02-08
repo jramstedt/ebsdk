@@ -2,7 +2,7 @@
 #define __AM79C960_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -249,8 +249,8 @@ your own risk.
              /* CSR4 Bit definitions - all undefined bits reserved */
                    /* This register is unique to the 79C960 */
 
-#define csr4_JABM	0x0001		/* Jabber interrupt mask
-#define csr4_JAB	0x0002		/* set if T-MAU detects a jabber condition
+#define csr4_JABM	0x0001		/* Jabber interrupt mask */
+#define csr4_JAB	0x0002		/* set if T-MAU detects a jabber condition */
 #define csr4_TXSTRTM	0x0004		/* TX start (of packet) interrupt mask */
 #define csr4_TXSTRT	0x0008		/*    */
 #define csr4_RCVCCOM	0x0010		/* RX Collision Counter Overflow interrupt mask */

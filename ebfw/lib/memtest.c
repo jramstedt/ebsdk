@@ -277,16 +277,18 @@ void memtest( ul min, ul max, int inc, int iterations, State_t McheckState, int 
 	   range/1024, runtime, range/(runtime*1024));
 #endif /* __NO_FLOATING_POINT */
 
-    printf("\t %d Corrected Errors, %d Total Errors\n\n",
-	   corrected_error_count, corrected_error_count+errcount);
-  for(i=0;i<8;i++)
-    printf("\t Byte #%d error count \t%8x\n",i,byte_number_error_count[i]);
-  for(i=0;i<4;i++)
-    printf("\t Bank #%d error count \t%8x\n",i,bank_number_error_count[i]);
-  for(i=0;i<16;i++)
-    printf("\t Bank #%d Dimm #%d error count \t%8x\n",i>>2,i & 3,dimm_number_error_count[i]);
-    if (iterations != 0)
-      printf("\t %d iterations remaining\n", iterations);
+	printf("\t %d Corrected Errors, %d Total Errors\n\n",
+		corrected_error_count, corrected_error_count+errcount);
+
+	for(i=0;i<8;i++)
+		printf("\t Byte #%d error count \t%8x\n",i,byte_number_error_count[i]);
+	for(i=0;i<4;i++)
+		printf("\t Bank #%d error count \t%8x\n",i,bank_number_error_count[i]);
+	for(i=0;i<16;i++)
+		printf("\t Bank #%d Dimm #%d error count \t%8x\n",i>>2,i & 3,dimm_number_error_count[i]);
+
+	if (iterations != 0)
+		printf("\t %d iterations remaining\n", iterations);
   }
 
   printf("\t 0 %016lx \n",*(long *)(0x801a0000100ul));

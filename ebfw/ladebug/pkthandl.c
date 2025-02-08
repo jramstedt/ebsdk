@@ -262,6 +262,7 @@ void ProcessPacket(DebugPacket *packet_structP)
 	      break;
 	  }
 	  /* Otherwise identical to connect to process insist */
+		/* fallthrough */
       case CONNECTTOPROCESSINSIST:
           PRTRACE1("LADBX Command: Connect to Process Insist.\n");
 	  specific_dataP[PROCESS_INFO_PROCESSOR_OFFSET] = PROCESSOR_ALPHA;

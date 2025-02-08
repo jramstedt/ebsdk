@@ -35,6 +35,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: acersio.c,v 1.1.1.1 199
  *
  * Revision 1.1  1998/07/13  14:36:00  bissen
  * Initial revision
+*/
 /*
  *
  * Original author: Dick Bissen

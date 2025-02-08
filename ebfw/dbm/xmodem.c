@@ -413,6 +413,7 @@ BOOLEAN XReceive( ul Address )
 		ConsecErrors++;
 		break;
 	    }
+	    /* fallthrough */
 	case RTN_CANCELED:
 	    CD.BlockSize = 0;
 	    CancelTransfer( &CD );

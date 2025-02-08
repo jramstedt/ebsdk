@@ -673,6 +673,7 @@ static int DECchip_21x4x_device_init(int device_no)
 	    /* Clear bits set durring the above tests */
 	    _21x4xClearCSRBits(device, CSR6, CSR6_HBD|CSR6_PCS|CSR6_SCR);
 	    /* use the 21142 configuration test if this fails */
+      /* fallthrough */
 	case DECCHIP_21142_TYPE:
 	  {
 	    BOOLEAN Found = FALSE;
