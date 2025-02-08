@@ -3,16 +3,20 @@ include $(CONFIG_DIR)/sdkmake.conf
 
 include $(EB_BASE)/rules.gnu
 
-AS			= as
-LC			= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
-CC			= gcc
-LD			= ld
-CPP			= cpp
-COPY		= cp -p
-CHMOD		= chmod
-DELETE	= rm -f
-OBJCOPY	= objcopy
-SYSGEN	= $(TOOLBOX)/sysgen
+AS				= as
+LC				= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
+CC				= gcc
+LD				= ld
+CPP				= cpp
+COPY			= cp -p
+CHMOD			= chmod
+DELETE		= rm -f
+OBJCOPY		= objcopy
+SYSGEN		= $(TOOLBOX)/sysgen
+COMPRESS	= $(TOOLBOX)/hfcomp
+MAKEROM		= $(TOOLBOX)/makerom
+SREC			= $(TOOLBOX)/srec
+HEX				= $(TOOLBOX)/hex32
 
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
@@ -20,10 +24,10 @@ CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
 ifdef EB_DISABLE_GRAPHICS
 CCFLAGS		+= -DDISABLE_GRAPHICS
 endif
-LDFLAGS			= --orphan-handling=warn -T elf-coff.ld -s --no-dynamic-linker -static
-LDLIBS			= -lc
+LDFLAGS		= --orphan-handling=warn -T elf-coff.ld -s --no-dynamic-linker -static
+LDLIBS		= -lc
 
-ALPHA_TOOLS 	= \
+ALPHA_TOOLS = \
 	AS=alpha-linux-gnu-as \
 	AR=alpha-linux-gnu-ar \
 	LD=alpha-linux-gnu-ld \
@@ -36,9 +40,9 @@ default_BUILD_TARGETS	= \
 	$(BOOTDIR)$(TARGET)dbm.img \
 	$(BOOTDIR)$(TARGET)dbm.cmp \
 	$(BOOTDIR)$(TARGET)dbm.rom \
+	$(BOOTDIR)$(TARGET)fsb.img \
 	$(BOOTDIR)$(TARGET)fsb.cmp \
 	$(BOOTDIR)$(TARGET)fsb.rom \
-	$(BOOTDIR)$(TARGET)fsb.img \
 	$(BOOTDIR)$(TARGET)sft.img \
 	$(BOOTDIR)$(TARGET)dbm.sr  \
 	$(BOOTDIR)$(TARGET)dbm.hex \
@@ -83,7 +87,7 @@ FSB_DEBUG_SRCS = console.c  io_port.c  uart.c  sromport.c
 FSBOBJFILES += $(FSB_DEBUG_SRCS:%.c=$(OBJDIR)%.o)
 endif
 
-default_PALCODE	= $(OBJDIR)osfpal
+default_PALCODE	= $(OBJDIR)osfpal.nh
 dp264_PALCODE		= ../palcode/dp264/osfpal_dbm.exe
 clubs_PALCODE		= ../palcode/clubs/osfpal_dbm.exe
 ifdef $(TARGET)_PALCODE
@@ -94,25 +98,14 @@ endif
 
 default_SOFTBOOTADR	= 900000
 ifdef $(TARGET)_SOFTBOOTADR
-SOFTBOOTADR					= $($(TARGET)_SOFTBOOTADR)
+SOFTBOOTADR			= $($(TARGET)_SOFTBOOTADR)
 else
-SOFTBOOTADR					= $(default_SOFTBOOTADR)
+SOFTBOOTADR			= $(default_SOFTBOOTADR)
 endif
-
-default_DBM_SYSGEN	= -e$(PALBASE) $(PALCODE) -e$(DBMENTRY) -s $(OBJDIR)dbm.nh
-dp264_DBM_SYSGEN		= -e$(PALBASE) -s $(PALCODE) -e$(DBMENTRY) -s $(OBJDIR)dbm.nh 
-clubs_DBM_SYSGEN		= -e$(PALBASE) -s $(PALCODE) -e$(DBMENTRY) -s $(OBJDIR)dbm.nh
-ifdef $(TARGET)_DBM_SYSGEN
-DBM_SYSGEN					= $($(TARGET)_DBM_SYSGEN)
-else
-DBM_SYSGEN					= $(default_DBM_SYSGEN)
-endif
-
-# TODO getver.c  
 
 .PHONY : all dbm vars
 
-all :
+all : $(OBJDIR)getver
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) dbm
 
 dbm : $(BUILD_TARGETS)
@@ -130,12 +123,76 @@ $(BOOTDIR)$(TARGET)% : $(OBJDIR)% $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
-# targets
+# Debug Monitor
+###############
+default_DBM_SYSGEN	= -e$(PALBASE) -s $(PALCODE) -e$(DBMENTRY) -s $(OBJDIR)dbm.nh
+dp264_DBM_SYSGEN		= -e$(PALBASE) -s $(PALCODE) -e$(DBMENTRY) -s $(OBJDIR)dbm.nh 
+clubs_DBM_SYSGEN		= -e$(PALBASE) -s $(PALCODE) -e$(DBMENTRY) -s $(OBJDIR)dbm.nh
+ifdef $(TARGET)_DBM_SYSGEN
+DBM_SYSGEN					= $($(TARGET)_DBM_SYSGEN)
+else
+DBM_SYSGEN					= $(default_DBM_SYSGEN)
+endif
 
 $(OBJDIR)dbm.img : $(PALCODE) $(OBJDIR)dbm.nh
 	$(SYSGEN) -v $(DBM_SYSGEN) -o $@
 
-#
+$(OBJDIR)dbm.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
+	$(LD) -Ttext-segment=$(DBMENTRY) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
+# https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
+# $(LD) -m -o $(OBJDIR)dbm.out -N -T $(DBMENTRY) -taso -non_shared -tr -h$(OBJDIR) -B $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.$(OBJ) -lm > $(OBJDIR)dbm.map
+#  -tr ??????????????????????
+#  -h  ??
+
+$(OBJDIR)dbm.rom : $(OBJDIR)dbm.cmp
+	$(OBJDIR)getver > $(OBJDIR)timestmp.fw
+	$(MAKEROM) -v -iDBM -f$(OBJDIR)timestmp.fw -l$(DECOMP_PALBASE) $< -o $@
+
+# Fail-Safe Booter
+###############
+default_FSB_SYSGEN	= -e$(PALBASE) -s $(PALCODE) -e$(FSBENTRY) -s $(OBJDIR)fsb.nh
+dp264_FSB_SYSGEN		= -e$(PALBASE) -s $(PALCODE) -e$(FSBENTRY) -s $(OBJDIR)fsb.nh 
+clubs_FSB_SYSGEN		= -e$(PALBASE) -s $(PALCODE) -e$(FSBENTRY) -s $(OBJDIR)fsb.nh
+ifdef $(TARGET)_FSB_SYSGEN
+FSB_SYSGEN					= $($(TARGET)_FSB_SYSGEN)
+else
+FSB_SYSGEN					= $(default_FSB_SYSGEN)
+endif
+
+$(OBJDIR)fsb.img : $(PALCODE) $(OBJDIR)fsb.nh
+	$(SYSGEN) -v $(FSB_SYSGEN) -o $@
+
+$(OBJDIR)fsb.elf : $(OBJDIR)crt0.o $(FSBOBJFILES) $(OBJDIR)lib.a $(OBJDIR)stubs.a $(OBJDIR)fsbver.o
+	$(LD) -Ttext-segment=$(DBMENTRY) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)fsb.map -o $@ $^ $(LDLIBS)
+
+$(OBJDIR)fsb.rom : $(OBJDIR)fsb.cmp
+	$(OBJDIR)getver > $(OBJDIR)timestmp.fw
+	$(MAKEROM) -v -iFSB -f$(OBJDIR)timestmp.fw -l$(DECOMP_PALBASE) $< -o $@
+
+# Soft Boot
+###############
+$(OBJDIR)sft.img : $(OBJDIR)sft.nh
+	$(COPY) $< $@
+
+$(OBJDIR)sft.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
+	$(LD) -Ttext-segment=$(SOFTBOOTADR) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)sft.map -o $@ $^ $(LDLIBS)
+
+$(OBJDIR)sft.sr : $(OBJDIR)sft.nh
+	$(SREC) -v -i $< $@
+
+$(OBJDIR)sft.hex : $(OBJDIR)sft.nh
+	$(HEX) -v $< $@
+
+# 
+
+$(OBJDIR)%.cmp : $(OBJDIR)%.img
+	$(COMPRESS) -v -$(CPUTYPE) -t0x$(PALBASE) $< $@
+
+%.hex : %.rom
+	$(HEX) -v $< $@
+
+%.sr : %.rom
+	$(SREC) -v -i $< $@
 
 %.sp : %.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
@@ -155,16 +212,14 @@ $(OBJDIR)crt0.o : $(OBJDIR)dbmentry.o
 $(OBJDIR)dbmver.o : version.c
 	$(CC) $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
-$(OBJDIR)dbm.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
-	$(LD) -Ttext-segment=$(DBMENTRY) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
+$(OBJDIR)fsbver.o : version.c
+	$(CC) $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
-# https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
-# $(LD) -m -o $(OBJDIR)dbm.out -N -T $(DBMENTRY) -taso -non_shared -tr -h$(OBJDIR) -B $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.$(OBJ) -lm > $(OBJDIR)dbm.map
-#  -tr ??????????????????????
-#  -h  ??
-
-$(OBJDIR)%.nh : $(OBJDIR)%.elf
-	$(OBJCOPY) -O binary $< $@
+#  Version utility...
+#-------------------------------------------------------------
+$(OBJDIR)getver : getver.c version.c
+	$(CC) -O2 -Wall -Wextra $(INCLUDES) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
+	$(CHMOD) a+x $@
 
 clean :
 	$(DELETE) *.o *~ \#*\# *.bak *.a core \

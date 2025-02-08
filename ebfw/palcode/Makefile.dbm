@@ -35,7 +35,7 @@ SRCS = osfpal.s ../srom_dbm.s ../sromcsrv.s platform.s
 
 .PHONY = all clean pvc
 
-all : $(OBJDIR)osfpal $(OBJDIR)osfpal.lis
+all : $(OBJDIR)osfpal $(OBJDIR)osfpal.lis $(OBJDIR)osfpal.nh
 
 # osfpal
 $(OBJDIR)osfpal.sp : osfpal.s
