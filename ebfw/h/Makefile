@@ -18,7 +18,10 @@
 
 CONFIG_DIR=../..
 include $(CONFIG_DIR)/sdkmake.conf
+
 include ../rules.gnu
+
+DELETE	= rm -rf
 
 all:
 

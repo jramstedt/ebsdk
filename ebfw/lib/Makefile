@@ -21,7 +21,7 @@ ALPHA_TOOLS 	= \
 
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
-CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin
+CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
 
 TARGET_SRCS	= $(TARGET)_io.c $(TARGET)mem.c
 

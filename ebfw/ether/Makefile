@@ -17,7 +17,7 @@ ALPHA_TOOLS 	= \
 	OBJDUMP=alpha-linux-gnu-objdump
 
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
-CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin
+CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
 
 C_SRCS	= DEC21040.c  am79c960.c  arp.c  bootp.c  eaddr.c  edevice.c  ethernet.c  ip.c  net_buff.c  netboot.c  netman.c  tftp.c  udp.c
 

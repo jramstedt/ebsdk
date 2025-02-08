@@ -17,7 +17,7 @@ ALPHA_TOOLS 	= \
 	OBJDUMP=alpha-linux-gnu-objdump
 
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
-CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin
+CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
 
 C_SRCS	= bios_dbg.c  biosem.c  cxx.c  dpml.c  fflush.c  stdlib.c  sflash.c  stub_pci.c
 
