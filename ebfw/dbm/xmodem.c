@@ -253,7 +253,7 @@ static int ReceiveBlock( CONTROLDATA * CD, ul Data )
 			return( RTN_EOT );
 
 	case CTRL_CAN:	C = ReceiveCharacter( READWAIT_BLOCK );
-			if( C == CTRL_CAN );
+			if( C == CTRL_CAN )
 			    return( RTN_CANCELED );
 			continue;
 
