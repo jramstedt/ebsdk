@@ -49,7 +49,7 @@ your own risk.
 **      DAR        Nov-1992     First version.
 */
 #ifndef LINT
-static char *rcsid = "$Id: cstrip.c,v 1.2 1999/04/09 17:39:29 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: cstrip.c,v 1.2 1999/04/09 17:39:29 paradis Exp $";
 #endif
 
 #include <stdio.h>

@@ -1,7 +1,7 @@
 
 /*****************************************************************************
 
-Copyright © 1993, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright ï¿½ 1993, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 
@@ -25,7 +25,7 @@ your own risk.
 ******************************************************************************/
 
 #ifndef LINT
-static char *rcsid = "$Id: eb164mem.c,v 1.1.1.1 1998/12/29 21:36:10 paradis Exp $ (EB64 Debug Monitor)";
+__attribute__((unused)) static const char *rcsid = "$Id: eb164mem.c,v 1.1.1.1 1998/12/29 21:36:10 paradis Exp $ (EB64 Debug Monitor)";
 #endif
 
 /*

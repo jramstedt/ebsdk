@@ -1,7 +1,7 @@
 
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -26,7 +26,7 @@ your own risk.
 ******************************************************************************/
 
 #ifndef LINT
-static char *rcsid = "$Id: avp.c,v 1.1.1.1 1998/12/29 21:36:04 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: avp.c,v 1.1.1.1 1998/12/29 21:36:04 paradis Exp $";
 #endif
 
 /*

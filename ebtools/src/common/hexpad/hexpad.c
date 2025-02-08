@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -23,7 +23,7 @@ otherwise; and you rely on the software, documentation and results solely at
 your own risk. 
 
 ******************************************************************************/
-static char *rcsid = "$Id: hexpad.c,v 1.1.1.1 1998/12/29 21:36:22 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: hexpad.c,v 1.1.1.1 1998/12/29 21:36:22 paradis Exp $";
 
 /*
  * $Log: hexpad.c,v $

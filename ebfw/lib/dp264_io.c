@@ -25,7 +25,7 @@ your own risk.
 ******************************************************************************/
 
 #ifndef LINT
-static char *rcsid = "$Id: dp264_io.c,v 1.2 1999/01/21 19:05:05 gries Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: dp264_io.c,v 1.2 1999/01/21 19:05:05 gries Exp $";
 #endif
 
 /*

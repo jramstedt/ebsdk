@@ -50,7 +50,7 @@ your own risk.
 **	DAR	   Nov-1992	First version.
 */
 #ifndef LINT
-static char *rcsid = "$Id: ccheck.c,v 1.1.1.1 1998/12/29 21:36:23 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: ccheck.c,v 1.1.1.1 1998/12/29 21:36:23 paradis Exp $";
 #endif
 /*
 typedef long vm_offset_t;

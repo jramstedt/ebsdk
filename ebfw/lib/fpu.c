@@ -25,7 +25,7 @@ your own risk.
 ******************************************************************************/
 
 #ifndef LINT
-static char *rcsid = "$Id: fpu.c,v 1.1.1.1 1998/12/29 21:36:11 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: fpu.c,v 1.1.1.1 1998/12/29 21:36:11 paradis Exp $";
 #endif
 
 /*

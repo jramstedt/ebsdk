@@ -25,7 +25,7 @@ your own risk.
 ******************************************************************************/
 
 #ifndef LINT
-static char *rcsid = "$Id: cmd.c,v 1.3 1999/04/15 21:30:39 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: cmd.c,v 1.3 1999/04/15 21:30:39 paradis Exp $";
 #endif
 
 /*

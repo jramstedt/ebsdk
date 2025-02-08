@@ -72,7 +72,7 @@ your own risk.
  *
 */
 #ifndef lint
-static char *rcsid = "$Id: clist.c,v 1.1.1.1 1998/12/29 21:36:23 paradis Exp $";
+__attribute__((unused)) static const char *rcsid = "$Id: clist.c,v 1.1.1.1 1998/12/29 21:36:23 paradis Exp $";
 #endif
 
 /*
