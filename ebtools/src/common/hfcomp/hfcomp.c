@@ -467,13 +467,13 @@ int main (int argc, char *argv []) {
 	}
     }
 
-    if     (strncmp(cpu, "21064", 5) == 0) sprintf(prefile, "%s/decmp64.img", toolbox);
-    else if(strncmp(cpu, "21066", 5) == 0) sprintf(prefile, "%s/decmp64.img", toolbox);
+    if     (strncmp(cpu, "21064", 5) == 0) sprintf(prefile, "%s/decmp064.img", toolbox);
+    else if(strncmp(cpu, "21066", 5) == 0) sprintf(prefile, "%s/decmp064.img", toolbox);
     else if(strncmp(cpu, "21164", 5) == 0) sprintf(prefile, "%s/decmp164.img", toolbox);
     else if(strncmp(cpu, "21264", 5) == 0) sprintf(prefile, "%s/decmp264.img", toolbox);
     else
     {
-	fprintf(stderr, "Illegall cpu type specified\n");
+	fprintf(stderr, "Illegal cpu type specified\n");
 	usage(argv[0]);
 	exit(FAILURE);
     }
