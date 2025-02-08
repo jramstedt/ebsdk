@@ -1,104 +1,946 @@
-		LINK EDITOR MEMORY MAP
+Archive member included to satisfy reference by file (symbol)
 
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o (cServe)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/rtc.o (outportb)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/rtc.o (localtime)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/crt0.o (initdata)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o (fsboot)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/file.o (errno)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o) (AllocateFloppyDrive)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o) (IsHeaderValid)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (memcpy)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o) (isprint)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o) (SMCInit)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o) (BeepCode)
+/home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (SpinDownFloppyDrive)
+/usr/alpha-linux-gnu/lib/libc.a(memmove.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/malloc.o (memmove)
+/usr/alpha-linux-gnu/lib/libc.a(strcat.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o) (strcat)
+/usr/alpha-linux-gnu/lib/libc.a(strchr.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (strchr)
+/usr/alpha-linux-gnu/lib/libc.a(strcmp.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o) (strcmp)
+/usr/alpha-linux-gnu/lib/libc.a(strcpy.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o) (strcpy)
+/usr/alpha-linux-gnu/lib/libc.a(strncat.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (strncat)
+/usr/alpha-linux-gnu/lib/libc.a(strncmp.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (strncmp)
+/usr/alpha-linux-gnu/lib/libc.a(strncpy.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (strncpy)
+/usr/alpha-linux-gnu/lib/libc.a(strrchr.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (strrchr)
+/usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+                              /usr/alpha-linux-gnu/lib/libc.a(memmove.o) (_wordcopy_fwd_aligned)
+/usr/alpha-linux-gnu/lib/libc.a(stxcpy.o)
+                              /usr/alpha-linux-gnu/lib/libc.a(strcat.o) (__stxcpy)
+/usr/alpha-linux-gnu/lib/libc.a(stxncpy.o)
+                              /usr/alpha-linux-gnu/lib/libc.a(strncat.o) (__stxncpy)
+/usr/alpha-linux-gnu/lib/libc.a(divl.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o) (__divl)
+/usr/alpha-linux-gnu/lib/libc.a(divlu.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (__divlu)
+/usr/alpha-linux-gnu/lib/libc.a(divqu.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o) (__divqu)
+/usr/alpha-linux-gnu/lib/libc.a(reml.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (__reml)
+/usr/alpha-linux-gnu/lib/libc.a(remlu.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o) (__remlu)
+/usr/alpha-linux-gnu/lib/libc.a(remqu.o)
+                              /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o) (__remqu)
 
-output		input		virtual
-section		section		address		    size
+There are no discarded input sections
 
-.text   			   10000	    a460
-		.text   	   10000	     120 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/crt0.o
-		.text   	   10120	     160 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbmain.o
-		.text   	   10280	     5f0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/file.o
-		.text   	   10870	     4a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
-		.text   	   10d10	     6a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/rtc.o
-		.text   	   113b0	     e80 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
-		.text   	   12230	     3a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
-		.text   	   125d0	     330 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
-		.text   	   12900	     270 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
-		.text   	   12b70	     850 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
-		.text   	   133c0	     230 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
-		.text   	   135f0	     100 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(string.o)
-		.text   	   136f0	     860 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
-		.text   	   13f50	     2b0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
-		.text   	   14200	     a90 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
-		.text   	   14c90	     300 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
-		.text   	   14f90	    2b20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
-		.text   	   17ab0	     cf0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
-		.text   	   187a0	     2a0 /usr/ccs/lib/libc.a(memmove.o)
-		.text   	   18a40	     900 /usr/ccs/lib/libc.a(ots_div_alpha.o)
-		.text   	   19340	     1a0 /usr/ccs/lib/libc.a(strcpy.o)
-		.text   	   194e0	     1f0 /usr/ccs/lib/libc.a(strcat.o)
-		.text   	   196d0	     110 /usr/ccs/lib/libc.a(strncpy.o)
-		.text   	   197e0	     180 /usr/ccs/lib/libc.a(strcmp.o)
-		.text   	   19960	      f0 /usr/ccs/lib/libc.a(strncmp.o)
-		.text   	   19a50	     180 /usr/ccs/lib/libc.a(strncat.o)
-		.text   	   19bd0	      f0 /usr/ccs/lib/libc.a(strchr.o)
-		.text   	   19cc0	     100 /usr/ccs/lib/libc.a(strrchr.o)
-		.text   	   19dc0	     1c0 /usr/ccs/lib/libc.a(memcpy.o)
-		.text   	   19f80	     4e0 /usr/ccs/lib/libc.a(ots_move_alpha.o)
+Memory Configuration
 
-.rdata  			   1c720	      00
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
 
-.rconst 			   1a460	    22c0
-		.rconst 	   1a460	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
-		.rconst 	   1a490	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
-		.rconst 	   1a4d0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
-		.rconst 	   1a4e0	     100 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
-		.rconst 	   1a5e0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
-		.rconst 	   1a5f0	      60 /usr/ccs/lib/libc.a(strncpy.o)
-		.rconst 	   1a650	      60 /usr/ccs/lib/libc.a(strncmp.o)
-		.rconst 	   1a6b0	      60 /usr/ccs/lib/libc.a(strncat.o)
-		.rconst 	   1a710	    2010 /usr/ccs/lib/libc.a(ots_div_data_alpha.o)
+Linker script and memory map
 
-.data   			   1c720	    1800
-		.data   	   1c720	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/crt0.o
-		.data   	   1c760	      50 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbmain.o
-		.data   	   1c7b0	     2f0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/file.o
-		.data   	   1caa0	     130 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
-		.data   	   1cbd0	      a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/rtc.o
-		.data   	   1cc70	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbver.o
-		.data   	   1ccd0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
-		.data   	   1cd10	     150 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
-		.data   	   1ce60	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
-		.data   	   1cea0	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
-		.data   	   1cf00	     140 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
-		.data   	   1d040	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
-		.data   	   1d080	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(string.o)
-		.data   	   1d0c0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
-		.data   	   1d100	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
-		.data   	   1d140	     740 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
-		.data   	   1d880	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
-		.data   	   1d8c0	     4a0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
-		.data   	   1dd60	     1c0 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+Address of section .text-segment set to 0x10000
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x120000000))
+                0x0000000000010000                . = SEGMENT_START ("text-segment", 0x120000000)
 
-.sdata  			   1e5d0	     4f0
-		.sdata  	   1e5d0	      20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbmain.o
-		.sdata  	   1e5f0	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/file.o
-		.sdata  	   1e630	      20 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
-		.sdata  	   1e650	      40 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/rtc.o
-		.sdata  	   1e690	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/fsbver.o
-		.sdata  	   1e6a0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
-		.sdata  	   1e6b0	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
-		.sdata  	   1e6e0	     190 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
-		.sdata  	   1e870	      50 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
-		.sdata  	   1e8c0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
-		.sdata  	   1e8d0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(string.o)
-		.sdata  	   1e8e0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
-		.sdata  	   1e8f0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
-		.sdata  	   1e900	     140 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
-		.sdata  	   1ea40	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
-		.sdata  	   1ea50	      60 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
-		.sdata  	   1eab0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+.init           0x0000000000010000      0x110
+ *(SORT_NONE(.init))
+ .init          0x0000000000010000      0x110 /home/janne/ebsdk/ebfw/obj/lx164/crt0.o
+                0x0000000000010000                __start
 
-.sbss   			   1eac0	      b0
-		.sbss   	   1eac0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
-		.sbss   	   1ead0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
-		.sbss   	   1eae0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
-		.sbss   	   1eaf0	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
-		.sbss   	   1eb00	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
-		.sbss   	   1eb10	      58 (scommon)
+.text           0x0000000000010110     0x97b0
+ *(.text.unlikely .text.*_unlikely .text.unlikely.*)
+ *(.text.exit .text.exit.*)
+ *(.text.startup .text.startup.*)
+ .text.startup  0x0000000000010110      0x104 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+                0x0000000000010110                main
+ *(.text.hot .text.hot.*)
+ *(SORT_BY_NAME(.text.sorted.*))
+ *(.text .stub .text.* .gnu.linkonce.t.*)
+ .text          0x0000000000010214        0x0 /home/janne/ebsdk/ebfw/obj/lx164/crt0.o
+ .text          0x0000000000010214       0x48 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+                0x0000000000010214                ladbx_poll
+                0x0000000000010218                printf
+                0x0000000000010228                sprintf
+                0x0000000000010238                PutChar
+                0x000000000001023c                GetChar
+                0x0000000000010244                CharAv
+                0x000000000001024c                puts
+                0x0000000000010254                Waitforever
+                0x0000000000010258                EstablishInitData
+ .text          0x000000000001025c      0x568 /home/janne/ebsdk/ebfw/obj/lx164/file.o
+                0x000000000001025c                LoadAFile
+                0x000000000001039c                FileWriteRange
+                0x00000000000104b8                FileDirectory
+                0x00000000000105d0                FileCopy
+ .text          0x00000000000107c4      0x454 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+                0x00000000000107c4                free
+                0x0000000000010888                init_storage_pool
+                0x0000000000010978                malloc
+                0x0000000000010aa4                realloc
+                0x0000000000010b44                malloc_summary
+ .text          0x0000000000010c18      0x670 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+                0x0000000000010d68                time
+                0x0000000000010ea0                printDate
+                0x0000000000010efc                InitRTC
+                0x0000000000011084                setDate
+ *fill*         0x0000000000011288        0x8 0000fe2f1f04ff47
+ .text          0x0000000000011290      0x330 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
+                0x0000000000011290                __main
+                0x00000000000112a0                mb
+                0x00000000000112b0                imb
+                0x00000000000112c0                rpcc
+                0x00000000000112d0                getsp
+                0x00000000000112e0                cServe
+                0x00000000000112f0                wrfen
+                0x0000000000011300                swppal
+                0x0000000000011310                halt
+                0x0000000000011320                wait_cycles
+                0x0000000000011350                swpipl
+                0x0000000000011360                wrmces
+                0x0000000000011370                rdmces
+                0x0000000000011380                CleanBCache
+                0x00000000000113a0                UnalignedReadB
+                0x00000000000113b0                UnalignedReadW
+                0x00000000000113d0                UnalignedReadL
+                0x00000000000113f0                UnalignedReadQ
+                0x0000000000011410                UnalignedWriteB
+                0x0000000000011440                UnalignedWriteW
+                0x0000000000011480                UnalignedWriteL
+                0x00000000000114b0                UnalignedWriteQ
+                0x00000000000114e0                UnalignedReadFloat
+                0x0000000000011510                UnalignedReadDouble
+                0x0000000000011540                UnalignedWriteFloat
+                0x0000000000011580                UnalignedWriteDouble
+ .text          0x00000000000115c0      0xcbc /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+                0x00000000000115c0                out_ioc_csr
+                0x0000000000011600                in_ioc_csr
+                0x000000000001161c                out_ioc_pci
+                0x000000000001165c                outportb
+                0x00000000000116b4                outportw
+                0x0000000000011710                outportl
+                0x0000000000011764                outcfgb
+                0x0000000000011848                outcfgw
+                0x0000000000011930                outcfgl
+                0x0000000000011a0c                inportb
+                0x0000000000011a40                inportw
+                0x0000000000011a78                inportl
+                0x0000000000011aa4                incfgb
+                0x0000000000011b6c                incfgw
+                0x0000000000011c38                incfgl
+                0x0000000000011cf8                outmemb
+                0x0000000000011d58                outmemw
+                0x0000000000011db8                outmeml
+                0x0000000000011e0c                indmemb
+                0x0000000000011e34                indmemw
+                0x0000000000011e5c                indmeml
+                0x0000000000011e78                outdmemb
+                0x0000000000011ed0                outdmemw
+                0x0000000000011f68                outdmeml
+                0x0000000000011fac                inmemb
+                0x0000000000011fe0                inmemw
+                0x0000000000012018                inmeml
+                0x0000000000012044                SetHAE
+                0x0000000000012094                inIack
+                0x00000000000120a4                PCIBusInit
+                0x0000000000012138                ISABusInit
+                0x000000000001220c                outLed
+                0x0000000000012228                IOPCIClearNODEV
+ .text          0x000000000001227c      0x208 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+                0x000000000001227c                gettime
+                0x00000000000122ac                localtime
+                0x0000000000012388                usleep
+                0x00000000000123c4                msleep
+                0x0000000000012428                sleep
+ .text          0x0000000000012484      0x38c /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+                0x0000000000012484                initdata
+                0x0000000000012670                DumpSysData
+ .text          0x0000000000012810      0x200 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+                0x0000000000012810                fsboot
+ .text          0x0000000000012a10      0x7a4 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+                0x0000000000012ad4                fgetc
+                0x0000000000012b64                fungetc
+                0x0000000000012ba4                fread
+                0x0000000000012c14                fputc
+                0x0000000000012cc0                fwrite
+                0x0000000000012d30                fclose
+                0x0000000000012d84                feof
+                0x0000000000012d8c                perror
+                0x0000000000012ebc                fdir
+                0x0000000000012f10                fload
+                0x0000000000012f58                fdr
+                0x0000000000012fb4                MapLogicalToPhysicalDevice
+                0x0000000000013020                fopen
+                0x0000000000013120                fcd
+ .text          0x00000000000131b4     0x2a68 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+                0x0000000000014a50                AllocateFloppyDrive
+                0x0000000000014b1c                Shutdown
+                0x00000000000158f8                ReadWriteRawSector
+                0x00000000000159f0                ReadWriteSectors
+ .text          0x0000000000015c1c      0x9c0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+                0x0000000000015c1c                fwid_match
+                0x0000000000015d5c                fwid_dump
+                0x0000000000015e38                ostype_match_i
+                0x0000000000015e6c                fwid_match_i
+                0x0000000000015ed0                ostype_match
+                0x0000000000016060                ostype_dump
+                0x0000000000016140                compute_romh_chksum
+                0x0000000000016188                dumpHeader
+                0x00000000000164e4                HasRomSignature
+                0x000000000001653c                IsHeaderValid
+ .text          0x00000000000165dc      0x118 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+                0x00000000000165dc                memcpy
+                0x0000000000016608                memcmp
+                0x0000000000016658                memset
+                0x000000000001667c                memchr
+                0x00000000000166b0                strlen
+                0x00000000000166d0                bzero
+ .text          0x00000000000166f4      0x2a4 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+                0x00000000000166f4                isalnum
+                0x0000000000016724                isalpha
+                0x0000000000016758                isascii
+                0x000000000001678c                iscntrl
+                0x00000000000167c0                isdigit
+                0x00000000000167f4                isgraph
+                0x0000000000016828                islower
+                0x000000000001685c                isprint
+                0x0000000000016890                ispunct
+                0x00000000000168c4                isspace
+                0x00000000000168f8                isupper
+                0x000000000001692c                isxdigit
+                0x0000000000016960                tolower
+                0x000000000001697c                toupper
+ .text          0x0000000000016998      0x75c /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+                0x0000000000016ac0                SMCEnablePARP
+                0x0000000000016be0                SMCInit
+ .text          0x00000000000170f4      0x29c /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+                0x00000000000170f4                tone
+                0x00000000000171cc                Beep
+                0x000000000001728c                BeepCode
+ .text          0x0000000000017390      0xb60 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+                0x000000000001761c                SpinDownFloppyDrive
+                0x0000000000017660                InitializeFloppyDrive
+                0x0000000000017c38                ReadLogicalSector
+                0x0000000000017ccc                WriteLogicalSector
+                0x0000000000017d60                init_pic
+ .text          0x0000000000017ef0        0x0 /home/janne/ebsdk/ebfw/obj/lx164/fsbver.o
+ .text          0x0000000000017ef0      0x220 /usr/alpha-linux-gnu/lib/libc.a(memmove.o)
+                0x0000000000017ef0                memmove
+ .text          0x0000000000018110       0x70 /usr/alpha-linux-gnu/lib/libc.a(strcat.o)
+                0x0000000000018110                strcat
+ .text          0x0000000000018180       0xb0 /usr/alpha-linux-gnu/lib/libc.a(strchr.o)
+                0x0000000000018180                index
+                0x0000000000018180                strchr
+ .text          0x0000000000018230      0x160 /usr/alpha-linux-gnu/lib/libc.a(strcmp.o)
+                0x0000000000018230                strcmp
+ .text          0x0000000000018390       0x20 /usr/alpha-linux-gnu/lib/libc.a(strcpy.o)
+                0x0000000000018390                strcpy
+ .text          0x00000000000183b0       0xb0 /usr/alpha-linux-gnu/lib/libc.a(strncat.o)
+                0x00000000000183b0                strncat
+ .text          0x0000000000018460      0x300 /usr/alpha-linux-gnu/lib/libc.a(strncmp.o)
+                0x0000000000018460                strncmp
+ .text          0x0000000000018760       0xa0 /usr/alpha-linux-gnu/lib/libc.a(strncpy.o)
+                0x0000000000018760                strncpy
+ .text          0x0000000000018800       0xd0 /usr/alpha-linux-gnu/lib/libc.a(strrchr.o)
+                0x0000000000018800                strrchr
+                0x0000000000018800                rindex
+ .text          0x00000000000188d0      0x590 /usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+                0x00000000000188d0                _wordcopy_fwd_aligned
+                0x0000000000018a70                _wordcopy_fwd_dest_aligned
+                0x0000000000018bb0                _wordcopy_bwd_aligned
+                0x0000000000018d30                _wordcopy_bwd_dest_aligned
+ .text          0x0000000000018e60      0x1f0 /usr/alpha-linux-gnu/lib/libc.a(stxcpy.o)
+                0x0000000000018ec8                __stxcpy
+ .text          0x0000000000019050      0x278 /usr/alpha-linux-gnu/lib/libc.a(stxncpy.o)
+                0x00000000000190d0                __stxncpy
+ *fill*         0x00000000000192c8        0x8 0000fe2f1f04ff47
+ .text          0x00000000000192d0       0x90 /usr/alpha-linux-gnu/lib/libc.a(divl.o)
+                0x00000000000192d0                __divl
+ .text          0x0000000000019360       0x90 /usr/alpha-linux-gnu/lib/libc.a(divlu.o)
+                0x0000000000019360                __divlu
+ .text          0x00000000000193f0      0x1b0 /usr/alpha-linux-gnu/lib/libc.a(divqu.o)
+                0x00000000000193f0                __divqu
+ .text          0x00000000000195a0       0x90 /usr/alpha-linux-gnu/lib/libc.a(reml.o)
+                0x00000000000195a0                __reml
+ .text          0x0000000000019630       0x90 /usr/alpha-linux-gnu/lib/libc.a(remlu.o)
+                0x0000000000019630                __remlu
+ .text          0x00000000000196c0      0x200 /usr/alpha-linux-gnu/lib/libc.a(remqu.o)
+                0x00000000000196c0                __remqu
+ *(.gnu.warning)
 
-.bss    			   1eb70	     5f0
-		.bss    	   1eb70	      10 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/malloc.o
-		.bss    	   1eb80	      30 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(time.o)
-		.bss    	   1ebb0	     380 /sae_users/paradis/sdk-cdbuild/CDIMAGE/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
-		.bss    	   1ef30	     21c (common)
+.fini           0x00000000000198c0        0x4
+ *(SORT_NONE(.fini))
+ .fini          0x00000000000198c0        0x4 /home/janne/ebsdk/ebfw/obj/lx164/crt0.o
+                0x00000000000198c0                _exit
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+
+.rodata         0x00000000000198c8      0xe28
+ *(.rodata .rodata.* .gnu.linkonce.r.*)
+ .rodata.str1.1
+                0x00000000000198c8      0xbff /home/janne/ebsdk/ebfw/obj/lx164/file.o
+                                        0x1fc (size before relaxing)
+ .rodata.str1.1
+                0x000000000001a4c7       0x68 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+ .rodata.str1.1
+                0x000000000001a4c7       0x52 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+ *fill*         0x000000000001a4c7        0x1 
+ .rodata.cst8   0x000000000001a4c8       0x18 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+ .rodata.str1.1
+                0x000000000001a4e0       0xc8 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+ .rodata.str1.1
+                0x000000000001a4e0       0x5f /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+ .rodata        0x000000000001a4e0       0xa8 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+ .rodata.str1.1
+                0x000000000001a588       0xd9 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+ .rodata        0x000000000001a588       0x28 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+ .rodata.str1.1
+                0x000000000001a5b0      0x349 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+ .rodata.str1.1
+                0x000000000001a5b0      0x384 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+ .rodata        0x000000000001a5b0      0x100 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+                0x000000000001a5b0                ctypeArray
+ .rodata.str1.1
+                0x000000000001a6b0       0xcb /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+ .rodata        0x000000000001a6b0       0x40 /usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+ *(.rdata)
+                [!provide]                        PROVIDE (_fpdata = .)
+ *(.pdata)
+
+.rodata1
+ *(.rodata1)
+
+.sdata2
+ *(.sdata2 .sdata2.* .gnu.linkonce.s2.*)
+
+.sbss2
+ *(.sbss2 .sbss2.* .gnu.linkonce.sb2.*)
+
+.reginfo
+ *(.reginfo)
+
+.eh_frame_hdr
+ *(.eh_frame_hdr)
+ *(.eh_frame_entry .eh_frame_entry.*)
+
+.eh_frame       0x000000000001a6f0     0x17cc
+ *(.eh_frame)
+ .eh_frame      0x000000000001a6f0       0xf0 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+ .eh_frame      0x000000000001a7e0       0xa8 /home/janne/ebsdk/ebfw/obj/lx164/file.o
+                                         0xc0 (size before relaxing)
+ .eh_frame      0x000000000001a888       0x90 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+                                         0xa8 (size before relaxing)
+ .eh_frame      0x000000000001a918      0x108 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+                                        0x120 (size before relaxing)
+ .eh_frame      0x000000000001aa20      0x3c0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+                                        0x3d8 (size before relaxing)
+ .eh_frame      0x000000000001ade0       0xa0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+                                         0xb8 (size before relaxing)
+ .eh_frame      0x000000000001ae80       0x48 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+                                         0x58 (size before relaxing)
+ .eh_frame      0x000000000001aec8       0x30 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+                                         0x48 (size before relaxing)
+ .eh_frame      0x000000000001aef8      0x1e8 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+                                        0x1f8 (size before relaxing)
+ .eh_frame      0x000000000001b0e0      0x4b0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+                                        0x4c0 (size before relaxing)
+ .eh_frame      0x000000000001b590      0x188 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+                                        0x1a0 (size before relaxing)
+ .eh_frame      0x000000000001b718       0x78 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+                                         0x90 (size before relaxing)
+ .eh_frame      0x000000000001b790      0x118 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+                                        0x130 (size before relaxing)
+ .eh_frame      0x000000000001b8a8       0x98 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+                                         0xa8 (size before relaxing)
+ .eh_frame      0x000000000001b940       0x78 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+                                         0x90 (size before relaxing)
+ .eh_frame      0x000000000001b9b8      0x1a8 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+                                        0x1b8 (size before relaxing)
+ .eh_frame      0x000000000001bb60       0x38 /usr/alpha-linux-gnu/lib/libc.a(memmove.o)
+                                         0x50 (size before relaxing)
+ .eh_frame      0x000000000001bb98       0x18 /usr/alpha-linux-gnu/lib/libc.a(strcat.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bbb0       0x18 /usr/alpha-linux-gnu/lib/libc.a(strchr.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bbc8       0x18 /usr/alpha-linux-gnu/lib/libc.a(strcmp.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bbe0       0x18 /usr/alpha-linux-gnu/lib/libc.a(strcpy.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bbf8       0x18 /usr/alpha-linux-gnu/lib/libc.a(strncat.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bc10       0x18 /usr/alpha-linux-gnu/lib/libc.a(strncmp.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bc28       0x18 /usr/alpha-linux-gnu/lib/libc.a(strncpy.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bc40       0x18 /usr/alpha-linux-gnu/lib/libc.a(strrchr.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bc58       0x50 /usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+                                         0x68 (size before relaxing)
+ .eh_frame      0x000000000001bca8       0x28 /usr/alpha-linux-gnu/lib/libc.a(stxcpy.o)
+ .eh_frame      0x000000000001bcd0       0x18 /usr/alpha-linux-gnu/lib/libc.a(stxncpy.o)
+                                         0x28 (size before relaxing)
+ .eh_frame      0x000000000001bce8       0x40 /usr/alpha-linux-gnu/lib/libc.a(divl.o)
+                                         0x50 (size before relaxing)
+ .eh_frame      0x000000000001bd28       0x40 /usr/alpha-linux-gnu/lib/libc.a(divlu.o)
+                                         0x50 (size before relaxing)
+ .eh_frame      0x000000000001bd68       0x68 /usr/alpha-linux-gnu/lib/libc.a(divqu.o)
+                                         0x78 (size before relaxing)
+ .eh_frame      0x000000000001bdd0       0x40 /usr/alpha-linux-gnu/lib/libc.a(reml.o)
+                                         0x50 (size before relaxing)
+ .eh_frame      0x000000000001be10       0x40 /usr/alpha-linux-gnu/lib/libc.a(remlu.o)
+                                         0x50 (size before relaxing)
+ .eh_frame      0x000000000001be50       0x6c /usr/alpha-linux-gnu/lib/libc.a(remqu.o)
+                                         0x80 (size before relaxing)
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.gnu_extab
+ *(.gnu_extab*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.note.build-id
+ *(.note.build-id)
+
+.note.GNU-stack
+                0x000000000001bebc        0x0
+ *(.note.GNU-stack)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/file.o
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /home/janne/ebsdk/ebfw/obj/lx164/fsbver.o
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(memmove.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcat.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strchr.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcmp.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcpy.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncat.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncmp.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncpy.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(strrchr.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(stxcpy.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(stxncpy.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(divl.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(divlu.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(divqu.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(reml.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(remlu.o)
+ .note.GNU-stack
+                0x000000000001bebc        0x0 /usr/alpha-linux-gnu/lib/libc.a(remqu.o)
+
+.note.gnu-property
+ *(.note.gnu-property)
+
+.note.ABI-tag
+ *(.note.ABI-tag)
+
+.note.package
+ *(.note.package)
+
+.note.dlopen
+ *(.note.dlopen)
+
+.note.netbsd.ident
+ *(.note.netbsd.ident)
+
+.note.openbsd.ident
+ *(.note.openbsd.ident)
+                0x000000000001bebc                . = .
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.sframe
+ *(.sframe)
+ *(.sframe.*)
+
+.gnu_extab
+ *(.gnu_extab)
+
+.gcc_except_table
+ *(.gcc_except_table .gcc_except_table.*)
+
+.exception_ranges
+ *(.exception_ranges*)
+
+.tdata          0x000000000001bebc        0x0
+                [!provide]                        PROVIDE (__tdata_start = .)
+ *(.tdata .tdata.* .gnu.linkonce.td.*)
+
+.tbss
+ *(.tbss .tbss.* .gnu.linkonce.tb.*)
+ *(.tcommon)
+
+.preinit_array  0x000000000001bebc        0x0
+                [!provide]                        PROVIDE (__preinit_array_start = .)
+ *(.preinit_array)
+                [!provide]                        PROVIDE (__preinit_array_end = .)
+
+.init_array     0x000000000001bebc        0x0
+                [!provide]                        PROVIDE (__init_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
+ *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
+                [!provide]                        PROVIDE (__init_array_end = .)
+
+.fini_array     0x000000000001bebc        0x0
+                [!provide]                        PROVIDE (__fini_array_start = .)
+ *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
+ *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
+                [!provide]                        PROVIDE (__fini_array_end = .)
+
+.ctors
+ *crtbegin.o(.ctors)
+ *crtbegin?.o(.ctors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .ctors)
+ *(SORT_BY_NAME(.ctors.*))
+ *(.ctors)
+
+.dtors
+ *crtbegin.o(.dtors)
+ *crtbegin?.o(.dtors)
+ *(EXCLUDE_FILE(*crtend?.o *crtend.o) .dtors)
+ *(SORT_BY_NAME(.dtors.*))
+ *(.dtors)
+
+.jcr
+ *(.jcr)
+
+.data.rel.ro
+ *(.data.rel.ro.local* .gnu.linkonce.d.rel.ro.local.*)
+ *(.data.rel.ro .data.rel.ro.* .gnu.linkonce.d.rel.ro.*)
+
+.dynamic
+ *(.dynamic)
+
+.data           0x000000000001bec0      0x575
+                [!provide]                        PROVIDE (_fdata = .)
+ *(.data .data.* .gnu.linkonce.d.*)
+ .data          0x000000000001bec0       0x37 /home/janne/ebsdk/ebfw/obj/lx164/crt0.o
+ .data          0x000000000001bef7        0x0 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+ .data          0x000000000001bef7        0x0 /home/janne/ebsdk/ebfw/obj/lx164/file.o
+ .data          0x000000000001bef7        0x0 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+ .data          0x000000000001bef7       0x30 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+ .data          0x000000000001bf27       0x3c /home/janne/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
+ .data          0x000000000001bf63        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+ .data          0x000000000001bf63        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+ .data          0x000000000001bf63        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+ *fill*         0x000000000001bf63        0x5 
+ .data          0x000000000001bf68       0x88 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+ .data          0x000000000001bff0        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+ .data          0x000000000001bff0       0x78 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+                0x000000000001bff0                Error3Strings
+ .data          0x000000000001c068      0x318 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+                0x000000000001c068                ostype_array
+                0x000000000001c108                ostype_smc
+                0x000000000001c118                ostype__sr
+                0x000000000001c128                ostype_vxw
+                0x000000000001c138                ostype_lnx
+                0x000000000001c148                ostype_fsb
+                0x000000000001c158                ostype_osf
+                0x000000000001c168                ostype_vms
+                0x000000000001c178                ostype_wnt
+                0x000000000001c188                ostype_dbm
+                0x000000000001c198                fwid_array
+                0x000000000001c270                fw_smc_id
+                0x000000000001c288                fw__sr_id
+                0x000000000001c2a0                fw_vxw_id
+                0x000000000001c2b8                fw_lnx_id
+                0x000000000001c2d8                fw_fsb_id
+                0x000000000001c2f8                fw_srm_id
+                0x000000000001c328                fw_wnt_id
+                0x000000000001c358                fw_dbm_id
+ .data          0x000000000001c380        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+ .data          0x000000000001c380        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+ .data          0x000000000001c380        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+ .data          0x000000000001c380        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+ .data          0x000000000001c380       0xa0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+                0x000000000001c380                FloppyDriveTypes
+                0x000000000001c3bc                FloppyDiskTypes
+                0x000000000001c3f0                Error4Strings
+ .data          0x000000000001c420       0x15 /home/janne/ebsdk/ebfw/obj/lx164/fsbver.o
+                0x000000000001c420                compile_time
+                0x000000000001c429                compile_date
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(memmove.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcat.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strchr.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcmp.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcpy.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncat.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncmp.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncpy.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(strrchr.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(stxcpy.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(stxncpy.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(divl.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(divlu.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(divqu.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(reml.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(remlu.o)
+ .data          0x000000000001c435        0x0 /usr/alpha-linux-gnu/lib/libc.a(remqu.o)
+ *(.xdata)
+
+.data1
+ *(.data1)
+                0x0000000000024430                _gp = (ALIGN (0x10) + 0x7ff0)
+
+.sdata          0x000000000001c438       0x41
+ *(.lit4)
+ *(.lit8)
+ *(.lita)
+ *(.sdata .sdata.* .gnu.linkonce.s.*)
+ .sdata         0x000000000001c438       0x10 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+                0x000000000001c438                InitialStackPointer
+                0x000000000001c440                halt_code
+ .sdata         0x000000000001c448        0x4 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+                0x000000000001c448                rtcBase
+ *fill*         0x000000000001c44c        0x4 
+ .sdata         0x000000000001c450       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+                0x000000000001c450                CPU_cycles_per_usecs
+                0x000000000001c458                UserCharAv
+                0x000000000001c460                UserGetChar
+                0x000000000001c468                UserPutChar
+ .sdata         0x000000000001c470        0x3 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+ .sdata         0x000000000001c473        0x6 /home/janne/ebsdk/ebfw/obj/lx164/fsbver.o
+                0x000000000001c473                dbm_version
+
+.got            0x000000000001c480      0x3e0
+ *(.got.plt)
+ *(.igot.plt)
+ *(.got)
+ .got           0x000000000001c480      0x3e0 /home/janne/ebsdk/ebfw/obj/lx164/crt0.o
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/file.o
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+ .got           0x000000000001c860        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+ .got           0x000000000001c860        0x0 /usr/alpha-linux-gnu/lib/libc.a(memmove.o)
+ .got           0x000000000001c860        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcat.o)
+ .got           0x000000000001c860        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcpy.o)
+ .got           0x000000000001c860        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncat.o)
+ .got           0x000000000001c860        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncpy.o)
+ .got           0x000000000001c860        0x0 /usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+ *(.igot)
+                0x000000000001c860                _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x000000000001c860                . = ALIGN (ALIGNOF (NEXT_SECTION))
+                0x000000000001c860                __bss_start = .
+
+.sbss           0x000000000001c860       0xa8
+ *(.dynsbss)
+ *(.sbss .sbss.* .gnu.linkonce.sb.*)
+ .sbss          0x000000000001c860       0x28 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+                0x000000000001c870                storage_pool_end
+                0x000000000001c878                storage_pool_start
+                0x000000000001c880                storage_initialized
+ .sbss          0x000000000001c888       0x40 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+                0x000000000001c888                PalImpureBase
+                0x000000000001c890                Userladbx_poll
+                0x000000000001c898                Userrealloc
+                0x000000000001c8a0                Userfree
+                0x000000000001c8a8                Usermalloc
+                0x000000000001c8b0                Usermalloc_summary
+                0x000000000001c8b8                Usertime
+                0x000000000001c8c0                CBarray
+ .sbss          0x000000000001c8c8       0x10 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+                0x000000000001c8d4                errno
+ .sbss          0x000000000001c8d8       0x28 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+ .sbss          0x000000000001c900        0x4 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+ .sbss          0x000000000001c904        0x4 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+ *(.scommon)
+
+.bss            0x000000000001c908      0x5d0
+ *(.dynbss)
+ *(.bss .bss.* .gnu.linkonce.b.*)
+ .bss           0x000000000001c908        0x0 /home/janne/ebsdk/ebfw/obj/lx164/crt0.o
+ .bss           0x000000000001c908        0x0 /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+ .bss           0x000000000001c908        0x0 /home/janne/ebsdk/ebfw/obj/lx164/file.o
+ .bss           0x000000000001c908        0xc /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+ .bss           0x000000000001c914        0x0 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+ .bss           0x000000000001c914        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(asmstuff.o)
+ .bss           0x000000000001c914        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+ *fill*         0x000000000001c914        0x4 
+ .bss           0x000000000001c918       0x30 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+ .bss           0x000000000001c948       0xe8 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+                0x000000000001c948                sysdata
+                0x000000000001c9a0                ExitData
+ .bss           0x000000000001ca30        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+ .bss           0x000000000001ca30       0x90 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+                0x000000000001ca30                LogicalDrives
+ .bss           0x000000000001cac0      0x370 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+ .bss           0x000000000001ce30       0xa4 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+                0x000000000001ce30                strbuf2
+                0x000000000001ce82                strbuf1
+ .bss           0x000000000001ced4        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+ .bss           0x000000000001ced4        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+ .bss           0x000000000001ced4        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+ .bss           0x000000000001ced4        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+ .bss           0x000000000001ced4        0x0 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+ .bss           0x000000000001ced4        0x0 /home/janne/ebsdk/ebfw/obj/lx164/fsbver.o
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(memmove.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcat.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strchr.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcmp.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strcpy.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncat.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncmp.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strncpy.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(strrchr.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(wordcopy.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(stxcpy.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(stxncpy.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(divl.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(divlu.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(divqu.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(reml.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(remlu.o)
+ .bss           0x000000000001ced4        0x0 /usr/alpha-linux-gnu/lib/libc.a(remqu.o)
+ *(COMMON)
+                0x000000000001ced8                . = ALIGN ((. != 0x0)?0x8:0x1)
+ *fill*         0x000000000001ced4        0x4 
+                0x000000000001ced8                . = ALIGN (0x8)
+                0x000000000001ced8                . = SEGMENT_START ("ldata-segment", .)
+                0x000000000001ced8                . = ALIGN (0x8)
+                0x000000000001ced8                _end = .
+                [!provide]                        PROVIDE (end = .)
+
+.stab
+ *(.stab)
+
+.stabstr
+ *(.stabstr)
+
+.stab.excl
+ *(.stab.excl)
+
+.stab.exclstr
+ *(.stab.exclstr)
+
+.stab.index
+ *(.stab.index)
+
+.stab.indexstr
+ *(.stab.indexstr)
+
+.comment        0x0000000000000000       0x1f
+ *(.comment)
+ .comment       0x0000000000000000       0x1f /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+                                         0x20 (size before relaxing)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/file.o
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(lx164_io.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(time.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(initdata.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fsboot.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fileio.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(fatdrv.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(romhead.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(string.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(ctype.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(smc.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(beep.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/lib.a(floppy.o)
+ .comment       0x000000000000001f       0x20 /home/janne/ebsdk/ebfw/obj/lx164/fsbver.o
+
+.gnu.build.attributes
+ *(.gnu.build.attributes .gnu.build.attributes.*)
+
+.debug
+ *(.debug)
+
+.line
+ *(.line)
+
+.debug_srcinfo
+ *(.debug_srcinfo)
+
+.debug_sfnames
+ *(.debug_sfnames)
+
+.debug_aranges
+ *(.debug_aranges)
+
+.debug_pubnames
+ *(.debug_pubnames)
+
+.debug_info
+ *(.debug_info .gnu.linkonce.wi.*)
+
+.debug_abbrev
+ *(.debug_abbrev)
+
+.debug_line
+ *(.debug_line .debug_line.* .debug_line_end)
+
+.debug_frame
+ *(.debug_frame)
+
+.debug_str
+ *(.debug_str)
+
+.debug_loc
+ *(.debug_loc)
+
+.debug_macinfo
+ *(.debug_macinfo)
+
+.debug_weaknames
+ *(.debug_weaknames)
+
+.debug_funcnames
+ *(.debug_funcnames)
+
+.debug_typenames
+ *(.debug_typenames)
+
+.debug_varnames
+ *(.debug_varnames)
+
+.debug_pubtypes
+ *(.debug_pubtypes)
+
+.debug_ranges
+ *(.debug_ranges)
+
+.debug_addr
+ *(.debug_addr)
+
+.debug_line_str
+ *(.debug_line_str)
+
+.debug_loclists
+ *(.debug_loclists)
+
+.debug_macro
+ *(.debug_macro)
+
+.debug_names
+ *(.debug_names)
+
+.debug_rnglists
+ *(.debug_rnglists)
+
+.debug_str_offsets
+ *(.debug_str_offsets)
+
+.debug_sup
+ *(.debug_sup)
+
+.gnu.attributes
+ *(.gnu.attributes)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.gnu.lto_*)
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/crt0.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/fsbmain.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/file.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/malloc.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/rtc.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/lib.a
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/stubs.a
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/fsbver.o
+LOAD /usr/alpha-linux-gnu/lib/libc.a
+OUTPUT(/home/janne/ebsdk/ebfw/obj/lx164/fsb.elf elf64-alpha)
