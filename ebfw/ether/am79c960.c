@@ -811,10 +811,10 @@ chk_recv_err(int device_index,volatile LANCE_RECV_BD *rb) {
     am79c960_counters[device_index].recv_fail_flen+= rb->oflo;
     am79c960_counters[device_index].recv_fail_fcs+= rb->crc;
 
-    if (rb->fram) PRTRACE1 ("Recv FRAMING ERROR\n");
-    if (rb->oflo) PRTRACE1 ("Recv OVERFLOW ERROR\n");
-    if (rb->crc)  PRTRACE1 ("Recv CRC ERROR\n");
-    if (rb->buff) PRTRACE1 ("Recv BUFF ERROR\n");
+    if (rb->fram) { PRTRACE1 ("Recv FRAMING ERROR\n"); }
+    if (rb->oflo) { PRTRACE1 ("Recv OVERFLOW ERROR\n"); }
+    if (rb->crc)  { PRTRACE1 ("Recv CRC ERROR\n"); }
+    if (rb->buff) { PRTRACE1 ("Recv BUFF ERROR\n"); }
 
     rb->err = 0;
     return TRUE;
@@ -851,10 +851,10 @@ static int chk_send_err(int device_index, volatile LANCE_SEND_BD *tb)
     am79c960_counters[device_index].send_fail_cc      += ((tb->tmd3 & tmd3_LCAR) != 0);
     am79c960_counters[device_index].send_fail_defer   += ((tb->tmd3 & tmd3_LCOL) != 0);
 
-    if (tb->tmd3 & tmd3_RTRY) PRTRACE1("Send error: RETRY ERROR\n");
-    if (tb->tmd3 & tmd3_LCAR) PRTRACE1("Send error: LOSS OF CARRIER\n");
-    if (tb->tmd3 & tmd3_LCOL) PRTRACE1("Send error: LATE COLLISION\n");
-    if (tb->tmd3 & tmd3_UFLO) PRTRACE1("Send error: UNDERFLOW ERROR\n");
+    if (tb->tmd3 & tmd3_RTRY) { PRTRACE1("Send error: RETRY ERROR\n"); }
+    if (tb->tmd3 & tmd3_LCAR) { PRTRACE1("Send error: LOSS OF CARRIER\n"); }
+    if (tb->tmd3 & tmd3_LCOL) { PRTRACE1("Send error: LATE COLLISION\n"); }
+    if (tb->tmd3 & tmd3_UFLO) { PRTRACE1("Send error: UNDERFLOW ERROR\n"); }
     tb->err = 0;
     return TRUE;
 }

@@ -1,7 +1,7 @@
 
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -120,7 +120,7 @@ typedef enum _GRAPHICS_TYPE {
 
 #define TGA_BT485_WRITE(addr,data)	\
     WRITE_REGISTER_ULONG (TGA_RAMDAC_SETUP, (addr)<<1);		\
-    WRITE_REGISTER_ULONG (TGA_RAMDAC_INTERFACE, ((addr)<<9) | (data)&0xFF);
+    WRITE_REGISTER_ULONG (TGA_RAMDAC_INTERFACE, ((addr)<<9) | ((data)&0xFF));
 
 
 #define BT485_PALETTE_CURSOR_WRITE_ADDR		0x0
@@ -170,7 +170,7 @@ typedef enum _GRAPHICS_TYPE {
     TGA_BT463_LOAD_ADDR(addr)			\
     WRITE_REGISTER_ULONG (TGA_RAMDAC_SETUP, (mode)<<2 | TGA_BT463_WRITE_BIT); \
     WRITE_REGISTER_ULONG (TGA_RAMDAC_INTERFACE,				      \
-    		((((mode)<<2) | TGA_BT463_WRITE_BIT)<<8) | (data)&0xFF );
+    		((((mode)<<2) | TGA_BT463_WRITE_BIT)<<8) | ((data)&0xFF) );
 
 
 #define BT463_ADDR_LOW			0x0

@@ -139,7 +139,7 @@ int fsboot(ul *destaddr)
   char fsbFilename[25];
   DBM_STATUS FileLoaded = FALSE;
   int idx,prefix;
-  int j,k;
+  int j;
   romheader_t *header;
 
   outLed(led_k_uart_inited);	/* UARTs initialized */
@@ -194,7 +194,7 @@ int fsboot(ul *destaddr)
   if(isa_present)
   {
 	  srom_access_lcd(0xC0,0);
-	  for (k=0;k<8;k++)
+	  for (int k=0;k<8;k++)
             srom_access_lcd(' ',1);
 	  srom_access_lcd(0xC0,0);
           k= 0;
@@ -206,7 +206,7 @@ int fsboot(ul *destaddr)
 	  }
    }
 #endif
-	if (FileLoaded = LoadAFile(fsbFilename, (char *) *destaddr)) {
+	if ((FileLoaded = LoadAFile(fsbFilename, (char *) *destaddr))) {
           header= (romheader_t *)*destaddr;
 	  if(IsHeaderValid(header))
           {

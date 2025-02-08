@@ -59,12 +59,12 @@ your own risk.
 
 #endif
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__GNUC__)
 #pragma inline (atomic_inc)
 #endif
 INLINE int atomic_inc(int source, volatile int *dest)
 {
-    unsigned int temp = 0, ret;
+    unsigned int temp = 0, ret = -1;
     ASM ("mb;");
     while (temp == 0)
     {
@@ -101,7 +101,7 @@ INLINE int atomic_inc(int source, volatile int *dest)
     return ret;
 }
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__GNUC__)
 #pragma inline (test_set_low)
 #endif
 static int test_set_low(volatile long *dest)
@@ -139,17 +139,16 @@ static int test_set_low(volatile long *dest)
     return 0;
 }
 
-#ifndef _WIN32
+#if !defined(_WIN32) && !defined(__GNUC__)
 #pragma inline (write_atomic)
 #endif
 static long write_atomic(long *dest, long source)
 {
-   long temp=0,ret;
 //    printf("write_atomic start %d %p %ld %ld\n",gh_task.pid,dest,*dest,source);
     ASM ("mb;");
     *dest= source;
 //    printf("write_atomic %d %p %ld %ld\n",gh_task.pid,dest,*dest,source);
-    return ret;
+    return 0;
 }
 
 #endif /* __INTERLOCK_H_LOADED */

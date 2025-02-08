@@ -108,8 +108,9 @@ int netboot(int argc, char *file)
 				  filename);
     }
     else {
+	char const empty[128] = "";
 	bootp_result = bootp_boot(monitor_ether_device,
-				  "",
+				  empty,
 				  server_addr,
 				  filename);
     }

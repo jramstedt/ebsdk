@@ -429,7 +429,7 @@ DBM_STATUS console_video_init(void)
 #ifdef NEEDVGA
 #ifdef NEEDVGA_BIOSEMULATION
       PRTRACE1("calling StartBiosEmulator\n"); 
-      if (status = StartBiosEmulator(bios_return_data)) {
+      if ((status = StartBiosEmulator(bios_return_data))) {
 	PRTRACE1("StartBiosEmulator Successful\n"); 
 	SetupBiosGraphics();
       }
@@ -565,7 +565,7 @@ DBM_STATUS console_port_init(void)
 #ifdef NEEDVGA
 #ifdef NEEDVGA_BIOSEMULATION
       PRTRACE1("calling StartBiosEmulator\n"); 
-      if (status = StartBiosEmulator(bios_return_data)) {
+      if ((status = StartBiosEmulator(bios_return_data))) {
 	PRTRACE1("StartBiosEmulator Successful\n"); 
 	SetupBiosGraphics();
       }
@@ -764,6 +764,8 @@ extern void InitTty( char * PortName, int BaudRate )
 
 	case SROM:
 	    SromPortInit( TRUE );
+	    break;
+	default:
 	    break;
     }
 }
