@@ -158,7 +158,11 @@ your own risk.
 #define DualOff
 #endif
 
+#ifdef __GNUC__
+	.section .init
+#else
 	.text
+#endif
 
 STARTFRM = 16           # return address and padding to octaword align
 
@@ -414,7 +418,9 @@ wait_a_long_time:
 
 .end	__start
 
-
+#ifdef __GNUC__
+.section .fini
+#endif
 
         .globl  _exit
         .ent    _exit, 0

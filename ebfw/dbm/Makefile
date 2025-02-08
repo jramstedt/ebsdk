@@ -20,7 +20,7 @@ CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
 ifdef EB_DISABLE_GRAPHICS
 CCFLAGS		+= -DDISABLE_GRAPHICS
 endif
-LDFLAGS			= -N -s --taso --no-dynamic-linker -static
+LDFLAGS			= --orphan-handling=warn -T elf-coff.ld -s --no-dynamic-linker -static
 LDLIBS			= -lc
 
 ALPHA_TOOLS 	= \
@@ -110,7 +110,7 @@ endif
 
 # TODO getver.c  
 
-.PHONY : all dbm vars CRT0
+.PHONY : all dbm vars
 
 all :
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) dbm
@@ -149,14 +149,14 @@ $(OBJDIR)%.o : %.c
 $(OBJDIR)%.nh : $(OBJDIR)%.elf
 	$(OBJCOPY) -O binary $< $@
 
-CRT0 : $(OBJDIR)dbmentry.o
+$(OBJDIR)crt0.o : $(OBJDIR)dbmentry.o
 	$(COPY) $< $(OBJDIR)crt0.o
 
 $(OBJDIR)dbmver.o : version.c
 	$(CC) $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
-$(OBJDIR)dbm.elf : $(OBJDIR)dbmentry.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o | CRT0
-	$(LD) -Ttext=$(DBMENTRY) -z noexecstack -e __start $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
+$(OBJDIR)dbm.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
+	$(LD) -Ttext-segment=$(DBMENTRY) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
 
 # https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
 # $(LD) -m -o $(OBJDIR)dbm.out -N -T $(DBMENTRY) -taso -non_shared -tr -h$(OBJDIR) -B $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.$(OBJ) -lm > $(OBJDIR)dbm.map
@@ -169,7 +169,8 @@ $(OBJDIR)%.nh : $(OBJDIR)%.elf
 clean :
 	$(DELETE) *.o *~ \#*\# *.bak *.a core \
 		$(S_SRCS:.s=.sp) \
-		$(addprefix $(OBJDIR), $(S_SRCS:.s=.o) $(C_SRCS:.c=.o)) \
+		$(addprefix $(OBJDIR), $(S_SRCS:.s=.o) $(C_SRCS:.c=.o) $(TARGET_SRCS:.c=.o) $(FSB_SRCS:.c=.o)) \
+		$(OBJDIR)crt0.o \
 		$(OBJDIR)dbm.nh \
 		$(OBJDIR)dbm.img \
 		$(OBJDIR)dbm.rom \
