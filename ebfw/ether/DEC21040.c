@@ -1929,7 +1929,7 @@ static void DECchip_21x4x_device_get_hw_address(int device_no,
       SromWord = (SromWord << 1) | ((SromData >> 3) & 0x01);
     }
 
-    sendto_srom(SROM_RD|SROM_SR|DT_CS & 0x0000ff00, addr);
+    sendto_srom(SROM_RD|SROM_SR, addr);
 
     *SromP++ = SromWord;
   }
