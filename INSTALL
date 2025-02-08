@@ -1,0 +1,10 @@
+# Debian
+Install cross compile tools
+apt install gcc-alpha-linux-gnu binutils-alpha-linux-gnu make bison flex
+
+# EBSDK
+Run ./configure to setup sdkmake.conf and sdkshell.conf
+sdkmake.conf is used in Makefiles
+
+## Optional:
+In skdmake.conf change EB_MAKE to EB_MAKE=make
