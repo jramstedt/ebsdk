@@ -82,7 +82,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: netboot.c,v 1.1.1.1 199
 /* global variables */
 static  volatile int lock=0,return_value=0;
 
-int netboot(int argc, char *file)
+int netboot(int argc, const char *file)
 {
     char filename[128];
     ip_addr server_addr;

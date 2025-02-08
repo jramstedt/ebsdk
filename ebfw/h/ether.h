@@ -134,7 +134,7 @@ extern void arp_show(void );
 /*::::::::::::::
 bootp.c
 ::::::::::::::*/
-extern int bootp_boot(int device_no , char input_file_name[128] , ip_addr server_addr , char boot_file_name[128]);
+extern int bootp_boot(int device_no , const char input_file_name[128] , ip_addr server_addr , char boot_file_name[128]);
 extern void bootp_init_module(void );
 
 /*::::::::::::::
@@ -249,7 +249,7 @@ extern void net_buffer_init_module(void );
 /*::::::::::::::
 netboot.c
 ::::::::::::::*/
-extern int netboot(int argc , char * file);
+extern int netboot(int argc , const char * file);
 
 
 /*::::::::::::::

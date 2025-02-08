@@ -240,7 +240,7 @@ static void bootp_input(void * protocol_data,
  *     FALSE  - bootp failed; server_addr and boot_file_name invalid.
  */
 int bootp_boot(int device_no, 
-	       char input_file_name[128], 
+	       const char input_file_name[128], 
 	       ip_addr server_addr, 
 	       char boot_file_name[128]) 
 {
