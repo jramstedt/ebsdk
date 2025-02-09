@@ -301,6 +301,11 @@ LDLIBS			= UseLINKLIBSinstead
 else
 LDFLAGS                 = -taso -non_shared -tr -h$(OBJDIR) -B
 LDLIBS                  = -lm
+
+# https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
+#  -tr is -transitive_link
+#  -h  is -hidden
+
 endif
 
 GASFLAGS_GLOBAL         = -v -$(CPUTYPE) $(EB_USER_GAS_FLAGS)

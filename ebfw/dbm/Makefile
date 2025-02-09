@@ -139,10 +139,6 @@ $(OBJDIR)dbm.img : $(PALCODE) $(OBJDIR)dbm.nh
 
 $(OBJDIR)dbm.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
 	$(LD) -Ttext-segment=$(DBMENTRY) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
-# https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
-# $(LD) -m -o $(OBJDIR)dbm.out -N -T $(DBMENTRY) -taso -non_shared -tr -h$(OBJDIR) -B $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.$(OBJ) -lm > $(OBJDIR)dbm.map
-#  -tr ??????????????????????
-#  -h  ??
 
 $(OBJDIR)dbm.rom : $(OBJDIR)dbm.cmp
 	$(OBJDIR)getver > $(OBJDIR)timestmp.fw
