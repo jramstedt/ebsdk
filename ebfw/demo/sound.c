@@ -45,7 +45,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: sound.c,v 1.1.1.1 1998/
  *
  */
 
-
+#include "lib.h"
 
 
 void Beep( int frequency, int duration );

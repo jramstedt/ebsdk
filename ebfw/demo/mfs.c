@@ -45,8 +45,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: mfs.c,v 1.1.1.1 1998/12
  *
  */
 
-
-
+#include "lib.h"
 
 #define	TRUE	1
 #define	FALSE	0
@@ -132,6 +131,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: mfs.c,v 1.1.1.1 1998/12
 
 int	fdactrk;
 
+/*
 extern	void	fdainit();
 extern	void	fdaspinup();
 extern	void	fdaspindown();
@@ -141,12 +141,19 @@ extern	void	fdasleep();
 extern	void	fdadump();
 extern	void	fdascribble();
 extern	void	fdagets();
+*/
 
 #define fdREAD  0		               /* read command */
 #define fdWRITE 1			       /* write command */
 
+int fdaio (char[], int, int);
+int fdasts();
+void fdainit();
+void fdawait();
+void fdasleep(int);
+void fdacmd(char[], int);
 
-leds(int x)
+void leds(int x)
 {
   *(unsigned int*)(0x201000000) = x&0xff;
   mb();
@@ -175,7 +182,7 @@ void main()
 void fdainit()
 {
   register int	i;
-  register char	cmd[NCMD];
+  char	cmd[NCMD];
   
   fdactrk = -1;
   outportb(FDADCR, DCRENAB|DCRNRES);
@@ -191,14 +198,14 @@ void fdainit()
 }
 
 int fdaio(buf, sec, type)
-     register char	buf[];
+     char  buf[];
      register int	sec;
      register int	type;
 {
   register int	dhead;
   register int	dtrk;
   register int	dsec;
-  register char	cmd[NCMD];
+  char	cmd[NCMD];
   register int	flag;
   
   if (fdactrk < 0) {
@@ -286,7 +293,7 @@ int fdaio(buf, sec, type)
 }
 
 void fdacmd(cmd, ncmd)
-     register char	cmd[];
+     char	cmd[];
      register int	ncmd;
 {
   register int	i;
@@ -302,7 +309,7 @@ int fdasts()
   register int	nsts;
   register int	byte;
   register int	i;
-  register char	sts[NSTS];
+  char	sts[NSTS];
   
   nsts = 0;
   for (;;) {

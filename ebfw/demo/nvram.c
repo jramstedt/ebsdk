@@ -42,16 +42,16 @@ __attribute__((unused)) static const char *rcsid = "$Id: nvram.c,v 1.1.1.1 1998/
  *
  */
 
-
+#include "lib.h"
 
 #define WINA 0x170
 #define WINB 0x171
 
-main()
+void main()
 {
   int x,c;
 
-  uart_init();
+  // uart_init();
 
   printf("reading NVRAM     \n");
   for (x=0xe;x<0x15;x++) {

@@ -45,10 +45,10 @@ __attribute__((unused)) static const char *rcsid = "$Id: pic.c,v 1.1.1.1 1998/12
  *
  */
 
-
-
+#include "lib.h"
 #include "82c59a.h"
-main()
+
+void main()
 {
   int x;
   int vector;
@@ -122,10 +122,4 @@ main()
     printf("vector = %x\n",vector);
   }
   (*(int(*)())0x3000000)();
-
 }
-
-
-  
-
-

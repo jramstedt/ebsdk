@@ -50,11 +50,11 @@ __attribute__((unused)) static const char *rcsid = "$Id: mouse_demo.c,v 1.1 1999
  *
  */
 
-
-
+#include "lib.h"
 
 unsigned int test[5]={0x55,0,0xFA,0xAA,0};
-main()
+
+void main()
 {
   unsigned int results[5];
   volatile int x;

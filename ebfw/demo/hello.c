@@ -57,7 +57,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: hello.c,v 1.1.1.1 1998/
 #include "system.h"
 #include "lib.h"
 
-main()
+int main()
 {
     printf ("Hello World\n\n");
     return 1;

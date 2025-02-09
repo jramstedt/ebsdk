@@ -45,7 +45,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: lp.c,v 1.1.1.1 1998/12/
  *
  */
 
-
+#include "lib.h"
 
 /*-----------------------------------------------------------------*/
 /*                                                                 */
@@ -110,7 +110,7 @@ int lp_debug =1;		/* debug switch */
 
 /*---------------------------------------------------------------*/
 
-print_init()
+void print_init()
 {				/* init maxcol variable */
   int i;
 				/* set to extended mode PS2 */ 
@@ -124,7 +124,7 @@ print_init()
   if (lp_debug==1) printf("[clp] line printer enabled\n");
 }
 
-print_out(int n)
+int print_out(int n)
 {
   char *cpnt = &cbuf[0];
   register int i,s,count=n;
@@ -142,7 +142,7 @@ print_out(int n)
 }
 
 
-main()
+void main()
 {
   int x,place=0;
 

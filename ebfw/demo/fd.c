@@ -45,7 +45,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: fd.c,v 1.1.1.1 1998/12/
  *
  */
 
-
+#include "lib.h"
 
 /*
  * Floppy disk test program. Tests
@@ -145,6 +145,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: fd.c,v 1.1.1.1 1998/12/
 
 int	fdactrk;
 
+/*
 extern	void	fdainit();
 extern	void	fdaspinup();
 extern	void	fdaspindown();
@@ -154,9 +155,23 @@ extern	void	fdasleep();
 extern	void	fdadump();
 extern	void	fdascribble();
 extern	void	fdagets();
+*/
+
+void fdainit();
+void fdaspinup();
+void fdagets(char[]);
+void fdadump(int);
+int fdaread(char[], int);
+void fdasleep(int);
+void fdacmd(char[], int);
+int fdasts();
+int fdaio(char[], int, int);
+void fdawait();
+int atoi(const char *);
 
 char	iobuf[3*512];
 
+void
 main()
 {
 	int	s;
@@ -200,7 +215,7 @@ fdagets(char buf[])
 }
 
 int
-atoi(char *s)
+atoi(const char *s)
 {
 	int	n;
 

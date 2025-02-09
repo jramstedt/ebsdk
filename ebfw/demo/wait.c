@@ -58,7 +58,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: wait.c,v 1.1.1.1 1998/1
 #include "lib.h"
 #include "time.h"
 
-main()
+void main()
 {
   register int x,y,clock=1;
 
@@ -67,7 +67,7 @@ main()
   printf("start\n");
   while (1) {
     for (x=0;x<1000;x++) {
-      WaitUs(1000);
+      usleep(1000);
     }
     printf("clock %d\n",clock++);
   }

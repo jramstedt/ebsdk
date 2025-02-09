@@ -52,6 +52,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: avp.c,v 1.1.1.1 1998/12
  */
 
 #include "lib.h"
+
 extern void  vp(long,long);
 void argvize( char *, char ** );
 void gets( char * );

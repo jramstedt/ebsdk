@@ -45,11 +45,11 @@ __attribute__((unused)) static const char *rcsid = "$Id: sum.c,v 1.1.1.1 1998/12
  *
  */
 
-
+#include "lib.h"
 
 #define REALMAX (0x2bb88)
 #define MAX (REALMAX)		/* 256k  */
-main()
+void main()
 {
   int *rom,x;
   unsigned sum=0,low,high;

@@ -42,7 +42,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: mtest.c,v 1.1.1.1 1998/
  *
  */
 
-
+#include "lib.h"
 
 #define BASE      ( 0)
 #define m16       ( 0x1000000/4)
@@ -66,15 +66,17 @@ extern	void	memtest1();
 extern	void	memtest2();
 extern	void	memtest3();
 
+void size_memory(int);
+
 #define MASK_1 0xFFFFFFFF
 int sizea,sizeb;
 
-main()
+void main()
 {
   int *mem=0,x;
   register unsigned int tmp,*flush=(unsigned int*) 0x140000;
 
-  uart_init();
+  // uart_init();
   size_memory(0);
 
   for (x=(0x140004/4);x<(sizea+sizeb)/4;x++) {
@@ -99,7 +101,7 @@ main()
   }
 }
 
-size_memory(int verbose)
+void size_memory(int verbose)
 {
   unsigned int reg_4;
   register unsigned int save, *p,mem_conf=0,bankA=0,bankB=0,size;

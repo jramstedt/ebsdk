@@ -45,7 +45,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: vga.c,v 1.1.1.1 1998/12
  *
  */
 
-
+#include "lib.h"
 
 /*#define DONT_GO_HIREZ  /**/
 #define DEBUG
@@ -264,10 +264,12 @@ extern  void    vgastl();
 extern  int     vgaldl();
 
 
+void q_setcolor(unsigned int, unsigned int);
 void q_setmode(unsigned int);
 void q_clearscreen();
 void q_loadchars();
 void writexy();
+
 /* Standard types */
 typedef unsigned char        BOOL;
 typedef unsigned char        BYTE;
@@ -516,7 +518,7 @@ unsigned  char readreg();
 void writereg();
 
 #define BAILOUT (*(int(*)())0)()
-main()
+void main()
 {
 	vgainit();
 }
@@ -712,7 +714,6 @@ while (1)
 
 
 void vgalcgen()
-
 {
   register long a;
   register int  i;
@@ -720,8 +721,8 @@ void vgalcgen()
   register unsigned char  *cp;
 
 #ifdef DEBUG
-printf("vgalcgen\n");
-for (i=0;i<0xfffff;i++) ;
+  printf("vgalcgen\n");
+  for (i=0;i<0xfffff;i++) ;
 #endif
 
 
@@ -793,8 +794,8 @@ void vgaerase()
   register int  i;
 
 #ifdef DEBUG
-printf("vgaerase\n");
-for (i=0;i<0xfffff;i++); 
+  printf("vgaerase\n");
+  for (i=0;i<0xfffff;i++); 
 #endif
 
 
@@ -951,7 +952,7 @@ char pr_3c5a[][6] = {
 	"PR30","PR31","PR32"
 	};
 
-
+void
 dumpvga()
 {
 	unsigned int i;
@@ -1707,11 +1708,11 @@ USHORT SetExtMode( BYTE ibMode,
 
 USHORT ClearScreen( VOID)
 {
-   BYTE bHoldReg;
+   unsigned char bHoldReg;
 
    /* set datapath source for pattern-to-screen BitBLT */
    outp( GC_INDEX, DATAPATH_CTRL);
-   inp( GC_DATA, bHoldReg);            /* save old Datapath Control reg */
+   bHoldReg = inp( GC_DATA );            /* save old Datapath Control reg */
    outp( GC_DATA, ROPSELECT_NO_ROPS |
                   PIXELMASK_ONLY |
                   PLANARMASK_NONE_0XFF |
@@ -1770,12 +1771,12 @@ USHORT ClearScreen( VOID)
 
 USHORT ClearLastLine( VOID)
 {
-   BYTE bHoldReg;
+   unsigned char bHoldReg;
    while(inportb(CTRL_REG_1) & GLOBAL_BUSY_BIT)
 	; /* wait for the chips to cool down.. */
    /* set datapath source for pattern-to-screen BitBLT */
    outp( GC_INDEX, DATAPATH_CTRL);
-   inp( GC_DATA, bHoldReg);            /* save old Datapath Control reg */
+   bHoldReg = inp( GC_DATA);            /* save old Datapath Control reg */
    outp( GC_DATA, ROPSELECT_NO_ROPS |
                   PIXELMASK_ONLY |
                   PLANARMASK_NONE_0XFF |
@@ -2042,6 +2043,8 @@ void q_clearscreen()
 	return;	/* not in a graphics mode?? */
 	}
 }
+
+void
 eisawriteb(addr,val)
 unsigned int addr;
 unsigned char val;
@@ -2054,6 +2057,7 @@ unsigned char val;
 
 }
 
+void
 eisawritel(addr,val)
 unsigned int addr;
 unsigned int val;
@@ -2062,6 +2066,8 @@ unsigned int val;
 	ptr = (unsigned int *)( ((0x80000000)+(addr<<5))<<2 | 0x60);
 	*ptr = val; mb();
 }
+
+void
 eisawritew(addr,val)
 unsigned int addr;
 unsigned short int val;
@@ -2086,8 +2092,10 @@ unsigned char val;
 	addr = 0xA0000 + (((y*1024)+x)&0xFFF);
 	eisawriteb(addr, val);
 } 
+
 volatile unsigned int tom;
-snooze()
+
+void snooze()
 {
 	int i;
 	for (i=0;i<0xffffff;i++) tom++;
@@ -2169,6 +2177,7 @@ unsigned char cin;
 }
 BYTE bg[8] = {0,0,0,0,0,0,0,0};
 
+void
 q_setcolor(fg,bg)
 unsigned int fg, bg;
 {

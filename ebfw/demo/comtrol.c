@@ -45,7 +45,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: comtrol.c,v 1.1.1.1 199
  *
  */
 
-
+#include "lib.h"
 
 #define	LDB	(slot|0xC8D)
 #define	MBX	(slot|0xC90)
@@ -77,14 +77,14 @@ void main()
       buf1[i] = i;
       buf2[i] = 0;
     }
-    outportl(MBX+0,&buf1[0]);
+    outportl(MBX+0, (unsigned int)&buf1[0]);
     outportw(MBX+4,BUF_SIZE/2);
     outportw(MBX+0x06, xfer_address);
     outportb(MBX+0x08, (0x01<<4));	   /* write */
     outportb(MBX+0x09, 0x00);
     outportb(LDB, 0x01);
     while ((inportb(slot|0xc99)&0xff)!=0xAA);			/* spin a bit */
-    outportl(MBX+0x00,&buf2[0]);
+    outportl(MBX+0x00, (unsigned int)&buf2[0]);
     outportb(MBX+0x08, (0x02<<4));           /* read */
     outportb(MBX+0x09, 0x00);
     outportb(LDB, 0x01);
