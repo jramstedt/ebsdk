@@ -402,9 +402,10 @@
 
 #ifndef DEBUG_MONITOR
 #include <stdio.h>
-#endif
-
 #include <string.h>
+#else
+#include "lib.h"
+#endif
 
 #define Null 0 
                 /* Value of a Null pointer */
@@ -441,3 +442,14 @@ typedef struct record
       } Rec_Type, *Rec_Pointer;
 
 
+Enumeration     Func_1 (); /* forward declaration necessary since Enumeration may not simply be int */
+Boolean         Func_2 ();
+Boolean         Func_3 ();
+void Proc_1();
+void Proc_2();
+void Proc_3();
+void Proc_4();
+void Proc_5();
+void Proc_6();
+void Proc_7();
+void Proc_8();

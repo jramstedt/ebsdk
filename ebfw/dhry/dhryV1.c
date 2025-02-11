@@ -455,13 +455,12 @@ typedef int		boolean;
 #define	REG
 #endif
 
-extern Enumeration	Func1();
-extern boolean		Func2();
-
 #ifndef DEBUG_MONITOR
 #include <stdio.h>
-#endif
 #include <string.h>
+#else
+#include "lib.h"
+#endif
 
 #ifdef TIMES
 #include <sys/param.h>
@@ -473,7 +472,21 @@ extern boolean		Func2();
 #include <sys/resource.h>
 #endif
 
-main()
+Enumeration	Func1();
+boolean		Func2();
+boolean		Func3();
+
+void Proc0();
+void Proc1();
+void Proc2();
+void Proc3();
+void Proc4();
+void Proc5();
+void Proc6();
+void Proc7();
+void Proc8();
+
+void main()
 {
 	Proc0();
 
@@ -492,7 +505,7 @@ Array2Dim	Array2Glob;
 RecordPtr	PtrGlb;
 RecordPtr	PtrGlbNext;
 
-Proc0()
+void Proc0()
 {
 	OneToFifty		IntLoc1;
 	REG OneToFifty		IntLoc2;
@@ -502,18 +515,18 @@ Proc0()
 	Enumeration	 	EnumLoc;
 	String30		String1Loc;
 	String30		String2Loc;
-	extern char		*malloc();
+	//extern char		*malloc();
 
 	register unsigned int	i;
 #ifdef TIME
-	long			time();
-	long			starttime;
-	long			benchtime;
-	long			nulltime;
+	time_t		time();
+	time_t		starttime;
+	time_t		benchtime;
+	time_t		nulltime;
 
-	starttime = time( (long *) 0);
+	starttime = time( (time_t *) 0);
 	for (i = 0; i < LOOPS; ++i);
-	nulltime = time( (long *) 0) - starttime; /* Computes o'head of loop */
+	nulltime = time( (time_t *) 0) - starttime; /* Computes o'head of loop */
 #endif
 #ifdef TIMES
 	clock_t			starttime;
@@ -554,7 +567,7 @@ Proc0()
 -- Start Timer --
 *****************/
 #ifdef TIME
-	starttime = time( (long *) 0);
+	starttime = time( (time_t *) 0);
 #endif
 #ifdef TIMES
 	times(&tms); starttime = tms.tms_utime;
@@ -593,7 +606,7 @@ Proc0()
 *****************/
 
 #ifdef TIME
-	benchtime = time( (long *) 0) - starttime - nulltime;
+	benchtime = time( (time_t *) 0) - starttime - nulltime;
 #ifdef DEBUG_MONITOR
 	printf("Dhrystone(%s) time for %d passes = %d\n",
 		Version,
@@ -638,7 +651,7 @@ Proc0()
 
 }
 
-Proc1(PtrParIn)
+void Proc1(PtrParIn)
 REG RecordPtr	PtrParIn;
 {
 #define	NextRecord	(*(PtrParIn->PtrComp))
@@ -661,7 +674,7 @@ REG RecordPtr	PtrParIn;
 #undef	NextRecord
 }
 
-Proc2(IntParIO)
+void Proc2(IntParIO)
 OneToFifty	*IntParIO;
 {
 	REG OneToFifty		IntLoc;
@@ -681,7 +694,7 @@ OneToFifty	*IntParIO;
 	}
 }
 
-Proc3(PtrParOut)
+void Proc3(PtrParOut)
 RecordPtr	*PtrParOut;
 {
 	if (PtrGlb != NULL)
@@ -691,7 +704,7 @@ RecordPtr	*PtrParOut;
 	Proc7(10, IntGlob, &PtrGlb->IntComp);
 }
 
-Proc4()
+void Proc4()
 {
 	REG boolean	BoolLoc;
 
@@ -700,7 +713,7 @@ Proc4()
 	Char2Glob = 'B';
 }
 
-Proc5()
+void Proc5()
 {
 	Char1Glob = 'A';
 	BoolGlob = FALSE;
@@ -708,7 +721,7 @@ Proc5()
 
 extern boolean Func3();
 
-Proc6(EnumParIn, EnumParOut)
+void Proc6(EnumParIn, EnumParOut)
 REG Enumeration	EnumParIn;
 REG Enumeration	*EnumParOut;
 {
@@ -727,7 +740,7 @@ REG Enumeration	*EnumParOut;
 	}
 }
 
-Proc7(IntParI1, IntParI2, IntParOut)
+void Proc7(IntParI1, IntParI2, IntParOut)
 OneToFifty	IntParI1;
 OneToFifty	IntParI2;
 OneToFifty	*IntParOut;
@@ -738,7 +751,7 @@ OneToFifty	*IntParOut;
 	*IntParOut = IntParI2 + IntLoc;
 }
 
-Proc8(Array1Par, Array2Par, IntParI1, IntParI2)
+void Proc8(Array1Par, Array2Par, IntParI1, IntParI2)
 Array1Dim	Array1Par;
 Array2Dim	Array2Par;
 OneToFifty	IntParI1;

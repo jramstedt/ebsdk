@@ -28,9 +28,7 @@ char            Ch_1_Glob,
 int             Arr_1_Glob [50];
 int             Arr_2_Glob [50] [50];
 
-extern char     *malloc ();
-Enumeration     Func_1 ();
-  /* forward declaration necessary since Enumeration may not simply be int */
+//extern char     *malloc ();
 
 #ifndef REG
         Boolean Reg = false;
@@ -45,29 +43,37 @@ Enumeration     Func_1 ();
 #ifndef SCWTIME
 #ifdef TIMES
 struct tms      time_info;
-extern  int     times ();
                 /* see library function "times" */
 #define Too_Small_Time (2*HZ)
                 /* Measurements should last at least about 2 seconds */
+
+clock_t         Begin_Time,
+                End_Time,
+                User_Time;
 #endif
 #ifdef TIME
-extern long     time();
+extern time_t     time();
                 /* see library function "time"  */
 #define Too_Small_Time 2
                 /* Measurements should last at least 2 seconds */
+
+time_t          Begin_Time,
+                End_Time,
+                User_Time;
 #endif
 #ifdef MSC_CLOCK
 extern clock_t	clock();
 #define Too_Small_Time (2*HZ)
+
+clock_t         Begin_Time,
+                End_Time,
+                User_Time;
 #endif
 
 #else
 #define Too_Small_Time 2.0
 #endif
 
-long            Begin_Time,
-                End_Time,
-                User_Time;
 float           Microseconds,
                 Dhrystones_Per_Second;
 
@@ -81,7 +87,7 @@ float           Microseconds,
 float SCWctime(), SCWetime();
 #endif
 
-main ()
+void main ()
 /*****/
 
   /* main program, corresponds to procedures        */
@@ -170,7 +176,7 @@ main ()
   Begin_Time = (long) time_info.tms_utime;
 #endif
 #ifdef TIME
-  Begin_Time = time ( (long *) 0);
+  Begin_Time = time ( (time_t *) 0);
 #endif
 #ifdef MSC_CLOCK
   Begin_Time = clock();
@@ -240,7 +246,7 @@ main ()
   End_Time = (long) time_info.tms_utime;
 #endif
 #ifdef TIME
-  End_Time = time ( (long *) 0);
+  End_Time = time ( (time_t *) 0);
 #endif
 #ifdef MSC_CLOCK
   End_Time = clock();
@@ -317,7 +323,7 @@ main ()
 }
 
 
-Proc_1 (Ptr_Val_Par)
+void Proc_1 (Ptr_Val_Par)
 /******************/
 
 REG Rec_Pointer Ptr_Val_Par;
@@ -351,7 +357,7 @@ REG Rec_Pointer Ptr_Val_Par;
 } /* Proc_1 */
 
 
-Proc_2 (Int_Par_Ref)
+void Proc_2 (Int_Par_Ref)
 /******************/
     /* executed once */
     /* *Int_Par_Ref == 1, becomes 4 */
@@ -374,7 +380,7 @@ One_Fifty   *Int_Par_Ref;
 } /* Proc_2 */
 
 
-Proc_3 (Ptr_Ref_Par)
+void Proc_3 (Ptr_Ref_Par)
 /******************/
     /* executed once */
     /* Ptr_Ref_Par becomes Ptr_Glob */
@@ -389,7 +395,7 @@ Rec_Pointer *Ptr_Ref_Par;
 } /* Proc_3 */
 
 
-Proc_4 () /* without parameters */
+void Proc_4 () /* without parameters */
 /*******/
     /* executed once */
 {
@@ -401,7 +407,7 @@ Proc_4 () /* without parameters */
 } /* Proc_4 */
 
 
-Proc_5 () /* without parameters */
+void Proc_5 () /* without parameters */
 /*******/
     /* executed once */
 {
