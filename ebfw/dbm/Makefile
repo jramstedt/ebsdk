@@ -24,7 +24,7 @@ CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
 ifdef EB_DISABLE_GRAPHICS
 CCFLAGS		+= -DDISABLE_GRAPHICS
 endif
-LDFLAGS		= --orphan-handling=warn -T elf-coff.ld -s --no-dynamic-linker -static
+LDFLAGS		= --orphan-handling=warn -T elf-coff.ld -z noexecstack -s --no-dynamic-linker -static
 LDLIBS		= -lc
 
 ALPHA_TOOLS = \
@@ -138,7 +138,7 @@ $(OBJDIR)dbm.img : $(PALCODE) $(OBJDIR)dbm.nh
 	$(SYSGEN) -v $(DBM_SYSGEN) -o $@
 
 $(OBJDIR)dbm.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
-	$(LD) -Ttext-segment=$(DBMENTRY) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
+	$(LD) -Ttext-segment=$(DBMENTRY) $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)dbm.rom : $(OBJDIR)dbm.cmp
 	$(OBJDIR)getver > $(OBJDIR)timestmp.fw
@@ -159,7 +159,7 @@ $(OBJDIR)fsb.img : $(PALCODE) $(OBJDIR)fsb.nh
 	$(SYSGEN) -v $(FSB_SYSGEN) -o $@
 
 $(OBJDIR)fsb.elf : $(OBJDIR)crt0.o $(FSBOBJFILES) $(OBJDIR)lib.a $(OBJDIR)stubs.a $(OBJDIR)fsbver.o
-	$(LD) -Ttext-segment=$(DBMENTRY) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)fsb.map -o $@ $^ $(LDLIBS)
+	$(LD) -Ttext-segment=$(DBMENTRY) $(LDFLAGS) -Map=$(OBJDIR)fsb.map -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)fsb.rom : $(OBJDIR)fsb.cmp
 	$(OBJDIR)getver > $(OBJDIR)timestmp.fw
@@ -171,7 +171,7 @@ $(OBJDIR)sft.img : $(OBJDIR)sft.nh
 	$(COPY) $< $@
 
 $(OBJDIR)sft.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
-	$(LD) -Ttext-segment=$(SOFTBOOTADR) -z noexecstack $(LDFLAGS) -Map=$(OBJDIR)sft.map -o $@ $^ $(LDLIBS)
+	$(LD) -Ttext-segment=$(SOFTBOOTADR) $(LDFLAGS) -Map=$(OBJDIR)sft.map -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)sft.sr : $(OBJDIR)sft.nh
 	$(SREC) -v -i $< $@
