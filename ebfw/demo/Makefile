@@ -12,6 +12,7 @@ COPY			= cp -p
 CHMOD			= chmod
 DELETE		= rm -f
 OBJCOPY		= objcopy
+SREC			= $(TOOLBOX)/srec
 
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
@@ -32,7 +33,7 @@ LIBS	= \
 	$(OBJDIR)lib.a \
 	$(OBJDIR)stubs.a
 
-.PHONY : default all cross-default cross-all
+.PHONY : default all cross-default cross-all clean $(OBJDIR)crt0.o
 
 default :
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) cross-default
@@ -44,7 +45,11 @@ cross-default : \
 	$(BOOTDIR)hello \
 	$(BOOTDIR)size \
 	$(BOOTDIR)yellow \
-	$(BOOTDIR)regtest
+	$(BOOTDIR)regtest \
+	$(BOOTDIR)hello.sr \
+	$(BOOTDIR)size.sr \
+	$(BOOTDIR)yellow.sr \
+	$(BOOTDIR)regtest.sr
 
 cross-all : \
 	$(BOOTDIR)hello \
@@ -80,6 +85,9 @@ $(OBJDIR)%.img : %.sp
 
 $(OBJDIR)%.o : %.c
 	$(CC) $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
+
+$(BOOTDIR)%.sr : $(OBJDIR)%.nh
+	$(SREC) -v -i $< $@
 
 %.nh : %.elf
 	$(OBJCOPY) -O binary $< $@

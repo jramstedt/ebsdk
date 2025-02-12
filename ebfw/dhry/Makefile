@@ -9,6 +9,7 @@ COPY			= cp -p
 CHMOD			= chmod
 DELETE		= rm -f
 OBJCOPY		= objcopy
+SREC			= $(TOOLBOX)/srec
 
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers -DDEBUG_MONITOR -DREG=register -DLOOPS=50000000 -DHZ=1 -DTIME
 CCFLAGS		= -c -Wall -Wextra -fno-builtin -ffreestanding
@@ -28,16 +29,23 @@ LIBS	= \
 	$(OBJDIR)lib.a \
 	$(OBJDIR)stubs.a
 
-.PHONY : all dhry
+.PHONY : all dhry clean $(OBJDIR)crt0.o
 
 all :
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) dhry
 
-dhry : $(BOOTDIR)dhryV1 $(BOOTDIR)dhryV2
+dhry : \
+	$(BOOTDIR)dhryV1 \
+	$(BOOTDIR)dhryV2 \
+	$(BOOTDIR)dhryV1.sr \
+	$(BOOTDIR)dhryV2.sr
 
 # Common
 $(BOOTDIR):
 	mkdir $(BOOTDIR); $(CHMOD) a+r+x $(BOOTDIR)
+
+$(BOOTDIR)%.sr : $(OBJDIR)%.nh
+	$(SREC) -v -i $< $@
 
 %.nh : %.elf
 	$(OBJCOPY) -O binary $< $@

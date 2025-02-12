@@ -103,7 +103,7 @@ else
 SOFTBOOTADR			= $(default_SOFTBOOTADR)
 endif
 
-.PHONY : all dbm vars
+.PHONY : all dbm vars clean $(OBJDIR)crt0.o
 
 all : $(OBJDIR)getver
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) dbm

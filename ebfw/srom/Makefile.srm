@@ -88,8 +88,17 @@ CPPFLAGS	+= $(SROM_CPP)
 # Rules for creating main targets.
 #-----------------------------------------------------------
 $(BOOTDIR)$(PROGRAM).img : $(OBJDIR)$(PROGRAM).img $(BOOTDIR)
+	$(COPY) $< $@
+	$(CHMOD) 664 $@
+	
 $(BOOTDIR)$(PROGRAM).hex : $(OBJDIR)$(PROGRAM).hex $(BOOTDIR)
+	$(COPY) $< $@
+	$(CHMOD) 664 $@
+
 $(BOOTDIR)$(PROGRAM).pad: $(OBJDIR)$(PROGRAM).pad $(BOOTDIR)
+	$(COPY) $< $@
+	$(CHMOD) 664 $@
+
 $(BOOTDIR)$(PROGRAM).rom: $(OBJDIR)$(PROGRAM).rom $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@

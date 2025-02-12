@@ -36,7 +36,7 @@ EB_SUBDIRS="h srom palcode lib stubs ieee ether ladebug dbm demo dhry"
 TASK=
 TASKNAME=Building
 
-if [ $0 = "clean" ] ; then
+if [ "${0##./}" = "clean" ] ; then
     TASK=clean
     TASKNAME=Cleaning
 fi
