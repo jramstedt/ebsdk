@@ -13,7 +13,7 @@ SREC			= $(TOOLBOX)/srec
 
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers -DDEBUG_MONITOR -DREG=register -DLOOPS=50000000 -DHZ=1 -DTIME
 CCFLAGS		= -c -Wall -Wextra -fno-builtin -ffreestanding
-LDFLAGS		= --orphan-handling=warn -N -z noexecstack -s --no-dynamic-linker -static
+LDFLAGS		= --orphan-handling=warn -T ../dbmboot.ld -z noexecstack -s --no-dynamic-linker -static
 LDLIBS		= -lc
 
 ALPHA_TOOLS = \
@@ -58,7 +58,7 @@ $(OBJDIR)dhryV2%.o : dhryV2%.c
 	$(CC) -O3 $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
 $(OBJDIR)dhryV2.elf : $(OBJDIR)crt0.o $(OBJDIR)dhryV2_1.o $(OBJDIR)dhryV2_2.o $(LIBS)
-	$(LD) -O3 -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(LD) -O3 -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -Map=$(OBJDIR)dhryV2.map -o $@ $^ $(LDLIBS)
 
 dhryV2 $(BOOTDIR)dhryV2 : $(OBJDIR)dhryV2.nh $(BOOTDIR)
 	$(COPY) $< $@
@@ -69,7 +69,7 @@ $(OBJDIR)dhryV1.o : dhryV1.c
 	$(CC) -O2 $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
 $(OBJDIR)dhryV1.elf : $(OBJDIR)crt0.o $(OBJDIR)dhryV1.o $(LIBS)
-	$(LD) -O2 -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(LD) -O2 -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -Map=$(OBJDIR)dhryV1.map -o $@ $^ $(LDLIBS)
 
 dhryV1 $(BOOTDIR)dhryV1 : $(OBJDIR)dhryV1.nh $(BOOTDIR)
 	$(COPY) $< $@

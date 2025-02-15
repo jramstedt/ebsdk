@@ -35,7 +35,7 @@ C_SRCS	= iobusini.c  beep.c  c8514.c  time.c  acersio.c  initdata.c  fsboot.c  f
 					smc.c  sum.c  mcheck.c  isa_dma.c  smcc669.c  am29v800.c  amdflash.c  memt.c  callback.c \
 					fpu.c
 
-.PHONY : all lib vars
+.PHONY : all lib vars clean
 
 all :
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) lib

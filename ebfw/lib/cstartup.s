@@ -1,7 +1,7 @@
 
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -102,7 +102,11 @@ your own risk.
 #include "regdefs.h"
 #include "paldefs.h"
 
+#ifdef __GNUC__
+	.section .init
+#else
 	.text
+#endif
 
 STARTFRM = 64           # return address, arguments and padding to octaword align
 
@@ -160,6 +164,9 @@ __start:
  	bsr	zero, _exit
 .end	__start
 
+#ifdef __GNUC__
+.section .fini
+#endif
 
         .globl  _exit
         .ent    _exit, 0

@@ -17,7 +17,7 @@ SREC			= $(TOOLBOX)/srec
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
 CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
-LDFLAGS		= --orphan-handling=warn -N -z noexecstack -s --no-dynamic-linker -static
+LDFLAGS		= --orphan-handling=warn -T ../dbmboot.ld -z noexecstack -s --no-dynamic-linker -static
 LDLIBS		= -lc
 
 ALPHA_TOOLS = \
@@ -80,7 +80,7 @@ $(BOOTDIR):
 %.sp : %.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
-$(OBJDIR)%.img : %.sp
+$(OBJDIR)%.o : %.sp
 	$(AS) $(ASFLAGS) -o $@ $^
 
 $(OBJDIR)%.o : %.c
@@ -89,7 +89,13 @@ $(OBJDIR)%.o : %.c
 $(BOOTDIR)%.sr : $(OBJDIR)%.nh
 	$(SREC) -v -i $< $@
 
+$(BOOTDIR)%.sr : $(OBJDIR)%.img
+	$(SREC) -v -i $< $@
+
 %.nh : %.elf
+	$(OBJCOPY) -O binary $< $@
+
+%.img : %.o
 	$(OBJCOPY) -O binary $< $@
 
 $(OBJDIR)crt0.o : $(OBJDIR)cstartup.o
@@ -97,7 +103,7 @@ $(OBJDIR)crt0.o : $(OBJDIR)cstartup.o
 
 # Hello
 $(OBJDIR)hello.elf : $(OBJDIR)crt0.o $(OBJDIR)hello.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -Map=$(OBJDIR)hello.map -o $@ $^ $(LDLIBS)
 
 hello $(BOOTDIR)hello : $(OBJDIR)hello.nh $(BOOTDIR)
 	$(COPY) $< $@
