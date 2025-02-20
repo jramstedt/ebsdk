@@ -18,14 +18,20 @@ MAKEROM		= $(TOOLBOX)/makerom
 SREC			= $(TOOLBOX)/srec
 HEX				= $(TOOLBOX)/hex32
 
+ifdef EB_DEBUG_BIOSEM
+BIOSEMLIB = $(COMMONLIB)$(DBGDIR)
+else
+BIOSEMLIB = $(COMMONLIB)$(RELDIR)
+endif
+
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
 CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
 ifdef EB_DISABLE_GRAPHICS
 CCFLAGS		+= -DDISABLE_GRAPHICS
 endif
-LDFLAGS		= --orphan-handling=warn -T elf-coff.ld -z noexecstack -s --no-dynamic-linker -static
-LDLIBS		= -lc
+LDFLAGS		= --orphan-handling=warn -L$(BIOSEMLIB) -L$(OBJDIR) -Telf-coff.ld -z noexecstack -s --no-dynamic-linker -static
+LDLIBS		= -l:ether.a -l:ladebug.a -l:biosem.a -l:lib.a -l:stubs.a -lc
 
 ALPHA_TOOLS = \
 	AS=alpha-linux-gnu-as \
@@ -56,19 +62,6 @@ BUILD_TARGETS	= $($(TARGET)_BUILD_TARGETS)
 else
 BUILD_TARGETS	= $(default_BUILD_TARGETS)
 endif
-
-ifdef EB_DEBUG_BIOSEM
-BIOSEMLIB = $(COMMONLIB)$(DBGDIR)/biosem.a
-else
-BIOSEMLIB = $(COMMONLIB)$(RELDIR)/biosem.a
-endif
-
-LIBS	= \
-	$(OBJDIR)ether.a\
-	$(OBJDIR)ladebug.a \
-	$(BIOSEMLIB) \
-	$(OBJDIR)lib.a \
-	$(OBJDIR)stubs.a
 
 TARGET_SRCS = $(TARGET)mck.c
 
@@ -103,12 +96,12 @@ else
 SOFTBOOTADR			= $(default_SOFTBOOTADR)
 endif
 
-.PHONY : all dbm vars clean $(OBJDIR)crt0.o
+.PHONY : all dbm vars clean
 
 all : $(OBJDIR)getver
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) dbm
 
-dbm : $(BUILD_TARGETS)
+dbm : $(OBJDIR)dbmentry.o $(BUILD_TARGETS)
 
 vars:
 	@echo OBJFILES is $(OBJFILES)
@@ -134,10 +127,10 @@ else
 DBM_SYSGEN					= $(default_DBM_SYSGEN)
 endif
 
-$(OBJDIR)dbm.img : $(PALCODE) $(OBJDIR)dbm.nh
+$(OBJDIR)dbm.img : $(OBJDIR)dbm.nh
 	$(SYSGEN) -v $(DBM_SYSGEN) -o $@
 
-$(OBJDIR)dbm.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
+$(OBJDIR)dbm.elf : $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
 	$(LD) -Ttext-segment=$(DBMENTRY) $(LDFLAGS) -Map=$(OBJDIR)dbm.map -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)dbm.rom : $(OBJDIR)dbm.cmp
@@ -155,10 +148,10 @@ else
 FSB_SYSGEN					= $(default_FSB_SYSGEN)
 endif
 
-$(OBJDIR)fsb.img : $(PALCODE) $(OBJDIR)fsb.nh
+$(OBJDIR)fsb.img : $(OBJDIR)fsb.nh
 	$(SYSGEN) -v $(FSB_SYSGEN) -o $@
 
-$(OBJDIR)fsb.elf : $(OBJDIR)crt0.o $(FSBOBJFILES) $(OBJDIR)lib.a $(OBJDIR)stubs.a $(OBJDIR)fsbver.o
+$(OBJDIR)fsb.elf : $(FSBOBJFILES) $(OBJDIR)lib.a $(OBJDIR)stubs.a $(OBJDIR)fsbver.o
 	$(LD) -Ttext-segment=$(DBMENTRY) $(LDFLAGS) -Map=$(OBJDIR)fsb.map -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)fsb.rom : $(OBJDIR)fsb.cmp
@@ -170,7 +163,7 @@ $(OBJDIR)fsb.rom : $(OBJDIR)fsb.cmp
 $(OBJDIR)sft.img : $(OBJDIR)sft.nh
 	$(COPY) $< $@
 
-$(OBJDIR)sft.elf : $(OBJDIR)crt0.o $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
+$(OBJDIR)sft.elf : $(OBJFILES) $(LIBS) $(OBJDIR)dbmver.o
 	$(LD) -Ttext-segment=$(SOFTBOOTADR) $(LDFLAGS) -Map=$(OBJDIR)sft.map -o $@ $^ $(LDLIBS)
 
 $(OBJDIR)sft.sr : $(OBJDIR)sft.nh
@@ -202,9 +195,6 @@ $(OBJDIR)%.o : %.c
 $(OBJDIR)%.nh : $(OBJDIR)%.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(OBJDIR)crt0.o : $(OBJDIR)dbmentry.o
-	$(COPY) $< $(OBJDIR)crt0.o
-
 $(OBJDIR)dbmver.o : version.c
 	$(CC) $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
@@ -221,7 +211,6 @@ clean :
 	$(DELETE) *.o *~ \#*\# *.bak *.a core \
 		$(S_SRCS:.s=.sp) \
 		$(addprefix $(OBJDIR), $(S_SRCS:.s=.o) $(C_SRCS:.c=.o) $(TARGET_SRCS:.c=.o) $(FSB_SRCS:.c=.o)) \
-		$(OBJDIR)crt0.o \
 		$(OBJDIR)dbm.nh \
 		$(OBJDIR)dbm.img \
 		$(OBJDIR)dbm.rom \
