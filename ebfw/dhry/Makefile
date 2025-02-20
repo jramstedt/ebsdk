@@ -12,9 +12,9 @@ OBJCOPY		= objcopy
 SREC			= $(TOOLBOX)/srec
 
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers -DDEBUG_MONITOR -DREG=register -DLOOPS=50000000 -DHZ=1 -DTIME
-CCFLAGS		= -c -Wall -Wextra -fno-builtin -ffreestanding
-LDFLAGS		= --orphan-handling=warn -T ../dbmboot.ld -z noexecstack -s --no-dynamic-linker -static
-LDLIBS		= -lc
+CCFLAGS		= -c -Wall -Wextra -fno-builtin -ffreestanding -funsigned-char
+LDFLAGS		= --orphan-handling=warn -L$(OBJDIR) -T ../dbmboot.ld -z noexecstack -s --no-dynamic-linker -static
+LDLIBS		= -l:lib.a -l:stubs.a -lc
 
 ALPHA_TOOLS = \
 	AS=alpha-linux-gnu-as \
@@ -25,11 +25,7 @@ ALPHA_TOOLS = \
 	OBJCOPY=alpha-linux-gnu-objcopy \
 	OBJDUMP=alpha-linux-gnu-objdump
 
-LIBS	= \
-	$(OBJDIR)lib.a \
-	$(OBJDIR)stubs.a
-
-.PHONY : all dhry clean $(OBJDIR)crt0.o
+.PHONY : all dhry clean
 
 all :
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) dhry
@@ -50,15 +46,12 @@ $(BOOTDIR)%.sr : $(OBJDIR)%.nh
 %.nh : %.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(OBJDIR)crt0.o : $(OBJDIR)cstartup.o
-	$(COPY) $< $(OBJDIR)crt0.o
-
 # V2
 $(OBJDIR)dhryV2%.o : dhryV2%.c
 	$(CC) -O3 $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
-$(OBJDIR)dhryV2.elf : $(OBJDIR)crt0.o $(OBJDIR)dhryV2_1.o $(OBJDIR)dhryV2_2.o $(LIBS)
-	$(LD) -O3 -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -Map=$(OBJDIR)dhryV2.map -o $@ $^ $(LDLIBS)
+$(OBJDIR)dhryV2.elf : $(OBJDIR)dhryV2_1.o $(OBJDIR)dhryV2_2.o
+	$(LD) -O3 $(LDFLAGS) -Map=$(OBJDIR)dhryV2.map -o $@ $^ $(LDLIBS)
 
 dhryV2 $(BOOTDIR)dhryV2 : $(OBJDIR)dhryV2.nh $(BOOTDIR)
 	$(COPY) $< $@
@@ -68,8 +61,8 @@ dhryV2 $(BOOTDIR)dhryV2 : $(OBJDIR)dhryV2.nh $(BOOTDIR)
 $(OBJDIR)dhryV1.o : dhryV1.c
 	$(CC) -O2 $(CCFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) -c $^
 
-$(OBJDIR)dhryV1.elf : $(OBJDIR)crt0.o $(OBJDIR)dhryV1.o $(LIBS)
-	$(LD) -O2 -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -Map=$(OBJDIR)dhryV1.map -o $@ $^ $(LDLIBS)
+$(OBJDIR)dhryV1.elf : $(OBJDIR)dhryV1.o
+	$(LD) -O2 $(LDFLAGS) -Map=$(OBJDIR)dhryV1.map -o $@ $^ $(LDLIBS)
 
 dhryV1 $(BOOTDIR)dhryV1 : $(OBJDIR)dhryV1.nh $(BOOTDIR)
 	$(COPY) $< $@
@@ -77,6 +70,5 @@ dhryV1 $(BOOTDIR)dhryV1 : $(OBJDIR)dhryV1.nh $(BOOTDIR)
 
 clean :
 	$(DELETE) *.o *~ \#*\# *.bak *.a core \
-	$(OBJDIR)crt0* \
 	$(OBJDIR)dhryV1* \
 	$(OBJDIR)dhryV2* \

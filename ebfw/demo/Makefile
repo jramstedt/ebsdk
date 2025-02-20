@@ -17,8 +17,8 @@ SREC			= $(TOOLBOX)/srec
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
 CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
-LDFLAGS		= --orphan-handling=warn -T ../dbmboot.ld -z noexecstack -s --no-dynamic-linker -static
-LDLIBS		= -lc
+LDFLAGS		= --orphan-handling=warn -L$(OBJDIR) -T../dbmboot.ld -z noexecstack -s --no-dynamic-linker -static
+LDLIBS		= -l:lib.a -l:stubs.a -lc
 
 ALPHA_TOOLS = \
 	AS=alpha-linux-gnu-as \
@@ -29,11 +29,7 @@ ALPHA_TOOLS = \
 	OBJCOPY=alpha-linux-gnu-objcopy \
 	OBJDUMP=alpha-linux-gnu-objdump
 
-LIBS	= \
-	$(OBJDIR)lib.a \
-	$(OBJDIR)stubs.a
-
-.PHONY : default all cross-default cross-all clean $(OBJDIR)crt0.o
+.PHONY : default all cross-default cross-all clean
 
 default :
 	$(MAKE) -f Makefile $(ALPHA_TOOLS) cross-default
@@ -98,28 +94,25 @@ $(BOOTDIR)%.sr : $(OBJDIR)%.img
 %.img : %.o
 	$(OBJCOPY) -O binary $< $@
 
-$(OBJDIR)crt0.o : $(OBJDIR)cstartup.o
-	$(COPY) $< $(OBJDIR)crt0.o
-
 # Hello
-$(OBJDIR)hello.elf : $(OBJDIR)crt0.o $(OBJDIR)hello.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -Map=$(OBJDIR)hello.map -o $@ $^ $(LDLIBS)
+$(OBJDIR)hello.elf : $(OBJDIR)hello.o
+	$(LD) $(LDFLAGS) -Map=$(OBJDIR)hello.map -o $@ $^ $(LDLIBS)
 
 hello $(BOOTDIR)hello : $(OBJDIR)hello.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # Size
-$(OBJDIR)size.elf : $(OBJDIR)crt0.o $(OBJDIR)size.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)size.elf : $(OBJDIR)size.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 size $(BOOTDIR)size : $(OBJDIR)size.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # Yellow
-$(OBJDIR)yellow.elf : $(OBJDIR)crt0.o $(OBJDIR)yellow.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)yellow.elf : $(OBJDIR)yellow.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 yellow $(BOOTDIR)yellow : $(OBJDIR)yellow.nh $(BOOTDIR)
 	$(COPY) $< $@
@@ -131,120 +124,120 @@ regtest $(BOOTDIR)regtest : $(OBJDIR)regtest.img $(BOOTDIR)
 	$(CHMOD) 664 $@
 
 # Loops
-$(OBJDIR)loops.elf : $(OBJDIR)crt0.o $(OBJDIR)loops1.o $(OBJDIR)loops2.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)loops.elf : $(OBJDIR)loops1.o $(OBJDIR)loops2.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 loops $(BOOTDIR)loops : $(OBJDIR)loops.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # Sum
-$(OBJDIR)sum.elf : $(OBJDIR)crt0.o $(OBJDIR)sum.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)sum.elf : $(OBJDIR)sum.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 sum $(BOOTDIR)sum : $(OBJDIR)sum.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # Memory test
-$(OBJDIR)mtest.elf : $(OBJDIR)crt0.o $(OBJDIR)mtest.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)mtest.elf : $(OBJDIR)mtest.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 mtest $(BOOTDIR)mtest : $(OBJDIR)mtest.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # Pic
-$(OBJDIR)pic.elf : $(OBJDIR)crt0.o $(OBJDIR)pic.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)pic.elf : $(OBJDIR)pic.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 pic $(BOOTDIR)pic : $(OBJDIR)pic.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # Sound
-$(OBJDIR)sound.elf : $(OBJDIR)crt0.o $(OBJDIR)sound.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)sound.elf : $(OBJDIR)sound.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 sound $(BOOTDIR)sound : $(OBJDIR)sound.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # NVRAM
-$(OBJDIR)nvram.elf : $(OBJDIR)crt0.o $(OBJDIR)nvram.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)nvram.elf : $(OBJDIR)nvram.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 nvram $(BOOTDIR)nvram : $(OBJDIR)nvram.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # VGA
-$(OBJDIR)vga.elf : $(OBJDIR)crt0.o $(OBJDIR)vga.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)vga.elf : $(OBJDIR)vga.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 vga $(BOOTDIR)vga : $(OBJDIR)vga.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # Time
-$(OBJDIR)time.elf : $(OBJDIR)crt0.o $(OBJDIR)wait.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)time.elf : $(OBJDIR)wait.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 time $(BOOTDIR)time : $(OBJDIR)time.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # lp
-$(OBJDIR)lp.elf : $(OBJDIR)crt0.o $(OBJDIR)lp.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)lp.elf : $(OBJDIR)lp.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 lp $(BOOTDIR)lp : $(OBJDIR)lp.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # flash
-$(OBJDIR)flash.elf : $(OBJDIR)crt0.o $(OBJDIR)flash.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)flash.elf : $(OBJDIR)flash.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 flash $(BOOTDIR)flash : $(OBJDIR)flash.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # mfs
-$(OBJDIR)mfs.elf : $(OBJDIR)crt0.o $(OBJDIR)mfs.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)mfs.elf : $(OBJDIR)mfs.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 mfs $(BOOTDIR)mfs : $(OBJDIR)mfs.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # fd
-$(OBJDIR)fd.elf : $(OBJDIR)crt0.o $(OBJDIR)fd.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)fd.elf : $(OBJDIR)fd.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 fd $(BOOTDIR)fd : $(OBJDIR)fd.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # comtrol
-$(OBJDIR)comtrol.elf : $(OBJDIR)crt0.o $(OBJDIR)comtrol.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)comtrol.elf : $(OBJDIR)comtrol.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 comtrol $(BOOTDIR)comtrol : $(OBJDIR)comtrol.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # mouse demo
-$(OBJDIR)mouse_demo.elf : $(OBJDIR)crt0.o $(OBJDIR)mouse_demo.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)mouse_demo.elf : $(OBJDIR)mouse_demo.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 mouse_demo $(BOOTDIR)mouse_demo : $(OBJDIR)mouse_demo.nh $(BOOTDIR)
 	$(COPY) $< $@
 	$(CHMOD) 664 $@
 
 # avp
-$(OBJDIR)avp.elf : $(OBJDIR)crt0.o $(OBJDIR)avp.o $(OBJDIR)vp.o $(OBJDIR)console.o $(LIBS)
-	$(LD) -Ttext-segment=$(BOOTADR) -e__start $(LDFLAGS) -o $@ $^ $(LDLIBS)
+$(OBJDIR)avp.elf : $(OBJDIR)avp.o $(OBJDIR)vp.o $(OBJDIR)console.o
+	$(LD) $(LDFLAGS) -o $@ $^ $(LDLIBS)
 
 avp $(BOOTDIR)avp : $(OBJDIR)avp.nh $(BOOTDIR)
 	$(COPY) $< $@
@@ -252,7 +245,6 @@ avp $(BOOTDIR)avp : $(OBJDIR)avp.nh $(BOOTDIR)
 
 clean :
 	$(DELETE) *.o *~ \#*\# *.bak *.a core \
-	$(OBJDIR)crt0* \
 	$(OBJDIR)hello* \
 	$(OBJDIR)size* \
 	$(OBJDIR)yellow* \

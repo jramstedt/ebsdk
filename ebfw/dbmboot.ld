@@ -1,6 +1,7 @@
 OUTPUT_FORMAT("elf64-alpha", "elf64-alpha", "elf64-alpha")
 OUTPUT_ARCH(alpha)
 ENTRY(__start)
+STARTUP(cstartup.o)
 SEARCH_DIR("=/usr/local/lib/alpha-linux-gnu"); SEARCH_DIR("=/lib/alpha-linux-gnu"); SEARCH_DIR("=/usr/lib/alpha-linux-gnu"); SEARCH_DIR("=/usr/local/lib"); SEARCH_DIR("=/lib"); SEARCH_DIR("=/usr/lib"); SEARCH_DIR("=/usr/alpha-linux-gnu/lib");
 
 SECTIONS
