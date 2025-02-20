@@ -398,7 +398,6 @@ static void PrintPlace(int size, ul place)
 void ExecuteProgram(Function_t place, int _argc , char * _argv[])
 {
   int retval;
-  int save_ipl;
 
   imb();
 

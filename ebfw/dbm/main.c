@@ -202,7 +202,6 @@ ul mem_size = 0;
 
 ul bootadr;
 ul **second_stack;
-//volatile ul secondary_cpu_function= 0;
 void (*volatile secondary_cpu_function)(void) = NULL;
 extern char __start;
 extern int storage_initialized;
@@ -288,7 +287,7 @@ int main(int argc, char *argv[])
    printf("Booting with %d Cpu(s)\n",cpu_count);
    second_stack= (ul **)second_cpu_lock;
    second_stack++;
-   secondary_cpu_function= NULL;
+   secondary_cpu_function = NULL;
    DumpSysData();
 #else /* CNS__PLACE_HOLDER18 not defined so the system should not be dual */
    printf("\n\nThis firmware does not support Dual CPUs but it thinks that there is a second CPU ! !\n\n");
@@ -406,6 +405,7 @@ void CommandExec (void)
   function = Lookup();
   if (function != NULL) (*function)();
 }
+
 #include "palcsrv.h"
 #include "paldata.h"
 #include "palosf.h"
@@ -414,24 +414,23 @@ void SRM_hack_Waitforever(ul *PalImpureBase);
 void Waitforever(ul *PalImpureBase)
 {
   void (*function)(void);
-  ul second_address;
 
    printf("Seconary PalImpureBase %lx\n",PalImpureBase);
-   *second_cpu_lock= 0;
+   *second_cpu_lock = 0;
 /*    printf("\nsecondary_cpu_function %lx %lx\n",secondary_cpu_function,&secondary_cpu_function); */
 #if 0
-    second_address= (ul)SRM_hack_Waitforever;
-    second_address+= 8;
+    void (*second_address)(ul*) = (ul)SRM_hack_Waitforever;
+    second_address += 8;
     printf("second Jumping to 0x%06x...0x%06lx\n\n", second_address,*(ul *)second_address);
     imb();
     cServe(second_address, 0, CSERVE_K_JTOPAL);
 #endif
     while (TRUE)
     {
-      while(secondary_cpu_function== NULL);
-      function=   secondary_cpu_function;
+      while(secondary_cpu_function == NULL);
+      function = secondary_cpu_function;
 /*      printf("\nsecondary_cpu_function %lx\n",secondary_cpu_function); */
-      secondary_cpu_function= NULL;
+      secondary_cpu_function = NULL;
       (*function)();
     }
 }

@@ -851,7 +851,7 @@ static void cmd_prtrace(void)
 {
   if (argc == 1)
     printf("Tracing by debug prints is %s.\n",
-	   prtrace_enable ? "ENABLED" : "DISABLED" );
+           prtrace_enable ? "ENABLED" : "DISABLED" );
   else prtrace_enable = (int)hexarg[1];
 }
 #endif /* TRACE_ENABLE */
@@ -867,12 +867,12 @@ static void cmd_beep(void) {Beep((int) decarg[1], (int) decarg[2]);}
 static void cmd_memtest(void)
 {
   memtest( (argc < 3) ? 0 : hexarg[2],
-	   (argc < 4) ? 0 : hexarg[3],
-	   (argc < 5) ? 0 : (int) hexarg[4],
-	   ((argc < 2) ? 1 : (int) decarg[1]),
-	   ((argc < 6) ? (State_t) StateOn : ConfigStateID(argv[5])), /* Machine checks on by default */
-	   ((argc < 7) ? 0 : (int) hexarg[6]) /* Stop driver by default */
-	  );
+           (argc < 4) ? 0 : hexarg[3],
+           (argc < 5) ? 0 : (int) hexarg[4],
+           ((argc < 2) ? 1 : (int) decarg[1]),
+           ((argc < 6) ? (State_t) StateOn : ConfigStateID(argv[5])), /* Machine checks on by default */
+           ((argc < 7) ? 0 : (int) hexarg[6]) /* Stop driver by default */
+          );
 }
 
 static void cmd_mcheck(void) { SetMcheck(ConfigStateID(argv[1]));}
@@ -974,7 +974,7 @@ static void cmd_boot(void)
     bootadr = ((argc < 2) ? bootadr : hexarg[1]);
     DisStartAddress = bootadr;
     if( XReceive( bootadr ) )
-	jToPal(bootadr);
+        jToPal(bootadr);
 }
 
 static void cmd_deposit(void) {
@@ -1214,8 +1214,8 @@ static void cmd_netboot(void)
 static void cmd_romload(void)
 {
   read_rom(argc,
-	   (argc<2 ? "" : argv[1]),
-	   ((argc < 3) ? bootadr : hexarg[2]), fixarg);
+           (argc<2 ? "" : argv[1]),
+           ((argc < 3) ? bootadr : hexarg[2]), fixarg);
 }
 static void cmd_romboot(void)
 {
@@ -1225,8 +1225,8 @@ static void cmd_romboot(void)
   {
     printf("read rom\n");
     if (read_rom(argc,
-	       (argc<2 ? "" : argv[1]),
-	       ((argc < 3) ? bootadr : hexarg[2]), fixarg)) {
+               (argc<2 ? "" : argv[1]),
+               ((argc < 3) ? bootadr : hexarg[2]), fixarg)) {
     printf("reset lock\n");
     lock =0;
     }
@@ -1295,8 +1295,8 @@ static void cmd_etherprom(void)
 static void cmd_preg(void)
 {
   printReg(
-	   ((argc < 2) ? (ul *)NULL : (ul *)(hexarg[1])),
-	   fixarg);
+           ((argc < 2) ? (ul *)NULL : (ul *)(hexarg[1])),
+           fixarg);
 }
 static void cmd_creg(void)
 {
@@ -1838,7 +1838,7 @@ const struct KEY {
 
 static void Help(int apropos)
 {
-  struct KEY *p;
+  const struct KEY *p;
   int linelgth = 0;
   int pagelgth = 0;
   int keywlgth;
@@ -1857,12 +1857,12 @@ static void Help(int apropos)
       linelgth += _MAX(13, keywlgth);
 
       if (linelgth > 79) {
-	if (++pagelgth > 24) {
-	  if (!kbdcontinue()) return;
-	  pagelgth = 1;
-	}
-	printf("\n");
-	linelgth = _MAX(13, keywlgth);
+        if (++pagelgth > 24) {
+          if (!kbdcontinue()) return;
+          pagelgth = 1;
+        }
+        printf("\n");
+        linelgth = _MAX(13, keywlgth);
       }
       printf("  %-11s", p->keyw);
       p += 1;
@@ -1903,32 +1903,32 @@ static void CommandHelp(char *arg, int apropos)
   while (p->keyw)
     {
       if ((strcmp(p->keyw, arg) == 0)
-	  || (strcmp("*", arg) == 0)
-	  || (apropos &&
-	      ((strstr(p->keyw, arg) != NULL)
-	       || (strstr(p->helpstr, arg) != NULL))))
-	{
-	  if ((pagelgth += 5) > 24)
-	    {
-	      pagelgth = 5;
-	      if (!kbdcontinue()) break;
-	    }
-	  printf("%s:\n %s\n", p->keyw, p->helpstr);
-	  printf(" syntax: %s %s\n", p->keyw, p->syntaxstr);
-	  s = p->syntax;
-	  printf(" arguments: ");
-	  while(*s)
-	    {
-	      synkey = *s++;
-	      if (synkey == 'X') printf("<hex> ");
-	      if (synkey == 'x') printf("<opt hex> ");
-	      if (synkey == 'D') printf("<dec> ");
-	      if (synkey == 'd') printf("<opt dec> ");
-	      if (synkey == 'S') printf("<str> ");
-	      if (synkey == 's') printf("<opt str> ");
-	    }
-	  printf("\n\n");
-	}
+          || (strcmp("*", arg) == 0)
+          || (apropos &&
+              ((strstr(p->keyw, arg) != NULL)
+               || (strstr(p->helpstr, arg) != NULL))))
+        {
+          if ((pagelgth += 5) > 24)
+            {
+              pagelgth = 5;
+              if (!kbdcontinue()) break;
+            }
+          printf("%s:\n %s\n", p->keyw, p->helpstr);
+          printf(" syntax: %s %s\n", p->keyw, p->syntaxstr);
+          s = p->syntax;
+          printf(" arguments: ");
+          while(*s)
+            {
+              synkey = *s++;
+              if (synkey == 'X') printf("<hex> ");
+              if (synkey == 'x') printf("<opt hex> ");
+              if (synkey == 'D') printf("<dec> ");
+              if (synkey == 'd') printf("<opt dec> ");
+              if (synkey == 'S') printf("<str> ");
+              if (synkey == 's') printf("<opt str> ");
+            }
+          printf("\n\n");
+        }
       p += 1;
     }
 }
@@ -1951,19 +1951,19 @@ void (*Lookup(void))(void)
       {
         synkey = p->syntax[i-1];
         if ((synkey == 'X') && !hexargok[i]) matchok = FALSE;
-	if (synkey=='x' && i<argc && !hexargok[i]) matchok = FALSE;
+        if (synkey=='x' && i<argc && !hexargok[i]) matchok = FALSE;
         if ((synkey == 'D') && !decargok[i]) matchok = FALSE;
-	if (synkey=='d' && i<argc && !decargok[i]) matchok = FALSE;
-	if (synkey=='S' && i>=argc) matchok = FALSE;
+        if (synkey=='d' && i<argc && !decargok[i]) matchok = FALSE;
+        if (synkey=='S' && i>=argc) matchok = FALSE;
       }
       if (matchok) {
-	fixarg = p->fixarg;
+        fixarg = p->fixarg;
         if (p->dual_cmd)
         {
 /*          printf("\nsecondary_cpu_function %lx %lx\n",&secondary_cpu_function,p->func); */
-          secondary_cpu_function= (ul) p->func;
+          secondary_cpu_function = p->func;
         }
-	return(p->func);
+        return(p->func);
       }
       printf("\nSyntax error!!!\n\n");
       CommandHelp(argv[0], 0);

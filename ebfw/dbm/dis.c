@@ -682,8 +682,8 @@ static void opr_fmt( char *opc, union instruction i )
 }
 
 typedef struct {
-    unsigned short op;
-   char *name;
+  unsigned short op;
+  char *name;
 } TFloatOp;
 
 static TFloatOp float_ops[] = {
@@ -702,18 +702,18 @@ static void dis_float( union instruction i )
 {
   unsigned long j;
 
-/* implements table C-6 */
+  /* implements table C-6 */
 
-   for (j = 0; j < sizeof(float_ops) / sizeof(TFloatOp); j++) {
-       if (float_ops[j].op == i.f.func) {
-	   printf("%10s    ", float_ops[j].name );
-	   printf("%2s,", reg(i.f.Fa, FP_REG));
-	   printf("%2s,", reg(i.f.Fb, FP_REG));
-	   printf("%2s", reg(i.f.Fc, FP_REG));
-	   return;
-       }
-   }
-   printf( "unknown (float)" );
+  for (j = 0; j < sizeof(float_ops) / sizeof(TFloatOp); j++) {
+    if (float_ops[j].op == i.f.func) {
+      printf("%10s    ", float_ops[j].name );
+      printf("%2s,", reg(i.f.Fa, FP_REG));
+      printf("%2s,", reg(i.f.Fb, FP_REG));
+      printf("%2s", reg(i.f.Fc, FP_REG));
+      return;
+    }
+  }
+  printf( "unknown (float)" );
 }
 
 

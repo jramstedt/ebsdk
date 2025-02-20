@@ -194,7 +194,7 @@ void * malloc(size_t size)
       newblock->size = newsize;
       newblock->next = block->next;
       if (newblock->next != NULL)
-	newblock->next->previous = newblock;
+      newblock->next->previous = newblock;
       newblock->previous = block;
       newblock->free = TRUE;
 

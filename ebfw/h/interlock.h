@@ -146,7 +146,7 @@ static long write_atomic(long *dest, long source)
 {
 //    printf("write_atomic start %d %p %ld %ld\n",gh_task.pid,dest,*dest,source);
     ASM ("mb;");
-    *dest= source;
+    *dest = source;
 //    printf("write_atomic %d %p %ld %ld\n",gh_task.pid,dest,*dest,source);
     return 0;
 }

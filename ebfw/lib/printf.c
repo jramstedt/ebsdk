@@ -196,12 +196,12 @@ typedef union
 {
     struct
     {
-	char * strptr;
+        char * strptr;
     } Copy;
 #ifdef NEEDFLOPPY
     struct
     {
-	FILE * File;
+        FILE * File;
     } File;
 #endif
 } FUNCTIONDATA;
@@ -267,7 +267,7 @@ static int PutNumber(sl value, int radix, int width, char fill, char modifier)
     break;
   case 'L': /* L is sl in NT and int on UNIX */
 #   ifdef PRINTF_L_LARGE
-	break;
+        break;
 #   endif
   default:
     if (radix < 0)
@@ -379,7 +379,7 @@ static int putFloat( double value, int fieldwidth, int precision, char fill, cha
 
     case FP_POS_NORM:		/* Positive normalized */
     case FP_NEG_NORM:		/* Negative normalized */
-	break;
+        break;
     }
 
     ExponentChar = 'E';
@@ -388,14 +388,16 @@ static int putFloat( double value, int fieldwidth, int precision, char fill, cha
     {
     case 'e':
         ExponentChar = 'e';
+        /* fallthrough */
     case 'E':
-	return( putFloatE( value, fieldwidth, precision, fill, ExponentChar ) );
+        return( putFloatE( value, fieldwidth, precision, fill, ExponentChar ) );
     case 'f':
-	return( putFloatF( value, fieldwidth, precision, fill ) );
+        return( putFloatF( value, fieldwidth, precision, fill ) );
     case 'g':
         ExponentChar = 'e';
+        /* fallthrough */
     case 'G':
-	return( putFloatG( value, fieldwidth, precision, fill, ExponentChar ) );
+        return( putFloatG( value, fieldwidth, precision, fill, ExponentChar ) );
     }
 
     return( 0 );
@@ -409,38 +411,38 @@ static int putFloatE( double value, int fieldwidth, int precision, char fill, ch
     int count = 0;
 
     if( value < 0 )
-	sign = 1, value = -value;
+        sign = 1, value = -value;
     else
-	sign = 0;
+        sign = 0;
 
     exp = ExtractExponent( &value );
     if( exp < 0 )
-	exp = -exp, exp_sign = 1;
+        exp = -exp, exp_sign = 1;
     else
-	exp_sign = 0;
+        exp_sign = 0;
 
     if( fieldwidth > 0 )	/* right justified */
     {
-	fieldwidth -= (precision+sign+6+(precision>0?1:0));
-	while( fieldwidth > 0 )
-	    fieldwidth--, (*PutFunction)( fill ), count++;
-	fieldwidth = 0;
+        fieldwidth -= (precision+sign+6+(precision>0?1:0));
+        while( fieldwidth > 0 )
+            fieldwidth--, (*PutFunction)( fill ), count++;
+        fieldwidth = 0;
     }
     if(sign)  
-	(*PutFunction)('-'),		  count++; /* Output the sign*/
+        (*PutFunction)('-'),		  count++; /* Output the sign*/
     if( precision == 0 ) value += 0.5;	/* round the msd if there are no others */
     (*PutFunction)((char)(((ul) value)+'0')), count++; /* Output the MSD*/
 
     if( precision > 0 )
     {
-	double Tmp;
+        double Tmp;
 
         (*PutFunction)('.' & 0x7f),	  count++; /* Output the decimal place. */
 
-	Tmp = value - (sl)value;	/* remove the integer part */
-	Tmp *= ten_table[precision];	/* shift the fraction into an integer */
-	Tmp += 0.5;			/* round the remaining fraction */
-	count += PutNumber( (sl)Tmp, 10, precision, '0', PUTNUMBER_SL_ ); /* print the digits */
+        Tmp = value - (sl)value;	/* remove the integer part */
+        Tmp *= ten_table[precision];	/* shift the fraction into an integer */
+        Tmp += 0.5;			/* round the remaining fraction */
+        count += PutNumber( (sl)Tmp, 10, precision, '0', PUTNUMBER_SL_ ); /* print the digits */
     }
 
     (*PutFunction)( ExponentChar );	count++; /* Output the exponent char */
@@ -450,9 +452,9 @@ static int putFloatE( double value, int fieldwidth, int precision, char fill, ch
     /* for left justified data finish the width padding if necessary */
     if( fieldwidth < 0 )
     {
-	fieldwidth = -fieldwidth - count;
-	while( fieldwidth > 0 )
-	    fieldwidth--, (*PutFunction)( fill ), count++;
+        fieldwidth = -fieldwidth - count;
+        while( fieldwidth > 0 )
+            fieldwidth--, (*PutFunction)( fill ), count++;
     }
 
     return count;
@@ -464,32 +466,32 @@ static int putFloatF( double value, int fieldwidth, int precision, char fill )
     int count = 0;
 
     if( precision == 0 )
-	value += value<0 ? (-0.5) : 0.5;/* round the int part if there is no frac */
+        value += value<0 ? (-0.5) : 0.5;/* round the int part if there is no frac */
 
     count += PutNumber( (sl)value, -10,
-			fieldwidth > 0 ?
-			(fieldwidth - (precision>0 ? (precision + 1) : 0) ) : 0,
-			fill, PUTNUMBER_SL_);
+                        fieldwidth > 0 ?
+                        (fieldwidth - (precision>0 ? (precision + 1) : 0) ) : 0,
+                        fill, PUTNUMBER_SL_);
 
     if( precision > 0 )
     {
-	double Tmp;
+        double Tmp;
 
         (*PutFunction)('.' & 0x7f),	  count++; /* Output the decimal place. */
 
-	Tmp = value<0 ? (-value) : value;   /* remove the sign */
-	Tmp = Tmp - (sl)Tmp;		    /* remove the integer part */
-	Tmp *= ten_table[precision];	    /* shift the fraction into an integer */
-	Tmp += 0.5;			    /* round the remaining fraction */
-	count += PutNumber( (sl)Tmp, 10, precision, '0', PUTNUMBER_SL_ ); /* print the digits */
+        Tmp = value<0 ? (-value) : value;   /* remove the sign */
+        Tmp = Tmp - (sl)Tmp;		    /* remove the integer part */
+        Tmp *= ten_table[precision];	    /* shift the fraction into an integer */
+        Tmp += 0.5;			    /* round the remaining fraction */
+        count += PutNumber( (sl)Tmp, 10, precision, '0', PUTNUMBER_SL_ ); /* print the digits */
     }
 
     /* for left justified data finish the width padding if necessary */
     if( fieldwidth < 0 )
     {
-	fieldwidth = -fieldwidth - count;
-	while( fieldwidth > 0 )
-	    fieldwidth--, (*PutFunction)( fill ), count++;
+        fieldwidth = -fieldwidth - count;
+        while( fieldwidth > 0 )
+            fieldwidth--, (*PutFunction)( fill ), count++;
     }
 
     return count;
@@ -505,40 +507,40 @@ static int putFloatG( double value, int fieldwidth, int precision, char fill, ch
     int RequiredPrecision;
 
     if( value < 0 )
-	sign = 1, MagValue = -value;
+        sign = 1, MagValue = -value;
     else
-	sign = 0, MagValue = value;
+        sign = 0, MagValue = value;
 
     exp = ExtractExponent( &MagValue );
 
     /* determine the required precision for display! */
     {
-	sl Tmp = (sl)(MagValue*ten_table[precision-1] + 0.5);
-	for( RequiredPrecision = precision;
-	     RequiredPrecision > 1 && (Tmp % 10) == 0;
-	     RequiredPrecision--, Tmp /= 10 )
-	    ;
+        sl Tmp = (sl)(MagValue*ten_table[precision-1] + 0.5);
+        for( RequiredPrecision = precision;
+             RequiredPrecision > 1 && (Tmp % 10) == 0;
+             RequiredPrecision--, Tmp /= 10 )
+            ;
     }
 
     /* Dynamically decide wether f or e format is smaller for this value */
     /* expression macros to make this more readable */
 #define FIXEDSIZE( PREC, EXP )	( (PREC) +				     \
-				  ((EXP) < ((PREC)-1) ? 1		:0) +\
-				  ((EXP) >=(PREC)     ? ((EXP)-(PREC)+1):0) +\
-				  ((EXP) < 0	      ? (-(EXP))	:0) )
+                                  ((EXP) < ((PREC)-1) ? 1		:0) +\
+                                  ((EXP) >=(PREC)     ? ((EXP)-(PREC)+1):0) +\
+                                  ((EXP) < 0	      ? (-(EXP))	:0) )
 #define EXPSIZE( PREC )		( 6+(PREC) )
     
     if( exp < precision &&
-	FIXEDSIZE( RequiredPrecision, exp ) < EXPSIZE( RequiredPrecision ) )
+        FIXEDSIZE( RequiredPrecision, exp ) < EXPSIZE( RequiredPrecision ) )
     {
-	RequiredPrecision -= (exp+1);
-	if( RequiredPrecision < 0 )
-	    RequiredPrecision = 0;
+        RequiredPrecision -= (exp+1);
+        if( RequiredPrecision < 0 )
+            RequiredPrecision = 0;
 
-	return( putFloatF( value, fieldwidth, RequiredPrecision, fill ) );
+        return( putFloatF( value, fieldwidth, RequiredPrecision, fill ) );
     }
     else
-	return( putFloatE( value, fieldwidth, RequiredPrecision-1, fill, ExponentChar ) );
+        return( putFloatE( value, fieldwidth, RequiredPrecision-1, fill, ExponentChar ) );
 
 #undef FIXEDSIZE
 #undef EXPSIZE
@@ -552,36 +554,36 @@ static int ExtractExponent( double *value )
     int exp;
 
     if( *value < 0 )
-	sign = 1, MagValue = -*value;
+        sign = 1, MagValue = -*value;
     else
-	sign = 0, MagValue = *value;
+        sign = 0, MagValue = *value;
 
     exp = 0;
     if (MagValue<1.0)
     {
-	while(MagValue*ten_table[24]<1.0)
-	{
-	    exp-= 24;
-	    MagValue *= ten_table[24];
-	}
-	while (MagValue<1.0)
-	{
-	    exp--;
-	    MagValue *= 10.0;
-	}
+        while(MagValue*ten_table[24]<1.0)
+        {
+            exp-= 24;
+            MagValue *= ten_table[24];
+        }
+        while (MagValue<1.0)
+        {
+            exp--;
+            MagValue *= 10.0;
+        }
     }
     else
     {
-	while(MagValue>=ten_table[24])
-	{
-	    exp+= 24;
-	    MagValue /= ten_table[24];
-	}
-	while(MagValue>=10.0)
-	{
-	    exp++;
-	    MagValue /= 10.0;
-	}
+        while(MagValue>=ten_table[24])
+        {
+            exp+= 24;
+            MagValue /= ten_table[24];
+        }
+        while(MagValue>=10.0)
+        {
+            exp++;
+            MagValue /= 10.0;
+        }
     }
 
     *value = sign ? (-MagValue) : MagValue;
@@ -622,7 +624,7 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
     ++f;
   }
 
-/* Parse field precision specifier */
+  /* Parse field precision specifier */
   if (*f == '.') {
     ++f;
     precision = 0;
@@ -641,11 +643,11 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
 
       /* Parse printf Modifiers */
       case 'h': pmod = 'h';
-	break;
+        break;
       case 'l': pmod = 'l';
-	break;
+        break;
       case 'L': pmod = 'L';
-	break;
+        break;
 
 
     /* Parse printf Specifier. */
@@ -653,10 +655,10 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
         {
           const unsigned char a = (unsigned char)va_arg(*ap, int);
 
-	  if (leftjust) {(*PutFunction)((char)(a & 0x7f)); ++(*count);}
-	  if (fieldwidth > 0) PutRepChar(fill, fieldwidth - 1);
-	  if (!leftjust) {(*PutFunction)((char)(a & 0x7f)); ++(*count);}
-	  return(f);
+          if (leftjust) {(*PutFunction)((char)(a & 0x7f)); ++(*count);}
+          if (fieldwidth > 0) PutRepChar(fill, fieldwidth - 1);
+          if (!leftjust) {(*PutFunction)((char)(a & 0x7f)); ++(*count);}
+          return(f);
         }
       case 'd': radix = -10;
         break;
@@ -667,34 +669,34 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
       case 'f':
       case 'g':
       case 'G':
-	{
-	  double a = va_arg(*ap, double);
-	  if (leftjust)
-	    fieldwidth = -fieldwidth;
-	  if (precision<0) precision = 6;
-	  count += putFloat(a, fieldwidth, precision, fill, *(f-1) );
-	  return(f);
-	}
+        {
+          double a = va_arg(*ap, double);
+          if (leftjust)
+            fieldwidth = -fieldwidth;
+          if (precision<0) precision = 6;
+          count += putFloat(a, fieldwidth, precision, fill, *(f-1) );
+          return(f);
+        }
 #endif /* __NO_FLOATING_POINT */
 
       case 'o': radix = 8;
         break;
       case 's':
-	{
-	  char *a = va_arg(*ap, char *);
+        {
+          char *a = va_arg(*ap, char *);
 
-	  if (leftjust) count += PutString((char *) a);
-	  if (fieldwidth > (int)strlen((char *) a))
-	    PutRepChar(fill, fieldwidth - strlen((char *)a));
-	  if (!leftjust) count += PutString((char *) a);
-	  return(f);
+          if (leftjust) count += PutString((char *) a);
+          if (fieldwidth > (int)strlen((char *) a))
+            PutRepChar(fill, fieldwidth - strlen((char *)a));
+          if (!leftjust) count += PutString((char *) a);
+          return(f);
         }
       case 'u': radix = 10;
         break;
       case 'x': radix = 16;
         break;
       case 'X': radix = 16;
-	UpperCase = TRUE;
+        UpperCase = TRUE;
         break;
       case '%': (*PutFunction)('%'); ++(*count);
         return(f);
@@ -721,7 +723,7 @@ static int OutputFunction(const char *f, va_list ap)
   while (*f) {
     if (*f == '%') f = FormatItem(f + 1, &ap, &count);
     else {(*PutFunction)(*f++); ++count;}
-    }
+  }
   return count;
 }
 

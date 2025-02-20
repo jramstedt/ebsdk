@@ -378,10 +378,13 @@ int dumpHeader(romheader_t *header)
 	printf("  Firmware ID (Opt.).. %08x%08x  ",
 	       header->romh.V1.fwoptid.id_S.high,
 	       header->romh.V1.fwoptid.id_S.low);
+  
 	for (i = 0; i < 8; i++)
+  {
 	   if (isprint((int)header->romh.V1.fwoptid.id[i]))
 	     printf ("%c", header->romh.V1.fwoptid.id[i]);
 	   else printf (".");
+  }
 	printf("\n");
         
         if (hver > 1) {         /* Version > 1 */
