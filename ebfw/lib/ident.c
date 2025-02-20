@@ -72,7 +72,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: ident.c,v 1.1.1.1 1998/
 #include "lib.h"
 #include "console.h"
 
-char *rcsidkeyarray[] = {
+const char *rcsidkeyarray[] = {
   "Author: ",
   "Date: ",
   "Header: ",

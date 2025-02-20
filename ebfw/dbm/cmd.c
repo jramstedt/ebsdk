@@ -758,7 +758,7 @@ extern ul default_address;
 extern ul bootadr;
 
 extern int cpu_count;
-extern ul secondary_cpu_function;
+extern void (*secondary_cpu_function)(void);
 extern char __start;
 extern ul DisStartAddress;
 ul scratch;
@@ -1050,7 +1050,7 @@ static void cmd_dirty_deposit(void) {
 
 static void cmd_examine(void)
 {
-  ul keepme;
+  ul keepme = 0UL;
 
   scratch = (ul)decarg[2];
   do {
@@ -1351,23 +1351,23 @@ static void cmd_wbcache(void) {wr_bcache(argc, hexarg[1], hexarg[2], fixarg);}
 
 static void cmd_read_io(void)
 {
-  ui (*function)(ui p);
-  ul mask;
+  ui (*function)(ui p) = NULL;
+  ul mask = 0UL;
 
   switch(fixarg) {
   case Long:
     function = inportl;
-    mask = (ul) 0xffffffff;
+    mask = 0xffffffffUL;
     break;
 
   case Word:
     function = inportw;
-    mask = (ul) 0xffff;
+    mask = 0xffffUL;
     break;
 
   case Byte:
     function = inportb;
-    mask = (ul) 0xff;
+    mask = 0xffUL;
     break;
 
   default:
@@ -1386,23 +1386,23 @@ static void cmd_read_io(void)
 
 static void cmd_write_io(void)
 {
-  void (*function)(ui p , ui d);
-  ul mask;
+  void (*function)(ui p , ui d) = NULL;
+  ul mask = 0UL;
 
   switch(fixarg) {
   case Long:
     function = outportl;
-    mask = (ul) 0xffffffff;
+    mask = 0xffffffffUL;
     break;
 
   case Word:
     function = outportw;
-    mask = (ul) 0xffff;
+    mask = 0xffffUL;
     break;
 
   case Byte:
     function = outportb;
-    mask = (ul) 0xff;
+    mask = 0xffUL;
     break;
 
   default:
@@ -1418,23 +1418,23 @@ static void cmd_write_io(void)
 
 static void cmd_memory_read_io(void)
 {
-  ui (*function)(ui p);
-  ul mask;
+  ui (*function)(ui p) = NULL;
+  ul mask = 0UL;
 
   switch(fixarg) {
   case Long:
     function = inmeml;
-    mask = (ul) 0xffffffff;
+    mask = 0xffffffffUL;
     break;
 
   case Word:
     function = inmemw;
-    mask = (ul) 0xffff;
+    mask = 0xffffUL;
     break;
 
   case Byte:
     function = inmemb;
-    mask = (ul) 0xff;
+    mask = 0xffUL;
     break;
 
   default:
@@ -1453,23 +1453,23 @@ static void cmd_memory_read_io(void)
 
 static void cmd_memory_write_io(void)
 {
-  void (*function)(ui p , ui d);
-  ul mask;
+  void (*function)(ui p , ui d) = NULL;
+  ul mask = 0UL;
 
   switch(fixarg) {
   case Long:
     function = outmeml;
-    mask = (ul) 0xffffffff;
+    mask = 0xffffffffUL;
     break;
 
   case Word:
     function = outmemw;
-    mask = (ul) 0xffff;
+    mask = 0xffffUL;
     break;
 
   case Byte:
     function = outmemb;
-    mask = (ul) 0xff;
+    mask = 0xffUL;
     break;
 
   default:
@@ -1497,25 +1497,25 @@ static void cmd_pcishow(void)
 }
 static void cmd_cfgr(void)
 {
-  int value;
-  ul mask;
+  int value = 0;
+  ul mask = 0UL;
 
   IOPCIClearNODEV();
 
   switch(fixarg) {
   case Long:
     value = incfgl((ui)((argc>3)?decarg[3]:0), (ui)decarg[2], (ui)((argc>4)?decarg[4]:0), (ui)hexarg[1]);
-    mask = (ul) 0xffffffff;
+    mask = 0xffffffffUL;
     break;
 
   case Word:
     value = incfgw((ui)((argc>3)?decarg[3]:0), (ui)decarg[2], (ui)((argc>4)?decarg[4]:0), (ui)hexarg[1]);
-    mask = (ul) 0xffff;
+    mask = 0xffffUL;
     break;
 
   case Byte:
     value = incfgb((ui)((argc>3)?decarg[3]:0), (ui)decarg[2], (ui)((argc>4)?decarg[4]:0), (ui)hexarg[1]);
-    mask = (ul) 0xff;
+    mask = 0xffUL;
     break;
 
   default:
@@ -1612,7 +1612,7 @@ static void cmd_mt(void)
 }
 #endif
 
-struct KEY {
+const struct KEY {
    char *keyw;
     char *syntax;
     void (*func)(void);
@@ -1833,7 +1833,7 @@ struct KEY {
 /* the memt.c lib module needs to be ported to work on NT due to the 64/32 long and pointer differences */
   { "mt","",cmd_mt,0,0,"Measure memory bandwidth.", ""},
 #endif
-  { 0, 0, 0, 0, 0, 0}
+  { NULL, NULL, NULL, 0, 0, NULL, NULL }
 };
 
 static void Help(int apropos)
@@ -1896,7 +1896,7 @@ static void Help(int apropos)
 
 static void CommandHelp(char *arg, int apropos)
 {
-  struct KEY *p;
+  const struct KEY *p;
   int pagelgth = 0;
   char *s, synkey;
   p = &keyarray[0];
@@ -1936,7 +1936,7 @@ static void CommandHelp(char *arg, int apropos)
 
 void (*Lookup(void))(void)
 {
-  struct KEY *p;
+  const struct KEY *p;
   int matchok;
   ui wantargs, i;
   char synkey;

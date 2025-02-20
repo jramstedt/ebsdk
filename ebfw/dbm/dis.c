@@ -700,7 +700,7 @@ static TFloatOp float_ops[] = {
 
 static void dis_float( union instruction i )
 {
-    int j;
+  unsigned long j;
 
 /* implements table C-6 */
 
@@ -785,7 +785,7 @@ static TFloatOp ieee_ops[] = {
 
 static void dis_ieee( union instruction i )
 {
-    int j;
+    unsigned long j;
 
 /* implements table C-7 */
 
@@ -849,7 +849,7 @@ static TFloatOp vax_ops[] = {
 
 static void dis_vax( union instruction i )
 {
-    int j;
+    unsigned long j;
 
 /* implements table C-8 */
 

@@ -493,7 +493,7 @@ void ChangeMem(int size, ul place)
 {
   int gc_argc;
 
-  place &= (ul)(-1<<size);  /* align pointer */
+  place &= ~0UL << size;  /* align pointer */
 
   while (TRUE) {
     PrintPlace(size, place);
@@ -513,7 +513,7 @@ void ChangeMem(int size, ul place)
 
 void FillMem(ul first, ul last, ui value)
 {
-  first &= (ul)(-1<<2);		/* longword align pointer */
+  first &= ~0UL << 2;		/* longword align pointer */
   while (first <= last) {
     WriteL ( first, value);
     first += sizeof(ui);

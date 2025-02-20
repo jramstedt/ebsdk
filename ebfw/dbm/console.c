@@ -553,7 +553,7 @@ static void cmdline_delete(int offset)
 static void donumber (int i)
 {
   char *s, c = '\0';
-  int value;
+  int value = 0;
 
   s = argv[i];
   hexarg[i] = 0;
