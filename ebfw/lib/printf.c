@@ -601,8 +601,8 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
   LeadingSign = FALSE;
   UpperCase = FALSE;
 
-/* Parse printf Flags */
-  while (strchr("-+ #0", (int)*f) != NULL) {
+  /* Parse printf Flags */
+  while (strchr("-+ #0", *f) != NULL) {
     switch(*f++) {
     case '-': leftjust = TRUE;
       break;
@@ -616,8 +616,8 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
     }
   }
 
-/* Parse field width specifier */
-  while (_isdigit(*f)) {
+  /* Parse field width specifier */
+  while (_isdigit((unsigned char)*f)) {
     fieldwidth = (fieldwidth * 10) + (*f - '0');
     ++f;
   }
@@ -626,7 +626,7 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
   if (*f == '.') {
     ++f;
     precision = 0;
-    while (_isdigit(*f)) {
+    while (_isdigit((unsigned char)*f)) {
       precision = (precision * 10) + (*f - '0');
       ++f;
     }
@@ -650,8 +650,8 @@ static const char *FormatItem(const char *f, va_list *ap, int *count)
 
     /* Parse printf Specifier. */
       case 'c':
-	{
-	  char a = va_arg(*ap, char);
+        {
+          const unsigned char a = (unsigned char)va_arg(*ap, int);
 
 	  if (leftjust) {(*PutFunction)((char)(a & 0x7f)); ++(*count);}
 	  if (fieldwidth > 0) PutRepChar(fill, fieldwidth - 1);
@@ -727,22 +727,22 @@ static int OutputFunction(const char *f, va_list ap)
 
 int printf(const char *f, ...)
 {
-  int count = 0,i;
+  int count = 0;
   va_list ap;
+
+  while (test_set_low(&print_lock))
+  {
+    usleep(1);
+  }
 
   PutFunction = UserPutChar;
 
   va_start(ap, f);
-
-  while (test_set_low(&print_lock))
-  {
-        for(i=0;i<256;i++);
-  }
-
   count = OutputFunction(f, ap);
- 
   va_end(ap);         /* clean up */
-  print_lock= 0;
+
+  print_lock = 0;
+
   return count;
 }
 
