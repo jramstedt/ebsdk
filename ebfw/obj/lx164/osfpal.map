@@ -1,0 +1,113 @@
+
+There are no discarded input sections
+
+Memory Configuration
+
+Name             Origin             Length             Attributes
+*default*        0x0000000000000000 0xffffffffffffffff
+
+Linker script and memory map
+
+                [!provide]                        PROVIDE (__executable_start = SEGMENT_START ("text-segment", 0x0))
+                0x0000000000000000                . = SEGMENT_START ("text-segment", 0x0)
+
+.init
+ *(SORT_NONE(.init))
+
+.text           0x0000000000000000     0x7060
+ *(.text.startup .text.startup.*)
+ *(.text)
+ .text          0x0000000000000000     0x6440 /home/janne/ebsdk/ebfw/obj/lx164/osfpal.o
+                0x0000000000002fc0                CallPal_Rti
+                0x0000000000005a54                MchkCommon
+                0x0000000000005ab0                HaltDoubleMchk
+                0x0000000000005d60                SaveState
+                0x0000000000006120                RestoreState
+ .text          0x0000000000006440      0x154 /home/janne/ebsdk/ebfw/obj/lx164/srom_dbm.o
+                0x0000000000006440                keypressed
+                0x000000000000645c                getChar
+                0x00000000000064bc                putChar
+                0x0000000000006528                autobaud_sync
+ *fill*         0x0000000000006594        0x4 0000fe2f1f04ff47
+ .text          0x0000000000006598       0x38 /home/janne/ebsdk/ebfw/obj/lx164/sromcsrv.o
+                0x0000000000006598                Sys_Cserve_Srom_Init
+                0x00000000000065b0                Sys_Cserve_Srom_Putc
+                0x00000000000065c0                Sys_Cserve_Srom_Getc
+ *fill*         0x00000000000065d0       0x10 0000fe2f1f04ff47
+ .text          0x00000000000065e0      0xa80 /home/janne/ebsdk/ebfw/obj/lx164/platform.o
+                0x00000000000065e0                Sys_Reset
+                0x00000000000068d0                Sys_ResetViaSwppal
+                0x00000000000068f0                Sys_Interrupt
+                0x00000000000069e8                Sys_IntMchkHandler
+                0x0000000000006b80                Sys_MchkLogOut
+                0x0000000000006c20                Sys_Cflush
+                0x0000000000006c40                Sys_WrIpir
+                0x0000000000006c60                Sys_Cserve
+                0x0000000000006f80                Wr_Bcache
+                0x0000000000006fe0                Sys_EnterConsole
+
+.fini
+ *(SORT_NONE(.fini))
+                [!provide]                        PROVIDE (__etext = .)
+                [!provide]                        PROVIDE (_etext = .)
+                [!provide]                        PROVIDE (etext = .)
+
+.rodata
+ *(.rodata .rodata.*)
+
+.eh_frame
+ *(.eh_frame)
+
+.eh_frame
+ *(.eh_frame)
+ *(.eh_frame.*)
+
+.data           0x0000000000007060       0x72
+ *(.data)
+ .data          0x0000000000007060       0x36 /home/janne/ebsdk/ebfw/obj/lx164/osfpal.o
+ .data          0x0000000000007096        0x0 /home/janne/ebsdk/ebfw/obj/lx164/srom_dbm.o
+ .data          0x0000000000007096        0x0 /home/janne/ebsdk/ebfw/obj/lx164/sromcsrv.o
+ .data          0x0000000000007096       0x3c /home/janne/ebsdk/ebfw/obj/lx164/platform.o
+                0x00000000000070d2                Pal_End
+
+.got
+ *(.got.plt)
+ *(.igot.plt)
+ *(.got)
+ *(.igot)
+
+.sdata
+ *(.sdata)
+                0x00000000000070d2                _edata = .
+                [!provide]                        PROVIDE (edata = .)
+                0x00000000000070e0                . = ALIGN (ALIGNOF (NEXT_SECTION))
+                0x00000000000070d2                __bss_start = .
+
+.sbss
+ *(.sbss)
+
+.bss            0x00000000000070d2        0x0
+ *(.bss)
+ .bss           0x00000000000070d2        0x0 /home/janne/ebsdk/ebfw/obj/lx164/osfpal.o
+ .bss           0x00000000000070d2        0x0 /home/janne/ebsdk/ebfw/obj/lx164/srom_dbm.o
+ .bss           0x00000000000070d2        0x0 /home/janne/ebsdk/ebfw/obj/lx164/sromcsrv.o
+ .bss           0x00000000000070d2        0x0 /home/janne/ebsdk/ebfw/obj/lx164/platform.o
+ *(COMMON)
+                0x00000000000070d8                . = ALIGN (0x8)
+                0x00000000000070d8                . = SEGMENT_START ("ldata-segment", .)
+                0x00000000000070d8                . = ALIGN (0x8)
+                0x00000000000070d8                _end = .
+                [!provide]                        PROVIDE (end = .)
+
+.comment
+ *(.comment)
+
+/DISCARD/
+ *(.note.GNU-stack)
+ *(.gnu_debuglink)
+ *(.rela.text)
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/osfpal.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/srom_dbm.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/sromcsrv.o
+LOAD /home/janne/ebsdk/ebfw/obj/lx164/platform.o
+OUTPUT(/home/janne/ebsdk/ebfw/obj/lx164/osfpal elf64-alpha)
