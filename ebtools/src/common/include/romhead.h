@@ -2,7 +2,7 @@
 #define __ROMHEAD_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -318,7 +318,7 @@ your own risk.
 
 #include "local.h"       /* Include environment specific definitions */
 
-#define ROM_H_SIGNATURE 0x5A5AC3C3
+#define ROM_H_SIGNATURE 0x5A5AC3C3U
 #define ROM_H_REVISION  2
 #define DEFAULT_ROM_H_REVISION 2
 #define ROM_H_BRANCH_SIGNATURE 0xc3e00000
