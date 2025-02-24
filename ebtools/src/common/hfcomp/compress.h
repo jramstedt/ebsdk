@@ -7,6 +7,11 @@ typedef unsigned int ULONG;
 typedef int LONG;
 typedef int INT;
 typedef unsigned int UINT;
+#elif __LP64__
+typedef unsigned int ULONG;
+typedef int LONG;
+typedef int INT;
+typedef unsigned int UINT;
 #else
 typedef unsigned long ULONG;
 typedef long LONG;
@@ -28,7 +33,7 @@ extern FILE *objIn;
 extern FILE *objOut;
 #endif
 
-#define WSIZE ((unsigned)32768)
+#define WSIZE (32768U)
 
 #define MIN_MATCH  3
 #define MAX_MATCH  258

@@ -18,6 +18,23 @@ typedef char *PSZ;
 extern INT verbose;
 extern LONG compressedSize;
 extern LONG decompressedSize;
+#elif __LP64__
+typedef unsigned int ULONG;
+typedef int LONG;
+typedef int INT;
+typedef unsigned int UINT;
+typedef ULONG *PULONG;
+typedef short SHORT;
+typedef unsigned short USHORT;
+typedef USHORT *PUSHORT;
+typedef unsigned char UCHAR;
+typedef char CHAR;
+typedef UCHAR *PUCHAR;
+typedef char *PSZ;
+
+extern INT verbose;
+extern LONG compressedSize;
+extern LONG decompressedSize;
 #else
 typedef unsigned long ULONG;
 typedef long LONG;
@@ -52,6 +69,7 @@ extern INT bits_left;
 int inflate (void);
 
 #ifdef ROM
+extern unsigned int decompress();
 
 #define slide area->Slide
 /* typedef int size_t; */

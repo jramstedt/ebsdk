@@ -65,8 +65,6 @@ __attribute__((used)) static const char *RCSid =
 #include "decomp.h"
 #undef DEBUG
 
-extern unsigned int decompress();
-
 unsigned int main()
 {
   unsigned int target_address;

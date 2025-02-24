@@ -319,7 +319,7 @@ your own risk.
 #endif /* ! (defined(DEBUG_TSUNAMI) || defined(DEBUG_ALCOR) || defined(DEBUG_APECS)) */
 
 /* this application may be loaded into memory at an address that is ONLY
- * longword alligned.  Therefore all calculations reguarding the location
+ * longword aligned.  Therefore all calculations reguarding the location
  * for the Data area relative to Start are not known
  */
 	.text   0
@@ -421,10 +421,10 @@ pvc$huf16$1002:
 	bis     r17, r31, r27           // Save r17 into scratch r27
 
 #define PAL_FUNC_CSERVE         (9)
-#define cserve_jump_to_arc      (69)
+#define cserve$jump_to_arc      (69)
 
 	bis     r30, 1, r17
-	lda     r16, cserve_jump_to_arc(r31)
+	lda     r16, cserve$jump_to_arc(r31)
 pvc$huf15$1002:
 	call_pal PAL_FUNC_CSERVE        // Load the new EXC_ADDR, return in PAL
 	bis     r28, r31, r16           // restore r16 from scratch r28
@@ -503,7 +503,7 @@ PALContinue:
 	bis     r31, 8, r28             // 47 bit Kseg
 	mtpr    r28, EV6__M_CTL         /* Turn on 47 bit Kseg */
 
-	ldah    r28, -32768(r31)        /* Kseg = 0xffff8000.00000000   */
+	ldah    r28, SEXT(0x8000)(r31)  /* Kseg = 0xffff8000.00000000   */
 	sll     r28, 16, r28            /* Shift into place             */
 	bis     r28, r27, r27
 

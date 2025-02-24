@@ -3,11 +3,12 @@ include $(CONFIG_DIR)/sdkmake.conf
 
 include $(EB_BASE)/rules.gnu
 
-AS		= as
-LC		= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
-LD		= ld
-CC		= gcc
-CPP		= cpp
+AS				= as
+LC				= $(shell echo '$1' | tr '[:upper:]' '[:lower:]' )
+LD				= ld
+CC				= gcc
+CPP				= cpp
+LINT			= /usr/bin/lint
 OBJCOPY		= objcopy
 OBJDUMP		= objdump
 SYSGEN		= $(TOOLBOX)/sysgen
@@ -23,11 +24,11 @@ ALPHA_TOOLS 	= \
 
 INCLUDES	= -I. -I../include
 
-CPPFLAGS	= -DPVCCHECK
-CCFLAGS		= -g $(HEADER_DEFS) -DNT_UP -mcpu=$(CPU) -c -Os -Wall -Wextra -fno-builtin -ffreestanding
-CFLAGS		= -g $(INCLUDES)
 ASFLAGS		= -m$(call LC,$(CPU))
-LINT		= /usr/bin/lint
+CPPFLAGS	= -DPVCCHECK $(HEADER_DEFS) -fdollars-in-identifiers
+CCFLAGS		= -mcpu=$(CCPU) -c -Os -Wall -Wextra -fno-builtin -ffreestanding
+CFLAGS		= -g -Wall -Wextra
+LDFLAGS	  = --orphan-handling=warn -nostdlib -T$(EB_BASE)/palcode/palcode.ld -z noexecstack --no-dynamic-linker -static
 LINTFLAGS	=  -1 -wp -av -n $(INCLUDES)
 
 HEADER_DEFS 	= \
@@ -42,10 +43,13 @@ DEPFLAGS	= -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
 INSTALL_TARGETS	= hfcomp decmp064.img decmp164.img decmp264.img
 
+.PHONY : all install clean
+
 all : hfcomp decomp064 decomp164 decomp264
 
-hfcomp : $(SRCS:.c=.o)
-	$(CC) $(CFLAGS) $(CPPFLAGS) $(HEADER_DEFS) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
+# hcomp
+hfcomp : $(SRCS)
+	$(CC) $(CFLAGS) $(CPPFLAGS) $(INCLUDES) $(OUTPUT_OPTION) $(TARGET_ARCH) $^
 
 ### Decompressor image
 MAKEFILE	= Makefile
@@ -55,6 +59,11 @@ CPU_164		= 21164
 CPU_264		= 21264
 CPU		= $(CPU_$(TYPE))
 
+CCPU_064	= $(CPU)
+CCPU_164	= $(CPU)a
+CCPU_264	= $(CPU)
+CCPU		= $(CCPU_$(TYPE))
+
 CPU_DTBMISS_064	= 9E0
 CPU_DTBMISS_164	= 200
 CPU_DTBMISS_264	= 300
@@ -63,7 +72,7 @@ CPU_DTBMISS	= $(CPU_DTBMISS_$(TYPE))
 decomp% :
 	$(MAKE) -f $(MAKEFILE) $(ALPHA_TOOLS) TYPE=$* decmpimg
 
-decmpimg : decmp$(TYPE).img upal$(TYPE).lis
+decmpimg : cstartup.o decmp$(TYPE).img upal$(TYPE).lis
 
 ### Decompressor
 
@@ -74,32 +83,32 @@ cstartup.o : cstartup.sp
 	$(AS) $(ASFLAGS) -o $@ $^
 
 decmp$(TYPE).o : decomp.c
-	$(CC) $(CCFLAGS) -DROM -o $@ -c $^
+	$(CC) $(CCFLAGS) $(CPPFLAGS) -DROM -o $@ $^
 
 inf_s$(TYPE).o : inflate.c
-	$(CC) $(CCFLAGS) -DROM -o $@ -c $^
+	$(CC) $(CCFLAGS) $(CPPFLAGS) -DROM -o $@ $^
 
 dbmmn$(TYPE).o : dbmmain.c
-	$(CC) $(CCFLAGS) -o $@ -c $^
+	$(CC) $(CCFLAGS) $(CPPFLAGS) -DROM -o $@ $^
 
-decmp$(TYPE).elf : cstartup.o decmp$(TYPE).o inf_s$(TYPE).o dbmmn$(TYPE).o
-	$(LD) -nostdlib -N -Ttext=$(DECOMP_BASE) -s -z noexecstack -e __start -o $@ $^
-#	$(LD) -N -segment_page 16 -T $(DECOMP_BASE) -non_shared -o $@ $^
-# https://web.archive.org/web/20070226182734/http://h30097.www3.hp.com:80/docs/base_doc/DOCUMENTATION/V50_HTML/MAN/MAN1/0241____.HTM
+decmp$(TYPE).elf : decmp$(TYPE).o inf_s$(TYPE).o dbmmn$(TYPE).o
+	$(LD) -Map=decmp$(TYPE).map -nostdlib -Tdecomp.ld -z noexecstack -s --no-dynamic-linker -static -o $@ $^
 
 ### micropal
 
 # Preprocesses micropal.s to upal$(TYPE).sp
 upal$(TYPE).sp : micropal.s
-	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) -DASSEMBLY_CODE $(HEADER_DEFS) $^ > $@
+	$(CPP) $(CPPFLAGS) $(INCLUDES) -DDC$(CPU) -DASSEMBLY_CODE $^ > $@
 
 upal$(TYPE).o : upal$(TYPE).sp
-	$(AS) $(ASFLAGS) -R -o $@ $^
+	$(AS) $(ASFLAGS) -o $@ $^
+
+upal$(TYPE).elf : upal$(TYPE).o
+	$(LD) $(LDFLAGS)  -Map=upal$(TYPE).map -o $@ $^
 
 # Strip all header sections (text and data)
-upal$(TYPE).nh : upal$(TYPE).o
+upal$(TYPE).nh : upal$(TYPE).elf
 	$(OBJCOPY) -O binary $< $@
-#	$(ASTRIP) -a -v $< $@
 
 upal$(TYPE).ent :
 	echo 0 uPalReset > $@
@@ -142,24 +151,24 @@ lint :
 
 clean :
 	rm -f *.o *~ \#*\# *.bak *.a core \
-	*.nh decmp*.elf *.lis *.dis \
+	*.nh decmp*.elf upal*.elf *.lis *.dis \
 	*.map *.pvc *.ent *.sp \
 	decmp*.img \
 	hfcomp
 
 # Dependencies
-DEPDIR := .deps
-DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
+#DEPDIR := .deps
+#DEPFLAGS = -MT $@ -MMD -MP -MF $(DEPDIR)/$*.d
 
-COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
+#COMPILE.c = $(CC) $(DEPFLAGS) $(CFLAGS) $(CPPFLAGS) $(TARGET_ARCH) -c
 
-%.o : %.c
-%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
-		$(COMPILE.c) $(OUTPUT_OPTION) $<
+#%.o : %.c
+#%.o : %.c $(DEPDIR)/%.d | $(DEPDIR)
+#		$(COMPILE.c) $(OUTPUT_OPTION) $<
 
-$(DEPDIR): ; @mkdir -p $@
+#$(DEPDIR): ; @mkdir -p $@
 
-DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
-$(DEPFILES):
+#DEPFILES := $(SRCS:%.c=$(DEPDIR)/%.d)
+#$(DEPFILES):
 
-include $(wildcard $(DEPFILES))
+#include $(wildcard $(DEPFILES))

@@ -2,7 +2,7 @@
 #define __HEADER_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -114,5 +114,7 @@ struct header {
 #define HEAD_target   0x0c
 #define HEAD_ID_stamp 0x10
 #define HEAD_csize    0x14
+
+#define SEXT(val) ((val ^ 0x8000) - 0x8000)
 
 #endif /* __HEADER_H_LOADED */
