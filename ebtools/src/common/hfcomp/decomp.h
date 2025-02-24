@@ -1,3 +1,6 @@
+#include <stddef.h>
+#include <stdint.h>
+
 #define FALSE 0
 #define TRUE 1
 
@@ -33,8 +36,8 @@ typedef UCHAR *PUCHAR;
 typedef char *PSZ;
 
 extern INT verbose;
-extern LONG compressedSize;
-extern LONG decompressedSize;
+extern size_t compressedSize;
+extern size_t decompressedSize;
 #else
 typedef unsigned long ULONG;
 typedef long LONG;
@@ -54,13 +57,13 @@ extern LONG compressedSize;
 extern LONG decompressedSize;
 #endif
 
-extern PUCHAR compressed;
-extern PUCHAR decompressed;
+extern const void *compressed;
+extern void *decompressed;
 
-extern PUCHAR inptr;
-extern PUCHAR outptr;
+extern const void *inptr;
+extern void *outptr;
 
-extern INT bits_left;
+extern size_t bits_left;
 
 #define MAX_BITS      13                 /* used in unShrink() */
 #define HSIZE         (1 << MAX_BITS)    /* size of global work area */
@@ -72,10 +75,6 @@ int inflate (void);
 extern unsigned int decompress();
 
 #define slide area->Slide
-/* typedef int size_t; */
-typedef unsigned long size_t;
-
-/* #define NULL (char *)0 */
 
 /*
 //
@@ -105,8 +104,8 @@ extern unsigned int BASE_OF_HEAP;
 //
 */
 
-#define huft_free(x) 
-#define fprintf(x,y)
+#define huft_free(x) ((void)0)
+#define fprintf(x,y) ((void)0)
 
 /* functional prototypes for memory routines */
 

@@ -348,7 +348,7 @@ void compress_stop (void) {
 
     /* now write out the header */
     if (_SEEN('v')) {
-      fprintf(stderr, "...compressed image header size %d (0x%X) bytes\n",
+      fprintf(stderr, "...compressed image header size %ld (0x%lX) bytes\n",
 	      sizeof(struct header), sizeof(struct header));
     }
     fwrite(hp, sizeof(struct header), 1, fout);
@@ -420,7 +420,7 @@ int main (int argc, char *argv []) {
  * This is a -xyz style options list.  Work out the options specified.
  */
 	    arg++;			/* skip the '-' */
-	    while (option = *arg++) {	/* until we reach the '0' string
+	    while ((option = *arg++)) {	/* until we reach the '0' string
 					 * terminator */
 		option = tolower(option);
 		switch (option) {
@@ -445,6 +445,7 @@ int main (int argc, char *argv []) {
 
 		    default: 
 			fprintf(stderr, "Unknown option \"%s\"\n", arg);
+                        /* fallthrough */
 		    case 'h': 
 		    case '?': 
 			usage(argv[0]);
@@ -496,7 +497,7 @@ int main (int argc, char *argv []) {
         return FALSE;
     }
     if (_SEEN('v')) {
-      fprintf(stderr, "Opened decompression library image %s, %d (0x%X) bytes)\n",
+      fprintf(stderr, "Opened decompression library image %s, %ld (0x%lX) bytes)\n",
 	      prefile, statbuf.st_size, statbuf.st_size);
     }
 
@@ -544,7 +545,7 @@ int main (int argc, char *argv []) {
         return FALSE;
     }
     if (_SEEN('v')) {
-      fprintf(stderr, "Opened input image file %s, %d (0x%X) bytes)\n",
+      fprintf(stderr, "Opened input image file %s, %ld (0x%lX) bytes)\n",
 	      infile, statbuf.st_size, statbuf.st_size);
     }
 

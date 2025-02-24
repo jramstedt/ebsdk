@@ -242,8 +242,6 @@ ULONG memcompress(unsigned char *tgt,
     unsigned char *src, 
     ULONG srcsize)
 {
-    int method      = DEFLATE;
-
     if (tgtsize <= 6L) {
       fprintf (stderr,"target buffer too small");
       return 0;
@@ -263,6 +261,7 @@ ULONG memcompress(unsigned char *tgt,
     deflate();
 
 #if 0
+    int method      = DEFLATE;
     /* For portability, force little-endian order on all machines: */
     tgt[0] = (char)(method & 0xff);
     tgt[1] = (char)((method >> 8) & 0xff);

@@ -81,6 +81,8 @@ __attribute__((used)) static const char *RCSid = "$Id: decomp.c,v 1.1.1.1 1998/1
  *
  */
 
+#include <stdint.h>
+
 #ifdef ROM
 
 /* nothing */
@@ -102,9 +104,9 @@ void exit(int code);
 #ifdef ROM
 
 #ifndef _WIN32
-extern unsigned long _end;
-extern unsigned long _edata;
-extern unsigned long _fbss;
+extern uintptr_t _end;
+extern uintptr_t _edata;
+extern uintptr_t _fbss;
 #define _END _end
 #define _EDATA _fbss
 #endif
@@ -123,16 +125,16 @@ INT verbose = FALSE ;
 /* This is important, because .bss normally established by the OS, */
 /* and for the firmware boot loading, it is not. */
 
-PUCHAR compressed = 0;
-LONG compressedSize = 0;
+const void *compressed = 0;
+size_t compressedSize = 0;
 
-PUCHAR decompressed = 0;
-LONG decompressedSize = 0;
+void *decompressed = 0;
+size_t decompressedSize = 0;
 
-PUCHAR inptr = 0;
-PUCHAR outptr = 0;
+const void* inptr = 0;
+void* outptr = 0;
 
-INT bits_left = 0;
+size_t bits_left = 0;
 
 #ifdef ROM
 
@@ -159,14 +161,14 @@ unsigned int
 decompress( void )
 {
 
-    PULONG Signature;
-    UINT Found = FALSE;
+    unsigned int *Signature; // See header.ID_rev2
+    int Found = FALSE;
     struct header *hp;
 
 #ifdef _WIN32
     compressed = (PUCHAR)(DECOMP_COMPRESSED);
 #else
-    compressed = (PUCHAR)&_END;
+    compressed = (void *)&_END;
 #endif /* _WIN32 */
 
     /* Start at the base of our image and walk through looking for */
@@ -174,10 +176,10 @@ decompress( void )
     /* gets stored on a longword boundary. */
     
 
-    for (Signature = (PULONG)compressed; 
-         Signature < (PULONG) (compressed + _1MEG); 
+    for (Signature = (unsigned int*)compressed; 
+         Signature < (unsigned int*)((uintptr_t)compressed + _1MEG); 
          Signature++) {
-      if ((*Signature & 0xFFFFFFFF) == SIGNATURE_STAMP_REV2) {
+      if (*Signature == SIGNATURE_STAMP_REV2) {
 	Found = TRUE;
 	break;
       }
@@ -195,10 +197,10 @@ decompress( void )
     ** for backward compatibility.
     */
 
-    hp = (struct header *) Signature;
+    hp = (struct header *)Signature;
     compressedSize = hp->csize;
-    compressed = (PUCHAR) ((size_t)Signature+sizeof(struct header));
-    decompressed = (PUCHAR) hp->target;
+    compressed = (void *)((uintptr_t)Signature+sizeof(struct header));
+    decompressed = (void *)(uintptr_t)hp->target;
 
     inptr = compressed;
     outptr = decompressed;

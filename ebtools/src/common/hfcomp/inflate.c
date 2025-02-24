@@ -148,6 +148,7 @@
 
 
 #ifndef	ROM
+#include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -195,7 +196,7 @@ typedef union _work {
 
 work *area= (work *)0;
 
-PUCHAR MemoryHeap = (PUCHAR)0;
+void *MemoryHeap = NULL;
 
 #else
 
@@ -350,38 +351,17 @@ unsigned hufts = 0;         /* track memory usage */
 #ifdef ROM
 void *malloc(size_t size)
 {
+    void *base;
+    base = MemoryHeap;
 
-    PUCHAR base;
-    ULONG  newBase;
-
-    base = (PUCHAR)MemoryHeap;
-
-    /*
     //
     // Bump up past the allocation
-    //
-    */
-    newBase = (ULONG)(base + size);
-
-    /*
-    //
     // round up to next quadword
     //
-    */
 
-    if ((newBase & 7) != 0) {
-        newBase = (newBase & 7) + 8;
-    }
-
-    MemoryHeap = (void *)(newBase);
-
-/*
-//    MemoryHeap = (void *)(( (ULONG)(temp + size) >> 3) << 3 + 8);
-//    MemoryHeap = (void *)(((ULONG)(temp + size) & ~7) + 8); 
-*/
+    MemoryHeap = (void *)(((uintptr_t)(MemoryHeap + size + 7) >> 3) << 3);
 
     return base;
-
 }
 
 void free(void *dummy)
@@ -428,7 +408,7 @@ int ReadByte(USHORT *x)
     if (compressedSize-- <=0)
         return 0;
 
-    *x = *inptr++;
+    *x = *(const unsigned char *)inptr++;
     return 8;
 }
 
@@ -546,7 +526,7 @@ int huft_build(unsigned *b, unsigned n, unsigned s, USHORT *d, USHORT *e, struct
         w += l;                 /* previous table always l bits */
 
         /* compute minimum size table less than or equal to l bits */
-        z = (z = g - w) > (unsigned)l ? l : z;  /* upper limit on table size */
+        z = (z = g - w) > (unsigned)l ? (unsigned)l : z;  /* upper limit on table size */
         if ((f = 1 << (j = k - w)) > a + 1)     /* try a k-w bit table */
         {                       /* too few codes for k-w bit table */
           f -= a + 1;           /* deduct codes from patterns left */
