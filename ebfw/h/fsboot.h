@@ -2,7 +2,7 @@
 #define __FSBOOT_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -103,7 +103,7 @@ extern DBM_STATUS LoadAFile(char * SourceFile , char * Destination);
 typedef  struct ImageData {
   ul destination;
   int prefix;
-  char **name;
+  const char **name;
 } Image_t;
 
 #define FSB_FWU_ENTRY		0x900000

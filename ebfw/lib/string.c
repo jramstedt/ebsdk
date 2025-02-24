@@ -158,10 +158,10 @@ void* memchr(const void* ptr, int ch, size_t count)
 
 size_t strlen(char *s)
 {
-  int len;
+  size_t len;
   len = 0;
-  while (*s++ != 0) len += 1;
-  return ((size_t)len);
+  while (*s++ != '\0') ++len;
+  return (len);
 }
 
 void bzero(char *s, int count)

@@ -111,12 +111,12 @@ __attribute__((unused)) static const char *rcsid = "$Id: fsboot.c,v 1.4 1999/02/
 #include "fsboot.h"
 #include "romhead.h"  /* includes lib.h */
 
-static char *fwu_strings[] = {FSB_FWU_STRINGS};
-static char *dbm_strings[] = {FSB_DBM_STRINGS};
-static char *wnt_strings[] = {FSB_WNT_STRINGS};
-static char *srm_strings[] = {FSB_SRM_STRINGS};
-static char *milo_strings[] = {FSB_MILO_STRINGS};
-static char *tst_strings[] = {FSB_tst_STRINGS};
+static const char *fwu_strings[] = {FSB_FWU_STRINGS};
+static const char *dbm_strings[] = {FSB_DBM_STRINGS};
+static const char *wnt_strings[] = {FSB_WNT_STRINGS};
+static const char *srm_strings[] = {FSB_SRM_STRINGS};
+static const char *milo_strings[] = {FSB_MILO_STRINGS};
+static const char *tst_strings[] = {FSB_tst_STRINGS};
 extern int isa_present;
 /*
 ** This array determines the search order for the
@@ -124,7 +124,7 @@ extern int isa_present;
 ** definitions determine the order of the various
 ** aliases of the different firmware images.
 **/
-static Image_t ImageArray[] = {
+static const Image_t ImageArray[] = {
   {FSB_FWU_ENTRY, FSB_FWU_PREFIX, fwu_strings},	/* Firmware Update Utility */
   {FSB_WNT_ENTRY, FSB_WNT_PREFIX, wnt_strings},	/* Windows NT Firmware */
   {FSB_DBM_ENTRY, FSB_DBM_PREFIX, dbm_strings},	/* Alpha Evaluation Board Debug Monitor */
@@ -164,79 +164,80 @@ int fsboot(ul *destaddr)
       j = 0;
       while (ImageArray[idx].name[j] != NULL) 
       {
-	prefix=ImageArray[idx].prefix;
+        prefix=ImageArray[idx].prefix;
 #ifdef DP264
-	while(prefix>=0)
+        while(prefix>=0)
         {
 #endif
-	*fsbFilename = '\0';	/* Clear name string */
+        *fsbFilename = '\0';	/* Clear name string */
 
-	/* Prepend target name */
-	if (prefix == 1)
+        /* Prepend target name */
+        if (prefix == 1)
 #ifdef DP264
-	if((!isa_present) && (ImageArray[idx].name[j][0]=='s') && (ImageArray[idx].name[j][1]=='r'))
-  	{
-	  strcpy(fsbFilename, "DS10");
-	}
-	else
+        if((!isa_present) && (ImageArray[idx].name[j][0]=='s') && (ImageArray[idx].name[j][1]=='r'))
+          {
+          strcpy(fsbFilename, "DS10");
+        }
+        else
 #endif
-	  strcpy(fsbFilename, TARGET_NAME);
+          strcpy(fsbFilename, TARGET_NAME);
 
-	/* Prepend target name alias if there is one */
-	if (prefix == 2)
-	  strcpy(fsbFilename, ALT_TARGET_NAME);
+        /* Prepend target name alias if there is one */
+        if (prefix == 2)
+          strcpy(fsbFilename, ALT_TARGET_NAME);
 
-	strcat(fsbFilename, ImageArray[idx].name[j]);
+        strcat(fsbFilename, ImageArray[idx].name[j]);
 
-	*destaddr = ImageArray[idx].destination;
+        *destaddr = ImageArray[idx].destination;
 
 #ifdef DP264
   if(isa_present)
   {
-	  srom_access_lcd(0xC0,0);
-	  for (int k=0;k<8;k++)
+          srom_access_lcd(0xC0,0);
+          for (int k=0;k<8;k++)
             srom_access_lcd(' ',1);
-	  srom_access_lcd(0xC0,0);
+          srom_access_lcd(0xC0,0);
           k= 0;
           while (ImageArray[idx].name[j][k])
-	  {
-	    srom_access_lcd(ImageArray[idx].name[j][k],1);
-	    k++;
-	    if (k>=8) break;
-	  }
+          {
+            srom_access_lcd(ImageArray[idx].name[j][k],1);
+            k++;
+            if (k>=8) break;
+          }
    }
 #endif
-	if ((FileLoaded = LoadAFile(fsbFilename, (char *) *destaddr))) {
+        if ((FileLoaded = LoadAFile(fsbFilename, (char *) *destaddr))) {
           header= (romheader_t *)*destaddr;
-	  if(IsHeaderValid(header))
+          if(IsHeaderValid(header))
           {
-	    int *from,*to,size,i;
-	    long temp; 
+            int *from, *to;
+            size_t size, i;
+            ul temp; 
 
-	    size= header->romh.V0.size/sizeof(*to);
-	    from= (int *)((*destaddr)+header->romh.V0.hsize);
-	    temp= header->romh.V0.destination.high;
+            size= header->romh.V0.size/sizeof(*to);
+            from= (int *)((*destaddr)+header->romh.V0.hsize);
+            temp= header->romh.V0.destination.high;
             temp= (temp << 32) + header->romh.V0.destination.low;
             to= (int *)temp;
-	    if (to<from)
-	    for(i=0;i<size;i++) 
-		to[i]= from[i];
-	    else
-            for(i=size-1;i>=0;i--)
+            if (to<from)
+            for(i=0;i<size;++i) 
+                to[i]= from[i];
+            else
+            for(i=size-1;i>=0;--i)
                 to[i]= from[i];
 
-	    *destaddr= temp;
-	  }
-	  outLed(idx);		/* Indicates which image was loaded */
-	  msleep(500);		/* Pause to display LED */
-	  return(TRUE);
-	}
+            *destaddr= temp;
+          }
+          outLed(idx);		/* Indicates which image was loaded */
+          msleep(500);		/* Pause to display LED */
+          return(TRUE);
+        }
 #ifdef DP264
-	prefix--;
+        prefix--;
         }
 #endif
 
-	++j;
+        ++j;
       }
       ++idx;
     }

@@ -51,7 +51,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: isa_dma.c,v 1.1.1.1 199
 void EnableIsaDmaChannel(int channel, int mode)
 {
   if (channel > 4) {
-    outportb(IO_82C37_DMA2_MODE, (mode<<6) | channel-4);
+    outportb(IO_82C37_DMA2_MODE, (mode<<6) | (channel - 4));
     outportb(IO_82C37_DMA2_WRMSK, channel-4);
   }
   else {
