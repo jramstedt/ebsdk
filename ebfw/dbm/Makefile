@@ -211,6 +211,7 @@ clean :
 	$(DELETE) *.o *~ \#*\# *.bak *.a core \
 		$(S_SRCS:.s=.sp) \
 		$(addprefix $(OBJDIR), $(S_SRCS:.s=.o) $(C_SRCS:.c=.o) $(TARGET_SRCS:.c=.o) $(FSB_SRCS:.c=.o)) \
+		$(OBJDIR)dbm.elf \
 		$(OBJDIR)dbm.nh \
 		$(OBJDIR)dbm.img \
 		$(OBJDIR)dbm.rom \
@@ -221,6 +222,7 @@ clean :
 		$(OBJDIR)dbm.out \
 		$(OBJDIR)dbm.map \
 		$(OBJDIR)dbmver.o \
+		$(OBJDIR)fsb.elf \
 		$(OBJDIR)fsb.nh \
 		$(OBJDIR)fsb.img \
 		$(OBJDIR)fsb.rom \
@@ -231,6 +233,7 @@ clean :
 		$(OBJDIR)fsb.out \
 		$(OBJDIR)fsb.map \
 		$(OBJDIR)fsbver.o \
+		$(OBJDIR)sft.elf \
 		$(OBJDIR)sft.nh \
 		$(OBJDIR)sft.dis \
 		$(OBJDIR)sft.out \

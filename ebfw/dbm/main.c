@@ -294,15 +294,15 @@ int main(int argc, char *argv[])
 #endif /* CNS__PLACE_HOLDER18 */
   }
   printf("PALcode Startup Code: %d (%s)\n",
-	 halt_code, halt_code_string(halt_code));
+         halt_code, halt_code_string(halt_code));
   printf("PALcode Base Address: 0x%04lx, PALcode Data Segment: 0x%04lx\n",
-	 *(ul *)(PalImpureBase + CNS_Q_PAL_BASE),
-	 PalImpureBase);
+         *(ul *)(PalImpureBase + CNS_Q_PAL_BASE),
+         PalImpureBase);
   if (heapsize > 0) {
     printf("Memory Heap: %d%s, start=0x%04lx, end=0x%04lx\n",
-	   (heapsize>(1024*1024)) ? heapsize/(1024*1024) : heapsize/1024,
-	   (heapsize>(1024*1024)) ? "MB" : "KB",
-	   storage_pool_start, storage_pool_end);
+           (heapsize>(1024*1024)) ? heapsize/(1024*1024) : heapsize/1024,
+           (heapsize>(1024*1024)) ? "MB" : "KB",
+           storage_pool_start, storage_pool_end);
   }
   printf("Debug Monitor Entry Address: 0x%04lx\n", &__start);
 #ifdef DP264
@@ -323,10 +323,10 @@ int main(int argc, char *argv[])
     int tmp = 1000000000/(*sysdata.cycle_cnt);
     tmp = tmp/10 + (tmp%10 >= 5 ? 1 : 0);
     printf("CPU Speed: %d psec (%d.%0.2d MHZ)\n",
-	   *sysdata.cycle_cnt, tmp/100, tmp%100 );
+           *sysdata.cycle_cnt, tmp/100, tmp%100 );
     /* DumpSysData(); */
   }
-			   
+
   outLed(led_k_checking_rtc);  /* Checking Real Time Clock */
   InitRTC();
 
@@ -341,7 +341,7 @@ int main(int argc, char *argv[])
 
     BBRAM_READ(BBRAM_BOOTADR + 4, val);
     if (val != BBRAM_BOOTADR_COOKIE(bootadr))
-	bootadr = DEFAULT_BOOTADR;
+        bootadr = DEFAULT_BOOTADR;
    
     BBRAM_READ(BBRAM_RMODE, regmode);
     BBRAM_READ(BBRAM_RMODE + 1, val);
@@ -363,7 +363,7 @@ int main(int argc, char *argv[])
 
     if (sysdata.valid) mem_size = (ul) (*sysdata.mem_size);
     printf(" Bootadr: 0x%lx   Memory Size: 0x%lx (%dMB)\n\n",
-	   bootadr, mem_size, mem_size/(1024*1024));
+           bootadr, mem_size, mem_size/(1024*1024));
 #ifdef Debug_Dual
   *second_stack= (ul *)malloc(10000);
   *second_cpu_lock= 0;
@@ -456,17 +456,17 @@ void SRM_hack_WakeUp()
   );
 #else
   asm("	mb;\
-	ldah    %t0, 0x400f(%zero);\
-	lda     %t0, 0xe000(%t0);\
-	sll     %t0, 13, %t0;\
-	subq    %zero, 1, %t1;\
+        ldah    %t0, 0x400f(%zero);\
+        lda     %t0, 0xe000(%t0);\
+        sll     %t0, 13, %t0;\
+        subq    %zero, 1, %t1;\
         sll     %t1, 47, %t1;\
-	bis	%t1, %t0, %t0;\
-	lda	%t1, 0x5a(%zero);\
-	stb	%t1, 0x80(%t0);\
-	bis	%zero, %a0, %sp;\
-	bis	%zero, %a1, %t12;\
-	",*second_stack,Waitforever);
+        bis	%t1, %t0, %t0;\
+        lda	%t1, 0x5a(%zero);\
+        stb	%t1, 0x80(%t0);\
+        bis	%zero, %a0, %sp;\
+        bis	%zero, %a1, %t12;\
+        ",*second_stack,Waitforever);
 //	addq	%t12, 8, %t12;\
 //.long	0x47FF041f;	\
 //.long   0x77FF1310;	\
@@ -474,7 +474,7 @@ void SRM_hack_WakeUp()
 //.long   0x7Bfb2000;",*second_stack,Waitforever);
     while (TRUE)
     {
-	;
+        ;
     }   
 #endif
 }
