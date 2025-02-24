@@ -14,8 +14,8 @@ PVC				=	$(EB_TOOLBOX)/pvc
 
 INCLUDES	= $(SROM_INCLUDES)
 
-LDFLAGS	  = -nostdlib -N -Ttext=0 -z noexecstack -e 0
-ASFLAGS		= -R -m$(call LC,$(CPUTYPE))
+ASFLAGS		= -m$(call LC,$(CPUTYPE))
+LDFLAGS	  = --orphan-handling=warn -nostdlib -T../palcode.ld -z noexecstack --no-dynamic-linker -static
 #
 # Define NPHALT if you want a non-privileged HALT function
 # (useful for debugging), otherwise, only the privileged
@@ -38,23 +38,17 @@ SRCS = osfpal.s ../srom_dbm.s ../sromcsrv.s platform.s
 all : $(OBJDIR)osfpal $(OBJDIR)osfpal.lis $(OBJDIR)osfpal.nh
 
 # osfpal
-$(OBJDIR)osfpal.sp : osfpal.s
+$(OBJDIR)%.sp : %.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
-$(OBJDIR)srom_dbm.sp : ../srom_dbm.s
-	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
-
-$(OBJDIR)sromcsrv.sp : ../sromcsrv.s
-	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
-	
-$(OBJDIR)platform.sp : platform.s
+$(OBJDIR)%.sp : ../%.s
 	$(CPP) $(CPPFLAGS) $(INCLUDES) $^ > $@
 
 $(OBJDIR)%.o : $(OBJDIR)%.sp
 	$(AS) $(ASFLAGS) -o $@ $^
 
 $(OBJDIR)osfpal : $(addprefix $(OBJDIR), $(notdir $(SRCS:.s=.o)))
-	$(LD) $(LDFLAGS) -o $@ $^
+	$(LD) -Map=$(OBJDIR)osfpal.map $(LDFLAGS) -o $@ $^
 
 # osfpal listing
 $(OBJDIR)osfpal.lis : $(OBJDIR)osfpal
@@ -90,6 +84,7 @@ clean :
 		$(OBJDIR)osfpal.o	\
 		$(OBJDIR)osfpal.nh	\
 		$(OBJDIR)osfpal.pvc		\
+		$(OBJDIR)osfpal.ent	\
 		$(OBJDIR)platform.sp	\
 		$(OBJDIR)platform.o	\
 		$(OBJDIR)sromcsrv.sp	\
