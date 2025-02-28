@@ -16,7 +16,7 @@ SREC			= $(TOOLBOX)/srec
 
 ASFLAGS		= -m$(call LC,$(CPUTYPE))
 CPPFLAGS	= $(CCFLAGS_GLOBAL) -fdollars-in-identifiers
-CCFLAGS		= -c -Os -Wall -Wextra -fno-builtin -ffreestanding
+CCFLAGS		= -c -Os -std=c99 -Wpedantic -Wall -Wextra -fanalyzer -fno-builtin -ffreestanding
 LDFLAGS		= --orphan-handling=warn -L$(OBJDIR) -T../dbmboot.ld -z noexecstack -s --no-dynamic-linker -static
 LDLIBS		= -l:lib.a -l:stubs.a -lc
 
