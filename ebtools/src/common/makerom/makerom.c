@@ -180,7 +180,7 @@ typedef struct fileinfo {
     int32 size;				/* size of the file */
     int32 padding;			/* padding required to longword align at the end of the file */
     int32 outputfile;			/* is this an output file? */
-    fw_id_t *fwid_ptr;                  /* Points to a predefined table */
+    const fw_id_t *fwid_ptr;                  /* Points to a predefined table */
     int fwid_alt;                       /* Used when user specified */
     union int_char {
       char ch[8];

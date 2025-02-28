@@ -85,10 +85,10 @@ your own risk.
 #endif
 
 /* Define a signature stamp "WimC" */
-#define SIGNATURE_STAMP 0x436D6957U
+#define SIGNATURE_STAMP 0x436D6957u
 
 /* Define a different signature stamp "FdhJ" */
-#define SIGNATURE_STAMP_REV2 0x4A686446U
+#define SIGNATURE_STAMP_REV2 0x4A686446u
 
 #ifndef ASSEMBLY_CODE
 /*

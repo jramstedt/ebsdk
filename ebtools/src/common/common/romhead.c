@@ -139,16 +139,16 @@ __attribute__((unused)) static const char *rcsid = "$Id: romhead.c,v 1.2 1999/04
 
 #include "romhead.h"  /* includes lib.h */
 
-char *fw_dbm_id[] = {FW_DBM_STRINGS};
-char *fw_wnt_id[] = {FW_WNT_STRINGS};
-char *fw_srm_id[] = {FW_SRM_STRINGS};
-char *fw_fsb_id[] = {FW_FSB_STRINGS};
-char *fw_lnx_id[] = {FW_LNX_STRINGS};
-char *fw_vxw_id[] = {FW_VXW_STRINGS};
-char *fw__sr_id[] = {FW__SR_STRINGS};
-char *fw_smc_id[] = {FW_SMC_STRINGS};
+const char *fw_dbm_id[] = {FW_DBM_STRINGS};
+const char *fw_wnt_id[] = {FW_WNT_STRINGS};
+const char *fw_srm_id[] = {FW_SRM_STRINGS};
+const char *fw_fsb_id[] = {FW_FSB_STRINGS};
+const char *fw_lnx_id[] = {FW_LNX_STRINGS};
+const char *fw_vxw_id[] = {FW_VXW_STRINGS};
+const char *fw__sr_id[] = {FW__SR_STRINGS};
+const char *fw_smc_id[] = {FW_SMC_STRINGS};
 
-fw_id_t fwid_array[] = {
+const fw_id_t fwid_array[] = {
   { FW_DBM,  fw_dbm_id, FW_DBM_OFFSET},
   { FW_WNT,  fw_wnt_id, FW_WNT_OFFSET},
   { FW_SRM,  fw_srm_id, FW_SRM_OFFSET},
@@ -157,20 +157,20 @@ fw_id_t fwid_array[] = {
   { FW_VXW,  fw_vxw_id, FW_VXW_OFFSET},
   { FW__SR,  fw__sr_id, FW__SR_OFFSET},
   { FW_SMC,  fw_smc_id, FW_SMC_OFFSET},
-  { 0, NULL}
+  { 0, NULL, 0}
 };
 
-char *ostype_dbm[] = {OS_DBM_STRINGS};
-char *ostype_wnt[] = {OS_WNT_STRINGS};
-char *ostype_vms[] = {OS_VMS_STRINGS};
-char *ostype_osf[] = {OS_OSF_STRINGS};
-char *ostype_fsb[] = {OS_FSB_STRINGS};
-char *ostype_lnx[] = {OS_LNX_STRINGS};
-char *ostype_vxw[] = {OS_VXW_STRINGS};
-char *ostype__sr[] = {OS__SR_STRINGS};
-char *ostype_smc[] = {OS_SMC_STRINGS};
+const char *ostype_dbm[] = {OS_DBM_STRINGS};
+const char *ostype_wnt[] = {OS_WNT_STRINGS};
+const char *ostype_vms[] = {OS_VMS_STRINGS};
+const char *ostype_osf[] = {OS_OSF_STRINGS};
+const char *ostype_fsb[] = {OS_FSB_STRINGS};
+const char *ostype_lnx[] = {OS_LNX_STRINGS};
+const char *ostype_vxw[] = {OS_VXW_STRINGS};
+const char *ostype__sr[] = {OS__SR_STRINGS};
+const char *ostype_smc[] = {OS_SMC_STRINGS};
 
-ostype_t ostype_array[] = {
+const ostype_t ostype_array[] = {
   { FW_OSTYPE_DBM, FW_DBM,  ostype_dbm},
   { FW_OSTYPE_WNT, FW_WNT,  ostype_wnt},
   { FW_OSTYPE_VMS, FW_SRM,  ostype_vms},
@@ -187,10 +187,10 @@ ostype_t ostype_array[] = {
 char strbuf1[MAXSTRING+2];
 char strbuf2[MAXSTRING+2];
 
-fw_id_t *fwid_match_i(int fwid)
+const fw_id_t *fwid_match_i(int fwid)
 {
-  fw_id_t *ptr;
-  ostype_t *ostype_ptr;
+  const fw_id_t *ptr;
+  const ostype_t *ostype_ptr;
 
   ptr = fwid_array;
   while (ptr->id_string) {
@@ -210,9 +210,9 @@ fw_id_t *fwid_match_i(int fwid)
   return ((fw_id_t *)NULL);
 }
 
-fw_id_t *fwid_match(char *arg)
+const fw_id_t *fwid_match(const char *const arg)
 {
-  fw_id_t *ptr;
+  const fw_id_t *ptr;
   int i, k;
 
   ptr = fwid_array;
@@ -239,9 +239,9 @@ fw_id_t *fwid_match(char *arg)
   return ((fw_id_t *)NULL);
 }
 
-void fwid_dump(char *pre)
+void fwid_dump(const char *const pre)
 {
-  fw_id_t *ptr;
+  const fw_id_t *ptr;
   int i;
 
   ptr = fwid_array;
@@ -255,10 +255,10 @@ void fwid_dump(char *pre)
   }
 }
 
-ostype_t *ostype_match(char *arg)
+const ostype_t *ostype_match(const char *const arg)
 {
-  ostype_t *ostype_ptr;
-  fw_id_t *fwid_ptr;
+  const ostype_t *ostype_ptr;
+  const fw_id_t *fwid_ptr;
   int i, k;
 
   ostype_ptr = ostype_array;
@@ -287,12 +287,12 @@ ostype_t *ostype_match(char *arg)
   if ((fwid_ptr = fwid_match(arg)) != NULL)
     return(ostype_match_i(fwid_ptr->firmware_id));
 
-  return ((ostype_t *)NULL);
+  return ((const ostype_t *)NULL);
 }
 
-ostype_t *ostype_match_i(int ostype)
+const ostype_t *ostype_match_i(int ostype)
 {
-  ostype_t *ptr;
+  const ostype_t *ptr;
 
   ptr = ostype_array;
   while (ptr->id_string) {
@@ -300,12 +300,12 @@ ostype_t *ostype_match_i(int ostype)
       return (ptr);
     ++ptr;
   }
-  return ((ostype_t *)NULL);
+  return ((const ostype_t *)NULL);
 }
 
-void ostype_dump(char *pre)
+void ostype_dump(const char *const pre)
 {
-  ostype_t *ptr;
+  const ostype_t *ptr;
   int i;
 
   ptr = ostype_array;
@@ -321,9 +321,9 @@ void ostype_dump(char *pre)
 /*
  * Compute the header checksum.
  */
-ui compute_romh_chksum(romheader_t *header)
+ui compute_romh_chksum(const romheader_t *const header)
 {
-  char *ptr;
+  const char *ptr;
   ui chksum = 0;
 
   ptr = (char *) header;
@@ -337,12 +337,12 @@ ui compute_romh_chksum(romheader_t *header)
 /* Prints out the ROM header pointed to by argument. 
  * Returns TRUE if header is valid; FALSE otherwise.
  */
-int dumpHeader(romheader_t *header)
+int dumpHeader(const romheader_t *const header)
 {
 
   int i, hver;
   ui hchksum;
-  fw_id_t *fwid_ptr;
+  const fw_id_t *fwid_ptr;
    
   printf("  Header Size......... 0x%X (%d) bytes\n", header->romh.V0.hsize, 
          header->romh.V0.hsize);
@@ -374,10 +374,13 @@ int dumpHeader(romheader_t *header)
 	printf("  Firmware ID (Opt.).. %08x%08x  ",
 	       header->romh.V1.fwoptid.id_S.high,
 	       header->romh.V1.fwoptid.id_S.low);
+  
 	for (i = 0; i < 8; i++)
+  {
 	   if (isprint((int)header->romh.V1.fwoptid.id[i]))
 	     printf ("%c", header->romh.V1.fwoptid.id[i]);
 	   else printf (".");
+  }
 	printf("\n");
         
         if (hver > 1) {         /* Version > 1 */
@@ -399,7 +402,7 @@ int dumpHeader(romheader_t *header)
 /* 
  * Returns TRUE if image has a ROM signature.
  */
-int HasRomSignature (romheader_t *RomImageHeader)
+int HasRomSignature (const romheader_t *const RomImageHeader)
 {
   if (RomImageHeader->romh.V0.csignature != (ui) ~ROM_H_SIGNATURE)
   return(FALSE);
@@ -417,7 +420,7 @@ int HasRomSignature (romheader_t *RomImageHeader)
 /* 
  * Returns TRUE if header is valid (has signature and checksum is correct).
  */
-int IsHeaderValid (romheader_t *RomImageHeader)
+int IsHeaderValid (const romheader_t *const RomImageHeader)
 {
     return ((HasRomSignature(RomImageHeader) && (ROMH_VERSION(RomImageHeader) == 0)) ||
             (HasRomSignature(RomImageHeader) && (compute_romh_chksum(RomImageHeader) == ROM_HEADER_CHECKSUM(RomImageHeader))));

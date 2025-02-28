@@ -33,7 +33,7 @@ extern FILE *objIn;
 extern FILE *objOut;
 #endif
 
-#define WSIZE (32768U)
+#define WSIZE (32768u)
 
 #define MIN_MATCH  3
 #define MAX_MATCH  258
