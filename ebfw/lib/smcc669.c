@@ -41,18 +41,18 @@ __attribute__((unused)) static const char *rcsid = "$Id: smcc669.c,v 1.1.1.1 199
 //#include "smc.h"
 #include "smcc669.h"
 
-static ui SMC669UltraBase;
+static uintptr_t SMC669UltraBase;
 
-static ui 
-SMC669ConfigState(ui baseAddr)
+static uintptr_t 
+SMC669ConfigState(uintptr_t baseAddr)
 {
-  int devId;
-  ui configPort;
-  ui indexPort;
-  ui dataPort;
+  ui devId;
+  uintptr_t configPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   configPort = indexPort = baseAddr;
-  dataPort = (ui) ((char *) configPort + 1);
+  dataPort = (uintptr_t) ((char *) configPort + 1);
 
   outportb( configPort, CONFIG_ON_KEY );
   outportb( configPort, CONFIG_ON_KEY );
@@ -64,10 +64,10 @@ SMC669ConfigState(ui baseAddr)
   return (baseAddr);
 }
 
-static ui 
+static uintptr_t 
 SMC669detectUltraIO()
 {
-  ui baseAddr;
+  uintptr_t baseAddr;
 
   baseAddr = 0x3f0;
   if ((baseAddr = SMC669ConfigState(baseAddr)) == 0x3f0){
@@ -77,11 +77,11 @@ SMC669detectUltraIO()
   if ((baseAddr = SMC669ConfigState(baseAddr)) == 0x370){
     return baseAddr;
   }
-  return (ui) 0;
+  return (uintptr_t) 0;
 }
 
 static void 
-SMC669runState(ui baseAddr)
+SMC669runState(uintptr_t baseAddr)
 {
   outportb( baseAddr, CONFIG_OFF_KEY );
 }
@@ -90,14 +90,14 @@ SMC669runState(ui baseAddr)
  *
  */
 static void
-SMC669EnableCOM1(ui baseAddr)
+SMC669EnableCOM1(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
   ui irqData;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, SMC37c669_SERIAL_IRQ_INDEX);
   irqData = inportb( dataPort );
@@ -110,14 +110,14 @@ SMC669EnableCOM1(ui baseAddr)
 }
 
 static void
-SMC669EnableCOM2(ui baseAddr)
+SMC669EnableCOM2(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
   ui irqData;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, SMC37c669_SERIAL_IRQ_INDEX);
   irqData = inportb( dataPort );
@@ -130,15 +130,15 @@ SMC669EnableCOM2(ui baseAddr)
 }
 
 
-void SMC669EnablePARP (ui baseAddr)
+void SMC669EnablePARP (uintptr_t baseAddr)
 {
-    ui indexPort;
-    ui dataPort;
+    uintptr_t indexPort;
+    uintptr_t dataPort;
 	ui dmaData;
 	ui irqData;
 
     indexPort = baseAddr;
-    dataPort = (ui)((char *)baseAddr + 1);
+    dataPort = (uintptr_t)((char *)baseAddr + 1);
 
     outportb( indexPort, SMC37c669_PARALLEL_FDC_DMA_INDEX);
 	dmaData = inportb( dataPort );
@@ -156,13 +156,13 @@ void SMC669EnablePARP (ui baseAddr)
 }
 
 static void
-SMC669DisableIDE(ui baseAddr)
+SMC669DisableIDE(uintptr_t baseAddr)
 {
-    ui indexPort;
-    ui dataPort;
+    uintptr_t indexPort;
+    uintptr_t dataPort;
 
     indexPort = baseAddr;
-    dataPort = (ui)((char *)baseAddr + 1);
+    dataPort = (uintptr_t)((char *)baseAddr + 1);
 
 	outportb( indexPort, SMC37c669_IDE_BASE_ADDRESS_INDEX);
 	outportb( dataPort, 0 );
@@ -173,15 +173,15 @@ SMC669DisableIDE(ui baseAddr)
 }
 
 static void
-SMC669EnableFDC(ui baseAddr)
+SMC669EnableFDC(uintptr_t baseAddr)
 {
-    ui indexPort;
-    ui dataPort;
+    uintptr_t indexPort;
+    uintptr_t dataPort;
 	ui dmaData;
 	ui irqData;
 
     indexPort = baseAddr;
-    dataPort = (ui)((char *)baseAddr + 1);
+    dataPort = (uintptr_t)((char *)baseAddr + 1);
 
     outportb( indexPort, SMC37c669_PARALLEL_FDC_DMA_INDEX);
 	dmaData = inportb( dataPort );

@@ -213,7 +213,7 @@ static void test2( ul llim, ul hlim, int step, mt_datum_t seed);
 static void test3( ul llim, ul hlim, int step);
 static int dump_error(ul p, mt_datum_t data, mt_datum_t pattern);
 
-void memtest( ul min, ul max, int inc, int iterations, State_t McheckState, int drivers)
+void memtest( ul min, ul max, ui inc, ui iterations, State_t McheckState, int drivers)
 {
   ul sp;
   ul range;
@@ -256,7 +256,7 @@ void memtest( ul min, ul max, int inc, int iterations, State_t McheckState, int 
       {
 	sp = ((sp>>13)<<13);
 	range = do_memtest(min, sp, step, (mt_datum_t) MTSeed);
-	sp = sp+(1<<14);
+	sp = sp+(1ul<<14);
 	if (max > sp)
 	  {
 	    printf("\n\n\t///////// Skipping over Stack /////////\n");
@@ -416,11 +416,9 @@ void print_dimm_number(long C_ADDR,int byte_number);
 
 static int dump_error( ul p, mt_datum_t data, mt_datum_t pattern)
 {
-  int i;
-  ul mask_bits;
-
 #ifdef DP264
-  mask_bits= 0xff;
+  int i;
+  ul mask_bits= 0xff;
   for (i=0;i<8;i++)
   {
      if ((data & mask_bits) != (pattern & mask_bits) )

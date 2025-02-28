@@ -137,7 +137,7 @@ FwupTranslateBusAddresses (
 static
 ARC_STATUS
 FwUpdateFlashImage (
-    IN ULONG ImageAddress,
+    IN uintptr_t ImageAddress,
     IN ULONG ImageSize,
     IN ULONG FlashOffset
     );
@@ -219,19 +219,20 @@ FlashInit (
 }
 
 int flash_main(
-    IN ULONG ImageAddress,
+    IN uintptr_t ImageAddress,
     IN LONG DestinationOffset, 
     IN ULONG UserSpecifiedSize
     )
 {
 
   ULONG FlashStartOffset, EndOffset;
-  ULONG ImageSize, ImageEnd, ImageStart;
+  size_t ImageSize;
+  uintptr_t ImageEnd, ImageStart;
   ULONG FlashSize;
   ULONG DestinationBlock, EndBlock;
   ARC_STATUS ReturnStatus;
   romheader_t * RomImageHeader;
-  fw_id_t *FwidData;
+  const fw_id_t *FwidData;
   int c,its_nt;
   BOOLEAN EraseOnly = FALSE;
   BOOLEAN HeaderOK;
@@ -247,11 +248,11 @@ int flash_main(
       return (0);
     }
 
-  if (ImageAddress == (ULONG) -1) {
+  if (ImageAddress == ~0ul) {
       EraseOnly = TRUE;
   }
 
-  FlashStartOffset = (ULONG) DestinationOffset;
+  FlashStartOffset = DestinationOffset;
   RomImageHeader = (romheader_t * ) ImageAddress;
 
   if (!EraseOnly) {
@@ -271,7 +272,7 @@ int flash_main(
               HeaderOK = dumpHeader(RomImageHeader);
 	      its_nt= (((int) RomImageHeader->romh.V1.fw_id)==1);
               if (ROMH_VERSION(RomImageHeader) != 0) {
-                  ImageStart = (ULONG)RomImageHeader + (ULONG)RomImageHeader->romh.V0.hsize;
+                  ImageStart = (uintptr_t)RomImageHeader + RomImageHeader->romh.V0.hsize;
                   ImageEnd =  ImageStart + RomImageHeader->romh.V1.rimage_size - 1;
                   ImageCheckSum = ChecksumMem(ImageStart, ImageEnd);
                   if (!HeaderOK || (ImageCheckSum != RomImageHeader->romh.V0.checksum)) {
@@ -459,21 +460,21 @@ FwupTranslateBusAddresses (
 static
 ARC_STATUS
 FwUpdateFlashImage (
-    IN ULONG ImageAddress,
+    IN uintptr_t ImageAddress,
     IN ULONG ImageSize,
     IN ULONG FlashOffset
     )
 {
     UCHAR VerifyData;
-    ULONG CurrentOffset;
+    uintptr_t CurrentOffset;
     ULONG Retries, ByteRetries;
     ULONG Index, Mismatch;
-    ULONG BlockSize;
-    ULONG BlockBase;
-    ULONG StartOffset, EndOffset;
+    size_t BlockSize;
+    uintptr_t BlockBase;
+    uintptr_t StartOffset, EndOffset;
 
     UCHAR Buffer[0x20000];
-    BOOLEAN VerifyInProgress;
+    BOOLEAN VerifyInProgress = FALSE;
     ARC_STATUS ReturnStatus = ESUCCESS;
 
     if (FlashOffset + ImageSize  > FwUpdateFlashDriver->DeviceSize) {
@@ -495,10 +496,10 @@ FwUpdateFlashImage (
      *      4) Write data from buffer.
      *      5) Verify write.
      */
-    CurrentOffset = (ULONG) FlashBlockAlign(StartOffset);
+    CurrentOffset = (uintptr_t) FlashBlockAlign(StartOffset);
     while ((CurrentOffset <= EndOffset) && (ReturnStatus == ESUCCESS)) {
         BlockSize = FlashBlockSize(CurrentOffset);
-        BlockBase = (ULONG) FlashBlockAlign(CurrentOffset);
+        BlockBase = (uintptr_t) FlashBlockAlign(CurrentOffset);
         for (Index = 0; Index < BlockSize; Index++) {
             if ((CurrentOffset >= StartOffset) && (CurrentOffset <= EndOffset)) {
                 if (ImageAddress == (ULONG) -1) {
@@ -619,9 +620,9 @@ CalculateBlockNumber (
     ULONG FlashOffset
     )
 {
-    ULONG BlockSize;
+    size_t BlockSize;
     ULONG BlockNumber = 0;
-    ULONG FlashPosition = 0;
+    uintptr_t FlashPosition = 0;
 
     for(; FlashPosition < FlashOffset;) {
         BlockSize = FlashBlockSize(FlashPosition);

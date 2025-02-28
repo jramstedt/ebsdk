@@ -271,7 +271,6 @@ static char *DeviceClassString(ui class);
 static ui PCI_slot_filled(int bus, int slot, int function)
 {
     ui l;
-    int save_ipl;
 
 /*
  *  First, clear any pending NODEV errors.
@@ -290,7 +289,7 @@ static ui PCI_slot_filled(int bus, int slot, int function)
  *    in this code under the remote debugger
  *    until interrupts are re-enabled.
  */
-    save_ipl = swpipl(7);
+    int save_ipl = swpipl(7);
 #endif
 
 /*  
@@ -1093,14 +1092,14 @@ void PCIShow(void)
 ui PCIValidAddress(ub *address)
 {
 #if (PCI_BASE_1_USED)
-    if (((ui) address > PCI_TBASE_1) &&
-        ((ui) address < PCI_TBASE_1 + _PCIMaskToSize(PCI_MASK_1)))
+    if (((uintptr_t) address > PCI_TBASE_1) &&
+        ((uintptr_t) address < PCI_TBASE_1 + _PCIMaskToSize(PCI_MASK_1)))
       return TRUE;
 #endif
 
 #if (PCI_BASE_2_USED)
-    if (((ui) address > PCI_TBASE_2) &&
-        ((ui) address < PCI_TBASE_2 + _PCIMaskToSize(PCI_MASK_2)))
+    if (((uintptr_t) address > PCI_TBASE_2) &&
+        ((uintptr_t) address < PCI_TBASE_2 + _PCIMaskToSize(PCI_MASK_2)))
       return TRUE;
 #endif
 
@@ -1117,17 +1116,17 @@ ui PCIMapAddress(ub *address)
 {
 #if (PCI_BASE_1_USED)
     {
-	if (((ui) address > PCI_TBASE_1) &&
-	  ((ui) address < PCI_TBASE_1 + _PCIMaskToSize(PCI_MASK_1)))
-	    return ((ui) address | PCI_BASE_1);
+	if (((uintptr_t) address > PCI_TBASE_1) &&
+	  ((uintptr_t) address < PCI_TBASE_1 + _PCIMaskToSize(PCI_MASK_1)))
+	    return ((uintptr_t) address | PCI_BASE_1);
     }
 #endif
 
 #if (PCI_BASE_2_USED) 
     {
-	if (((ui) address > PCI_TBASE_2) &&
-	  ((ui) address < PCI_TBASE_2 + _PCIMaskToSize(PCI_MASK_2)))
-	    return ((ui) address | PCI_BASE_2);
+	if (((uintptr_t) address > PCI_TBASE_2) &&
+	  ((uintptr_t) address < PCI_TBASE_2 + _PCIMaskToSize(PCI_MASK_2)))
+	    return ((uintptr_t) address | PCI_BASE_2);
     }
 #endif
     return 0;

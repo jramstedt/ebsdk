@@ -155,7 +155,7 @@ I28F008SA_Initialize(
     WRITE_CONFIG_RAM_DATA(NvRamPtr, ID_REQUEST);
 
     ManufacturerID = READ_CONFIG_RAM_DATA(NvRamPtr);
-    DeviceID = READ_CONFIG_RAM_DATA((PUCHAR)((ULONG)NvRamPtr + 1));
+    DeviceID = READ_CONFIG_RAM_DATA((PUCHAR)((uintptr_t)NvRamPtr + 1));
 
     if ((ManufacturerID == MANUFACTURER_ID) && (DeviceID == DEVICE_ID)) {
         I28F008SA_LastError = 0;
@@ -287,7 +287,7 @@ I28F008SA_BlockAlign(
     IN PUCHAR Address
     )
 {
-    return (PUCHAR)((ULONG)Address & ~(BLOCK_SIZE-1));
+    return (PUCHAR)((uintptr_t)Address & ~(BLOCK_SIZE-1));
 }
 
 static 

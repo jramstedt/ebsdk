@@ -63,7 +63,7 @@ WRITE_FLASH_UCHAR(
 //
 
 UCHAR pReadFlashByte(
-    IN ULONG FlashOffset
+    IN uintptr_t FlashOffset
     );
 
 //
@@ -103,7 +103,7 @@ PlatformFlashReadByte(
 //
 
 VOID pWriteFlashByte(
-    IN ULONG FlashOffset,
+    IN uintptr_t FlashOffset,
     IN UCHAR Data
     )
 /*++
@@ -136,7 +136,7 @@ Notes:
 
 
 UCHAR pReadFlashByte(
-    IN ULONG FlashOffset
+    IN uintptr_t FlashOffset
     )
 /*++
 
@@ -154,12 +154,12 @@ Return Value:
 
 --*/
 {
-    ULONG ReturnVal;
+    UCHAR ReturnVal;
 
     
     ReturnVal = READ_FLASH_UCHAR ( FlashOffset );
 
-    return (UCHAR)ReturnVal;
+    return ReturnVal;
 }
 
 #endif /* NEEDFLASHMEMORY */

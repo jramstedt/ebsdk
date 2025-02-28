@@ -414,7 +414,7 @@ void ProcessPacket(DebugPacket *packet_structP)
 		  start_addr + ReadNetInt(specific_dataP + MEM_DATA_COUNT_OFFSET);
 	      unsigned char * current_position = specific_dataP+MEM_DATA_CONTENT_OFFSET; 
 	      ul dataread;
-	      int i;
+	      unsigned int i;
 	      /* allign the address */
 	      address_value addr = ~((~start_addr) | 0x7);
               PRTRACE1("LADBX Command: Read.\n");
@@ -446,7 +446,7 @@ void ProcessPacket(DebugPacket *packet_structP)
 		  start_addr + ReadNetInt(specific_dataP + MEM_DATA_COUNT_OFFSET);
 	      unsigned char * current_position = specific_dataP+MEM_DATA_CONTENT_OFFSET; 
 	      ul dataread;
-	      int i;
+	      unsigned int i;
 	      /* align the address */
 	      address_value addr = ~((~start_addr) | 0x7); 
               PRTRACE1("LADBX Command: Write.\n");

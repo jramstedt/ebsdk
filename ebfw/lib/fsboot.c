@@ -212,21 +212,21 @@ int fsboot(ul *destaddr)
           {
             int *from, *to;
             size_t size, i;
-            ul temp; 
+            uintptr_t temp; 
 
-            size= header->romh.V0.size/sizeof(*to);
-            from= (int *)((*destaddr)+header->romh.V0.hsize);
-            temp= header->romh.V0.destination.high;
-            temp= (temp << 32) + header->romh.V0.destination.low;
-            to= (int *)temp;
-            if (to<from)
-            for(i=0;i<size;++i) 
-                to[i]= from[i];
+            size = header->romh.V0.size/sizeof(*to);
+            from = (int *)((*destaddr)+header->romh.V0.hsize);
+            temp = header->romh.V0.destination.high;
+            temp = (temp << 32) + header->romh.V0.destination.low;
+            to = (int *)temp;
+            if (to < from)
+              for(i = 0; i < size; ++i) 
+                  to[i] = from[i];
             else
-            for(i=size-1;i>=0;--i)
-                to[i]= from[i];
+              for(i = size; i-- > 0;)
+                  to[i] = from[i];
 
-            *destaddr= temp;
+            *destaddr = temp;
           }
           outLed(idx);		/* Indicates which image was loaded */
           msleep(500);		/* Pause to display LED */

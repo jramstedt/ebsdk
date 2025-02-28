@@ -180,7 +180,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: main.c,v 1.3 1999/01/21
 #include "tsunami.h"
 
 #ifndef DEFAULT_BOOTADR
-#define	DEFAULT_BOOTADR	0x300000
+#define	DEFAULT_BOOTADR	0x300000ul
 #endif
 
 /*
@@ -200,7 +200,7 @@ int halt_code = -1;
 ul InitialStackPointer = (ul) -1L;
 ul mem_size = 0;
 
-ul bootadr;
+uintptr_t bootadr;
 ul **second_stack;
 void (*volatile secondary_cpu_function)(void) = NULL;
 extern char __start;
@@ -481,7 +481,12 @@ void SRM_hack_WakeUp()
 
 void SRM_hack_Waitforever(ul *PalImpureBase)
 {
- asm("        mb;\
+#ifdef __GNUC__
+__asm__
+#else
+ asm
+#endif
+("        mb;\
 .long	0x47e11400; \
 .long	0x77e02840; \
 .long	0x201f2086; \

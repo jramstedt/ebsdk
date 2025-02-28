@@ -152,18 +152,18 @@ __attribute__((unused)) static const char *rcsid = "$Id: lx164_io.c,v 1.1.1.1 19
     ( (ul)( (register & 0xff) | ((function & 0x7) << 8) | ((device & 0x1f) << 11) | \
         ((bus & 0xff) << 16) ) )
 
-#define PCI_IO	  (0x858UL<<28)    /*    CPU Adr[39:28]=0x858 select PCI I/O.	*/
-#define PCI_MEM   (0x800UL<<28)    /*    CPU Adr[39:28]=0x800 select PCI Mem.	*/
-#define PCI_CFG   (0x870UL<<28)    /*    CPU Adr[39:28]=0x870 select PCI Cfg.	*/
-#define IOC_CSR(x) ((0x874UL<<28)|(ul)(x))
-#define IACK      (0x872UL<<28)
-#define PCI_D_MEM (0x860UL<<28)    /*    CPU Adr[39:28]=0x860 select PCI dense Mem.*/
-#define IOC_PCI   (0x876UL<<28)    /* PCI related            */
+#define PCI_IO	  (0x858ul<<28)    /*    CPU Adr[39:28]=0x858 select PCI I/O.	*/
+#define PCI_MEM   (0x800ul<<28)    /*    CPU Adr[39:28]=0x800 select PCI Mem.	*/
+#define PCI_CFG   (0x870ul<<28)    /*    CPU Adr[39:28]=0x870 select PCI Cfg.	*/
+#define IOC_CSR(x) ((0x874ul<<28)|(ul)(x))
+#define IACK      (0x872ul<<28)
+#define PCI_D_MEM (0x860ul<<28)    /*    CPU Adr[39:28]=0x860 select PCI dense Mem.*/
+#define IOC_PCI   (0x876ul<<28)    /* PCI related            */
 
-#define Byt       (0UL<<TRANSFER_LENGTH_SHIFT)
-#define Wrd       (1UL<<TRANSFER_LENGTH_SHIFT)
-#define Tri       (2UL<<TRANSFER_LENGTH_SHIFT)
-#define Lng       (3UL<<TRANSFER_LENGTH_SHIFT)
+#define Byt       (0ul<<TRANSFER_LENGTH_SHIFT)
+#define Wrd       (1ul<<TRANSFER_LENGTH_SHIFT)
+#define Tri       (2ul<<TRANSFER_LENGTH_SHIFT)
+#define Lng       (3ul<<TRANSFER_LENGTH_SHIFT)
 
 #define IO_B(x) ((ul)(PCI_IO|Byt|(((ul)(x)&IO_MASK)<<BYTE_ENABLE_SHIFT)))
 #define IO_W(x) ((ul)(PCI_IO|Wrd|(((ul)(x)&IO_MASK)<<BYTE_ENABLE_SHIFT)))
@@ -309,8 +309,8 @@ void PCIBusInit(void)
 {
   ul mask;
   mask = in_ioc_csr(pyxis_err_mask);	/* Read current mask */
-  mask = ((1UL<<pyxis_err_v_rcvd_mas_abt)
-      |(1UL<<pyxis_err_v_rcvd_tar_abt));
+  mask = ((1ul<<pyxis_err_v_rcvd_mas_abt)
+      |(1ul<<pyxis_err_v_rcvd_tar_abt));
   out_ioc_csr(pyxis_err_mask, mask);	/* of master abort */
 
 /*
@@ -378,8 +378,8 @@ ul IOPCIClearNODEV(void)
   PRTRACE2("pyxis_err:%04x\n", status);
 
   status = status &
-    ((1UL<<pyxis_err_v_rcvd_mas_abt)|
-     (1UL<<pyxis_err_v_rcvd_tar_abt));
+    ((1ul<<pyxis_err_v_rcvd_mas_abt)|
+     (1ul<<pyxis_err_v_rcvd_tar_abt));
 
 /*
  * Clear it.

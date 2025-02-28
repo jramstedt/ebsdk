@@ -2,7 +2,7 @@
 #define __EB164_H_LOADED
 /*****************************************************************************
 
-Copyright © 1993, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright ï¿½ 1993, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 
@@ -164,8 +164,8 @@ your own risk.
  * System Address Space                                                     *
  ****************************************************************************/
 
-#define MINIMUM_SYSTEM_MEMORY		    0x1000000 /* 16MB */
-#define MAXIMUM_SYSTEM_CACHE     	    0x800000  /* 8MB */
+#define MINIMUM_SYSTEM_MEMORY               0x1000000 /* 16MB */
+#define MAXIMUM_SYSTEM_CACHE                0x800000  /* 8MB */
 #define DMA_BUFF_BASE                       0x100000
 
 
@@ -180,24 +180,24 @@ your own risk.
  */
 
 #define PCI_BASE_1_USED                     1
-#define PCI_BASE_1                          0x000100000
-#define PCI_MASK_1                          0x000000000
-#define PCI_TBASE_1                         0x000100000
+#define PCI_BASE_1                          0x000100000u
+#define PCI_MASK_1                          0x000000000u
+#define PCI_TBASE_1                         0x000100000u
 
 #define PCI_BASE_2_USED                     0
-#define PCI_BASE_2                          0x000000000
-#define PCI_MASK_2                          0x000000000
-#define PCI_TBASE_2                         0x000000000
+#define PCI_BASE_2                          0x000000000u
+#define PCI_MASK_2                          0x000000000u
+#define PCI_TBASE_2                         0x000000000u
 
 #define PCI_BASE_3_USED                     0
-#define PCI_BASE_3                          0x000000000
-#define PCI_MASK_3                          0x000000000
-#define PCI_TBASE_3                         0x000000000
+#define PCI_BASE_3                          0x000000000u
+#define PCI_MASK_3                          0x000000000u
+#define PCI_TBASE_3                         0x000000000u
 
 #define PCI_BASE_4_USED                     0
-#define PCI_BASE_4                          0x000000000
-#define PCI_MASK_4                          0x00000000
-#define PCI_TBASE_4                         0x000000000
+#define PCI_BASE_4                          0x000000000u
+#define PCI_MASK_4                          0x000000000u
+#define PCI_TBASE_4                         0x000000000u
 
 /*
  * Each mask translates to a number of these units.  For

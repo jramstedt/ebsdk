@@ -2,7 +2,7 @@
 #define __MON_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -243,7 +243,7 @@ extern void ChangeMem(int size , ul place);
 extern void FillMem(ul first , ul last , ui value);
 extern void PrintVersion(void );
 extern void jToPal(ul destaddr);
-extern int get_bootadr(void );
+extern uintptr_t get_bootadr(void );
 extern char * halt_code_string(int halt_code);
 
 #ifdef NOT_IN_USE

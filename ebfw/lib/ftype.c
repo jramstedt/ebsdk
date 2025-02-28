@@ -59,7 +59,7 @@ int ftype(double x)
 {
   int sign;
 
-  sign = (int) (VAL_H_DOUBLE(x) & 0x80000000U);
+  sign = (int) (VAL_H_DOUBLE(x) & 0x80000000u);
 
   if (IS_SNAN_DOUBLE(x))
     return (FP_SNAN);
@@ -84,7 +84,7 @@ int ftypef(float x)
 {
   int sign;
 
-  sign = (int) (VAL_FLOAT(x) & 0x80000000U);
+  sign = (int) (VAL_FLOAT(x) & 0x80000000u);
 
   if (IS_SNAN_FLOAT(x))
     return (FP_SNAN);

@@ -45,18 +45,18 @@ __attribute__((unused)) static const char *rcsid = "$Id: acersio.c,v 1.1.1.1 199
 #include "lib.h"
 #include "acersio.h"
 
-static ui AcerSIOBase;
+static uintptr_t AcerSIOBase;
 
-static ui 
+static uintptr_t 
 AcerSIOConfigState(ui baseAddr)
 {
-  int devId;
-  ui configPort;
-  ui indexPort;
-  ui dataPort;
+  ui devId;
+  uintptr_t configPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   configPort = indexPort = baseAddr;
-  dataPort = (ui) ((char *) configPort + 1);
+  dataPort = (uintptr_t) ((char *) configPort + 1);
 
   outportb( configPort, CONFIG_ON_KEY1 );
   outportb( configPort, CONFIG_ON_KEY2 );
@@ -68,10 +68,10 @@ AcerSIOConfigState(ui baseAddr)
   return (baseAddr);
 }
 
-static ui 
+static uintptr_t 
 AcerSIOdetectUltraIO()
 {
-  ui baseAddr;
+  uintptr_t baseAddr;
 
   baseAddr = 0x3f0;
   if ((baseAddr = AcerSIOConfigState(baseAddr)) == 0x3f0){
@@ -81,7 +81,7 @@ AcerSIOdetectUltraIO()
   if ((baseAddr = AcerSIOConfigState(baseAddr)) == 0x370){
     return baseAddr;
   }
-  return (ui) 0;
+  return (uintptr_t) 0;
 }
 
 static void 
@@ -94,13 +94,13 @@ AcerSIOrunState(ui baseAddr)
  *
  */
 static void
-AcerSIOEnableCOM1(ui baseAddr)
+AcerSIOEnableCOM1(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort,  SER1);	/* select com1 */
@@ -119,13 +119,13 @@ AcerSIOEnableCOM1(ui baseAddr)
 }
 
 static void
-AcerSIOEnableCOM2(ui baseAddr)
+AcerSIOEnableCOM2(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort,  SER2);	/* select com2 */
@@ -144,13 +144,13 @@ AcerSIOEnableCOM2(ui baseAddr)
 }
 
 
-void AcerSIOEnablePARP (ui baseAddr)
+void AcerSIOEnablePARP (uintptr_t baseAddr)
 {
-    ui indexPort;
-    ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
     indexPort = baseAddr;
-    dataPort = (ui)((char *)baseAddr + 1);
+    dataPort = (uintptr_t)((char *)baseAddr + 1);
 
     outportb( indexPort, LOGICAL_DEVICE_NUMBER);
     outportb( dataPort, PARP);	/* Select parallel port */
@@ -169,13 +169,13 @@ void AcerSIOEnablePARP (ui baseAddr)
 }
 
 static void
-AcerSIOEnableRTC(ui baseAddr)
+AcerSIOEnableRTC(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, RTCL );	/* select real time clock */
@@ -185,13 +185,13 @@ AcerSIOEnableRTC(ui baseAddr)
 }
 
 static void
-AcerSIOEnableKeyboard(ui baseAddr)
+AcerSIOEnableKeyboard(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, KYBD );	/* select keyboard/mouse */
@@ -207,15 +207,15 @@ AcerSIOEnableKeyboard(ui baseAddr)
 }
 
 static void
-AcerSIOEnableFDC(ui baseAddr)
+AcerSIOEnableFDC(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
-  ui oldValue;
+  uintptr_t oldValue;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, FDC );	/* select floppy controller */
@@ -238,15 +238,15 @@ AcerSIOEnableFDC(ui baseAddr)
 
 #ifdef DEBUG_AcerSIO
 void
-AcerSIOReportDeviceStatus(ui baseAddr)
+AcerSIOReportDeviceStatus(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
   ui currentControl;
   ui fer;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, POWER_CONTROL );
   currentControl = inportb( dataPort );

@@ -1371,6 +1371,10 @@ static void DECchip_21x4x_device_clear_interrupts(int device_no)
     printf("Digital Semiconductor 21x4x: DECchip_21x4x_device_clear_interrupts() called\n");
 #endif
 
+    if (device == NULL) {
+        printf("ERROR: invalid device (%d)\n", device_no);
+        return;
+    }
 /*
  *  Clear any interrupts there may be.
  */
@@ -1623,8 +1627,10 @@ static void DECchip_21040_device_get_hw_address(int device_no,
  *  Don't incur the overhead again of reading it from the ROM.
  */
     if (DECchip_21x4x_device_hw_address_valid(device->hw_address)) {
-      memcpy(hw_address, device->hw_address, ROM_MAC_SIZE);
-      return;
+        if (hw_address == device->hw_address) return;
+
+        memcpy(hw_address, device->hw_address, ROM_MAC_SIZE);
+        return;
     }
 
 /*
@@ -1695,8 +1701,8 @@ static void DECchip_21x4x_device_stop(int device_no)
  */
 
     if (device == NULL) {
-	printf("ERROR: invalid device (%d)\n", device_no);
-	return;
+        printf("ERROR: invalid device (%d)\n", device_no);
+        return;
     }
 /*
  *  Tell the world which device.
@@ -1909,6 +1915,8 @@ static void DECchip_21x4x_device_get_hw_address(int device_no,
  *  Don't incur the overhead again of reading it from the ROM.
  */
   if (DECchip_21x4x_device_hw_address_valid(device->hw_address)) {
+    if (hw_address == device->hw_address) return;
+
     memcpy(hw_address, device->hw_address, ROM_MAC_SIZE);
     return;
   }

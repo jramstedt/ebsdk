@@ -111,6 +111,10 @@ void printReg(ul * register_array, int group)
     printf("\nGeneral Purpose Registers\n");
     x = CNS_Q_GPR / 8;
     str = "r";
+    break;
+  default:
+    printf("\nUnknown Register Group\n");
+    return;
   }
   printf("register file @: %08x\n", register_array+x);
 

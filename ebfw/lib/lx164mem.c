@@ -65,19 +65,20 @@ ui in_mem_gcr(ui p)
 }
 
 
-static int banksize(int bcr_reg)
+static unsigned long banksize(const unsigned int bcr_reg)
 {
-  int csr;
-  int size;
+  unsigned int csr;
+  unsigned long size;
   csr = in_mem_mcr(bcr_reg);
   if ((csr & MC_BCR_M_BANK_ENABLE) == 0) return(0);
   size = ((csr & MC_BCR_M_BANK_SIZE) >> MC_BCR_V_BANK_SIZE);
   if (size == 8) {
 	  size = 2048;
   } else {
-	  size = (1 << (7 - size)) * 8;
+	  // size = (1 << (7 - size)) * 8;
+    size = 1024 >> size;
   }
-  return(size*1024*1024);
+  return(size * 1024 * 1024);
 }
 
 void memdetect(void)

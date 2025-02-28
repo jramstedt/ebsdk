@@ -156,7 +156,7 @@ void* memchr(const void* ptr, int ch, size_t count)
 	return NULL;
 }
 
-size_t strlen(char *s)
+size_t strlen(const char *s)
 {
   size_t len;
   len = 0;

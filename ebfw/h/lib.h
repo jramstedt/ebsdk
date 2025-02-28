@@ -2,7 +2,7 @@
 #define __LIB_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -321,6 +321,7 @@ your own risk.
 
 #include <stddef.h>
 #include <stdarg.h>
+#include <stdint.h>
 
 #undef TRUE
 #define TRUE 1
@@ -660,7 +661,7 @@ extern char * fdr(char * DriveString);
 mflash.c
 ::::::::::::::*/
 #ifdef NEEDFLASHMEMORY
-extern int flash_main(ui ImageAddress, int DestinationOffset, ui UserSpecifiedSize);
+extern int flash_main(uintptr_t ImageAddress, int DestinationOffset, ui UserSpecifiedSize);
 #endif
 
 /*::::::::::::::
@@ -705,7 +706,7 @@ extern int mt( int argc, char *argv[] );
 /*::::::::::::::
 memtest.c
 ::::::::::::::*/
-extern void memtest( ul min, ul max, int inc, int iterations, State_t McheckState, int drivers);
+extern void memtest( ul min, ul max, ui inc, ui iterations, State_t McheckState, int drivers);
 
 
 
@@ -852,7 +853,7 @@ extern long int atol(const char *nptr);
 /*::::::::::::::
 string.c
 ::::::::::::::*/
-extern size_t strlen(char * s);
+extern size_t strlen(const char * s);
 extern void bzero(char * s , int count);
 extern int memcmp(const void * pcs , const void * pct , size_t n);
 extern void * memset(void * ps , int c , size_t n);

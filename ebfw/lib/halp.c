@@ -46,7 +46,7 @@ WRITE_PORT_UCHAR (
                        IN UCHAR Value
                        )
 {
-    outportb( (ui)AddressP, (ui)Value);
+    outportb( (ui)(uintptr_t)AddressP, (ui)Value);
 }
 
 
@@ -57,7 +57,7 @@ WRITE_REGISTER_UCHAR (
                       IN UCHAR Data
                       )
 {
-ULONG Address = (ULONG)AddressP;
+    uintptr_t Address = (uintptr_t)AddressP;
 
    if (((Address >> 28) & 0xE) == 0xA) {  // Is it spare space?
        Address &= ~(0xA << 28);
@@ -73,7 +73,7 @@ READ_REGISTER_UCHAR (
                       IN PUCHAR AddressP
                       )
 {
-ULONG Address = (ULONG)AddressP;
+    uintptr_t Address = (uintptr_t)AddressP;
 
    if (((Address >> 28) & 0xE) == 0xA) { // Is it spare space?
        Address &= ~(0xA << 28);
@@ -91,7 +91,7 @@ WRITE_REGISTER_ULONG (
                       IN ULONG Data
                       )
 {
-ULONG Address = (ULONG)AddressP;
+    uintptr_t Address = (uintptr_t)AddressP;
 
    if (((Address >> 28) & 0xE) == 0xA) {  // Is it spare space?
        Address &= ~(0xA << 28);
@@ -107,7 +107,7 @@ READ_REGISTER_ULONG (
                       IN PULONG AddressP
                       )
 {
-ULONG Address = (ULONG)AddressP;
+    uintptr_t Address = (uintptr_t)AddressP;
 
    if (((Address >> 28) & 0xE) == 0xA) { // Is it spare space?
        Address &= ~(0xA << 28);

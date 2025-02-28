@@ -458,14 +458,14 @@ ul IOPCIClearNODEV(void)
   return FALSE;
 }
 
-void WRITE_FLASH_UCHAR(ul Offset, ub Value)
+void WRITE_FLASH_UCHAR(uintptr_t Offset, ub Value)
 {
   Value&=0xff;
   WriteIOQ(TIG_ACCESS(Offset),Value);
   mb();
 }
 
-ub READ_FLASH_UCHAR ( ul FlashOffset )
+ub READ_FLASH_UCHAR ( uintptr_t FlashOffset )
 {
   ul result;
   result = ReadIOQ(TIG_ACCESS(FlashOffset));

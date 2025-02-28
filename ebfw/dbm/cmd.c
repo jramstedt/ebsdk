@@ -1006,6 +1006,19 @@ static void cmd_deposit(void) {
   } while (scratch > 0);
 }
 
+#ifdef __GNUC__
+static void deposit_quad (unsigned long address, unsigned long value) {
+    // CALL_PAL INSQHIL Insert into longword queue at head, interlocked
+    register sl __r0 __asm__("$0");
+    register ul __r16 __asm__("$16") = address;
+    register ul __r17 __asm__("$17") = value;
+    __asm__ __volatile__ (
+      "call_pal 0x87;"
+      : "+r"(__r16), "+r"(__r17), "=r"(__r0)
+    );
+}
+#endif
+
 static void cmd_dirty_deposit(void) {
   scratch = (ul)decarg[3];
   do {
@@ -1014,14 +1027,7 @@ static void cmd_dirty_deposit(void) {
 #ifdef _WIN32
       deposit_quad(hexarg[1],(ul)hexarg[2]);
 #elif __GNUC__
-      // CALL_PAL INSQHIL Insert into longword queue at head, interlocked
-      register sl __r0 __asm__("$0");
-      register ul __r16 __asm__("$16") = hexarg[1];
-      register ul __r17 __asm__("$17") = hexarg[2];
-      __asm__ __volatile__ (
-        "call_pal 0x87;"
-        : "+r"(__r16), "+r"(__r17), "=r"(__r0)
-      );
+      deposit_quad(hexarg[1], hexarg[2]);
 #else
       asm("call_pal 0x87",hexarg[1],(ul)hexarg[2]);
 #endif
@@ -1050,7 +1056,7 @@ static void cmd_dirty_deposit(void) {
 
 static void cmd_examine(void)
 {
-  ul keepme = 0UL;
+  ul keepme = 0ul;
 
   scratch = (ul)decarg[2];
   do {
@@ -1156,13 +1162,13 @@ static void cmd_date(void)
 #ifdef NEEDFLASHMEMORY
 static void cmd_flash(void) {
   if (fixarg)
-        flash_main ((ui)(-1),
-                    (ui)((argc < 2) ? 0 : hexarg[1]),
-                    (ui)((argc < 3) ? 0 : hexarg[2]));
+        flash_main (~0ul,
+                    ((argc < 2) ? 0ul : hexarg[1]),
+                    ((argc < 3) ? 0ul : hexarg[2]));
   else  
-    flash_main ( (ui)((argc < 2) ? bootadr : hexarg[1]),
-                (ui)((argc < 3) ? -1 : hexarg[2]),
-                (ui)((argc < 4) ? 0 : hexarg[3]));
+    flash_main (((argc < 2) ? bootadr : hexarg[1]),
+                ((argc < 3) ? ~0ul : hexarg[2]),
+                ((argc < 4) ? 0ul : hexarg[3]));
 }
 
 #ifdef NEEDFLOPPY
@@ -1352,7 +1358,7 @@ static void cmd_wbcache(void) {wr_bcache(argc, hexarg[1], hexarg[2], fixarg);}
 static void cmd_read_io(void)
 {
   ui (*function)(ui p) = NULL;
-  ul mask = 0UL;
+  ul mask = 0ul;
 
   switch(fixarg) {
   case Long:
@@ -1371,7 +1377,7 @@ static void cmd_read_io(void)
     break;
 
   default:
-    break;
+    return;
   }
 
   scratch = (ul)decarg[2];
@@ -1387,7 +1393,7 @@ static void cmd_read_io(void)
 static void cmd_write_io(void)
 {
   void (*function)(ui p , ui d) = NULL;
-  ul mask = 0UL;
+  ul mask = 0ul;
 
   switch(fixarg) {
   case Long:
@@ -1406,7 +1412,7 @@ static void cmd_write_io(void)
     break;
 
   default:
-    break;
+    return;
   }
 
   scratch = (ul)decarg[3];
@@ -1419,7 +1425,7 @@ static void cmd_write_io(void)
 static void cmd_memory_read_io(void)
 {
   ui (*function)(ui p) = NULL;
-  ul mask = 0UL;
+  ul mask = 0ul;
 
   switch(fixarg) {
   case Long:
@@ -1438,7 +1444,7 @@ static void cmd_memory_read_io(void)
     break;
 
   default:
-    break;
+    return;
   }
 
   scratch = (ul)decarg[2];
@@ -1454,7 +1460,7 @@ static void cmd_memory_read_io(void)
 static void cmd_memory_write_io(void)
 {
   void (*function)(ui p , ui d) = NULL;
-  ul mask = 0UL;
+  ul mask = 0ul;
 
   switch(fixarg) {
   case Long:
@@ -1473,7 +1479,7 @@ static void cmd_memory_write_io(void)
     break;
 
   default:
-    break;
+    return;
   }
 
   scratch = (ul)decarg[3];
@@ -1498,7 +1504,7 @@ static void cmd_pcishow(void)
 static void cmd_cfgr(void)
 {
   int value = 0;
-  ul mask = 0UL;
+  ul mask = 0ul;
 
   IOPCIClearNODEV();
 
@@ -1519,7 +1525,7 @@ static void cmd_cfgr(void)
     break;
 
   default:
-    break;
+    return;
   }
 
   if (IOPCIClearNODEV())
@@ -1546,7 +1552,7 @@ static void cmd_cfgw(void)
     break;
 
   default:
-    break;
+    return;
   }
 
   if (IOPCIClearNODEV())

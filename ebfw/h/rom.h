@@ -2,7 +2,7 @@
 #define __ROM_H_LOADED
 /*****************************************************************************
 
-       Copyright © 1993, 1994 Digital Equipment Corporation,
+       Copyright ï¿½ 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved
@@ -51,13 +51,13 @@ your own risk.
 /*::::::::::::::
 rom.c
 ::::::::::::::*/
-extern int read_rom(int argc, char *arg, ul address, int compare);
+extern int read_rom(int argc, const char *const arg, uintptr_t address, int compare);
 extern void list_rom_headers(void );
 
 #ifndef DISABLE_BOOTOPTION
 extern void set_romboot(char * arg);
 #endif /* DISABLE_BOOTOPTION */
 
-extern ui romimage_size(romheader_t * rhead);
+extern size_t romimage_size(romheader_t * rhead);
 
 #endif /* __ROM_H_LOADED */

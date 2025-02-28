@@ -110,7 +110,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: malloc.c,v 1.1.1.1 1998
 #ifdef DEBUG
 #define CHECK_BLOCK	check_block
 #else
-#define CHECK_BLOCK
+#define CHECK_BLOCK(block, c) ((void)0)
 #endif
 
 int storage_initialized;
@@ -336,11 +336,13 @@ void init_storage_pool(void)
 #undef POOLST_MAX
 }
 
+__attribute__((unused))
 static void bogus_block(int error)
 {
   printf("Bogus block error: %d\n", error);
 }
 
+__attribute__((unused))
 static void dump_block(tag_t *block, int c)
 {
   if (block == NULL) {

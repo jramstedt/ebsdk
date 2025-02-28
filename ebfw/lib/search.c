@@ -137,7 +137,7 @@ int search( ul first, ul last, int size, char *valstr, int inverse )
    char *fmt[] = {"%02x\n", "%04x\n", "%08x\n", "%016lx\n"};
    ul i, addr;
    ul val, mask;
-   ul memval;
+   ul memval = 0ul;
    int keycnt = 0;
    int found = 0;
    void ParseVal( char *, ul *, ul *, int );
@@ -149,7 +149,7 @@ int search( ul first, ul last, int size, char *valstr, int inverse )
    val &= mask;
    printf( "val = %lx  mask = %lx\n", val, mask );
 
-   first &= (ul)(-1<<size);   /* ensure proper alignment */
+   first &= (~0ul) << size;   /* ensure proper alignment */
 
    i = first;
    while( i <= last ){
@@ -204,7 +204,7 @@ ParseVal( char *s, ul *val, ul *mask, int size )
    *val  = 0;
    *mask = 0xffffffffffffffff;
 
-   while( c = *s++ ){
+   while((c = *s++)){
 	   tmpval = 0;
 	   tmpmask = 0xffffffffffffffff;
 	   if( isdigit((int) c ) ) tmpval = c - '0';

@@ -163,15 +163,15 @@ Return Value:
 
 --*/
 {
-    ULONG Offset = (ULONG)FlashOffset;
+    uintptr_t Offset = (uintptr_t)FlashOffset;
 
-    if (Offset < SECTOR_1_BASE) {
+    if (Offset < SECTOR_2_BASE) {
         return 0;
-    } else if (Offset < SECTOR_2_BASE) {
-        return 1;
     } else if (Offset < SECTOR_3_BASE) {
-        return 2;
+        return 1;
     } else if (Offset < SECTOR_4_BASE) {
+        return 2;
+    } else if (Offset < SECTOR_5_BASE) {
         return 3;
     }
 
@@ -272,7 +272,7 @@ Return Value:
 --*/
 {
 
-    pWriteFlashByte((ULONG)FlashOffset, COMMAND_READ_RESET);
+    pWriteFlashByte((uintptr_t)FlashOffset, COMMAND_READ_RESET);
     return ESUCCESS;
 }
 
@@ -307,7 +307,7 @@ Return Value:
     pWriteFlashByte(COMMAND_ADDR2, COMMAND_DATA2);
     pWriteFlashByte(COMMAND_ADDR3, COMMAND_DATA3_PROGRAM);
 
-    pWriteFlashByte((ULONG)FlashOffset, Data);
+    pWriteFlashByte((uintptr_t)FlashOffset, Data);
 
     ReturnStatus = Am29LV800_CheckStatus(FlashOffset, FlashByteWrite, Data);
 
@@ -349,7 +349,7 @@ Return Value:
     pWriteFlashByte(COMMAND_ADDR3, COMMAND_DATA3);
     pWriteFlashByte(COMMAND_ADDR4, COMMAND_DATA4);
     pWriteFlashByte(COMMAND_ADDR5, COMMAND_DATA5);
-    pWriteFlashByte((ULONG)FlashOffset, COMMAND_DATA6_SECTOR_ERASE);
+    pWriteFlashByte((uintptr_t)FlashOffset, COMMAND_DATA6_SECTOR_ERASE);
 
     KeStallExecutionProcessor(80); // short stall for erase command to take
 
@@ -461,7 +461,7 @@ Notes:
 
 --*/
 {
-    ULONG Offset = (ULONG)FlashOffset;
+    uintptr_t Offset = (uintptr_t)FlashOffset;
 
     if (Offset < SECTOR_2_BASE) {
         return (PUCHAR)SECTOR_1_BASE;
@@ -473,7 +473,7 @@ Notes:
         return (PUCHAR)SECTOR_4_BASE;
     }
 
-    return (PUCHAR)(ULONG)(Offset & ~(SECTOR_5_SIZE-1));
+    return (PUCHAR)(Offset & ~(SECTOR_5_SIZE-1));
 }
 
 
@@ -506,7 +506,7 @@ Return Value:
     // Assume Read mode is on
     //
 
-    ReturnVal = pReadFlashByte((ULONG)FlashOffset);
+    ReturnVal = pReadFlashByte((uintptr_t)FlashOffset);
 
     return ReturnVal;
 }

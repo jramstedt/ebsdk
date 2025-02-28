@@ -867,7 +867,7 @@ Return Value:
   ARC_STATUS ReturnStatus;
 
   AmdFlashCommandSequence(DriverInformation.pFlashDevice->Commands->ByteProgramCommand);
-  pWriteFlashByte((ULONG)FlashOffset, Data);
+  pWriteFlashByte((uintptr_t)FlashOffset, Data);
 
   //
   // Get the status
@@ -909,7 +909,7 @@ Return Value:
   //
   // Finish the sequence...
   //
-  pWriteFlashByte((ULONG)FlashOffset, 
+  pWriteFlashByte((uintptr_t)FlashOffset, 
                   DriverInformation.pFlashDevice->SectorEraseConfirm);
 
   //
@@ -949,7 +949,7 @@ Return Value:
 --*/
 {
   PAMD_SECTOR_INFORMATION pLayout;
-  ULONG BaseOffset = 0;
+  uintptr_t BaseOffset = 0;
   int i;
 
   //
@@ -962,8 +962,8 @@ Return Value:
   // desired sector
   //
   for(i = 0; pLayout[i].Size != 0; i++) {
-    if (((ULONG)FlashOffset >= pLayout[i].Offset) &&
-        ((ULONG)FlashOffset < (pLayout[i].Offset + pLayout[i].Size))) {
+    if (((uintptr_t)FlashOffset >= pLayout[i].Offset) &&
+        ((uintptr_t)FlashOffset < (pLayout[i].Offset + pLayout[i].Size))) {
       //
       // FlashOffset falls in the current sector, set BaseOffset
       //
@@ -996,7 +996,7 @@ Return Value:
 
 --*/
 {
-  return pReadFlashByte((ULONG)FlashOffset);
+  return pReadFlashByte((uintptr_t)FlashOffset);
 }
 
 BOOLEAN
@@ -1063,8 +1063,8 @@ Return Value:
   // desired sector
   //
   for(i = 0; pLayout[i].Size != 0; i++) {
-    if (((ULONG)FlashOffset >= pLayout[i].Offset) &&
-        ((ULONG)FlashOffset < (pLayout[i].Offset + pLayout[i].Size))) {
+    if (((uintptr_t)FlashOffset >= pLayout[i].Offset) &&
+        ((uintptr_t)FlashOffset < (pLayout[i].Offset + pLayout[i].Size))) {
       //
       // FlashOffset falls in the current sector, remember the size
       //

@@ -162,23 +162,23 @@ void ParseLogout(LogoutFrame_t *Frame)
 
   value = *(ul *) ((long) Frame + LAF_Q_ICPERR);
 
-  if (value & (1UL<<ICPERR_V_DPE))
+  if (value & (1ul<<ICPERR_V_DPE))
     printf("ICache Data Parity Error\n");
 
-  if (value & (1UL<<ICPERR_V_TPE))
+  if (value & (1ul<<ICPERR_V_TPE))
     printf("ICache Tag Parity Error\n");
 
-  if (value & (1UL<<ICPERR_V_TMR))
+  if (value & (1ul<<ICPERR_V_TMR))
     printf("ICache Timeout Error\n");
 
 
   value  = *(ul *) ((long) Frame + LAF_Q_DCPERR);
 
-  if (value & (1UL<<DCPERR_V_LOCK)) {
-    if (value & ((1UL<<DCPERR_V_DP0)|(1<<DCPERR_V_DP1)))
+  if (value & (1ul<<DCPERR_V_LOCK)) {
+    if (value & ((1ul<<DCPERR_V_DP0)|(1ul<<DCPERR_V_DP1)))
       printf("DCache Data Parity Error\n");
 
-    if (value & ((1UL<<DCPERR_V_TP0)|(1<<DCPERR_V_TP1)))
+    if (value & ((1ul<<DCPERR_V_TP0)|(1ul<<DCPERR_V_TP1)))
 	printf("DCache Tag Parity Error\n");
   }
 
@@ -197,53 +197,53 @@ void ParseLogout(LogoutFrame_t *Frame)
 
   value = *(ul *) ((long) Frame + LAF_Q_EI_STAT);
 
-  if (value & (1UL<<EI_V_SEO_HRD_ERR))
+  if (value & (1ul<<EI_V_SEO_HRD_ERR))
     printf("Second EI hard error\n");
 
-  if (value & (1UL<<EI_V_EI_PAR_ERR))
+  if (value & (1ul<<EI_V_EI_PAR_ERR))
     printf("EI command/address parity error\n");
 
-  if (value & (1UL<<EI_V_UNC_ECC_ERR))
+  if (value & (1ul<<EI_V_UNC_ECC_ERR))
     printf("Uncorrectable ECC error\n");
 
-  if (value & (1UL<<EI_V_BC_TC_PERR))
+  if (value & (1ul<<EI_V_BC_TC_PERR))
     printf("BCache tag control parity error\n");
 
-  if (value & (1UL<<EI_V_BC_TPERR))
+  if (value & (1ul<<EI_V_BC_TPERR))
     printf("BCache Tag parity error\n");
 
 
   value = *(ul *) ((long) Frame + LAF_Q_CIA_ERR);
 
-  if (value & (1UL<<pyxis_err_v_err_valid)) {
-    if (value & (1UL<<pyxis_err_v_un_corr_err))
+  if (value & (1ul<<pyxis_err_v_err_valid)) {
+    if (value & (1ul<<pyxis_err_v_un_corr_err))
       printf("Uncorrectable ECC Error\n");
 
-    if (value & (1UL<<pyxis_err_v_cpu_pe))
+    if (value & (1ul<<pyxis_err_v_cpu_pe))
       printf("SysBus Parity Error\n");
 
-    if (value & (1UL<<pyxis_err_v_mem_nem))
+    if (value & (1ul<<pyxis_err_v_mem_nem))
       printf("NonExistent Memory Error\n");
 
-    if (value & (1UL<<pyxis_err_v_pci_serr))
+    if (value & (1ul<<pyxis_err_v_pci_serr))
       printf("PCI bus system error\n");
 
-    if (value & (1UL<<pyxis_err_v_perr))
+    if (value & (1ul<<pyxis_err_v_perr))
       printf("PCI bus parity error\n");
 
-    if (value & (1UL<<pyxis_err_v_pci_addr_pe))
+    if (value & (1ul<<pyxis_err_v_pci_addr_pe))
       printf("PCI address parity error\n");
 
-    if (value & (1UL<<pyxis_err_v_rcvd_mas_abt))
+    if (value & (1ul<<pyxis_err_v_rcvd_mas_abt))
       printf("PCI Master Abort\n");
 
-    if (value & (1UL<<pyxis_err_v_rcvd_tar_abt))
+    if (value & (1ul<<pyxis_err_v_rcvd_tar_abt))
       printf("PCI Target Abort\n");
 
-    if (value & (1UL<<pyxis_err_v_pa_pte_inv))
+    if (value & (1ul<<pyxis_err_v_pa_pte_inv))
       printf("Invalid scatter-gather PTE\n");
 
-    if (value & (1UL<<pyxis_err_v_ioa_timeout))
+    if (value & (1ul<<pyxis_err_v_ioa_timeout))
       printf("I/O Timeout\n");
   }
   printf("\n");
@@ -257,14 +257,14 @@ void SetMcheckSystem(State_t state)
   case StateOn:
   case StateCPU:
     wr_bcache(3,
-	      cServe(0, 0, CSERVE_K_RD_BCCTL) & ~0x8010UL,
+	      cServe(0, 0, CSERVE_K_RD_BCCTL) & ~0x8010ul,
 	      cServe(0, 0, CSERVE_K_RD_BCCFG),
 	      0);
     break;
 
   case StateOff:
     wr_bcache(3,
-	      cServe(0, 0, CSERVE_K_RD_BCCTL) | 0x8010UL,
+	      cServe(0, 0, CSERVE_K_RD_BCCTL) | 0x8010ul,
 	      cServe(0, 0, CSERVE_K_RD_BCCFG),
 	      0);
     break;

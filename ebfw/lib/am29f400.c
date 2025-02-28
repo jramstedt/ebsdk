@@ -172,15 +172,15 @@ Return Value:
 
 --*/
 {
-    ULONG Offset = (ULONG)FlashOffset;
+    uintptr_t Offset = (uintptr_t)FlashOffset;
 
-    if (Offset < SECTOR_1_BASE) {
+    if (Offset < SECTOR_2_BASE) {
         return 0;
-    }  else if (Offset < SECTOR_2_BASE) {
-        return 1;
     }  else if (Offset < SECTOR_3_BASE) {
-        return 2;
+        return 1;
     }  else if (Offset < SECTOR_4_BASE) {
+        return 2;
+    }  else if (Offset < SECTOR_5_BASE) {
         return 3;
     }  else {
 

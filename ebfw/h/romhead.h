@@ -318,7 +318,7 @@ your own risk.
 
 #include "local.h"       /* Include environment specific definitions */
 
-#define ROM_H_SIGNATURE 0x5A5AC3C3U
+#define ROM_H_SIGNATURE 0x5A5AC3C3u
 #define ROM_H_REVISION  2
 #define DEFAULT_ROM_H_REVISION 2
 #define ROM_H_BRANCH_SIGNATURE 0xc3e00000
@@ -471,11 +471,11 @@ typedef union {
 
 typedef struct fw_id {
   int firmware_id;
-  char **id_string;
+  const char **id_string;
   ui default_fw_offset;
 } fw_id_t;
 
-extern fw_id_t fwid_array[];
+extern const fw_id_t fwid_array[];
 
 #define FW_OSTYPE_DBM 0
 #define FW_OSTYPE_WNT 1
@@ -500,10 +500,10 @@ extern fw_id_t fwid_array[];
 typedef struct os_types {
   int ostype;
   int firmware_id;
-  char **id_string;
+  const char **id_string;
 } ostype_t;
 
-extern ostype_t ostype_array[];
+extern const ostype_t ostype_array[];
 
 /*
  * The ROM header checksum should always be assigned to the last
@@ -537,14 +537,14 @@ extern ostype_t ostype_array[];
 /*
  * romheader.c prototypes
  */
-extern fw_id_t * fwid_match_i(int fwid);
-extern ostype_t * ostype_match(char * arg);
-extern ostype_t * ostype_match_i(int ostype);
-extern void ostype_dump(char * pre);
-extern ui compute_romh_chksum(romheader_t * header);
-extern int dumpHeader(romheader_t * header);
-extern int HasRomSignature (romheader_t *RomImageHeader);
-extern fw_id_t * fwid_match(char * arg);
-extern void fwid_dump(char * pre);
-extern int IsHeaderValid (romheader_t *RomImageHeader);
+extern const fw_id_t * fwid_match_i(int fwid);
+extern const ostype_t * ostype_match(const char *const arg);
+extern const ostype_t * ostype_match_i(int ostype);
+extern void ostype_dump(const char *const pre);
+extern ui compute_romh_chksum(const romheader_t *const header);
+extern int dumpHeader(const romheader_t *const header);
+extern int HasRomSignature (const romheader_t *const RomImageHeader);
+extern const fw_id_t * fwid_match(const char *const arg);
+extern void fwid_dump(const char *const pre);
+extern int IsHeaderValid (const romheader_t *const RomImageHeader);
 #endif /* __ROMHEAD_H_LOADED */

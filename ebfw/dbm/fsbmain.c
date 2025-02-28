@@ -131,7 +131,7 @@ BOOLEAN IsMousePresent( int PortBase ){ return 0;}
 int main(int argc, char *argv[])
 {
   romheader_t * RomImageHeader;
-  volatile ul destaddr;
+  volatile uintptr_t destaddr;
 
   /* Initialize calls to malloc. */
   storage_initialized = FALSE;
@@ -161,7 +161,7 @@ int main(int argc, char *argv[])
   console_port_init(); 
 #endif
 
-  if (fsboot(&destaddr)) {
+  if (fsboot((ul *)&destaddr)) {
     RomImageHeader = (romheader_t *) destaddr;
     if ((RomImageHeader->romh.V0.signature == ROM_H_SIGNATURE) &&
 	(RomImageHeader->romh.V0.csignature == (ui) ~ROM_H_SIGNATURE)) {

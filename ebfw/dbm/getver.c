@@ -67,9 +67,9 @@ __attribute__((unused)) static const char *rcsid = "$Id: getver.c,v 1.1.1.1 1998
 
 extern char compile_date[], compile_time[], dbm_version[];
 
-char *FirmwareVersion = dbm_version;
-char *FirmwareBuildDate = compile_date;
-char *FirmwareBuildTime = compile_time;
+const char *const FirmwareVersion = dbm_version;
+const char *const FirmwareBuildDate = compile_date;
+const char *const FirmwareBuildTime = compile_time;
 
 int main ()
 {
@@ -77,8 +77,8 @@ int main ()
     char BuildTimeStamp[13];
     char Colon;
     char MonthString[5];
-    char *MonthName[] =  {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                          "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
+    const char *const MonthName[12] =  {"Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
     int MonthNumber;
     int Day;
     int Year;
@@ -113,9 +113,7 @@ int main ()
        &Colon,
        &Minute);
 
-    for (MonthNumber = 0;
-     MonthNumber < sizeof(MonthName)/sizeof(MonthName[0]);
-     MonthNumber++) {
+    for (MonthNumber = 0; MonthNumber < 12; ++MonthNumber) {
         if (strcmp(MonthString,MonthName[MonthNumber]) == 0) {
             MonthNumber++;
             break;
@@ -134,7 +132,7 @@ int main ()
     /*
     // print the info
     */
-    printf("%02.2d%02.2d%02.2d%02.2d%02.2d%02.2d%02.2d%02.2d\n", 
+    printf("%2.2d%2.2d%2.2d%2.2d%2.2d%2.2d%2.2d%2.2d\n", 
            MajorVersion, 
            MinorVersion, 
            0,

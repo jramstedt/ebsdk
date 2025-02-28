@@ -345,7 +345,7 @@ DiskHasChanged (
 #endif
 
 static void fdawait(void);
-static void setdma(char *buf, int type);
+static void setdma(const char *const buf, int type);
 
 
 
@@ -645,7 +645,7 @@ CommandTerminatedSuccessfully (
      *   |CODE|CODE|END |CHCK|    |SLCT|    |    |
      *   -----------------------------------------
      */
-    if ((Result[0] & ST0_INTERRUPT_CODE) != IC_NORMAL_TERMINATION) {
+    if (ByteCount == 0 || (Result[0] & ST0_INTERRUPT_CODE) != IC_NORMAL_TERMINATION) {
         return FALSE;
     }
     return TRUE;
@@ -1441,7 +1441,7 @@ static void fdawait(void)
 #define DMAMASK03 0x0A
 #define DMAMASK47 0xD4
 
-static void setdma(char *buf, int type)
+static void setdma(const char *const buf, int type)
 {
   
   /* control */
@@ -1459,10 +1459,10 @@ static void setdma(char *buf, int type)
 
   /* target address */
   outportb(DMACBP, 0x00);
-  outportb(DMAOFFS, (int)buf >>  0);
-  outportb(DMAOFFS, (int)buf >>  8);
-  outportb(DMALPAG, (int)buf >> 16);
-  outportb(DMAHPAG, (int)buf >> 24);
+  outportb(DMAOFFS, (uintptr_t)buf >>  0);
+  outportb(DMAOFFS, (uintptr_t)buf >>  8);
+  outportb(DMALPAG, (uintptr_t)buf >> 16);
+  outportb(DMAHPAG, (uintptr_t)buf >> 24);
   /* count */
   outportb(DMACBP, 0x00);
   outportb(DMACNT, (512-1) >>  0);	

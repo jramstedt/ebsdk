@@ -492,7 +492,7 @@ void ChangeMem(int size, ul place)
 {
   int gc_argc;
 
-  place &= ~0UL << size;  /* align pointer */
+  place &= ~0ul << size;  /* align pointer */
 
   while (TRUE) {
     PrintPlace(size, place);
@@ -512,7 +512,7 @@ void ChangeMem(int size, ul place)
 
 void FillMem(ul first, ul last, ui value)
 {
-  first &= ~0UL << 2;		/* longword align pointer */
+  first &= ~0ul << 2;		/* longword align pointer */
   while (first <= last) {
     WriteL ( first, value);
     first += sizeof(ui);
@@ -626,15 +626,15 @@ void jToPal(ul destaddr)
 #endif /* __EMULATE_FLOATING_POINT */
 }
 
-int get_bootadr(void)
+uintptr_t get_bootadr(void)
 {
-  ui val=0,x, v;
-  
-  for (x=0;x<4;x++) {
+  uintptr_t bootadr = 0ul;
+  ui x, v;
+  for (x = 0; x < 4; ++x) {
     BBRAM_READ(BBRAM_BOOTADR + x, v);
-    val |= v << (x * 8);
+    bootadr |= v << (x * 8);
   }
-  return val;
+  return bootadr;
 }
 
 char *halt_code_string(int halt_code)

@@ -168,8 +168,8 @@ static BOOLEAN MSerReset( int PortBase )
 static BOOLEAN MSerDetect( int PortBase )
 {
     char ReceiveBuffer[MSER_MAX_RESET_BUFFER];
-    int Count;
-    int i;
+    size_t Count;
+    size_t i;
 
     /* Set the baud rate for the mouse */
     UartInitLine( PortBase, MSER_BAUDRATE );

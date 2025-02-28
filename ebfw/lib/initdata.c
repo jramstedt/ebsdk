@@ -172,7 +172,7 @@ void initdata(int process)
  */
 
 #ifndef ISP_SIMULATION
-    bzero((char *)&_EDATA, (int)&_END - (int)&_EDATA);
+    bzero((char *)&_EDATA, (uintptr_t)&_END - (uintptr_t)&_EDATA);
 #endif
 #endif
   

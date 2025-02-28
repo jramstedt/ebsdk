@@ -57,18 +57,18 @@ __attribute__((unused)) static const char *rcsid = "$Id: smc.c,v 1.1.1.1 1998/12
 #include "lib.h"
 #include "smc.h"
 
-static ui SMCUltraBase;
+static uintptr_t SMCUltraBase;
 
-static ui 
-SMCConfigState(ui baseAddr)
+static uintptr_t 
+SMCConfigState(uintptr_t baseAddr)
 {
-  int devId;
-  ui configPort;
-  ui indexPort;
-  ui dataPort;
+  ui devId;
+  uintptr_t configPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   configPort = indexPort = baseAddr;
-  dataPort = (ui) ((char *) configPort + 1);
+  dataPort = (uintptr_t) ((char *) configPort + 1);
 
   outportb( configPort, CONFIG_ON_KEY );
   outportb( configPort, CONFIG_ON_KEY );
@@ -80,10 +80,10 @@ SMCConfigState(ui baseAddr)
   return (baseAddr);
 }
 
-static ui 
+static uintptr_t 
 SMCdetectUltraIO()
 {
-  ui baseAddr;
+  uintptr_t baseAddr;
 
   baseAddr = 0x3f0;
   if ((baseAddr = SMCConfigState(baseAddr)) == 0x3f0){
@@ -93,11 +93,11 @@ SMCdetectUltraIO()
   if ((baseAddr = SMCConfigState(baseAddr)) == 0x370){
     return baseAddr;
   }
-  return (ui) 0;
+  return (uintptr_t) 0;
 }
 
 static void 
-SMCrunState(ui baseAddr)
+SMCrunState(uintptr_t baseAddr)
 {
   outportb( baseAddr, CONFIG_OFF_KEY );
 }
@@ -106,13 +106,13 @@ SMCrunState(ui baseAddr)
  *
  */
 static void
-SMCEnableCOM1(ui baseAddr)
+SMCEnableCOM1(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort,  SER1);	/* select com1 */
@@ -131,13 +131,13 @@ SMCEnableCOM1(ui baseAddr)
 }
 
 static void
-SMCEnableCOM2(ui baseAddr)
+SMCEnableCOM2(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort,  SER2);	/* select com2 */
@@ -156,39 +156,39 @@ SMCEnableCOM2(ui baseAddr)
 }
 
 
-void SMCEnablePARP (ui baseAddr)
+void SMCEnablePARP (uintptr_t baseAddr)
 {
-    ui indexPort;
-    ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
-    indexPort = baseAddr;
-    dataPort = (ui)((char *)baseAddr + 1);
+  indexPort = baseAddr;
+  dataPort = (uintptr_t)((char *)baseAddr + 1);
 
-    outportb( indexPort, LOGICAL_DEVICE_NUMBER);
-    outportb( dataPort, PARP);	/* Select parallel port */
+  outportb( indexPort, LOGICAL_DEVICE_NUMBER);
+  outportb( dataPort, PARP);	/* Select parallel port */
 
-    outportb( indexPort, ADDR_LOW);
-    outportb( dataPort, (PARP_BASE & 0xFF));
+  outportb( indexPort, ADDR_LOW);
+  outportb( dataPort, (PARP_BASE & 0xFF));
 
-    outportb( indexPort, ADDR_HI);
-    outportb( dataPort, ((PARP_BASE >> 8) & 0xFF));
+  outportb( indexPort, ADDR_HI);
+  outportb( dataPort, ((PARP_BASE >> 8) & 0xFF));
 
-    outportb( indexPort, INTERRUPT_SEL);
-    outportb( dataPort, PARP_INTERRUPT);
+  outportb( indexPort, INTERRUPT_SEL);
+  outportb( dataPort, PARP_INTERRUPT);
 
-    outportb( indexPort, ACTIVATE);
-    outportb( dataPort, DEVICE_ON);
+  outportb( indexPort, ACTIVATE);
+  outportb( dataPort, DEVICE_ON);
 }
 
 #ifdef DEBUG_SMC
 static void
-SMCEnableIDE1(ui baseAddr)
+SMCEnableIDE1(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, IDE1 );	/* select IDE1 */
@@ -199,13 +199,13 @@ SMCEnableIDE1(ui baseAddr)
 #endif
 
 static void
-SMCDisableIDE(ui baseAddr, ui ide_id)
+SMCDisableIDE(uintptr_t baseAddr, uintptr_t ide_id)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, (ub) ide_id ); /* select IDEn */
@@ -215,13 +215,13 @@ SMCDisableIDE(ui baseAddr, ui ide_id)
 }
 
 static void
-SMCEnableRTC(ui baseAddr)
+SMCEnableRTC(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, RTCL );	/* select real time clock */
@@ -231,13 +231,13 @@ SMCEnableRTC(ui baseAddr)
 }
 
 static void
-SMCEnableKeyboard(ui baseAddr)
+SMCEnableKeyboard(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, KYBD );	/* select keyboard/mouse */
@@ -253,15 +253,15 @@ SMCEnableKeyboard(ui baseAddr)
 }
 
 static void
-SMCEnableFDC(ui baseAddr)
+SMCEnableFDC(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
 
-  ui oldValue;
+  uintptr_t oldValue;
 
   indexPort = baseAddr;
-  dataPort = (ui) ((char *) baseAddr + 1);
+  dataPort = (uintptr_t) ((char *) baseAddr + 1);
 
   outportb( indexPort, LOGICAL_DEVICE_NUMBER );
   outportb( dataPort, FDC );	/* select floppy controller */
@@ -284,10 +284,10 @@ SMCEnableFDC(ui baseAddr)
 
 #ifdef DEBUG_SMC
 void
-SMCReportDeviceStatus(ui baseAddr)
+SMCReportDeviceStatus(uintptr_t baseAddr)
 {
-  ui indexPort;
-  ui dataPort;
+  uintptr_t indexPort;
+  uintptr_t dataPort;
   ui currentControl;
   ui fer;
 

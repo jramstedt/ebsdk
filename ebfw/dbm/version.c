@@ -105,6 +105,6 @@ __attribute__((unused)) static const char *rcsid = "$Id: version.c,v 1.2 1999/01
  */
 
 
-char compile_date[] =  __DATE__;
-char compile_time[] =  __TIME__;
-char dbm_version[] = "3.2.0";
+const char compile_date[] =  __DATE__;
+const char compile_time[] =  __TIME__;
+const char dbm_version[] = "3.2.0";

@@ -91,9 +91,9 @@ double strtod(const char *str, char **ptr)
       /* Return pointer to terminating character
        */
       if (ptr != NULL) *ptr = (char *)scanptr;
-
-      /* Return converted string
-       */
-      return(atof(str));
     }
+
+    /* Return converted string
+    */
+    return(atof(str));
 }

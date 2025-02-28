@@ -1058,7 +1058,7 @@ short int kbreak(address_value address)
 	
 	s = bptinsert(address, savedinst);
 	
-	if (s!=SUCCESS) PRTRACE2("Duplicate breakpoint %#010x\n", address);
+	if (s!=SUCCESS) { PRTRACE2("Duplicate breakpoint %#010x\n", address); }
 	return REPLY_OK;
     }
     else {
@@ -1232,6 +1232,10 @@ void printReg(ul * reg_file, int group)
   case GPREGGROUP:
     puts("\nGeneral Purpose Registers\n");
     str = "r";
+    break;
+  default:
+    puts("\nUnknown Register Group\n");
+    return;
   }
 
   /* reg_file overrides the default location */

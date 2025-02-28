@@ -56,7 +56,7 @@ __attribute__((unused)) static const char *rcsid = "$Id: int.c,v 1.1.1.1 1998/12
 
 void intr_enable(int int_level)
 {
-   int INT1mask, INT2mask;
+   unsigned int INT1mask, INT2mask;
 
    INT1mask = inportb( INT1_MASK );
    INT2mask = inportb( INT2_MASK );
@@ -69,6 +69,7 @@ void intr_enable(int int_level)
   case 10:
   case 9:
      INT2mask &= ~(1<<(int_level-8));
+     /* fallthrough */
    case 7:
    case 6:
    case 5:

@@ -71,8 +71,8 @@ Purpose: Firmware/HAL driver for AMD Am29F040 512kB flash device.
     PUCHAR PrefixAddress1;                                                     \
     PUCHAR PrefixAddress2;                                                     \
     PrefixAddress1 = PrefixAddress2 = Am29F040_BlockAlign(address);            \
-    PrefixAddress1 = (PUCHAR)((ULONG)PrefixAddress1 + COMMAND_PREFIX_OFFSET1); \
-    PrefixAddress2 = (PUCHAR)((ULONG)PrefixAddress2 + COMMAND_PREFIX_OFFSET2); \
+    PrefixAddress1 = (PUCHAR)((uintptr_t)PrefixAddress1 + COMMAND_PREFIX_OFFSET1); \
+    PrefixAddress2 = (PUCHAR)((uintptr_t)PrefixAddress2 + COMMAND_PREFIX_OFFSET2); \
     WRITE_CONFIG_RAM_DATA(PrefixAddress1, COMMAND_PREFIX_COMMAND1);            \
     HalpMb();                                                                  \
     WRITE_CONFIG_RAM_DATA(PrefixAddress2, COMMAND_PREFIX_COMMAND2);            \
@@ -80,10 +80,10 @@ Purpose: Firmware/HAL driver for AMD Am29F040 512kB flash device.
     }
 
 #define COMMAND_ADDRESS(address) \
-    ((PUCHAR)(((ULONG)(BLOCK_ALIGN(address)) + (COMMAND_OFFSET))))
+    ((PUCHAR)(((uintptr_t)(BLOCK_ALIGN(address)) + (COMMAND_OFFSET))))
 
 #define BLOCK_ALIGN(address) \
-    ((PUCHAR)((ULONG)(address) & ~(BLOCK_SIZE-1)))
+    ((PUCHAR)((uintptr_t)(address) & ~(BLOCK_SIZE-1)))
 
 //
 // Local function prototypes
@@ -198,7 +198,7 @@ Am29F040_Initialize(
     WRITE_CONFIG_RAM_DATA(COMMAND_ADDRESS(NvRamPtr), ID_REQUEST);
 
     ManufacturerID = READ_CONFIG_RAM_DATA(NvRamPtr);
-    DeviceID = READ_CONFIG_RAM_DATA((PUCHAR)((ULONG)NvRamPtr + 1));
+    DeviceID = READ_CONFIG_RAM_DATA((PUCHAR)((uintptr_t)NvRamPtr + 1));
 
     if ((ManufacturerID == MANUFACTURER_ID) && 
         (DeviceID == Am29F040_DEVICE_ID)) {
@@ -226,7 +226,7 @@ Am29F080_Initialize(
     WRITE_CONFIG_RAM_DATA(COMMAND_ADDRESS(NvRamPtr), ID_REQUEST);
 
     ManufacturerID = READ_CONFIG_RAM_DATA(NvRamPtr);
-    DeviceID = READ_CONFIG_RAM_DATA((PUCHAR)((ULONG)NvRamPtr + 1));
+    DeviceID = READ_CONFIG_RAM_DATA((PUCHAR)((uintptr_t)NvRamPtr + 1));
 
     if ((ManufacturerID == MANUFACTURER_ID) && 
         (DeviceID == Am29F080_DEVICE_ID)) {

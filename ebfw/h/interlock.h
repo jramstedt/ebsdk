@@ -48,7 +48,7 @@ your own risk.
 
 #elif __GNUC__
 
-#define INLINE static
+#define INLINE inline static
 #define ASM __asm__ 
 
 #else /* unix */
@@ -104,7 +104,7 @@ INLINE int atomic_inc(int source, volatile int *dest)
 #if !defined(_WIN32) && !defined(__GNUC__)
 #pragma inline (test_set_low)
 #endif
-static int test_set_low(volatile long *dest)
+INLINE int test_set_low(volatile long *dest)
 {
     long temp = 0, ret = -1;
     ASM ("mb;");
@@ -142,7 +142,7 @@ static int test_set_low(volatile long *dest)
 #if !defined(_WIN32) && !defined(__GNUC__)
 #pragma inline (write_atomic)
 #endif
-static long write_atomic(long *dest, long source)
+INLINE long write_atomic(long *dest, long source)
 {
 //    printf("write_atomic start %d %p %ld %ld\n",gh_task.pid,dest,*dest,source);
     ASM ("mb;");

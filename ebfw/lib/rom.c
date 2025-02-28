@@ -228,16 +228,16 @@ static int high_region;
  *  Scan ROM for Special ROM header...
  */
 
-int read_rom(int argcount, char *arg, ul address, int compare)
+int read_rom(int argcount, const char *const arg, uintptr_t address, int compare)
 {
-  ostype_t *ostype_ptr;
-  fw_id_t *fwid_ptr;
+  const ostype_t *ostype_ptr;
+  const fw_id_t *fwid_ptr;
   int ostype, image;
-  int loaded, Matches;
-  ul destination;
+  int loaded, Matches = FALSE;
+  uintptr_t destination;
   ul found_header;
   ui checksum;
-  romheader_t *header;
+  const romheader_t *header;
 
   loaded = FALSE;
   found_header= FALSE;
@@ -258,7 +258,7 @@ int read_rom(int argcount, char *arg, ul address, int compare)
   ostype = 0x81;      /* Default case.  Just load first image */
   ostype_ptr = NULL;
   destination = address;
-  header = (romheader_t *)destination;
+  header = (const romheader_t *)destination;
 
   if ((*arg == '\0') && compare) {  /* Default case for compare:  Use type from source. */
       if (IsHeaderValid(header) && (ROMH_VERSION(header) > 0)) {
@@ -321,14 +321,13 @@ int read_rom(int argcount, char *arg, ul address, int compare)
   }
 
   if (found_header && !compare)
-    {
+  {
       dumpHeader(&head);
       if (argcount>2)
 	destination = address;
-      else {
-	destination = (ul) (head.romh.V0.destination.high << 32)
-	  | (ul) head.romh.V0.destination.low;
-      }
+      else
+	destination = ((ul)head.romh.V0.destination.high << 32) | (ul)head.romh.V0.destination.low;
+
       checksum = load_rom(destination, (src+head.romh.V0.size*ROMINC), head.romh.V0.decomp);
 
       if (ROMH_VERSION(&head) != 0) { /* Check checksums only if > V0 */
@@ -677,10 +676,10 @@ static int CompareToRom (ul source, ul rommax)
  * It includes the size of the header.
  * A standard header is expected at location specified by rhead. 
  */
-ui romimage_size(romheader_t * rhead)
+size_t romimage_size(romheader_t * rhead)
 {
    char c;
-   int i ;
+   size_t i;
    char * img_src = (char * ) rhead;
    
    if (rhead->romh.V0.decomp == 0) 	/* If the image is not compressed, */

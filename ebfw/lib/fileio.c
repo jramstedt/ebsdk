@@ -254,7 +254,7 @@ fopen (
  *      stream:  File pointer to opened file.
  *
  *  RETURNS
- * 	The character read or EOF if at the end of file.
+ *      The character read or EOF if at the end of file.
  *
  *  AUTHOR
  *      Peter J. Bell, Digital Equipment Corporation, 5/29/97
@@ -262,15 +262,15 @@ fopen (
 int fgetc( FILE * stream )
 {
     if( stream->BufferIndex < stream->BufferEnd )
-	return( stream->Buffer[stream->BufferIndex++] );
+        return( stream->Buffer[stream->BufferIndex++] );
     else
     {
         ub Buffer[2];
 
-	if( LogicalDrives[stream->DriveNumber].ReadData( stream, Buffer, 1 ) )
-	    return( Buffer[0] );
-	else
-	    return( EOF );
+        if( LogicalDrives[stream->DriveNumber].ReadData( stream, Buffer, 1 ) )
+            return( Buffer[0] );
+        else
+            return( EOF );
     }
 }
 
@@ -285,20 +285,22 @@ int fgetc( FILE * stream )
  *      stream:  File pointer to opened file.
  *
  *  RETURNS
- * 	The character read or EOF if it could not be returned.
+ *      The character read or EOF if it could not be returned.
  *
  *  AUTHOR
  *      Peter J. Bell, Digital Equipment Corporation, 5/29/97
  */
 int fungetc( int c, FILE * stream )
 {
-    if( stream->BufferIndex > -4 )
+    if (c == EOF) return (EOF);
+
+    if( stream->BufferIndex > -4u )
     {
-	stream->Buffer[--stream->BufferIndex] = c;
-	return( c );
+        stream->Buffer[--stream->BufferIndex] = c;
+        return( c );
     }
     else
-	return( EOF );
+        return( EOF );
 }
 
 
@@ -309,7 +311,7 @@ int fungetc( int c, FILE * stream )
  *      This function implents the standard C fread() function.
  *
  *  FORM OF CALL
- * 	fread(ptr, size, nobj, stream);
+ *      fread(ptr, size, nobj, stream);
  * 
  *  INPUTS
  *      ptr:    Pointer to area where data will be read to.
@@ -369,19 +371,19 @@ int fputc( int c, FILE * stream )
 {
     if( stream->BufferIndex < (stream->BufferSize-1) )
     {
-	stream->Buffer[stream->BufferIndex++] = c;
-	return( c );
+        stream->Buffer[stream->BufferIndex++] = c;
+        return( c );
     }
     else
     {
         ub Buffer[2];
 
-	Buffer[0] = c;
-	Buffer[1] = 0;
-	if( LogicalDrives[stream->DriveNumber].WriteData(stream, Buffer, 1 ) != 1 )
-	    return( EOF );
-	else
-	    return( c );
+        Buffer[0] = c;
+        Buffer[1] = 0;
+        if( LogicalDrives[stream->DriveNumber].WriteData(stream, Buffer, 1 ) != 1 )
+            return( EOF );
+        else
+            return( c );
     }
 }
 
