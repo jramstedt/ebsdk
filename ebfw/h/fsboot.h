@@ -2,7 +2,7 @@
 #define __FSBOOT_H_LOADED
 /*****************************************************************************
 
-       Copyright � 1993, 1994 Digital Equipment Corporation,
+       Copyright © 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved

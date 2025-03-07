@@ -2,7 +2,7 @@
 #define __EB164_H_LOADED
 /*****************************************************************************
 
-Copyright � 1993, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright © 1993, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 

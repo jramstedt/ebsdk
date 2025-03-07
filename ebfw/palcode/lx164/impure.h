@@ -6,7 +6,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright � 1994							    *
+**  Copyright © 1994							    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *

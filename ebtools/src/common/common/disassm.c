@@ -3,7 +3,7 @@ __attribute__((unused)) static const char *RCSid = "$Id: disassm.c,v 1.1.1.1 199
 #endif
 /*****************************************************************************
 
-       Copyright � 1993, 1994 Digital Equipment Corporation,
+       Copyright © 1993, 1994 Digital Equipment Corporation,
                        Maynard, Massachusetts.
 
                         All Rights Reserved

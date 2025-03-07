@@ -1,6 +1,6 @@
 /*****************************************************************************
 
-Copyright � 1994, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright © 1994, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 

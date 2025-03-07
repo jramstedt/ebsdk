@@ -2,7 +2,7 @@
 #define __ARCCODES_H_LOADED
 /*****************************************************************************
 
-Copyright � 1995, Digital Equipment Corporation, Maynard, Massachusetts. 
+Copyright © 1995, Digital Equipment Corporation, Maynard, Massachusetts. 
 
                         All Rights Reserved
 

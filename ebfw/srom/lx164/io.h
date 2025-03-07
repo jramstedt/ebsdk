@@ -3,7 +3,7 @@
 /*
 *****************************************************************************
 **                                                                          *
-**  Copyright � 1993							    *
+**  Copyright © 1993							    *
 **  by Digital Equipment Corporation, Maynard, Massachusetts.		    *
 **                                                                          *
 **  All Rights Reserved							    *
