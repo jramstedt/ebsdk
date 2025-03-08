@@ -1,3 +1,11 @@
 # Testing new Debug Monitor in old Debug Monitor
 AlphaPC164LX> flload lx164sft.img 900000
 AlphaPC164LX> go
+
+# Starting Debug Monitor on AlphaPC 164LX
+1. Copy lx164dbm.rom (in ebboot/lx164/) to floppy
+2. Enable fail-safe booter: Set CF7 on J27 (System Configuration Jumpers)
+3. Power on
+4. After 1-2-3 beeps loading starts
+
+You can use standard ISA POST Code diagnostic card to see boot codes
