@@ -1,0 +1,18 @@
+for i in a b c d e f g 
+do
+    if (ls ew"$i"0 > nl) then
+	echo Test device ew"$i"0
+	set netdev `show dev | grep ew"$i"0|cat -l 4`
+	net -sa "$netdev" >ndbr/lp_nodes_"$netdev"
+	set "$netdev"_loop_count  2 2>nl
+	set "$netdev"_loop_inc    1 2>nl
+	set "$netdev"_loop_patt   ffffffff 2>nl
+	set "$netdev"_loop_size   10 2>nl
+	set "$netdev"_lp_msg_node 1 2>nl
+	#set network mode to external loopback; mode=0=normal live net
+	net -cm ex "$netdev"
+	nettest "$netdev" -sv 3 -mode nc -p 0 -w 1 &
+    else
+	exit
+    fi
+done		

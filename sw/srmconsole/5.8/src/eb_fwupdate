@@ -1,0 +1,8 @@
+echo "Loading Firmware Update Utility ..."
+if (cat fat:fwupdate.exe/dva0 > pmem:900000 2>nl) then
+	echo "Executing Firmware Update Utility"
+	stop -drivers
+	jtopal 900000
+fi
+echo "Firmware Update Utility not found."
+nt 

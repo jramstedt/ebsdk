@@ -1,0 +1,2 @@
+echo "Non-destructive Test of the Floppy started"
+exer -a '?r-Rc' dva0 -p 0 -d1 0 -m -l 240&
