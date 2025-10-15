@@ -23,7 +23,7 @@ your own risk.
 
 ******************************************************************************/
 
-#define RCSID "$Id: srom.s,v 1.1.1.1 1998/12/29 21:36:12 paradis Exp $"
+#define RCSID "$Id: srom.s,v 3.3 2025/10/11 16:23:38 jramstedt Exp $"
 
 /*
  * --------------------------------------------------------------------
@@ -68,6 +68,12 @@ your own risk.
  *		 Digital Equipment Corporation
  *
  * $Log: srom.s,v $
+ * Revision 3.3  2025/10/11 16:23:38  jramstedt
+ * Reset PCI on PYXIS init
+ * Added and fixed comments
+ * Changed some magic numbers to defines
+ * Added .set noat
+ *
  * Revision 1.1.1.1  1998/12/29 21:36:12  paradis
  * Initial CVS checkin
  *
@@ -286,7 +292,6 @@ your own risk.
  *
  */
 
-
 #include "dc21164.h"
 #include "io.h"
 #include "pyxis.h"
@@ -305,7 +310,7 @@ your own risk.
 #define STALL	mfpr	r31, pt0	/* 1 cycle stall.		*/
 
 
-	
+.set noat
 .align 3
 /* ======================================================================
  * 1..Initialize the CPU's Internal Processor Registers.
@@ -458,12 +463,12 @@ SetScache:
 /*
  *	Time to do a soft reset of the Pyxis chip
  */
-	LDLI(r16, 200000)		/* wait for at least 250usec	*/
+	LDLI(r16, 20000)		/* wait for at least 250usec	*/
 	bsr	r27, wait_n_cycles	/* based on a max speed of 80MHz */
 
 
 	ldah	r16, 0x4000(r14)	/* build the 87.8000.0900 address */
-	lda		r8, 0x900(r16)
+	lda		r8, MC_RESET(r16)
 	LDLI(r17, 0xDEAD)
 	stl_p	r17, 0(r8)			/* reset the Pyxis */
 	mb
@@ -477,13 +482,16 @@ SetScache:
  */
 
 	LDLI	(r17, 0xAE170027)
-	ldah    r16, 0x1000(r14)	/* r16 <- MCR ptr		*/
-	lda		r16, 0x500(r16)		/* MDR1 offset */
+	ldah    r16, 0x1000(r14)	/* r16 <- MCR ptr (87.5000.0000) */
+	lda		r16, MC_MDR1(r16)	/* MDR1 offset */
 	stl_p	r17, 0(r16)			/* set mdr1 register */
 	mb
 
+/*
+ *	Time to do a reset of the Pyxis memory clocks.
+ */
 	ldah	r16, 0x1000(r14)	/* build the 87.5000.0040 address */
-	lda		r8, 0x40(r16)
+	lda		r8, MC_MCMR(r16)
 	LDLI(r17, 0x10ff)
 	stl_p	r17, 0(r8)			/* reset Pyxis memory clocks */
 	mb
@@ -519,7 +527,7 @@ wbase_loop:
 /*
  *  Initialize the PYXIS.
  */
-#define PYXIS_CTRL_K_INIT ((1 << MC_PYXIS_CTRL_V_PCI_EN)		| \
+#define PYXIS_CTRL_K_INIT ((0 << MC_PYXIS_CTRL_V_PCI_EN)		| \
 			(0 << MC_PYXIS_CTRL_V_PCI_LOOP_EN) 	| \
 			(0 << MC_PYXIS_CTRL_V_FST_BB_EN) 		| \
 			(1 << MC_PYXIS_CTRL_V_PCI_MST_EN)		| \
@@ -536,9 +544,16 @@ wbase_loop:
 			(0 << MC_PYXIS_CTRL_V_RL_TYPE) 		| \
 			(0 << MC_PYXIS_CTRL_V_RM_TYPE)		)
 
-	lda	r16, MC_PYXIS_CTRL(r14)	/* r16 <- pointer to pyxis_ctrl	*/
-	LDLI	(r17, PYXIS_CTRL_K_INIT)   /* r17 <- pyxis_ctrl_k_init	*/
-	bsr	r26, srom_wrtest	/* write and test pyxis_ctrl	*/
+	lda	r16, MC_PYXIS_CTRL(r14)			/* r16 <- pointer to pyxis_ctrl	*/
+	LDLI	(r17, PYXIS_CTRL_K_INIT)	/* r17 <- pyxis_ctrl_k_init	*/
+	bsr	r26, srom_wrtest				/* write and test pyxis_ctrl	*/
+
+	LDLI	(r16, 20000)	/* load cycles into R16.	*/
+	bsr	r27, wait_n_cycles	/* Count for this many CPU cycles*/
+
+	lda	r16, MC_PYXIS_CTRL(r14)				/* r16 <- pointer to pyxis_ctrl	*/
+	bis	r17, MC_PYXIS_CTRL_M_PCI_EN, r17	/* release PCI reset */
+	bsr	r26, srom_wrtest					/* write and test pyxis_ctrl	*/
 
 /*
  *	Initialize the interrupt configuration, flash control, and
@@ -546,12 +561,12 @@ wbase_loop:
  */
 
 	lda	r16, MC_PYXIS_CTRL1(r14)	/* r16 <- pointer to pyxis_ctrl1	*/
-	bis		r31, MC_PYXIS_CTRL1_M_IOA_BEN, r17
+	bis	r31, MC_PYXIS_CTRL1_M_IOA_BEN, r17
 	bsr	r26, srom_wrtest	/* write and test pyxis_ctrl	*/
 
 	lda	r16, MC_FLASH_CTRL(r14)	/* r16 <- pointer to flash_ctrl	*/
 	bis	r31, r31, r17		/* r17 <- data for flash_ctrl	*/
-	bsr	r26, srom_wrtest	/* write and test pci_lat (disable flash) */
+	bsr	r26, srom_wrtest	/* write and test flash_ctrl (disable flash) */
 
 /*
  *	Route Fan and NMI to sys_mch_chk_irq, and Halt to mch_halt_irq.
@@ -566,9 +581,9 @@ wbase_loop:
 //	bsr	r26, srom_wrtest			/* write and test intr_routing register */
 
 	bsr	r26, InitSIO		/* Init SIO, ISA bus and others	*/
+
 	OutLEDPORT(0x20)
 
-	
 /*
  *  Turn on the logical devices in the SMC FDC37C93X part.  To do this, we
  *  must first put the device in its configuration state by writting
@@ -869,7 +884,7 @@ ReadConfigJumpers:
  *	400 MHz            9    4                6			6
  *	466 MHz           10    4                6			7
  *	533 MHz           12    4                7			8
- *	666 MHz           13    4                7			9
+ *	600 MHz           13    4                7			9
  *	666 MHz           15    4                8			10
  *
  *	                BC_CONFIG               BC_CONTROL
@@ -1822,7 +1837,7 @@ pd17:						//check #SDRAM device banks
     lda	r0, 2(r31)			// there 4 banks - need to set bit in match
 	sll	r0, 56, r0			// 1<<56
 	bis	r0, r18, r18		// match_data |= (1 << 56)
-	lda	r0, 1(r31)		// there are 14 rows if 4bank set
+	lda	r0, 1(r31)			// there are 14 rows if 4bank set
 	srl	r6, 1, r1			// bank = DIMM_SLOT >> 1
 	addl	r1, 16, r1		// bit pos of mask is @(16+bank)
 	sll	r0, r1, r0			// 1<<(16+bank)
@@ -2083,10 +2098,15 @@ gtr_m_lo = < -
 	<6 @ gtr_v_idle_bc_width> !-	// part of cache config code
 	<0>>
 #endif
-	LDLI	(r17, 0x332)		/* r17 <- GTR bits		*/
-	ldah    r8, 0x1000(r14)		/* r8 <- PYXIS mem csr base ptr	*/
-	lda	r16, MC_GTR(r8) 		/* r16 <- GTR ptr		*/
-	bsr	r26, srom_wrtest		/* write and test it	*/
+#define PYXIS_GTR_INIT (\
+	(2 << MC_GTR_V_MIN_RAS_PRECHARGE)	| \
+	(3 << MC_GTR_V_CAS_LATENCY) 		| \
+	(3 << MC_GTR_V_IDLE_BC_WIDTH)	)
+
+	LDLI	(r17, PYXIS_GTR_INIT)	/* r17 <- GTR bits		*/
+	ldah	r8, 0x1000(r14)			/* r8 <- PYXIS mem csr base ptr	*/
+	lda	r16, MC_GTR(r8) 			/* r16 <- GTR ptr		*/
+	bsr	r26, srom_wrtest			/* write and test it	*/
 
 	// now the rtr base
 #if 0
@@ -2096,9 +2116,14 @@ rtr_m_lo = < -
 	<0 @ rtr_v_force_ref> !-		// can't force refresh while changing val
 	<0>>
 #endif
-	LDLI	(r17, 0x750)		/* r17 <- RTR bits		*/
-	lda	r16, MC_RTR(r8) 		/* r16 <- RTR ptr		*/
-	bsr	r26, srom_wrtest		/* write and test it	*/
+#define PYXIS_RTR_INIT (\
+	(5 << MC_RTR_V_REFRESH_WIDTH)	| \
+	(14 << MC_RTR_V_REF_INTERVAL)	| \
+	(0 << MC_RTR_V_FORCE_REF)	)
+
+	LDLI	(r17, PYXIS_RTR_INIT)	/* r17 <- RTR bits		*/
+	lda	r16, MC_RTR(r8) 			/* r16 <- RTR ptr		*/
+	bsr	r26, srom_wrtest			/* write and test it	*/
 
 /*
  *	Force Refresh
@@ -2125,16 +2150,27 @@ ForceRefWait:
 
 	bis		r17, r31, r5		/* save r17 -> r5 */
 /*
- *	Setup the memory controler section based on the hardcoded values.
+ *	Setup the memory controller section based on the hardcoded values.
  *	The MCR should only set the BCACHE_ENABLE bit if the Bcache is actually
  *	turned on.  Note: It is set now, and because with the hard coded memory size
  *	and the IIC memory sizing the bcache will always be on.  This will have
  *	to change if we run with caches off.
  */
+#define PYXIS_MCR_INIT (\
+	(1 << MC_MCR_V_MODE_REQ)		| \
+	(1 << MC_MCR_V_BCACHE_ENABLE)	| \
+	(0 << MC_MCR_V_PIPELINE_CACHE)	| \
+	(1 << MC_MCR_V_OVERLAP_DISABLE) | \
+	(0 << MC_MCR_V_SEQ_TRACE)		| \
+	(0 << MC_MCR_V_CKE_AUTO)		| \
+	(0 << MC_MCR_V_DRAM_CLK_AUTO)	| \
+	(2 << MC_MCR_V_DRAM_M0DE_BL)	| \
+	(1 << MC_MCR_V_DRAM_M0DE_WT)	| \
+	(3 << MC_MCR_V_DRAM_M0DE_LM)	)
 
-	ldah    r16, 0x1000(r14)	/* r16 <- MCR ptr		*/
-	LDLI	(r17, 0x3A1401)		/* r17 <- MCR bits		*/
-	bsr	r26, srom_wrtest		/* write and test it		*/
+	ldah    r16, 0x1000(r14)		/* r16 <- MCR ptr		*/
+	LDLI	(r17, PYXIS_MCR_INIT)	/* r17 <- MCR bits		*/
+	bsr	r26, srom_wrtest			/* write and test it		*/
 
 /*
  *	Lets loop for 8 times
@@ -3673,12 +3709,12 @@ WriteSIO_UBCSB:
 	lda	r1, SIO_UTIL_BUS_B(r31)	/* SIO's Utility Bus select B.	*/
 
 WriteConf:
-	and	r1, 3, r3		/* Find out correct byte lane.	*/
-	insbl	r16, r3, r2		/* Place value in its byte lane */
-	sll	r1, BYTE_ENABLE_SHIFT, r1 /* Compose address.		*/
-	load_pci_config_base(r3)	/* Load base of PCI conf. space.*/
-	ldah	r16, (19-11)(r31)	/* SIO has device ID = 19	*/
-	bis	r3, r16, r3		/* Add it to config address.	*/
+	and	r1, 3, r3					/* Find out correct byte lane.	*/
+	insbl	r16, r3, r2				/* Place value in its byte lane */
+	sll	r1, BYTE_ENABLE_SHIFT, r1	/* Compose address.		*/
+	load_pci_config_base(r3)		/* Load base of PCI conf. space.*/
+	ldah	r16, (19-11)(r31)		/* SIO has device ID = 19	*/
+	bis	r3, r16, r3					/* Add it to config address.	*/
 	br	r31, WriteData
 
 WriteLEDS:
@@ -4704,7 +4740,6 @@ read_flash:
 	zap	r0, 0xF0, r0		/* blow off the high longword	*/	
 	addq	r17, 4, r17		/* Increment offset for next RD.*/
 					/* Fall-thru to ComputeCheckSum */
-
 
 /*=======================================================================
  * = ComputeCheckSum - Computes checksum of input longword.		=

@@ -1,6 +1,8 @@
 # Testing new Debug Monitor in old Debug Monitor
+```
 AlphaPC164LX> flload lx164sft.img 900000
 AlphaPC164LX> go
+```
 
 # Starting Debug Monitor on AlphaPC 164LX
 1. Copy lx164dbm.rom (in ebboot/lx164/) to floppy
@@ -8,4 +10,26 @@ AlphaPC164LX> go
 3. Power on
 4. After 1-2-3 beeps loading starts
 
-You can use standard ISA POST Code diagnostic card to see boot codes
+You can use standard ISA POST Code diagnostic card to see boot codes.
+
+# AlphaPC 164LX SROM
+I replaced SROM chip with reprogrammable [AT17LV256](https://www.microchip.com/en-us/product/at17lv256). It doesn't matter if the chip has more capacity than original.  
+After building ```ebfw/srom``` the produced ihex file ```ebboot/lx164/lx164_sr.hex``` can be programmed with [Atmel CPS](https://www.microchip.com/en-us/development-tool/configurator-programming-system).
+
+# AT17LV256 programming with [Atmel CPS](https://www.microchip.com/en-us/development-tool/configurator-programming-system)
+In Windows 2000 the installer fails to install ```tvichw32.dll```.  
+Running the installer .exe with ```/a``` flag allows to give temproary directory where files are extracted.  
+Copy ```tvichw32.dll``` to ```\winnt\system32```.  
+
+Following programming settings work:
+* Procedure: /E
+* Family: AT6K/Other
+* Device: AT17LV256(A) (256K)
+* Reset Polarity: High
+
+If you don't have the official [ATDH2200E CONFIGURATOR PROGRAMMING KIT](https://www.microchip.com/en-us/development-tool/atdh2200e) it is easy to build one on a breadboard using [the schematics](https://ww1.microchip.com/downloads/en/DeviceDoc/doc0642.pdf).  
+I used a 5V power supply.
+
+# 21174 PYXIS in AlphaPC 164LX
+Enabling ```MC_MCR_M_PIPELINE_CACHE``` causes ```LED_F_MEMCHECKSUM``` error.  
+Disabling ```MC_MCR_M_OVERLAP_DISABLE``` (overlap enabled) causes memory errors.  

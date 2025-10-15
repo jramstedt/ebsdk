@@ -3,13 +3,18 @@ Install cross compile tools
 apt install gcc-alpha-linux-gnu binutils-alpha-linux-gnu make bison flex
 
 # EBSDK
-Run ./configure to setup sdkmake.conf and sdkshell.conf
-sdkmake.conf is used in Makefiles
+Run ```./configure``` to setup ```sdkmake.conf``` and ```sdkshell.conf```.  
+```sdkmake.conf``` is used in Makefiles.  
+```sdkshell.conf``` sets up shell environment variables.  
+```bash
+$ source sdkshell.conf
+```
 
 ## Optional:
-In skdmake.conf change EB_MAKE to EB_MAKE=make
+In ```skdmake.conf``` and ```sdkshell.conf``` change EB_MAKE to EB_MAKE=make
 
 # Patch needed for binutils
+```
 diff -bur binutils-2.43.90.20250127/bfd/coff-alpha.c ../binutils-2.43.90.20250127/bfd/coff-alpha.c
 --- binutils-2.43.90.20250127/bfd/coff-alpha.c  2025-01-02 10:59:47.000000000 +0200
 +++ ../binutils-2.43.90.20250127/bfd/coff-alpha.c       2025-01-27 12:12:03.000000000 +0200
@@ -46,3 +51,4 @@ diff -bur binutils-2.43.90.20250127/bfd/coff-alpha.c ../binutils-2.43.90.2025012
 -                 r_size -= startbyte << 3;
                   uint64_t mask = (((uint64_t) 1 << r_size) - 1) << r_offset;
                   val = (val & ~mask) | ((stack[--tos] << r_offset) & mask);
+```
