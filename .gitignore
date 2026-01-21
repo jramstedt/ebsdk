@@ -37,3 +37,5 @@ ebtools/src/common/mini_dbg/*.sr
 ebtools/src/common/mini_dbg/*.ic
 
 ebtools/src/unix/gas/gas
+
+ebfw/obj/lx164/
