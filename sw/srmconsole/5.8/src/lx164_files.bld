@@ -328,13 +328,15 @@ encapsulate	cp$src:isacfg_de205	add_de205	 ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECU
 encapsulate	cp$src:test_eb164	test		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
 encapsulate	cp$src:memexer_eb164	memexer		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
 encapsulate	cp$src:sys_exer_eb164	sys_exer	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
-encapsulate     cp$src:floppy_write     floppy_write    ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:floppy_eb164	floppy		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
+encapsulate	cp$src:floppy_write	floppy_write	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:network_eb164	network		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
 encapsulate	cp$src:exer_read	exer_read	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
 encapsulate	cp$src:exer_write	exer_write	ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE	-script
-encapsulate	cp$src:tgax             tgax		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
-encapsulate	cp$src:show_status	show_status	ATTR$M_READ|ATTR$M_EXECUTE	-script
-encapsulate	cp$src:kill_diags_eb164 kill_diags	ATTR$M_READ|ATTR$M_EXECUTE	-script
-encapsulate     cp$src:showit           showit          ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:tgax		tgax		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
+encapsulate	cp$src:show_status	show_status	ATTR$M_READ|ATTR$M_EXECUTE		-script
+encapsulate	cp$src:kill_diags_eb164	kill_diags	ATTR$M_READ|ATTR$M_EXECUTE		-script
+encapsulate	cp$src:showit		showit		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
 encapsulate	cp$src:dqtest		dqtest		ATTR$M_READ|ATTR$M_WRITE|ATTR$M_EXECUTE -script
 #
 # When you want the symbol table driver in your image, you have to have

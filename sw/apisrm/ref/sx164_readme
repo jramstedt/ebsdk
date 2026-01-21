@@ -1,0 +1,8 @@
+#
+# Simplify the process of reading fwreadme.txt from CD or floppy.
+#
+if (show update_dev | grep dv > nl) then
+    more fat:fwreadme.txt/$update_dev
+else
+    more iso9660:[alphapc164sx]fwreadme.txt/$update_dev
+fi
